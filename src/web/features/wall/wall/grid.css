@@ -1,0 +1,144 @@
+/* Imported first by ../wall.css: page layout, the 3x3 cam grid, the featured YouTube cell, the snow table. */
+.wall-main:focus {
+  outline: none;
+}
+
+.wall {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: var(--space-4);
+  box-sizing: border-box;
+  height: 100vh;
+  padding: var(--wall-safe);
+  overflow: hidden;
+}
+
+.wall-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: 0;
+}
+
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wall-cell {
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--img-empty);
+}
+
+.wall-cell > .cam-tile {
+  height: 100%;
+}
+
+/* featured YouTube cell: the player fills the cell, its label sits under it (never over the player) */
+.wall-yt {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
+
+.wall-yt .cam-yt {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wall-yt .cam-player {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
+.wall-yt .cam-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.wall-yt .cam-yt-credit {
+  display: none; /* the label below carries the YouTube attribution */
+}
+
+.wall-yt-cap {
+  overflow: hidden;
+  padding: var(--space-1) var(--space-2);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wall-yt-cap::after {
+  content: " · YouTube";
+  color: var(--text-dim);
+}
+
+.wall-star {
+  color: var(--accent);
+}
+
+/* 3-day snow table: the band under the grid, resorts as columns */
+.wall-snow {
+  margin-top: auto;
+}
+
+.wall-snow-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.wall-snow-table caption,
+.wall-snow-table th {
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wall-snow-table caption {
+  padding-bottom: var(--space-1);
+  color: var(--text-dim);
+  text-align: left;
+}
+
+.wall-snow-table :is(th, td) {
+  overflow: hidden;
+  padding: 2px var(--space-2);
+  border-top: 1px solid var(--line);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-snow-table thead th {
+  border-top: 0;
+}
+
+.wall-snow-table th[scope="row"] {
+  width: 6em;
+  color: var(--text-dim);
+  text-align: left;
+}
+
+.wall-snow-table td {
+  color: var(--snow);
+  font: 800 var(--fs-3) / 1.1 var(--font-num);
+  font-feature-settings: var(--num-features);
+}

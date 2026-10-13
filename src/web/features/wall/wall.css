@@ -1,0 +1,166 @@
+/* TV wall (spec §8.4), tokens.css variables only. 1920x1080, always dark, [data-scale="wall"] type ladder:
+   3fr = 16:9 cam grid + the snow table in the band under it | 1fr = sidebar, all inside --wall-safe. The clock stays
+   at or below the pick name; night = the --wall-dim veil; kiosk = no cursor and no controls after 3 s idle. */
+@import "./wall/grid.css";
+
+/* sidebar: one column, footer pinned to the bottom. The 1fr column is ~460 px wide, so the hero sizes step down
+   until every resort name fits on one line; the ladder relations hold: clock <= pick name > pick number >= 64 px,
+   and no text below --fs-5 (28 px). */
+.wall-side {
+  --fs-pick-name: 80px;
+  --fs-pick-num: 72px;
+  --fs-clock: 72px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wall-side .sec-h {
+  margin-bottom: var(--space-1);
+}
+
+.wall-side .cond-wall-list {
+  gap: var(--space-1);
+}
+
+.wall-side > * {
+  flex: none;
+  margin: 0;
+}
+
+.wall-clock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+  align-items: baseline;
+}
+
+.wall-time {
+  color: var(--text);
+  font: 900 var(--fs-clock) / 0.9 var(--font-num);
+  font-feature-settings: var(--num-features);
+}
+
+.wall-date,
+.wall-foot {
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wall-date {
+  color: var(--text-dim);
+}
+
+/* PickCompact in a narrow column: one column, no score/drive, and the wall's own 2-reason list */
+.wall-pick .pick-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.wall-pick :is(.pick-stat, .pick-compact-why) {
+  display: none;
+}
+
+/* when the column runs short (a two-line resort name, long reasons) the reasons clip first, never the footer */
+.wall-side > .wall-pick {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wall-pick > .pick {
+  flex: none;
+}
+
+.wall-why {
+  display: grid;
+  flex: 0 1 auto;
+  gap: var(--space-1);
+  min-height: 0;
+  margin: var(--space-2) 0 0;
+  overflow: hidden;
+  padding: 0;
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  line-height: 1.2;
+  list-style: none;
+}
+
+.wall-why li {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.wall-why li::before {
+  content: "▸ ";
+  color: var(--accent);
+}
+
+/* avalanche badges: a smaller diamond beside the level word over the zone (the full scale is on the briefing) */
+.wall-side .cond-wall-zone {
+  --wall-scale: 1.25;
+
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 var(--space-2);
+}
+
+.wall-side .cond-wall-zone > .cond-dia {
+  grid-row: span 2;
+}
+
+.wall-side .cond-wall-zone > .cond-scale {
+  display: none;
+}
+
+.wall-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  margin-top: auto;
+  color: var(--text-dim);
+}
+
+.wall-offline,
+.wall-paused {
+  color: var(--warn-text);
+}
+
+/* fullscreen button: over the top-right corner, only while the pointer moves */
+.wall-kiosk {
+  position: absolute;
+  z-index: 6;
+  top: var(--wall-safe);
+  right: var(--wall-safe);
+  transition: opacity 0.3s;
+}
+
+/* kiosk: hide the cursor and the controls after 3 s without pointer movement */
+.wall-idle,
+.wall-idle * {
+  cursor: none;
+}
+
+.wall-idle .wall-kiosk {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* night: stakes, roads and the forecast only, under the dimming veil */
+.wall-night::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  background: var(--wall-dim);
+  pointer-events: none;
+}
