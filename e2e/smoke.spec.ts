@@ -1,6 +1,7 @@
 // Smoke suite (spec §8.10, §14): runs in every Playwright project (phone, laptop, wall, tz) against `vite preview`
 // and the local D1 seed. Every test also fails on any console error (fixtures.ts). No snapshots.
-import { expect, pinTime, seedStorage, test, testidOrder } from './fixtures.ts';
+import { expect, guardPage, pinTime, test, testidOrder } from './fixtures.ts';
+import { cell, freshPerson, planDay, removePerson, trackerApi, useIp } from './tracker-api.ts';
 
 const BRIEFING = ['header', 'pick', 'stakes', 'resorts', 'roads', 'avalanche', 'forecast', 'footer'] as const;
 const RESORT_PAGE = ['head', 'cams', 'snow', 'lifts', 'weather', 'roads', 'avalanche', 'info'] as const;
@@ -40,15 +41,20 @@ test('pick card previews the trip start with a ranked resort', async ({ page }) 
   await expect(page.getByTestId('pick-ridge')).toBeVisible();
 });
 
-// The tracker store is a placeholder until /api/tracker lands (spec §9.3): with no people, "I am" cannot name a
-// tracker person, so the [Crew | As me] toggle stays hidden and the card runs one virtual skier.
-test('without tracker people the pick stays crew-only even when "me" is stored', async ({ page }) => {
-  await seedStorage(page, { 'utahsnow.me': 'otakar0001', 'utahsnow.pickView': 'me' });
+// "I am" names a tracker person (seeded crew of 4): the [Crew | As me] toggle appears and switches the card's heading.
+test('"as me": choosing a crew member switches the pick between the crew and that person', async ({ page }) => {
+  await pinTime(page, '2027-01-05T13:30:00Z');
   await page.goto('/');
   const pick = page.getByTestId('pick');
-  await expect(pick).toContainText('Add the crew in Tracker');
-  await expect(page.getByTestId('pick-view')).toHaveCount(0);
+  await expect(pick).toContainText(/Crew pick · \d+ going/);
+  await page.getByTestId('iam-chip').locator('select').selectOption('otakar0001');
   await expect(page.getByTestId('iam-chip')).toHaveCount(0);
+  await page.getByTestId('pick-view').getByText('As me').click();
+  await expect(pick).toContainText('My pick');
+  await expect(pick.locator('.pick-who')).toHaveText('As me: Otakar');
+  await page.getByTestId('pick-view').getByText('Crew').click();
+  await expect(pick).toContainText("Today's pick");
+  await expect(pick).toContainText(/Crew pick · \d+ going/);
 });
 
 test('stake row shows at least 4 stake cams', async ({ page }) => {
@@ -117,10 +123,92 @@ test('header clock shows Denver time and the pick runs for today on a trip morni
 });
 
 test('no horizontal scroll on any page', async ({ page }) => {
-  for (const hash of ['#/', '#/resort/alta', '#/cams', '#/settings']) {
+  for (const hash of ['#/', '#/resort/alta', '#/cams', '#/tracker', '#/settings']) {
     await page.goto(`/${hash}`);
     await expect(page.getByTestId('footer')).toBeVisible();
     const overflow = Number(await page.evaluate('document.documentElement.scrollWidth - innerWidth'));
     expect(overflow, hash).toBeLessThanOrEqual(0);
+  }
+});
+
+// Spec §9.6 / §13: two browsers share one tracker, and undo restores the previous value.
+test('tracker: a day set in one browser shows in another, and undo restores it', async ({
+  page,
+  browser,
+  request,
+  baseURL,
+}, info) => {
+  const api = trackerApi(request, baseURL ?? '');
+  const who = await freshPerson(api, info.project.name);
+  const errors: string[] = [];
+  const other = await browser.newContext({ baseURL, viewport: page.viewportSize() });
+  try {
+    const pageB = await other.newPage();
+    await guardPage(pageB, errors);
+    await useIp(page, api);
+    await useIp(pageB, api);
+    await page.goto('/#/tracker');
+    await pageB.goto('/#/tracker');
+    await expect(cell(pageB, who, '2026-12-28')).toHaveAttribute('aria-label', /no day recorded/);
+
+    await cell(page, who, '2026-12-28').click();
+    await page.getByTestId('tracker-picker').locator('[data-resort="brighton"]').click();
+    await expect(cell(page, who, '2026-12-28')).toContainText('Brighton');
+    await expect(page.getByTestId('tracker-sync')).toContainText('Synced');
+
+    await pageB.reload();
+    await expect(cell(pageB, who, '2026-12-28')).toContainText('Brighton');
+    const list = pageB.getByTestId('tracker-audit-list');
+    const id = await list
+      .locator('li', { hasText: `${who.name} · ` })
+      .first()
+      .getAttribute('data-audit');
+    const row = list.locator(`li[data-audit="${id}"]`); // pinned: the undo adds a newer row above it
+    await row.getByRole('button', { name: 'Undo' }).click();
+    await expect(cell(pageB, who, '2026-12-28')).toHaveAttribute('aria-label', /no day recorded/);
+    await expect(row).toContainText('Undone');
+
+    await page.reload();
+    await expect(cell(page, who, '2026-12-28')).toHaveAttribute('aria-label', /no day recorded/);
+    expect(errors, 'second browser console errors').toEqual([]);
+  } finally {
+    await other.close();
+    await removePerson(api, who);
+  }
+});
+
+// Spec §9.2-9.3 / §13: Alta + Snowbird share 7 days; an 8th is refused with 422 cap-exceeded (API and UI).
+test('tracker: an 8th Alta/Snowbird day is refused with 422 cap-exceeded and the UI says so', async ({
+  page,
+  request,
+  baseURL,
+  allowErrors,
+}, info) => {
+  allowErrors.push(/status of 422/); // the refused POST is logged by the browser as a failed resource
+  const api = trackerApi(request, baseURL ?? '');
+  const who = await freshPerson(api, info.project.name);
+  try {
+    await useIp(page, api);
+    await page.goto('/#/tracker');
+    await expect(cell(page, who, '2027-01-03')).toBeVisible();
+    // Seven days behind the page's back: its copy still shows all 7 left, so the UI sends the 8th.
+    const dates = ['2026-12-27', '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01', '2027-01-02'];
+    for (const [i, d] of dates.entries()) {
+      expect((await planDay(api, who, d, i % 2 ? 'snowbird' : 'alta')).status).toBe(200);
+    }
+    const eighth = await planDay(api, who, '2027-01-04', 'alta');
+    expect(eighth.status).toBe(422);
+    expect(eighth.body).toMatchObject({ error: 'validation', code: 'cap-exceeded', group: 'alta-snowbird' });
+
+    await cell(page, who, '2027-01-03').click();
+    await page.getByTestId('tracker-picker').locator('[data-resort="snowbird"]').click();
+    await expect(page.getByTestId('tracker-notice')).toContainText('has used all 7');
+    await expect(cell(page, who, '2027-01-03')).toHaveAttribute('aria-label', /no day recorded/);
+
+    await page.reload(); // with fresh data the picker offers no 8th Alta/Snowbird day
+    await cell(page, who, '2027-01-03').click();
+    await expect(page.getByTestId('tracker-picker').locator('[data-resort="alta"]')).toBeDisabled();
+  } finally {
+    await removePerson(api, who);
   }
 });

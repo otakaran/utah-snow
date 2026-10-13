@@ -1,0 +1,120 @@
+/* Tracker feature (#/tracker, spec §9.5). Only tokens.css variables. Leading sections live in tracker/:
+   grid (day grid), sheet (picker), page (head, notice, tables); then lists and crew here, in cascade order. */
+@import "./tracker/grid.css";
+@import "./tracker/sheet.css";
+@import "./tracker/page.css";
+
+/* Lists: bookings and recent changes */
+.trk-h3 {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.trk-list {
+  display: grid;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trk-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  padding-block: var(--space-2);
+  border-bottom: 1px dotted var(--line);
+}
+
+.trk-list-main {
+  display: inline-flex;
+  flex: 1 1 16rem;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+}
+
+.trk-list-note {
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+
+.trk-list-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.trk-need-none,
+.trk-hint {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.trk-hint {
+  flex-basis: 100%;
+  font-size: var(--fs-caption);
+}
+
+/* Crew */
+.trk-people,
+.trk-bookings {
+  width: 100%;
+}
+
+.trk-person-list {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trk-person-item {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.trk-person-top,
+.trk-person-controls,
+.trk-inline-form,
+.trk-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.trk-add {
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.trk-person-label {
+  font: 800 var(--fs-3) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.trk-danger {
+  border-color: var(--bad);
+  background: var(--bad);
+  color: var(--on-bad);
+}
+
+.trk-problem {
+  color: var(--bad);
+}

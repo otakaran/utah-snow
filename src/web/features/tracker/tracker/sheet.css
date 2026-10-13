@@ -1,0 +1,99 @@
+/* Tracker bottom-sheet picker (DayPicker.tsx). Only tokens.css variables.
+   Bottom sheet on phones, centred dialog from 900 px. */
+.trk-sheet {
+  width: min(100vw, 34rem);
+  max-width: none;
+  max-height: 88vh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 -12px 40px var(--shadow);
+}
+
+.trk-sheet::backdrop {
+  background: var(--scrim);
+}
+
+@media (min-width: 900px) {
+  .trk-sheet {
+    margin: auto;
+    border-radius: var(--radius);
+  }
+}
+
+.trk-sheet-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+}
+
+.trk-sheet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.trk-sheet-title {
+  font: 800 var(--fs-3) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.trk-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trk-choice {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.trk-choice:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.trk-choice-name {
+  font: 800 var(--fs-body) / 1.15 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.trk-choice-note {
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+
+.trk-choice-current {
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+.trk-choice:disabled {
+  border-style: dashed;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: not-allowed;
+}
+
+.trk-clear {
+  justify-self: start;
+}

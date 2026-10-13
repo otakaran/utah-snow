@@ -12,6 +12,7 @@ import { CamsPage } from './features/cams/index.ts';
 import { crewPick } from './features/pick-card/index.ts';
 import { Resort } from './features/resort/index.ts';
 import { BaseChip, IAmChip, Settings, ThemeToggle, UnitsToggle } from './features/settings/index.ts';
+import { TrackerPage } from './features/tracker/index.ts';
 import { clock, shortDate, tzAbbr } from './lib/format.ts';
 import { type Route, type RouteName, route } from './router.ts';
 import { Attribution } from './ui/Attribution.tsx';
@@ -140,8 +141,8 @@ function Outlet({ r }: { r: Route }) {
       return <Resort id={r.id} />;
     case 'cams': // ★ on the crew pick's cams, as on the briefing and resort pages
       return <CamsPage pick={crewPick.value?.pick ?? null} />;
-    case 'tracker': // TODO(assemble): features/tracker (§9.5) when it lands
-      return <Stub testid="tracker-stub" title="Day tracker" detail="Ski days, Ikon caps and bookings for the crew." />;
+    case 'tracker':
+      return <TrackerPage />;
     case 'wall': // TODO(assemble): features/wall (§8.4); render it without the header and footer
       return (
         <Stub

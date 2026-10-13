@@ -16,7 +16,11 @@ export function migrate(db: D1Database): Promise<void> {
   ]);
 }
 
-/** Empty the store tables between tests (storage is shared across a test file). */
+/** Empty the store and tracker tables between tests (storage is shared across a test file); FK order. */
 export async function clearStore(db: D1Database): Promise<void> {
-  await db.batch(['source_state', 'counters', 'stake_frames', 'audit_log'].map((t) => db.prepare(`DELETE FROM ${t}`)));
+  await db.batch(
+    ['source_state', 'counters', 'stake_frames', 'audit_log', 'ski_days', 'bookings', 'people'].map((t) =>
+      db.prepare(`DELETE FROM ${t}`),
+    ),
+  );
 }

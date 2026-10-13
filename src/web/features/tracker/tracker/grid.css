@@ -1,0 +1,174 @@
+/* Tracker day grid (Grid.tsx). Only tokens.css variables.
+   Cells: Skied = solid plate + ● dot, Planned = dashed outline + ◌ ring, empty = dotted "+". */
+
+.trk-grid-wrap {
+  max-height: min(70vh, 640px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.trk-grid-wrap:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.trk-grid {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.trk-grid th,
+.trk-grid td {
+  padding: 3px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.trk-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: var(--space-2) var(--space-1);
+  background: var(--surface-2);
+  text-align: left;
+}
+
+.trk-corner {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trk-grid thead .trk-corner {
+  left: 0;
+  z-index: 3;
+}
+
+.trk-person {
+  min-width: 6rem;
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trk-person-name {
+  display: block;
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trk-mode {
+  display: block;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.trk-mode-unknown {
+  color: var(--warn-text);
+}
+
+.trk-date {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 6.25rem;
+  padding-inline: var(--space-2);
+  background: var(--surface);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.trk-date-day {
+  display: block;
+  font: 700 var(--fs-caption) / 1.2 var(--font-body);
+}
+
+.trk-date-no {
+  display: block;
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+
+.trk-row-past .trk-date-day {
+  color: var(--text-dim);
+}
+
+.trk-grid .trk-row-today th,
+.trk-grid .trk-row-today td {
+  background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--surface);
+}
+
+.trk-row-today .trk-date {
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.trk-row-today .trk-date-no {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.trk-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-width: 6rem;
+  min-height: var(--tap);
+  padding: var(--space-1) var(--space-2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  color: var(--text);
+  font: 700 var(--fs-caption) / 1.15 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.trk-cell:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.trk-cell-skied {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+
+.trk-cell-planned {
+  border: 2px dashed var(--line-strong);
+}
+
+.trk-cell-empty {
+  align-items: center;
+  border: 1px dotted var(--line);
+  color: var(--text-dim);
+}
+
+.trk-cell-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.trk-cell-skied .glyph {
+  color: var(--ok);
+}
+
+.trk-cell-planned .glyph {
+  color: var(--off);
+}
+
+.trk-cell-add {
+  font: 800 var(--fs-body) / 1 var(--font-display);
+}

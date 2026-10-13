@@ -1,5 +1,6 @@
 -- Local/e2e seed (pnpm db:local): one source_state row per row id the slot table writes, fetched "now",
--- a fresh cron:last (so /api/health?strict=1 is green), a crew of 4 and one cached drive. Re-runnable.
+-- a fresh cron:last (so /api/health?strict=1 is green), a crew of 4 and one cached drive. Re-runnable: it resets the
+-- tracker tables and the tracker rate counters (local D1 only; e2e people are removed by the tests themselves).
 -- Payloads are minimal: '{}' / '[]' placeholders (every adapter that reads its last-good row tolerates them),
 -- realistic RoadStatus rows for the four corridors.
 INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, status, fail_count) VALUES
@@ -43,6 +44,11 @@ INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, stat
 VALUES ('cron:last', json_object('slot', 0, 'startedAt', unixepoch() * 1000, 'jobs', json('[]'), 'deferred', json('[]'),
   'suspects', json('[]')), unixepoch() * 1000, unixepoch() * 1000, 'ok', 0);
 
+DELETE FROM audit_log;
+DELETE FROM bookings;
+DELETE FROM ski_days;
+DELETE FROM people;
+DELETE FROM counters WHERE key LIKE 'rl:%';
 INSERT OR REPLACE INTO people (id, name, mode, color, created_at, updated_at, deleted_at) VALUES
   ('otakar0001', 'Otakar', 'ski', '#3b82f6', unixepoch() * 1000, unixepoch() * 1000, NULL),
   ('sam0000002', 'Sam', 'board', '#ef4444', unixepoch() * 1000, unixepoch() * 1000, NULL),

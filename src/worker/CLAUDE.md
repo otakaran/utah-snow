@@ -1,7 +1,7 @@
 # src/worker
 
-`index.ts` routes `/api/*` (health, snapshot, cams, stake, debug/probe; `api/edge.ts` caches + ETags cams/stake,
-`frames/` reads the stake archive) and runs `runTick` on cron. Next: `/api/tracker`. Shared row types: `src/shared/types/`.
+`index.ts` routes `/api/*` (health, snapshot, cams, stake, tracker, debug/probe; `api/edge.ts` caches + ETags cams/stake,
+`frames/` reads the stake archive) and runs `runTick` on cron. Shared row types: `src/shared/types/`.
 
 ## Source contract (`sources/types.ts`)
 - One adapter per source: `sources/<id>.ts` + `<id>.test.ts` + `fixtures/<id>/<YYYYMMDD>-<tag>.<ext>` (+ `<id>/` helpers).
@@ -29,12 +29,12 @@
 - `http.ts` helpers: `json()`, ETag/304, cache helpers. Every `/api` response sends `X-Robots-Tag`, `Referrer-Policy`, `X-Content-Type-Options`.
 - No CORS headers. `caches.default` only for snapshot, cams and stake.
 - `/api/snapshot` sends `X-Build` = `BUILD_ID` (`http.ts`: Vite `define` `__BUILD_ID__`, `'dev'` under Vitest); the wall reloads on change.
-- `/api/debug/probe` returns the same 404 JSON as an unknown route unless `X-Probe-Key` equals `PROBE_KEY`.
-- `/api/health?strict=1` returns 503 with `failures[]` until the first cron tick has written `cron:last`.
+- `/api/debug/probe`: the unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`. `/api/health?strict=1`: 503 until `cron:last`.
+- `/api/tracker` (`api/tracker/`; SQL in `store/tracker.ts` + `tracker/writes.ts`): GET no-store; POST one op. `guard.ts`: 403
+  headers/Origin (localhost if `DEV=1`), 503 `no-salt` (empty `IP_HASH_SALT`), 429, 422; 409 carries the full `current`.
 
 ## Tests
 - `unit` project (node): `sources/**` and `lib/**` tests. Adapter tests: field assertions on fixtures plus one gate failure.
-- `worker` project (workerd, `cloudflare:workers` `env`/`exports`): `api/**` and `cron/**` contract tests.
-- The `worker` project sets `fsModuleCache: false` (Vitest 5 cache is unreadable from workerd).
+- `worker` project (workerd, `cloudflare:workers` `env`/`exports`, `fsModuleCache: false`): `api/**` + `cron/**` contracts.
 - Fixtures: one live file plus <= 5 Wayback in-season files per source, each <= 30 KB, trimmed by `pnpm fixtures`.
-- Worker tests call `migrate(env.DB)` / `clearStore(env.DB)` from `store/test-db.ts` (migrations via `?raw`, `raw.d.ts`).
+- Worker tests call `migrate(env.DB)` / `clearStore(env.DB)` (store + tracker tables) from `store/test-db.ts`.

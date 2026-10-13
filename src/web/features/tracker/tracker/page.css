@@ -1,0 +1,173 @@
+/* Tracker page head, tone helpers, inline notice and the days-left / thresholds tables. Only tokens.css variables.
+   Status = shape + word + color: tone classes color the glyph; the word is always printed beside it. */
+.tracker {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.trk-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.trk-lede,
+.trk-empty {
+  color: var(--text-dim);
+}
+
+.trk-sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: var(--space-1);
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+
+.trk-iam select {
+  min-width: 12rem;
+}
+
+.trk-tone-ok .glyph {
+  color: var(--ok);
+}
+
+.trk-tone-warn .glyph {
+  color: var(--warn-text);
+}
+
+.trk-tone-bad .glyph {
+  color: var(--bad);
+}
+
+.trk-tone-off .glyph {
+  color: var(--off);
+}
+
+/* Inline notice: sticks to the bottom of the viewport while the page is on screen. */
+.trk-notice {
+  position: sticky;
+  bottom: var(--space-3);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.trk-notice p {
+  flex: 1;
+  min-width: 0;
+}
+
+.trk-notice-ok {
+  border-color: var(--ok);
+}
+
+.trk-notice-ok .glyph {
+  color: var(--ok);
+}
+
+.trk-notice-warn {
+  border-color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.trk-notice-warn .glyph {
+  color: var(--warn-text);
+}
+
+.trk-notice-bad {
+  border-color: var(--bad);
+}
+
+.trk-notice-bad .glyph {
+  color: var(--bad);
+}
+
+/* Days left and thresholds tables */
+.trk-table-wrap {
+  overflow-x: auto;
+}
+
+.trk-table {
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.trk-table th,
+.trk-table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.trk-table thead th {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trk-table tbody th {
+  font: 800 var(--fs-body) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trk-cap {
+  display: block;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.trk-left-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font: 800 var(--fs-body) / 1.2 var(--font-display);
+  font-feature-settings: var(--num-features);
+  white-space: nowrap;
+}
+
+.trk-left.trk-tone-warn .trk-left-main {
+  color: var(--warn-text);
+}
+
+.trk-left.trk-tone-bad .trk-left-main {
+  color: var(--bad);
+}
+
+.trk-left-split,
+.trk-th-exp {
+  display: block;
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.trk-table .trk-crew-row th,
+.trk-table .trk-crew-row td {
+  border-top: 2px solid var(--line-strong);
+}
+
+.trk-th-left,
+.trk-th-snow {
+  display: block;
+  white-space: nowrap;
+}
+
+.trk-th-left {
+  font-weight: 800;
+}

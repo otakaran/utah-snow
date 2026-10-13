@@ -1,11 +1,14 @@
-// /api path table (spec §7): exact paths, then patterns (the stake routes carry ids in the path; the handler parses
-// them). Unknown path -> 404, wrong method -> 405 (both no-store); a thrown handler -> 500.
+// /api path table (spec §7): exact paths (tracker: GET state, POST one op), then patterns (the stake routes carry
+// ids in the path; the handler parses them). Unknown path -> 404, wrong method -> 405 (both no-store); a thrown
+// handler -> 500.
 // Security headers and X-Build are applied to every response here, after the handler (and its cache lookup).
 import { cams } from './api/cams.ts';
 import { health } from './api/health.ts';
 import { probe } from './api/probe.ts';
 import { snapshot } from './api/snapshot.ts';
 import { STAKE_PATH, stake } from './api/stake.ts';
+import { trackerGet } from './api/tracker/get.ts';
+import { trackerPost } from './api/tracker/mutate.ts';
 import { apiError, methodNotAllowed, notFound, withApiHeaders } from './http.ts';
 import { errorText, logLine } from './lib/log.ts';
 
@@ -18,6 +21,7 @@ const ROUTES: Record<string, Route> = {
   '/api/snapshot': { GET: snapshot },
   '/api/cams': { GET: cams },
   '/api/debug/probe': { GET: probe },
+  '/api/tracker': { GET: trackerGet, POST: trackerPost },
 };
 const PATTERNS: readonly [RegExp, Route][] = [[STAKE_PATH, { GET: stake }]];
 
