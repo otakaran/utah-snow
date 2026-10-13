@@ -103,6 +103,8 @@
 .cond-fc-card {
   padding: var(--space-3);
   container-type: inline-size;
+  /* a wider fallback font (before the woff2 swaps in) scrolls the table inside its card, never the page */
+  overflow-x: auto;
 }
 .cond-fc-table {
   width: 100%;

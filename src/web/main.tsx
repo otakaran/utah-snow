@@ -1,6 +1,7 @@
 // Entry (spec §8.1, §8.4, §8.6, §8.8): redeploy guard, router, data stores, theme sync, then render the shell.
 import { effect } from '@preact/signals';
 import { render } from 'preact';
+import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './ui/ui.css';

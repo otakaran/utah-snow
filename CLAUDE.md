@@ -24,7 +24,7 @@
   pick-card, cams, conditions, resort, settings), `styles/` (tokens.css, base.css).
 - `e2e/`: Playwright `smoke.spec.ts`, `fixtures.ts` (console-error gate, network stubs) and `seed.sql` for local D1.
 - `scripts/`: plain-node tools; `check-repo.ts` (+ `check-repo/`) enforces the rules below.
-- `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`.
+- `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`, `fonts/` (Barlow woff2 + OFL, <= 120 KB).
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
 - `.github/workflows/`: ci (check, e2e, deploy on main) and health (twice daily `/api/health?strict=1`).
 - Status now: all source adapters registered and writing D1 (resorts, roads, NWS, avy, snotel, YouTube, stakes + KV

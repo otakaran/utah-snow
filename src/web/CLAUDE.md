@@ -4,14 +4,13 @@ Shell: `main.tsx` (build guard, router, stores, theme effect), `app.tsx` (header
 routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker` + `#/wall` stubs; bad paths redirect to `#/`).
 
 ## Feature folders (`features/<f>/`)
-- `index.ts` is the only import surface; components are `PascalCase.tsx`; one `<f>.css` using only `tokens.css` variables
-  (over 250 lines it `@import`s its leading sections from `<f>/`, which keeps the cascade order).
+- `index.ts` is the only import surface; `PascalCase.tsx` components; one `<f>.css` (tokens only; over 250 lines it
+  `@import`s its leading sections from `<f>/`, keeping cascade order). Features import each other only via `index.ts`.
 - briefing (spec 8.2 order: header, pick, stakes, resorts, roads, avalanche, forecast, then `status`; `footer` is the
   shell's), pick-card (PickCard, PickCompact, Ridge; the only caller of `src/shared/pick/`), cams (CamTile, CamGallery,
   StakeRow, CamsPage, players), conditions (Roads/Avalanche/Forecast panels), resort (8 sections of spec 8.7),
   settings (page + header chips). To come: wall, tracker.
-- Features import each other only through `index.ts`. `ui/` holds presentational pieces (+ `ui.css`, `forms.css`,
-  `overlays.css`, `shell.css`) and never imports a feature. `src/web/` never imports `src/worker/`.
+- `ui/`: presentational pieces (+ ui, forms, overlays, shell css), never imports a feature; nor `src/web/` the worker.
 - Unit tests only for pure helpers (vitest `unit` project includes `src/web/**/*.test.ts`); UI is covered by Playwright.
 
 ## Data stores (`data/`, Preact signals)
@@ -24,8 +23,9 @@ routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker` + `#/wall` stub
 - units, theme (dark|sun|auto), base, me, ride, pickView, crewToday, dataSaver, wall, skiFraction, admin.
 
 ## Tokens and themes
-- Colors only via `styles/tokens.css` (locked); obey its header's UI rules. `<html data-theme>` dark|sun; wall
-  `data-scale="wall"`. Values arrive imperial: convert with `src/shared/units.ts`; time only via `src/shared/time.ts`.
+- Colors only via `styles/tokens.css` (locked; obey its header's UI rules); `styles/fonts.css` maps `public/fonts`.
+  `<html data-theme>` dark|sun; wall `data-scale="wall"`. Values arrive imperial: convert with `src/shared/units.ts`;
+  time only via `src/shared/time.ts`.
 
 ## Players and visibility (`lib/`)
 - `visibility.ts`: one 5 s scheduler + shared IntersectionObserver; work runs only on screen and while visible.
