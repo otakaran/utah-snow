@@ -141,18 +141,6 @@
   color: var(--warn-text);
 }
 
-/* LIVE plates breathe: a slow pulse on the ● glyph only, the word stays solid (base.css stops it under reduced
-   motion) */
-.wall .cam-live .glyph {
-  animation: wall-pulse 2s ease-in-out infinite alternate;
-}
-
-@keyframes wall-pulse {
-  to {
-    opacity: 0.35;
-  }
-}
-
 /* fullscreen button: over the top-right corner, only while the pointer moves */
 .wall-kiosk {
   position: absolute;

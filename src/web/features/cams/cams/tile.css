@@ -142,7 +142,7 @@
   color: var(--on-live);
 }
 
-/* A slow pulse on the LIVE glyph; none under reduced motion */
+/* A slow pulse on the LIVE glyph only (every tile, the wall too); the word stays solid; none under reduced motion */
 @media (prefers-reduced-motion: no-preference) {
   .cam-live .glyph {
     animation: cam-pulse 2.4s ease-in-out infinite;

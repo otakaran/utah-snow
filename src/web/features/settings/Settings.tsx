@@ -97,7 +97,7 @@ function SkiFraction({ onSaved }: { onSaved: (f: Flash) => void }) {
   const pct = Math.round(skiFraction.value * 100);
   return (
     <details class="advanced">
-      <summary>
+      <summary class="disclosure">
         Ski-day fraction: <span class="num">{pct}%</span>
       </summary>
       <label class="field">

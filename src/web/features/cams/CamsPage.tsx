@@ -15,7 +15,7 @@ import { JumpBar, type JumpItem } from '../../ui/JumpBar.tsx';
 import { Section } from '../../ui/Section.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
 import { roadView } from '../conditions/index.ts';
-import { overnightOf } from '../pick-card/index.ts';
+import { crewPick, overnightFor } from '../pick-card/index.ts';
 import { CamGallery, resortGallery } from './CamGallery.tsx';
 import { visibleCams } from './cam-view.ts';
 
@@ -57,7 +57,9 @@ export function CamsPage({ pick = null }: Props) {
         const n = visibleCams(cams, states, 'detail', now).length;
         const off = cams.filter((d) => states.get(d.id)?.status === 'seasonal-off').length;
         const isPick = id === pick;
-        const inches = fmt('snow', overnightOf(snap, id), u);
+        // The briefing stake plates' number: the resort report, else the pick's SNOTEL or forecast input (named).
+        const o = overnightFor(snap, crewPick.value, id);
+        const inches = fmt('snow', o.inches, u);
         return (
           <Section
             key={id}
@@ -85,7 +87,7 @@ export function CamsPage({ pick = null }: Props) {
                       {inches.value}
                       <small>{inches.unit}</small>
                     </span>
-                    <span class="cam-inches-cap">Overnight</span>
+                    <span class="cam-inches-cap">{o.note ? `Overnight · ${o.note}` : 'Overnight'}</span>
                   </span>
                 )
               }
