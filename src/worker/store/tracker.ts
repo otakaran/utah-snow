@@ -142,21 +142,6 @@ export function markUndoneStmt(db: D1Database, auditId: number): D1PreparedState
     .bind(auditId);
 }
 
-export interface RateCounter {
-  key: string;
-  expiresAt: number; // window end, epoch ms
-}
-
-/** One batch of counter increments (spec §9.4); returns each counter's new value, in order. */
-export async function bumpCounters(db: D1Database, counters: readonly RateCounter[]): Promise<number[]> {
-  const stmt = db.prepare(
-    `INSERT INTO counters (key, value, expires_at) VALUES (?1, 1, ?2)
-     ON CONFLICT(key) DO UPDATE SET value = counters.value + 1 RETURNING value`,
-  );
-  const rs = await db.batch(counters.map((c) => stmt.bind(c.key, c.expiresAt)));
-  return rs.map((r) => Number((r.results[0] as { value?: number } | undefined)?.value ?? 0));
-}
-
 /** A write's optimistic-concurrency token: now, but strictly after the token it replaces (spec §9.3). */
 export const nextToken = (now: number, prev: number | null): number => Math.max(now, (prev ?? 0) + 1);
 

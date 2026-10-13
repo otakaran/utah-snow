@@ -71,10 +71,12 @@ describe('liveDelayMin', () => {
 
 describe('driveMatrix', () => {
   it('uses the preset row, or the nearest preset for a custom point (approx)', () => {
-    expect(driveMatrix({ id: 'sandy', ...BASES.sandy })).toMatchObject({ approx: false, min: { alta: 27 } });
+    const sandy = driveMatrix({ id: 'sandy', ...BASES.sandy });
+    expect(sandy.min.alta).toBe(27);
+    expect(Object.keys(sandy.exact)).toHaveLength(Object.keys(sandy.min).length); // a preset is exact everywhere
     const custom = { id: 'custom', lat: 40.64, lon: -111.5 };
     expect(nearestPreset(custom)).toBe('park-city-old-town');
-    expect(driveMatrix(custom)).toMatchObject({ approx: true, min: { 'deer-valley': 4 }, exact: {} });
+    expect(driveMatrix(custom)).toMatchObject({ min: { 'deer-valley': 4 }, exact: {} });
   });
 
   it('uses /api/drive results for a custom base, the nearest preset row for resorts it lacks', () => {
@@ -83,9 +85,8 @@ describe('driveMatrix', () => {
     const m = driveMatrix(custom, api);
     expect(m.min).toMatchObject({ alta: 48, brighton: 46, snowbird: 43 }); // snowbird: downtown-slc row
     expect(m.exact).toEqual({ alta: { mi: 31.2 }, brighton: { mi: 31, via: 'BCC mouth' } });
-    expect(m.approx).toBe(true);
     const all = Object.fromEntries(Object.keys(m.min).map((r) => [r, { min: 30, mi: 20 }]));
-    expect(driveMatrix(custom, all).approx).toBe(false);
+    expect(Object.keys(driveMatrix(custom, all).exact)).toHaveLength(Object.keys(m.min).length);
     expect(driveMatrix({ id: 'sandy', ...BASES.sandy }, api).min.alta).toBe(27); // presets ignore api results
   });
 });

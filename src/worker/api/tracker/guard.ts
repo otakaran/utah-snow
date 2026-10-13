@@ -9,8 +9,6 @@ import type { BookingKind, SkiMode, TrackerResort } from '../../../shared/types.
 import { type DayStatus, MAX_PEOPLE, type PersonRow, type TrackerRaw } from '../../store/tracker.ts';
 import { admit, invalid } from '../post-guard.ts';
 
-export { invalid };
-
 export type Op =
   | { op: 'upsertDay'; personId: string; date: string; resortId: TrackerResort; status: DayStatus; prev: number | null }
   | { op: 'deleteDay'; personId: string; date: string; prev: number }

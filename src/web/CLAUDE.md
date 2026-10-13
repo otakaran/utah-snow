@@ -1,21 +1,21 @@
 # src/web
 
 Shell: `main.tsx` (build guard, router, stores, theme effect), `app.tsx` (header, `Outlet`, footer), `router.ts` (hash
-routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker`, `#/wall` stub; bad paths redirect to `#/`).
+routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker`, `#/wall` full-bleed; bad paths redirect to `#/`).
 
 ## Feature folders (`features/<f>/`)
 - `index.ts` is the only import surface; `PascalCase.tsx` components; one `<f>.css` (tokens only; over 250 lines it
   `@import`s its leading sections from `<f>/`, keeping cascade order). Features import each other only via `index.ts`.
-- briefing (spec 8.2 order: header, pick, stakes, resorts, roads, avalanche, forecast, then `status`; `footer` is the
-  shell's), pick-card (PickCard, PickCompact, Ridge; the only caller of `src/shared/pick/`), cams (CamTile, CamGallery,
-  StakeRow, CamsPage, players), conditions (Roads/Avalanche/Forecast panels), resort (8 sections of spec 8.7),
-  settings (page + header chips), tracker (§9.5 grid, DayPicker, caps, per-person thresholds, bookings, crew, undo). To come: wall.
+- briefing (spec 8.2 order: header, pick, stakes, resorts, roads, avalanche, forecast, then `status`), pick-card (PickCard,
+  PickCompact, Ridge; the only caller of `src/shared/pick/`), cams (CamTile, CamGallery, StakeRow, CamsPage, players,
+  timelapse Scrubber), conditions (Roads/Avalanche/Forecast panels, ModelTable), resort (spec 8.7), settings (+ header
+  chips, CustomBase), tracker (§9.5 grid, DayPicker, caps, thresholds, bookings, crew, undo), wall (`config/wall.ts` sets).
 - `ui/`: presentational pieces (+ ui, forms, overlays, shell css), never imports a feature; nor `src/web/` the worker.
   Unit tests only for pure helpers (vitest `unit` includes `src/web/**/*.test.ts`); UI is covered by Playwright.
 
 ## Data stores (`data/`, Preact signals)
-- `snapshot.ts`: `/api/snapshot` with ETag, 120 s (60 s on the wall), visible only; server clock (`serverNow` from the
-  Date header) and X-Build -> `lib/build-guard.ts`. `health.ts`: `/api/health`, global badge.
+- `snapshot.ts`: `/api/snapshot` (ETag, 120 s, 60 s on the wall, visible only), `serverNow`, X-Build -> `build-guard.ts`;
+  overlays `mtnpowder.ts` (browser fetch of red MtnPowder rows). `health.ts`: badge. `drive.ts`: `/api/drive` (custom base).
 - `cams.ts`: `/api/cams` every 60 s once a cam view calls `ensureCams()`. `open-meteo.ts`: browser-only, 30 min,
   shared localStorage cache, 429 backoff. `tracker.ts` (+ `tracker/`; wire types `shared/types/tracker.ts`): 10 min
   (30 s on #/tracker) + focus; ops apply optimistically, in order, with `prevUpdatedAt` + `clientId`; 200/409 replace it.

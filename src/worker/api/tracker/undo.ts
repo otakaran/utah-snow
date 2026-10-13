@@ -20,8 +20,9 @@ import {
   personSetStmt,
   type TrackerRaw,
 } from '../../store/tracker.ts';
+import { invalid } from '../post-guard.ts';
 import { conflict } from './get.ts';
-import { dayRules, type Guarded, invalid, personClash } from './guard.ts';
+import { dayRules, type Guarded, personClash } from './guard.ts';
 import type { Plan } from './mutate.ts';
 
 type Revert = Omit<Plan, 'action' | 'entity' | 'key' | 'extra' | 'conflictCode'>;

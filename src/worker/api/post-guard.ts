@@ -6,7 +6,7 @@ import { isObj, type Obj, tryJson } from '../../shared/json.ts';
 import { DAY, HOUR, isoUtc } from '../../shared/time.ts';
 import { apiError, json } from '../http.ts';
 import { ipHash } from '../lib/hash.ts';
-import { bumpCounters } from '../store/tracker.ts';
+import { bumpCounters } from '../store/counters.ts';
 
 /** A request that passed the header, salt and rate checks, with its JSON object body. */
 export interface Admitted {

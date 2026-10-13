@@ -1,4 +1,4 @@
-// Shared Playwright setup for smoke.spec.ts: every test fails on a console error or page error, and nothing leaves
+// Shared Playwright setup for every spec: each test fails on a console error or page error, and nothing leaves
 // localhost (Open-Meteo gets a canned 6-location body, cam images a 1x1 GIF), so runs are fast and never count
 // against the crew's shared Open-Meteo limit. `pinTime` fakes the browser clock AND the API Date header, because
 // the app derives its clock from the server Date (serverNow = Date.now() + skew).
@@ -42,6 +42,9 @@ export const test = base.extend<{ consoleErrors: string[]; allowErrors: RegExp[]
       const errors: string[] = [];
       await guardPage(page, errors);
       await use(errors);
+      // A Date-pinning handler (pinTime, the wall's wallAt) can still be in route.fetch() for a poll when the test
+      // ends; that throws "route.fetch: Test ended" and fails a passed test. Drop the handlers and their errors.
+      await page.unrouteAll({ behavior: 'ignoreErrors' });
       expect(
         errors.filter((e) => !allowErrors.some((r) => r.test(e))),
         'console errors',

@@ -6,6 +6,7 @@ import { expect, test } from './fixtures.ts';
 
 const DAY = '2027-01-05T19:00:00Z'; // 12:00 MST
 const NIGHT = '2027-01-06T02:00:00Z'; // 19:00 MST
+const DAWN = '2027-01-05T13:30:00Z'; // 06:30 MST: 05:30 in the tz project's Los Angeles browser (spec §8.10)
 
 /** Installs the page clock at `iso`, pins the API Date header to it and optionally stamps /api/snapshot X-Build. */
 async function wallAt(page: Page, iso: string, build?: string): Promise<void> {
@@ -52,6 +53,13 @@ test('at 19:00 local: night mode, stake stills only and no video', async ({ page
   await expect(page.locator('[data-testid="wall-tile"][data-slot="stake"]').first()).toBeVisible();
   await expect(page.locator('video')).toHaveCount(0);
   await expect(page.locator('iframe')).toHaveCount(0);
+});
+
+test('at 06:30 Denver time night mode is off, whatever the browser time zone', async ({ page }) => {
+  await wallAt(page, DAWN);
+  await page.goto('/#/wall');
+  await expect(page.getByTestId('wall-clock')).toContainText('6:30');
+  await expect(page.getByTestId('wall')).toHaveAttribute('data-night', 'false');
 });
 
 test('a new X-Build on /api/snapshot reloads the wall exactly once', async ({ page }) => {

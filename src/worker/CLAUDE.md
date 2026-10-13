@@ -1,7 +1,7 @@
 # src/worker
 
-`index.ts` routes `/api/*` (health, snapshot, cams, stake, tracker, debug/probe; `api/edge.ts` caches + ETags cams/stake,
-`frames/` reads the stake archive) and runs `runTick` on cron. Shared row types: `src/shared/types/`.
+`index.ts` routes `/api/*` (health, snapshot, cams[/report], stake, drive, tracker, debug/probe) and runs `runTick` on cron;
+`frames/` lists timelapse frames (KV archive, HDRelay, Prism, Roundshot). Shared row types: `src/shared/types/`.
 
 ## Source contract (`sources/types.ts`)
 - One adapter per source: `sources/<id>.ts` + `<id>.test.ts` + `fixtures/<id>/<YYYYMMDD>-<tag>.<ext>` (+ `<id>/` helpers).
@@ -27,14 +27,14 @@
 
 ## API conventions (`api/`, one file per route)
 - `http.ts` helpers: `json()`, ETag/304, cache helpers. Every `/api` response sends `X-Robots-Tag`, `Referrer-Policy`, `X-Content-Type-Options`.
-- No CORS headers. `caches.default` only for snapshot, cams and stake.
+- No CORS headers. `caches.default` only for snapshot, cams and stake. `/api/drive`: D1 `drive_cache` (30 d), 20 misses/day.
 - `/api/snapshot` sends `X-Build` = `BUILD_ID` (`http.ts`: Vite `define` `__BUILD_ID__`, `'dev'` under Vitest); the wall reloads on change.
 - `/api/debug/probe`: the unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`. `/api/health?strict=1`: 503 until `cron:last`.
-- `/api/tracker` (`api/tracker/`; SQL in `store/tracker.ts` + `tracker/writes.ts`; wire types `shared/types/tracker.ts`): GET no-store; POST one op. `guard.ts`: 403
-  headers/Origin (localhost if `DEV=1`), 503 `no-salt` (empty `IP_HASH_SALT`), 429, 422; 409 carries the full `current`.
+- `/api/tracker` (`api/tracker/`; SQL in `store/tracker.ts` + `tracker/writes.ts`; wire types `shared/types/tracker.ts`): GET no-store; POST one op; 409 carries `current`. Its guard
+  is `api/post-guard.ts` (also cams/report): 403 headers/Origin (localhost if `DEV=1`), 503 `no-salt`, `rl:*` 429, 422.
 
 ## Tests
 - `unit` project (node): `sources/**` and `lib/**` tests. Adapter tests: field assertions on fixtures plus one gate failure.
-- `worker` project (workerd, `cloudflare:workers` `env`/`exports`, `fsModuleCache: false`): `api/**` + `cron/**` contracts.
+- `worker` project (workerd, `cloudflare:workers` `env`/`exports`, `fsModuleCache: false`): `api/`, `cron/`, `frames/` tests.
 - Fixtures: one live file plus <= 5 Wayback in-season files per source, each <= 30 KB, trimmed by `pnpm fixtures`.
 - Worker tests call `migrate(env.DB)` / `clearStore(env.DB)` (store + tracker tables) from `store/test-db.ts`.

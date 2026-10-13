@@ -79,8 +79,7 @@ export interface DriveDetail {
 }
 export interface DriveMatrix {
   min: Record<ResortId, number>;
-  approx: boolean; // some resort uses the nearest preset's row ("≈ approx")
-  exact: Partial<Record<ResortId, DriveDetail>>; // resorts with an exact drive; the others are approximate
+  exact: Partial<Record<ResortId, DriveDetail>>; // resorts with an exact drive; the others show "≈" (nearest preset)
 }
 
 type ExactDrive = { min: number; mi: number; via?: string; warning?: string };
@@ -106,7 +105,7 @@ export function driveMatrix(
     if (hit.warning) d.warning = hit.warning;
     exact[r] = d;
   }
-  return { min, approx: Object.keys(exact).length < RESORT_IDS.length, exact };
+  return { min, exact };
 }
 
 /** The resort's corridor, plus Parleys when the drive crosses the Wasatch (base lon >= -111.70 to LCC/BCC). */

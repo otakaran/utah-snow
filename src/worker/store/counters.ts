@@ -35,6 +35,21 @@ export async function incrementCounter(
   return row?.value ?? by;
 }
 
+export interface RateCounter {
+  key: string;
+  expiresAt: number; // window end, epoch ms
+}
+
+/** One batch of counter increments (the shared POST rate limits, spec §9.4); returns each counter's new value, in order. */
+export async function bumpCounters(db: D1Database, counters: readonly RateCounter[]): Promise<number[]> {
+  const stmt = db.prepare(
+    `INSERT INTO counters (key, value, expires_at) VALUES (?1, 1, ?2)
+     ON CONFLICT(key) DO UPDATE SET value = counters.value + 1 RETURNING value`,
+  );
+  const rs = await db.batch(counters.map((c) => stmt.bind(c.key, c.expiresAt)));
+  return rs.map((r) => Number((r.results[0] as { value?: number } | undefined)?.value ?? 0));
+}
+
 /** `cpu-suspect:{job}:{Denver date}` increment for the dispatcher's tick-start batch. */
 export function cpuSuspectStmt(db: D1Database, job: string, now: number): D1PreparedStatement {
   return counterIncStmt(db, `cpu-suspect:${job}:${localDate(now)}`, 1, now + CPU_SUSPECT_TTL_MS);

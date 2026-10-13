@@ -35,7 +35,7 @@ export function ResortCards({ hero }: { hero: (id: ResortId, isPick: boolean) =>
               units={u}
               isPick={isPick}
               date={date}
-              drive={driveText(d.min[id], d.live[id], d.approx)}
+              drive={driveText(d.min[id], d.live[id], !d.exact[id])}
               daysLeft={daysLeftText(id, skiDays.value, crew, meId)}
               hero={hero(id, isPick)}
             />

@@ -60,6 +60,7 @@ function DriveLine({ d }: { d: DriveInfo }) {
       </span>{' '}
       {d.mi !== null ? `· ${d.mi} mi ` : ''}from {d.from}
       {d.via ? ` via ${d.via}` : ''}
+      {d.warning ? <span class="rs-warn"> · {d.warning}</span> : null}
       {d.delayMin !== null && d.delayMin > 0 ? <span class="rs-warn"> +{d.delayMin} min live</span> : null}
       {d.delayMin === 0 ? <span class="rs-dim"> · no live delay</span> : null}
     </span>

@@ -12,31 +12,31 @@
   caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page, parking (`parkingCal`), cam-url,
   geo (drive matrix, corridors, live-sign delay), `pick/` (the pick engine). `config.test.ts` checks the registries.
 - `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
-- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams, stake, tracker, debug/probe), JSON/ETag helpers.
+- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams[/report], stake, drive, tracker, debug/probe) + helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
 - `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
   `probe-seed.ts` (hosts no adapter probes). Adapters: `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/` (+ `<id>/` helpers).
 - `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs against the budget; 08Z D1 prune), `job.ts` (one job's writes).
 - `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, tick-state, row-meta, history, frames, counters,
   prune, tracker; `test-db.ts` for tests).
-- `src/worker/api/`: one file per route, each with a contract test (`edge.ts`: caches.default + ETag); `frames/`, `tracker/`.
+- `src/worker/api/`: one file per route + contract test (`edge.ts`: caches.default + ETag; `post-guard.ts`: shared POST checks);
+  `tracker/`. `src/worker/frames/`: timelapse frame lists (KV archive, HDRelay, Prism, Roundshot) for `/api/stake/*`.
 - `src/web/`: Preact SPA (map in `src/web/CLAUDE.md`): shell, `data/` stores, `lib/`, `ui/`, `features/` (briefing,
-  pick-card, cams, conditions, resort, settings, tracker), `styles/` (tokens.css, base.css).
-- `e2e/`: Playwright `smoke.spec.ts`, `fixtures.ts` (console-error gate, network stubs), `tracker-api.ts`, `seed.sql`.
-- `scripts/`: plain-node tools; `check-repo.ts` (+ `check-repo/`) enforces the rules below.
+  pick-card, cams, conditions, resort, settings, tracker, wall), `styles/` (tokens.css, base.css).
+- `e2e/`: Playwright `smoke.spec.ts` + one spec per feature, `fixtures.ts` (console-error gate, stubs), `tracker-api.ts`, `seed.sql`.
+- `scripts/`: plain-node tools: `check-repo.ts` (+ `check-repo/`) enforces the rules below; `drift-check`, `refresh-fixtures`, `bench-parsers`.
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`, `fonts/` (Barlow woff2 + OFL, <= 120 KB).
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
-- `.github/workflows/`: ci (check, e2e, deploy on main) and health (twice daily `/api/health?strict=1`).
-- Status now: all source adapters writing D1; `/api/cams`, `/api/stake/*`, `/api/tracker` (caps, audit + undo, rate
-  limits); web briefing, pick (crew + "as me"), cams, resort, tracker and settings pages. Not yet built: the MtnPowder
-  browser fallback UI, the wall, the drift workflow, Phase 2 `scripts/{refresh-fixtures,drift-check,bench-parsers}.ts`.
+- `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`), drift (Mondays; `drift` issue).
+- Status now: Phase 2 built: every adapter and `/api` route; briefing, pick (crew + "as me"), cams + timelapse scrubbers,
+  resort (+ model table), tracker, settings (custom base via `/api/drive`), the wall, MtnPowder browser fallback, scripts.
 
 ## Commands
 - `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm deploy` runs from CI on main. Logs: `pnpm wrangler tail`.
 - `pnpm check` = `node scripts/check-repo.ts && biome check . && tsc -b && vitest run`. Must pass before commit.
 - `pnpm test` (vitest projects `unit` = node, `worker` = workerd). `pnpm e2e` (Playwright on `vite preview :4173`;
   `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused).
-- `pnpm exec biome check --write .` formats and applies safe fixes.
+- `pnpm exec biome check --write .` formats + safe fixes. `pnpm drift` (cam drift), `pnpm bench` (parse ms per slot, <= 5).
 - `pnpm cf-typegen` after any `wrangler.jsonc` change; commit `worker-configuration.d.ts`.
 - `pnpm db:local`: local D1 migrations + `e2e/seed.sql` (resets the tracker). Tracker writes need a non-empty
   `IP_HASH_SALT` in `.dev.vars` (else 503 `no-salt`).
@@ -69,7 +69,7 @@
 ## How to add a source, cam or resort
 - Source:
   1. Create `src/worker/sources/<id>.ts` by copying the closest sibling adapter.
-  2. `pnpm fixtures <id>` (Phase 2 script).
+  2. `pnpm fixtures <id>` (trims to <= 30 KB, re-parses; `--wayback <ts>` for in-season captures).
   3. Write `<id>.test.ts`: field assertions on the fixture plus one validation-gate failure.
   4. Register it in `sources/index.ts`; add its id to slots in `config/schedule.ts` (matrix test fails over 45).
   5. If the UI uses it, extend `Snapshot` in `src/shared/types.ts` and `store/snapshot.ts`.

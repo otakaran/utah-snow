@@ -1,6 +1,7 @@
 // Custom base (spec §8.5, §7 GET /api/drive): set through the settings form, the resort cards show the nearest
 // preset's minutes as "≈" while /api/drive is pending, then the answer. /api/drive is stubbed with the drive that
 // e2e/seed.sql caches for 40.761,-111.891 (alta 48 min), so no OSRM call is made.
+import type { Page } from '@playwright/test';
 import { expect, test } from './fixtures.ts';
 
 const DRIVE = {
@@ -16,6 +17,17 @@ const DRIVE = {
   computedAt: '2026-10-13T12:00:00Z',
 };
 const LINK = 'https://www.google.com/maps/place/Hotel/@40.7601,-111.8952,15z/data=!4m6!3m5!3d40.76084!4d-111.89104';
+
+/** Sets the custom base through the settings form's pasted Maps link, then opens the briefing. */
+async function useCustomBase(page: Page): Promise<void> {
+  await page.goto('/#/settings');
+  const form = page.getByTestId('base-custom');
+  await form.getByLabel('Name').fill('E2E Hotel');
+  await form.getByLabel('Paste Google Maps link').fill(LINK);
+  await form.getByRole('button', { name: 'Use this base' }).click();
+  await expect(page.getByTestId('base-chip')).toContainText('E2E Hotel');
+  await page.locator('.app-brand').click();
+}
 
 test('custom base form: bounds error, then ≈ the nearest preset until /api/drive answers', async ({ page }) => {
   const asked: string[] = [];
@@ -53,4 +65,20 @@ test('custom base form: bounds error, then ≈ the nearest preset until /api/dri
   expect(asked).toEqual(['?lat=40.761&lon=-111.891']);
   const stored = await page.evaluate(() => localStorage.getItem('utahsnow.driveCustom'));
   expect(JSON.parse(stored ?? 'null')).toMatchObject({ key: '40.761,-111.891', results: { alta: { min: 48 } } });
+});
+
+test('a partial /api/drive answer marks only the missing resorts ≈; a Guardsman route shows its warning', async ({
+  page,
+}) => {
+  const { snowbasin: _, ...results } = DRIVE.results;
+  const warning = 'route uses seasonally closed Guardsman Pass';
+  const partial = { ...DRIVE, results: { ...results, 'deer-valley': { min: 41, mi: 34.5, warning } }, partial: true };
+  await page.route(/\/api\/drive\?/, (route) => route.fulfill({ json: partial }));
+  await useCustomBase(page);
+  const card = (id: string) => page.locator(`[data-testid="resort-card"][data-resort="${id}"]`);
+  await expect(card('alta')).toContainText('48 min');
+  await expect(card('alta')).not.toContainText('≈');
+  await expect(card('snowbasin')).toContainText('≈');
+  await page.goto('/#/resort/deer-valley');
+  await expect(page.getByTestId('head')).toContainText(warning);
 });
