@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "utah-snow",
+  "main": "./src/worker/index.ts",
+  "compatibility_date": "2026-10-06",
+  "workers_dev": false,
+  "send_metrics": false,
+  "upload_source_maps": true,
+  "routes": [{ "pattern": "utah.otakar.dev", "custom_domain": true }],
+  // no assets.directory: the Cloudflare Vite plugin writes it into the generated build config
+  "assets": { "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  "triggers": { "crons": ["*/5 * * * *"] },
+  "kv_namespaces": [{ "binding": "FRAMES", "id": "00000000-0000-0000-0000-000000000000" }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "utah-snow",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}
