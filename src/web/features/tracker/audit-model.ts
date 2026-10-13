@@ -70,3 +70,11 @@ export function describeAudit(e: AuditLike, nameOf: (id: string) => string): str
   else line = `${e.action} ${e.key}`;
   return e.action === 'undo' ? `Undo: ${line}` : line;
 }
+
+/** The person an audit row is about (day, person or per-person booking), or null for crew-wide rows. */
+export function auditPerson(e: Pick<AuditLike, 'entity' | 'key'>): string | null {
+  const parts = e.key.split('|');
+  const id =
+    e.entity === 'ski_days' ? parts[0] : e.entity === 'people' ? e.key : e.entity === 'bookings' ? parts[2] : null;
+  return id && id !== '*' ? id : null;
+}

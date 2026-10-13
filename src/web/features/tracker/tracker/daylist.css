@@ -1,0 +1,167 @@
+/* Phone day list (DayList.tsx), below 900 px only (the grid takes over from 900 px). Only tokens.css variables.
+   One card per date; chips carry the crew stripe (inset, so the status border keeps its shape):
+   Skied = solid plate + ● dot, Planned = dashed outline + ◌ ring, empty = dotted "+". */
+.trk-daylist {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 900px) {
+  .trk-daylist {
+    display: none;
+  }
+}
+
+.trk-dl {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trk-dl-day {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.trk-dl-day.trk-row-today {
+  border-color: var(--accent);
+  background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--surface);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.trk-dl-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  padding-inline: var(--space-1);
+}
+
+.trk-dl-date {
+  font: 700 var(--fs-body) / 1.2 var(--font-body);
+}
+
+.trk-dl-no {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trk-row-today .trk-dl-no {
+  color: var(--accent);
+}
+
+.trk-row-past .trk-dl-date {
+  color: var(--text-dim);
+}
+
+.trk-dl-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--space-1);
+}
+
+.trk-chip {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: var(--space-1) var(--space-2) var(--space-1) calc(var(--space-2) + 4px);
+  border: 2px solid transparent;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  box-shadow: inset 4px 0 0 var(--crew, var(--line-strong));
+  color: var(--text);
+  font: 700 var(--fs-caption) / 1.2 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.trk-chip:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.trk-chip-skied {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+
+.trk-chip-planned {
+  border: 2px dashed var(--line-strong);
+}
+
+.trk-chip-empty {
+  border: 1px dotted var(--line);
+  color: var(--text-dim);
+}
+
+.trk-chip-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.trk-chip-name {
+  overflow: hidden;
+  color: var(--text);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trk-chip-status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.trk-chip-skied .glyph {
+  color: var(--ok);
+}
+
+.trk-chip-planned .glyph {
+  color: var(--off);
+}
+
+.trk-chip-resort {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trk-chip-add {
+  font: 800 var(--fs-body) / 1 var(--font-display);
+}
+
+.trk-dl-past > summary {
+  min-height: var(--tap);
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.trk-dl-past[open] > summary {
+  margin-bottom: var(--space-2);
+}

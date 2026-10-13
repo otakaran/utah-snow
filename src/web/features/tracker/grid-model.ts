@@ -73,6 +73,14 @@ export function gridRows<D extends CapDay>(
   }));
 }
 
+/** Phone list order (spec §9.5): today, then upcoming dates, then past dates (most recent first, collapsed). */
+export function dayListGroups<R extends { when: When }>(rows: readonly R[]): { head: R[]; past: R[] } {
+  const today = rows.filter((r) => r.when === 'today');
+  const upcoming = rows.filter((r) => r.when === 'future');
+  const past = rows.filter((r) => r.when === 'past').reverse();
+  return { head: [...today, ...upcoming], past };
+}
+
 /** The row to bring into view: today during the trip, else the first (before) or the last (after) trip day. */
 export function focusDate(today: string): string {
   if (!today || today < TRIP.start) return TRIP.start;
@@ -118,4 +126,10 @@ export function resortChoices(
 /** Cell caption: resort and status word, or null for an empty cell. */
 export function cellText(day: Pick<CapDay, 'resortId' | 'status'> | null): { resort: string; status: string } | null {
   return day ? { resort: RESORT_LABEL[day.resortId], status: STATUS_WORD[day.status] } : null;
+}
+
+/** Accessible name of a grid cell or list chip: 'Ana, Sun, Dec 27: Alta, Skied. Change'. */
+export function cellLabel(name: string, dateText: string, day: Pick<CapDay, 'resortId' | 'status'> | null): string {
+  const t = cellText(day);
+  return `${name}, ${dateText}: ${t ? `${t.resort}, ${t.status}` : 'no day recorded'}. Change`;
 }

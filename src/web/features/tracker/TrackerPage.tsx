@@ -1,8 +1,11 @@
 // #/tracker (spec §9.5): the crew's shared Ikon day tracker. Link-only, no login: anyone with the link can edit;
-// every change lands in "Recent changes" with an Undo. Section order: days, days left, save thresholds, bookings,
-// crew, recent changes. With no crew yet, the crew form comes first.
+// a saved edit confirms in the page notice with Undo, and every change lands in "Recent changes" with an Undo.
+// Section order: days (grid from 900 px, list below), days left + save thresholds, bookings, crew, recent changes.
+// With no crew yet, the crew form comes first.
 import { useEffect } from 'preact/hooks';
+import { localDate } from '../../../shared/time.ts';
 import { me, setMe } from '../../data/settings.ts';
+import { serverNow } from '../../data/snapshot.ts';
 import {
   dismissNotice,
   people,
@@ -11,19 +14,21 @@ import {
   trackerNotice,
   trackerSaving,
   trackerServerTime,
+  undoChange,
   watchTracker,
 } from '../../data/tracker.ts';
 import { clock } from '../../lib/format.ts';
+import { Countdown } from '../../ui/Countdown.tsx';
 import { Section } from '../../ui/Section.tsx';
 import { Glyph } from '../../ui/StatusChip.tsx';
 import type { Tone } from '../../ui/status.ts';
 import { AuditLog } from './AuditLog.tsx';
 import { Bookings } from './Bookings.tsx';
+import { DayList } from './DayList.tsx';
 import { DayPicker } from './DayPicker.tsx';
 import { Grid } from './Grid.tsx';
 import { People } from './People.tsx';
 import { Summary } from './Summary.tsx';
-import { Thresholds } from './Thresholds.tsx';
 import './tracker.css';
 
 function SyncLine() {
@@ -79,10 +84,11 @@ function IAm() {
 
 const NOTICE_TONE: Record<'ok' | 'warn' | 'bad', Tone> = { ok: 'ok', warn: 'warn', bad: 'bad' };
 
-/** Inline result of the last change: cap reached, rate limit, conflict, server warnings. */
+/** Inline result of the last change: saved (with Undo), cap reached, rate limit, conflict, server warnings. */
 function Notice() {
   const n = trackerNotice.value;
   if (!n) return null;
+  const { undo } = n;
   return (
     <div
       class={`trk-notice trk-notice-${n.tone}`}
@@ -91,6 +97,18 @@ function Notice() {
     >
       <Glyph tone={NOTICE_TONE[n.tone]} />
       <p>{n.text}</p>
+      {undo !== undefined ? (
+        <button
+          type="button"
+          class="btn"
+          onClick={() => {
+            dismissNotice();
+            void undoChange(undo);
+          }}
+        >
+          Undo
+        </button>
+      ) : null}
       <button type="button" class="btn-icon" aria-label="Dismiss" onClick={dismissNotice}>
         ×
       </button>
@@ -102,7 +120,7 @@ export function TrackerPage() {
   useEffect(() => watchTracker(), []);
   const empty = people.value.length === 0;
   const crew = (
-    <Section testid="tracker-people" index={empty ? '01' : '05'} title="Crew">
+    <Section testid="tracker-people" index={empty ? '01' : '04'} title="Crew">
       <People />
     </Section>
   );
@@ -111,6 +129,7 @@ export function TrackerPage() {
       <div class="trk-head">
         <div>
           <h1 class="page-title">Day tracker</h1>
+          <Countdown today={localDate(serverNow.value)} />
           <p class="trk-lede">Shared by link: anyone with it can edit. Every change can be undone below.</p>
           <SyncLine />
         </div>
@@ -125,20 +144,18 @@ export function TrackerPage() {
         <>
           <Section testid="tracker-days" index="01" title="Ski days" sub="Tap a day to set or clear a resort">
             <Grid />
+            <DayList />
           </Section>
-          <Section testid="tracker-summary" index="02" title="Days left">
+          <Section testid="tracker-summary" index="02" title="Days left" sub="Number = snow worth a capped day">
             <Summary />
           </Section>
-          <Section testid="tracker-thresholds" index="03" title="Save thresholds">
-            <Thresholds />
-          </Section>
-          <Section testid="tracker-bookings" index="04" title="Bookings">
+          <Section testid="tracker-bookings" index="03" title="Bookings">
             <Bookings />
           </Section>
           {crew}
         </>
       )}
-      <Section testid="tracker-audit" index={empty ? '02' : '06'} title="Recent changes">
+      <Section testid="tracker-audit" index={empty ? '02' : '05'} title="Recent changes">
         <AuditLog />
       </Section>
       <Notice />

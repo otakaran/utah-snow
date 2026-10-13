@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CapDay } from '../../../shared/caps.ts';
-import { capTable, capTone, capWord } from './summary-model.ts';
+import { capTable, capTone, capWord, pips } from './summary-model.ts';
 
 const d = (personId: string, date: string, resortId: CapDay['resortId'], status: CapDay['status'] = 'skied') => ({
   personId,
@@ -40,10 +40,16 @@ describe('tracker cap summary', () => {
     expect(t.rows[1]?.cells[1]).toMatchObject({ group: 'brighton', remaining: 6, tone: 'ok' });
   });
 
+  it('punches skied, then planned, then left pips; none when unlimited, extra ones over the cap', () => {
+    expect(pips(4, 1, 2)).toEqual(['skied', 'planned', 'planned', 'left']);
+    expect(pips(null, 3, 0)).toEqual([]);
+    expect(pips(2, 2, 1)).toEqual(['skied', 'skied', 'planned']);
+  });
+
   it('adds a crew-minimum row only for two or more people', () => {
     const days = Array.from({ length: 7 }, (_, i) => d('eva', `2027-01-0${i + 1}`, 'brighton'));
     const t = capTable(people, days);
-    expect(t.crew?.[1]).toMatchObject({ group: 'brighton', remaining: 0, tone: 'bad', word: 'None left' });
+    expect(t.crew?.[1]).toMatchObject({ group: 'brighton', remaining: 0, tone: 'bad', word: 'None left', skied: 7 });
     expect(t.crew?.[0]).toMatchObject({ group: 'alta-snowbird', remaining: 7 });
     expect(t.crew?.[4]?.remaining).toBeNull();
     expect(capTable(people.slice(0, 1), days).crew).toBeNull();

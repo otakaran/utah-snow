@@ -1,0 +1,24 @@
+/* Countdown (ui/Countdown.tsx): Barlow Condensed 900 digits in --snow with --snow-glow, one step below the page
+   title (--fs-2 under --fs-1), so it never outranks it. Only tokens.css variables. */
+.countdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.35em;
+  margin: var(--space-1) 0 0;
+  font: 800 var(--fs-caption) / 1.1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.countdown-num {
+  color: var(--snow);
+  font-size: var(--fs-2);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 14px var(--snow-glow);
+}
+
+.countdown-word {
+  color: var(--text-dim);
+}

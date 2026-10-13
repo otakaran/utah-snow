@@ -1,5 +1,5 @@
-// The tracker page's inline notice (cap reached, rate limit, conflict, server warnings) and the device's client id.
-// Re-exported through data/tracker.ts; import from there.
+// The tracker page's inline notice (saved with Undo, cap reached, rate limit, conflict, server warnings) and the
+// device's client id. Re-exported through data/tracker.ts; import from there.
 import { signal } from '@preact/signals';
 
 export type NoticeTone = 'ok' | 'warn' | 'bad';
@@ -7,6 +7,8 @@ export interface Notice {
   id: number;
   tone: NoticeTone;
   text: string;
+  /** Audit id the notice's Undo reverts (a saved edit), else absent. */
+  undo?: number;
 }
 
 const NOTICE_MS = 8_000;
@@ -19,10 +21,10 @@ let seq = 0;
 let timer: ReturnType<typeof setTimeout> | null = null;
 
 /** Shows an inline notice; ok and warn clear themselves, bad stays until dismissed or replaced. */
-export function notify(tone: NoticeTone, text: string): void {
+export function notify(tone: NoticeTone, text: string, undo?: number | null): void {
   if (timer) clearTimeout(timer);
   const id = ++seq;
-  trackerNotice.value = { id, tone, text };
+  trackerNotice.value = typeof undo === 'number' ? { id, tone, text, undo } : { id, tone, text };
   timer =
     tone === 'bad'
       ? null

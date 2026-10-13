@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   addDays,
   daysRemaining,
+  daysUntil,
   denverOffsetMin,
   formatClock,
   formatClockRel,
@@ -108,6 +109,14 @@ describe('trip days', () => {
     expect(tripDayNumber('2027-01-01')).toBe(6);
     expect(tripDayNumber('2027-02-01')).toBeNull();
     expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+  });
+
+  it('counts whole days until a date, 0 on or after it or for bad input', () => {
+    expect(daysUntil('2026-10-13', '2026-12-27')).toBe(75);
+    expect(daysUntil('2026-12-26', '2026-12-27')).toBe(1);
+    expect(daysUntil('2026-12-27', '2026-12-27')).toBe(0);
+    expect(daysUntil('2027-01-02', '2026-12-27')).toBe(0);
+    expect(daysUntil('', '2026-12-27')).toBe(0);
   });
 
   it('switches on tomorrow at tomorrowFrom only when tomorrow is a trip day', () => {

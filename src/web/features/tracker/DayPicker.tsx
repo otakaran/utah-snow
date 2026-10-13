@@ -1,6 +1,6 @@
 // Bottom-sheet picker for one grid cell (spec §9.5): Planned/Skied, the 7 resort values and Clear. A choice is off,
 // with its reason shown, when the resort is skiers-only for a boarder or the cap group is used up. Choosing saves
-// at once (optimistic); the server's verdict shows in the page notice. Native modal <dialog>: Esc and focus trap.
+// at once (optimistic); the page notice confirms it (with Undo) or says why not. Native modal <dialog>: Esc, focus trap.
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import type { DayStatus } from '../../../shared/caps.ts';
 import { formatLocalDate, localDate } from '../../../shared/time.ts';
@@ -9,7 +9,7 @@ import { serverNow } from '../../data/snapshot.ts';
 import { mutate, people, skiDays } from '../../data/tracker.ts';
 import { Icon } from '../../ui/Icon.tsx';
 import { Toggle } from '../../ui/Toggle.tsx';
-import { defaultStatus, resortChoices } from './grid-model.ts';
+import { defaultStatus, RESORT_LABEL, resortChoices } from './grid-model.ts';
 import { closePicker, pickerTarget } from './picker-state.ts';
 
 const STATUS_OPTIONS = [
@@ -44,16 +44,18 @@ export function DayPicker() {
     else if (!open && d.open) d.close();
   }, [open]);
 
+  const md = t ? formatLocalDate(t.date, 'md') : '';
   const choose = (resortId: TrackerResort) => {
-    if (!t) return;
+    if (!t || !person) return;
     if (day?.resortId !== resortId || day.status !== status) {
-      void mutate({ op: 'upsertDay', personId: t.personId, date: t.date, resortId, status });
+      const saved = `${person.name} → ${RESORT_LABEL[resortId]}, ${md} saved`;
+      void mutate({ op: 'upsertDay', personId: t.personId, date: t.date, resortId, status }, saved);
     }
     closePicker();
   };
   const clear = () => {
-    if (!t) return;
-    void mutate({ op: 'deleteDay', personId: t.personId, date: t.date });
+    if (!t || !person) return;
+    void mutate({ op: 'deleteDay', personId: t.personId, date: t.date }, `${person.name} · ${md} cleared`);
     closePicker();
   };
   const onBackdrop = (e: MouseEvent) => {

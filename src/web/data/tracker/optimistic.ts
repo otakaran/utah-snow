@@ -1,7 +1,7 @@
 // Pure op helpers for the tracker store: the optimistic patch shown while an op is in flight, the
 // optimistic-concurrency token it sends, and what to do after a 409 (spec §9.3). Collections an op does not touch
 // keep their array identity, so views that read only them do not re-render.
-import type { BookingRow, DayRow, PersonRow, TrackerOp, TrackerState } from './wire.ts';
+import type { AuditEntry, BookingRow, DayRow, PersonRow, TrackerOp, TrackerState } from './wire.ts';
 
 const sameDay = (d: DayRow, personId: string, date: string): boolean => d.personId === personId && d.date === date;
 const sameBooking = (b: BookingRow, o: { date: string; kind: string; personId: string }): boolean =>
@@ -125,4 +125,34 @@ export function conflictPlan(s: TrackerState, op: TrackerOp): ConflictPlan {
     default:
       return 'stop';
   }
+}
+
+/** The audit `entity|key` an op writes (worker mutate.ts), or null when it has none to undo (addPerson, undo). */
+function auditKey(op: TrackerOp): string | null {
+  switch (op.op) {
+    case 'upsertDay':
+    case 'deleteDay':
+      return `ski_days|${op.personId}|${op.date}`;
+    case 'updatePerson':
+    case 'removePerson':
+      return `people|${op.personId}`;
+    case 'upsertBooking':
+    case 'deleteBooking':
+      return `bookings|${op.date}|${op.kind}|${op.personId}`;
+    case 'addPerson':
+    case 'undo':
+      return null;
+  }
+}
+
+/** The id of the audit row a just-accepted op wrote (the newest live row of its action and key), for its Undo. */
+export function auditIdFor(audit: readonly AuditEntry[], op: TrackerOp): number | null {
+  const key = auditKey(op);
+  if (key === null) return null;
+  let best: AuditEntry | null = null;
+  for (const e of audit) {
+    if (e.action !== op.op || e.undoneBy !== null || `${e.entity}|${e.key}` !== key) continue;
+    if (!best || e.at > best.at || (e.at === best.at && e.id > best.id)) best = e;
+  }
+  return best?.id ?? null;
 }
