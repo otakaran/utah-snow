@@ -5,14 +5,14 @@
 // moves the validators but neither `t` nor `asOf` (the 'unchanged' check). Pictures older than 24 h are not
 // archived (off-season or frozen cam): no timelapse window could show them. The archive core is
 // src/shared/stake-archive.ts (shared with stake-skiutah).
-import type { CamId } from '../../../config/cams/index.ts';
+import { ALTA_BOARD } from '../../../config/cams/alta.ts';
 import { readCam, type StakeFrame, type StakeShot, settle, toShot } from '../../shared/stake-archive.ts';
 import { MIN } from '../../shared/time.ts';
 import type { StakeRow } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const STAKE_ALTA_URL = 'https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg';
-export const STAKE_ALTA_CAM = 'alta-collins-stake' satisfies CamId;
+export const STAKE_ALTA_CAM = ALTA_BOARD.cam;
 const ROW = 'stake:alta';
 
 export const stakeAlta: Source<StakeShot> = {

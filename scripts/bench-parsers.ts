@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { SLOTS } from '../config/schedule.ts';
 import { isObj } from '../src/shared/json.ts';
+import { slotJobIds } from '../src/worker/cron/slots.ts';
 import type { Source } from '../src/worker/sources/types.ts';
 import { shimCtx, waybackMs } from './lib/fetch-shim.ts';
 import { JOBS, MAINT_SUBS, MAINTENANCE, openedPrev } from './lib/jobs.ts';
@@ -56,11 +57,8 @@ const decode = (s: string) =>
     isObj(v) && typeof v.$bytes === 'string' ? Uint8Array.from(Buffer.from(v.$bytes, 'base64')).buffer : v,
   ) as Payload;
 
-/** The jobs a slot can run (morning included); maintenance stands for its sub-jobs. */
-const slotJobs = (slot: number): string[] => {
-  const def = SLOTS[slot];
-  return [...new Set([...(def?.always ?? []), ...(def?.morning ?? [])])];
-};
+/** The jobs a slot can run (morning and maintenance included); maintenance stands for its sub-jobs. */
+const slotJobs = (slot: number): string[] => slotJobIds(slot, true, true);
 const sourcesOf = (id: string): readonly Source[] =>
   id === MAINTENANCE ? MAINT_SUBS : JOBS.filter((j) => j.id === id);
 

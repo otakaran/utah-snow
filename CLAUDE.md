@@ -16,7 +16,7 @@
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
 - `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
   `probe-seed.ts` (hosts no adapter probes). Adapters: `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/` (+ `<id>/` helpers).
-- `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs against the budget; 08Z D1 prune), `job.ts` (one job's writes).
+- `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs within budget; 08Z prune), `job.ts`, `slots.ts` (pure slot rules).
 - `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, tick-state, row-meta, history, frames, counters,
   prune, tracker; `test-db.ts` for tests).
 - `src/worker/api/`: one file per route + contract test (`edge.ts`: caches.default + ETag; `post-guard.ts`: shared POST checks);

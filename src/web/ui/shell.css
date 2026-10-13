@@ -217,7 +217,7 @@
   gap: var(--space-1);
 }
 
-/* "Coming soon" placeholder routes */
+/* Route error box (app.tsx RouteBoundary) */
 .stub {
   display: grid;
   gap: var(--space-3);

@@ -30,11 +30,14 @@ let listening = false;
 
 const onWall = (): boolean => route.peek().name === 'wall';
 
+/** A phone-width viewport (max-width 600px): the HLS cap here and the scrubber's 15-min step. */
+export const isPhone = (): boolean => typeof matchMedia === 'function' && matchMedia(PHONE_QUERY).matches;
+
 /** Concurrent HLS players allowed on this page right now. */
 export function hlsCap(): number {
   const r = route.peek();
   if (r.name === 'wall') return Math.max(0, Math.min(r.params.hls, WALL_HLS_MAX));
-  return typeof matchMedia === 'function' && matchMedia(PHONE_QUERY).matches ? 1 : 2;
+  return isPhone() ? 1 : 2;
 }
 
 const capOf = (kind: PlayerKind): number => (kind === 'youtube' ? 1 : hlsCap());

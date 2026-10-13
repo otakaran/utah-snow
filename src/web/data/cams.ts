@@ -3,6 +3,7 @@
 // Until the first answer, or while it fails, tiles render from config/cams alone (an error keeps the last good
 // states). Also sends YouTube player errors to POST /api/cams/report (one per cam per 10 min).
 import { signal } from '@preact/signals';
+import { YT_REPORT_CODES } from '../../../config/youtube.ts';
 import type { CamState, YtUnmapped } from '../../shared/types.ts';
 
 /** One /api/cams entry; archive cams also carry their newest KV frame. */
@@ -19,7 +20,7 @@ export type CamsApiStatus = 'idle' | 'ok' | 'error';
 const PERIOD_MS = 60_000;
 const TICK_MS = 15_000;
 const REPORT_GAP_MS = 10 * 60_000;
-export const YT_REPORT_CODES: ReadonlySet<number> = new Set([2, 5, 100, 101, 150, 153]);
+const REPORT_CODES: ReadonlySet<number> = new Set(YT_REPORT_CODES);
 
 export const camStates = signal<ReadonlyMap<string, CamApiState>>(new Map());
 export const camsStatus = signal<CamsApiStatus>('idle');
@@ -77,7 +78,7 @@ export function ensureCams(): void {
 
 /** Tells the Worker a YouTube embed failed (spec §8.3), at most once per cam per 10 min. Fire and forget. */
 export function reportYtError(camId: string, code: number): void {
-  if (!YT_REPORT_CODES.has(code)) return;
+  if (!REPORT_CODES.has(code)) return;
   const now = Date.now();
   if (now - (reportedAt.get(camId) ?? 0) < REPORT_GAP_MS) return;
   reportedAt.set(camId, now);

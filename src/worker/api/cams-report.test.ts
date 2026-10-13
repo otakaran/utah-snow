@@ -2,9 +2,7 @@ import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
 import worker from '../index.ts';
-import { ipHash } from '../lib/hash.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
-import { rateCounters } from './post-guard.ts';
 
 const ORIGIN = 'https://utah.otakar.dev';
 const IP = '203.0.113.9';
@@ -63,22 +61,9 @@ describe('POST /api/cams/report', () => {
     expect(await keys()).toEqual([]);
   });
 
-  it('applies the tracker guards: 403 without the headers/Origin, 429 over the shared IP limit', async () => {
-    for (const h of [
-      { ...HEADERS, Origin: 'https://evil.example' },
-      { ...HEADERS, 'X-Requested-With': '' },
-    ]) {
-      const res = await report({ camId: CAM, code: 150 }, h);
-      expect(res.status).toBe(403);
-      expect(await res.json()).toEqual({ error: 'forbidden' });
-    }
-    const [hour] = rateCounters(await ipHash(IP, testEnv.IP_HASH_SALT), Date.now());
-    await env.DB.prepare('INSERT INTO counters (key, value, expires_at) VALUES (?1, 120, ?2)')
-      .bind(hour?.key, hour?.expiresAt)
-      .run();
-    const res = await report({ camId: CAM, code: 150 });
-    expect(res.status).toBe(429);
-    expect(await res.json()).toMatchObject({ error: 'rate-limited' });
+  it('runs the shared POST guard first (api/post-guard.ts): 403 without X-Requested-With', async () => {
+    const res = await report({ camId: CAM, code: 150 }, { ...HEADERS, 'X-Requested-With': '' });
+    expect(res.status).toBe(403);
     expect(await keys()).toEqual([]);
   });
 });

@@ -17,11 +17,12 @@ import { WallSidebar } from './WallSidebar.tsx';
 function useTicker(seconds: number, paused: boolean, reset: string): number {
   const [n, setN] = useState(0);
   useEffect(() => setN(0), [reset]);
+  // `reset` also restarts the interval, so a new set gets a full period.
   useEffect(() => {
     if (paused) return;
     const t = setInterval(() => setN((x) => x + 1), seconds * 1000);
     return () => clearInterval(t);
-  }, [seconds, paused]);
+  }, [seconds, paused, reset]);
   return n;
 }
 

@@ -36,6 +36,9 @@ export const CAMS = [
 /** Every registered cam id, so references to cams are checked at compile time. */
 export type CamId = (typeof CAMS)[number]['id'];
 
+/** Cam lookup by id (web tiles, the wall, the Worker's frame lists). */
+export const CAM_BY_ID: ReadonlyMap<string, CamDef> = new Map(CAMS.map((c): [string, CamDef] => [c.id, c]));
+
 /** StakeRow and TV-wall order (5–6 tiles; brighton-snowstake-skiutah is omitted while hiddenUntilFresh). */
 export const STAKE_ORDER = [
   'alta-collins-stake',

@@ -57,5 +57,5 @@ INSERT OR REPLACE INTO people (id, name, mode, color, created_at, updated_at, de
 
 INSERT OR REPLACE INTO drive_cache (key, payload, created_at) VALUES ('40.761,-111.891', json_object(
   'origin', json_object('lat', 40.761, 'lon', -111.891),
-  'results', json('{"alta":{"min":48,"mi":31.2},"snowbird":{"min":45,"mi":29.9},"brighton":{"min":46,"mi":31.0,"via":"bcc-mouth"},"solitude":{"min":43,"mi":28.6,"via":"bcc-mouth"},"deer-valley":{"min":41,"mi":34.5},"snowbasin":{"min":52,"mi":47.8}}'),
-  'computedAt', strftime('%Y-%m-%dT%H:%M:%SZ', 'now')), unixepoch() * 1000);
+  'results', json('{"alta":{"min":48,"mi":31.2},"snowbird":{"min":45,"mi":29.9},"brighton":{"min":46,"mi":31.0,"via":"bcc-mouth"},"solitude":{"min":43,"mi":28.6,"via":"bcc-mouth"},"deer-valley":{"min":41,"mi":34.5},"snowbasin":{"min":52,"mi":47.8}}')),
+  unixepoch() * 1000);

@@ -2,6 +2,7 @@
    status chips and freshness badges come from ui/ (ui.css); classes here are prefixed cond-.
    Row tones set --tone (the left edge); NAC levels set --nac (fill) and --nac-text (ink). */
 @import "./conditions/rows.css";
+@import "./conditions/model-table.css";
 
 /* avalanche: NAC diamond, level word, labelled scale */
 .cond-zone {

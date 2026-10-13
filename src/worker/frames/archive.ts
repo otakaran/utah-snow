@@ -1,7 +1,8 @@
 // Archive frame lists (spec §6.3): the stake_frames index of one KV-archived cam -> scrubber frames and markers,
 // plus the KV read of one frame. Frames newer than READY_MS are never listed, because a fresh KV put may not have
 // propagated yet. Shared by the provider lists: FramesQuery, parseQuery and thin. Wire types: src/shared/types/cams.ts.
-import { CAMS } from '../../../config/cams/index.ts';
+import { ALTA_BOARD } from '../../../config/cams/alta.ts';
+import { CAM_BY_ID } from '../../../config/cams/index.ts';
 import { addDays, formatClock, HOUR, localDate, MIN, zonedToUtc } from '../../shared/time.ts';
 import type { CamDef, FrameMarker, TimelapseFrame } from '../../shared/types.ts';
 import { listFrames, readFrame } from '../store/frames.ts';
@@ -10,18 +11,14 @@ export const READY_MS = 2 * MIN;
 export const MAX_HOURS = 26; // the KV TTL; nothing older exists
 export const DEFAULT_HOURS = 24;
 const T_RE = /^\d{1,15}$/;
-const ALTA_STAKE = 'alta-collins-stake'; // cleared at 04:00 and 16:00 local; other stakes' reset times are unknown
-const CLEARS = ['04:00', '16:00'] as const;
-const PRE_CLEAR_MS = 30 * MIN;
+const PRE_CLEAR_MS = 30 * MIN; // only Alta's board-clear times are known (ALTA_BOARD)
 
 export interface FramesQuery {
   hours: number;
   step: 5 | 15;
 }
 
-const BY_ID = new Map((CAMS as readonly CamDef[]).map((c) => [c.id, c]));
-
-export const camDef = (id: string): CamDef | undefined => BY_ID.get(id);
+export const camDef = (id: string): CamDef | undefined => CAM_BY_ID.get(id);
 
 /** The cam whose KV archive backs this cam's timelapse (the `-still` twin for the live stakes), else null. */
 export function archiveSource(def: CamDef): string | null {
@@ -42,15 +39,19 @@ export function parseQuery(params: URLSearchParams): FramesQuery {
 
 export const frameUrl = (camId: string, t: number): string => `/api/stake/${camId}/frame/${t}`;
 
-/** Keeps frames at least `stepMin` apart, walking back from the newest (so the newest is always kept). */
+/**
+ * Keeps frames about `stepMin` apart, walking back from the newest (so the newest is always kept). A gap up to a
+ * tenth (at most 1 min) short still counts: frame times jitter by milliseconds (HDRelay) or seconds (Last-Modified).
+ */
 export function thin<T extends { t: number }>(rows: readonly T[], stepMin: number): T[] {
   if (stepMin <= 5) return [...rows];
   const gap = stepMin * MIN;
+  const min = gap - Math.min(MIN, gap / 10);
   const out: T[] = [];
   for (let i = rows.length - 1; i >= 0; i--) {
     const r = rows[i] as T;
     const last = out[out.length - 1];
-    if (!last || last.t - r.t >= gap) out.push(r);
+    if (!last || last.t - r.t >= min) out.push(r);
   }
   return out.reverse();
 }
@@ -60,7 +61,7 @@ export function altaMarkers(frames: readonly { t: number }[], from: number, to: 
   const out: FrameMarker[] = [];
   const last = localDate(to);
   for (let date = localDate(from); date && date <= last; date = addDays(date, 1)) {
-    for (const hm of CLEARS) {
+    for (const hm of ALTA_BOARD.clears) {
       const t = zonedToUtc(`${date} ${hm}`);
       if (t === null || t < from || t > to) continue;
       const pre = frames.filter((f) => f.t >= t - PRE_CLEAR_MS && f.t < t).at(-1);
@@ -82,7 +83,7 @@ export function buildArchive(
     const url = frameUrl(source, r.t);
     return { t: r.t, thumb: url, full: url, bytes: r.bytes };
   });
-  const markers = source === ALTA_STAKE ? altaMarkers(frames, window.from, window.to) : [];
+  const markers = source === ALTA_BOARD.cam ? altaMarkers(frames, window.from, window.to) : [];
   return { frames, markers };
 }
 

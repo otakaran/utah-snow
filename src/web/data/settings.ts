@@ -5,6 +5,8 @@
 import { computed, type ReadonlySignal, type Signal, signal } from '@preact/signals';
 import { BASES, type BaseId, CUSTOM_BOUNDS, DEFAULT_BASE } from '../../../config/bases.ts';
 import { STRATEGY } from '../../../config/strategy.ts';
+import { wasatchPoint } from '../../shared/geo.ts';
+import { isObj } from '../../shared/json.ts';
 import type { Units } from '../../shared/units.ts';
 import { WALL_DEFAULTS, type WallParams, wallParams } from '../router.ts';
 
@@ -72,18 +74,19 @@ const oneOf =
   (raw: unknown): T | undefined =>
     values.find((v) => v === raw);
 
-const isObj = (raw: unknown): raw is Record<string, unknown> => typeof raw === 'object' && raw !== null;
 const inRange = (n: unknown, [lo, hi]: readonly [number, number]): n is number =>
   typeof n === 'number' && Number.isFinite(n) && n >= lo && n <= hi;
-const round = (n: number, dp: number): number => Math.round(n * 10 ** dp) / 10 ** dp;
 
-/** A valid custom base (Wasatch bounds, 1-30 char label, rounded to 3 dp), or null ("Outside the Wasatch area"). */
+/** The trimmed label is 1-30 characters. */
+export const labelOk = (label: string): boolean => {
+  const n = label.trim().length;
+  return n >= CUSTOM_BOUNDS.labelLen[0] && n <= CUSTOM_BOUNDS.labelLen[1];
+};
+
+/** A valid custom base (1-30 char label, wasatchPoint: 3 dp inside the bounds, as /api/drive checks), or null. */
 export function checkCustomBase(lat: number, lon: number, label: string): CustomBase | null {
-  const name = label.trim();
-  const [minLen, maxLen] = CUSTOM_BOUNDS.labelLen;
-  if (name.length < minLen || name.length > maxLen) return null;
-  if (!inRange(lat, CUSTOM_BOUNDS.lat) || !inRange(lon, CUSTOM_BOUNDS.lon)) return null;
-  return { lat: round(lat, CUSTOM_BOUNDS.dp), lon: round(lon, CUSTOM_BOUNDS.dp), label: name };
+  const p = labelOk(label) ? wasatchPoint(lat, lon) : null;
+  return p ? { ...p, label: label.trim() } : null;
 }
 
 const isBaseId = (id: unknown): id is BaseId => typeof id === 'string' && Object.hasOwn(BASES, id);

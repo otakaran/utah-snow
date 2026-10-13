@@ -27,7 +27,7 @@
 
 ## API conventions (`api/`, one file per route)
 - `http.ts` helpers: `json()`, ETag/304, cache helpers. Every `/api` response sends `X-Robots-Tag`, `Referrer-Policy`, `X-Content-Type-Options`.
-- No CORS headers. `caches.default` only for snapshot, cams and stake. `/api/drive`: D1 `drive_cache` (30 d), 20 misses/day.
+- No CORS headers. `caches.default` only for snapshot, cams and stake. `/api/drive`: D1 `drive_cache`, limits in its header.
 - `/api/snapshot` sends `X-Build` = `BUILD_ID` (`http.ts`: Vite `define` `__BUILD_ID__`, `'dev'` under Vitest); the wall reloads on change.
 - `/api/debug/probe`: the unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`. `/api/health?strict=1`: 503 until `cron:last`.
 - `/api/tracker` (`api/tracker/`; SQL in `store/tracker.ts` + `tracker/writes.ts`; wire types `shared/types/tracker.ts`): GET no-store; POST one op; 409 carries `current`. Its guard

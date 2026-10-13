@@ -2,12 +2,12 @@
 // and the freshness footer (with the set and a Paused marker); the 3-day snow mini-table runs under the cam grid
 // (SnowDays). Night: clock, roads and footer only. The clock (--fs-clock) never outsizes the pick name
 // (--fs-pick-name); everything sits inside --wall-safe (wall.css).
+import { WALL_SET_DEFS, type WallSet } from '../../../../config/wall.ts';
 import { isoToMs } from '../../../shared/time.ts';
 import { globalBadge } from '../../data/health.ts';
 import { units } from '../../data/settings.ts';
 import { offline, snapshot } from '../../data/snapshot.ts';
 import { clock, shortDate } from '../../lib/format.ts';
-import type { WallSet } from '../../router.ts';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { AvalanchePanel, RoadsPanel } from '../conditions/index.ts';
 import { crewPick, PickCompact } from '../pick-card/index.ts';
@@ -18,15 +18,6 @@ interface Props {
   set: WallSet;
   paused: boolean;
 }
-
-const SET_LABEL: Record<WallSet, string> = {
-  all: 'All resorts',
-  stakes: 'Stakes',
-  lcc: 'Little Cottonwood',
-  bcc: 'Big Cottonwood',
-  pc: 'Park City',
-  ogden: 'Ogden',
-};
 
 /** PickCompact (crew, no ridge) plus the pick's top 2 reasons, which replace the card's single line (wall.css). */
 function WallPick() {
@@ -57,7 +48,7 @@ function Footer({ now, set, paused }: Omit<Props, 'night'>) {
         {offline.value ? <b class="wall-offline">Offline</b> : null}
       </span>
       <span class="wall-set">
-        {SET_LABEL[set]}
+        {WALL_SET_DEFS[set].short}
         {paused ? <b class="wall-paused"> · Paused</b> : null}
       </span>
     </footer>

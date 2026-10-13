@@ -1,5 +1,6 @@
 // D1 `counters` (key, value, expires_at) plus the /api/health quota reads (spec §5.3, §7, §9.1).
 // Every write refreshes expires_at = now + ttl, so `expires_at - ttl` is the last write time.
+import { OSRM } from '../../../config/bases.ts';
 import { CPU_SUSPECT_TTL_MS } from '../../../config/schedule.ts';
 import { addDays, DAY, HOUR, localDate, ptDate, zonedToUtc } from '../../shared/time.ts';
 
@@ -37,17 +38,21 @@ export async function incrementCounter(
 
 export interface RateCounter {
   key: string;
+  limit: number;
   expiresAt: number; // window end, epoch ms
 }
 
-/** One batch of counter increments (the shared POST rate limits, spec §9.4); returns each counter's new value, in order. */
-export async function bumpCounters(db: D1Database, counters: readonly RateCounter[]): Promise<number[]> {
+/**
+ * One batch of conditional increments (the rate limits, spec §7, §9.4): each counter gets +1 only while it is below
+ * its limit, so a request over a limit writes nothing to it. Returns, in order, whether each one was under its limit.
+ */
+export async function bumpUnder(db: D1Database, counters: readonly RateCounter[]): Promise<boolean[]> {
   const stmt = db.prepare(
     `INSERT INTO counters (key, value, expires_at) VALUES (?1, 1, ?2)
-     ON CONFLICT(key) DO UPDATE SET value = counters.value + 1 RETURNING value`,
+     ON CONFLICT(key) DO UPDATE SET value = counters.value + 1 WHERE counters.value < ?3 RETURNING value`,
   );
-  const rs = await db.batch(counters.map((c) => stmt.bind(c.key, c.expiresAt)));
-  return rs.map((r) => Number((r.results[0] as { value?: number } | undefined)?.value ?? 0));
+  const rs = await db.batch(counters.map((c) => stmt.bind(c.key, c.expiresAt, c.limit)));
+  return rs.map((r) => r.results.length > 0);
 }
 
 /** `cpu-suspect:{job}:{Denver date}` increment for the dispatcher's tick-start batch. */
@@ -60,14 +65,40 @@ export const bumpYtPending = (db: D1Database, camId: string, now: number): Promi
   incrementCounter(db, `${YT_PENDING}:${camId}`, 1, YT_PENDING_TTL_MS, now);
 
 /**
- * GET /api/drive cache misses today: `drive:{YYYYMMDD}` (Denver day), expiring at the next Denver midnight.
- * Returns the new count and that midnight (epoch ms) for the 429's retryAfterS.
+ * GET /api/drive limits for the Denver day, expiring at the next Denver midnight (`resetAt`, for retryAfterS):
+ * `drive:ip:{ipHash}:{YYYYMMDD}` counts one client's lookups (cache hits too), `drive:{YYYYMMDD}` everyone's misses.
  */
-export async function bumpDriveMisses(db: D1Database, now: number): Promise<{ count: number; resetAt: number }> {
+export function driveCounters(
+  hash: string,
+  now: number,
+): { lookups: RateCounter; misses: RateCounter; resetAt: number } {
   const today = localDate(now);
+  const day = today.replace(/-/g, '');
   const resetAt = zonedToUtc(`${addDays(today, 1)} 00:00`) ?? now + DAY;
-  const count = await incrementCounter(db, `drive:${today.replace(/-/g, '')}`, 1, resetAt - now, now);
-  return { count, resetAt };
+  return {
+    lookups: { key: `drive:ip:${hash}:${day}`, limit: OSRM.lookupsPerIpDay, expiresAt: resetAt },
+    misses: { key: `drive:${day}`, limit: OSRM.missesPerDay, expiresAt: resetAt },
+    resetAt,
+  };
+}
+
+const DRIVE_LEASE = 'drive:lease';
+
+/** Takes the single /api/drive miss lease until `until` (free, or the holder's expired); false while it is held. */
+export async function takeDriveLease(db: D1Database, now: number, until: number): Promise<boolean> {
+  const row = await db
+    .prepare(
+      `INSERT INTO counters (key, value, expires_at) VALUES (?1, 1, ?2)
+       ON CONFLICT(key) DO UPDATE SET expires_at = excluded.expires_at WHERE counters.expires_at <= ?3 RETURNING value`,
+    )
+    .bind(DRIVE_LEASE, until, now)
+    .first();
+  return row !== null;
+}
+
+/** Ends this request's lease (`until` as taken), never a later holder's. */
+export async function releaseDriveLease(db: D1Database, until: number): Promise<void> {
+  await db.prepare('DELETE FROM counters WHERE key = ?1 AND expires_at = ?2').bind(DRIVE_LEASE, until).run();
 }
 
 /** YouTube quota counter key: the quota day is Pacific. */

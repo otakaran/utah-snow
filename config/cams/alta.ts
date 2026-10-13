@@ -3,6 +3,7 @@
 // stake, which is `collins-snow-stake`. Prism `archr_cam_id` is 65 (albion-basin) and 88 (mount-baldy).
 // do_still: plain <img> only (the host sends no ACAO); never crossorigin, fetch or canvas.
 import type { CamDef } from '../../src/shared/types.ts';
+import type { CamId } from './index.ts';
 
 const DO = 'https://alta-webcams.sfo3.cdn.digitaloceanspaces.com';
 const GCS = 'https://storage.googleapis.com';
@@ -21,9 +22,15 @@ const PRISM = {
   credit: 'Alta · Prism',
 } as const;
 
+/** The Collins stake board is cleared at these local times (scrubber markers, the stake tile's note). */
+export const ALTA_BOARD = { cam: 'alta-collins-stake', clears: ['04:00', '16:00'] } as const satisfies {
+  cam: CamId;
+  clears: readonly [string, string];
+};
+
 // biome-ignore format: dense registry, one cam per 2-4 lines
 export const ALTA_CAMS = [
-  // STAKE, 1920x1080. Board cleared at 04:00 and 16:00; source updates about every 5 min (refreshS 120).
+  // STAKE, 1920x1080. Board cleared at ALTA_BOARD.clears; source updates about every 5 min (refreshS 120).
   // Timelapse is our own archive (job stake-alta); the wall tile shows the latest archive frame.
   { ...DO_STILL, id: 'alta-collins-stake', name: 'Collins Snow Stake', refreshS: 120, isStake: true,
     timelapse: { provider: 'archive' }, archive: { everyMin: 5 },

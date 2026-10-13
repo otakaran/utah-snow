@@ -9,17 +9,15 @@ import { formatClockRel } from '../../../shared/time.ts';
 import type { StakeFramesBody, TimelapseFrame } from '../../../shared/types.ts';
 import { serverNow } from '../../data/snapshot.ts';
 import { dataSaverOn } from '../../lib/data-saver.ts';
+import { isPhone } from '../../lib/player-manager.ts';
 import { framesUrl, isFramesBody, keyMove, lookahead, markerSpot, scrubStep, stepIndex } from './scrubber.ts';
 
 type Load = { s: 'loading' } | { s: 'ok'; body: StakeFramesBody } | { s: 'none' } | { s: 'error' };
 type Dir = 1 | -1;
 
-const PHONE_QUERY = '(max-width: 600px)';
 const REST_MS = 500;
 const KEEP = 12; // preloaded images kept around the current frame
 const THUMB_PX = 16; // the native slider thumb: its centre runs from 8 px to width − 8 px
-
-const isPhone = (): boolean => typeof matchMedia === 'function' && matchMedia(PHONE_QUERY).matches;
 
 function useFrames(camId: string, step: 5 | 15): Load {
   const [load, setLoad] = useState<Load>({ s: 'loading' });
@@ -46,12 +44,14 @@ function useFrames(camId: string, step: 5 | 15): Load {
   return load;
 }
 
-/** The full-size frame once `frame` has been shown for REST_MS and the full image has loaded, else null. */
+/**
+ * The full-size frame once `frame` has been shown for REST_MS and the full image has loaded, else null. The loaded
+ * URL is returned only while it is still this frame's, so a new frame never shows the previous full for a render.
+ */
 function useRestingFull(frame: TimelapseFrame | undefined, enabled: boolean): string | null {
   const [src, setSrc] = useState<string | null>(null);
   const full = frame && enabled && frame.full !== frame.thumb ? frame.full : null;
   useEffect(() => {
-    setSrc(null);
     if (!full) return;
     const img = new Image();
     const timer = setTimeout(() => {
@@ -63,7 +63,7 @@ function useRestingFull(frame: TimelapseFrame | undefined, enabled: boolean): st
       img.onload = null;
     };
   }, [full]);
-  return src;
+  return src === full ? src : null;
 }
 
 export function Scrubber({ camId, title }: { camId: string; title: string }) {

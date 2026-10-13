@@ -1,18 +1,22 @@
 // GET /api/drive?lat=&lon= (spec §7, §4.6): OSRM drive times from a custom base to the six resorts' base lots.
-// lat/lon are rounded to 3 dp; outside CUSTOM_BOUNDS -> 422 outside-wasatch. D1 drive_cache answers for 30 days (a hit
-// is free); a miss bumps the global `drive:{YYYYMMDD}` counter (Denver day) and above 20 returns 429 until Denver
-// midnight. Then six sequential OSRM calls 1.1 s apart (the demo server allows 1 req/s): Brighton and Solitude via the
-// BCC mouth (no geometry), the rest with full geometry and a warning when it passes Guardsman Pass. A failed resort
-// is omitted (`partial: true`, never cached). Only a complete 200 is `public, max-age=86400`; no caches.default.
+// 403 without `X-Requested-With: utahsnow` (no <img> or cross-site probes). lat/lon are rounded to 3 dp; outside
+// CUSTOM_BOUNDS -> 422 outside-wasatch. Per Denver day one client (ipKey: IPv4, or the IPv6 /64) gets 10 lookups,
+// cache hits included, so probing which points are cached costs as much as a miss. D1 drive_cache answers for 30
+// days. A miss takes the single lease (else 503, Retry-After 10, no miss counted), re-reads the cache, then bumps the
+// global `drive:{YYYYMMDD}` counter (above 20 -> 429 until Denver midnight; over-limit requests write nothing). Then
+// six sequential OSRM calls 1.1 s apart (the demo server allows 1 req/s): Brighton and Solitude via the BCC mouth (no
+// geometry; config/bases.ts BCC_MOUTH says when), the rest with full geometry and a warning when it passes Guardsman
+// Pass. A failed resort is omitted (`partial: true`, never cached). Only a complete 200 is `public, max-age=86400`;
+// no caches.default. The body carries no time, so a cached answer never tells when a point was looked up.
 import { BCC_MOUTH, GUARDSMAN, OSRM, VIA_BCC_MOUTH } from '../../../config/bases.ts';
 import { RESORT_IDS, RESORTS } from '../../../config/resorts.ts';
-import { driveKey, type Point, passesNear, wasatchPoint } from '../../shared/geo.ts';
-import { isoUtc } from '../../shared/time.ts';
+import { driveKey, haversineKm, type Point, passesNear, wasatchPoint } from '../../shared/geo.ts';
 import type { DriveLeg, DriveResponse, ResortId } from '../../shared/types.ts';
 import { apiError, JSON_TYPE, json } from '../http.ts';
 import { createFetchx } from '../lib/fetchx.ts';
+import { ipHash } from '../lib/hash.ts';
 import { errorText, logLine } from '../lib/log.ts';
-import { bumpDriveMisses } from '../store/counters.ts';
+import { bumpUnder, driveCounters, releaseDriveLease, takeDriveLease } from '../store/counters.ts';
 import { readDrive, writeDrive } from '../store/drive.ts';
 import { rateLimited } from './post-guard.ts';
 
@@ -30,24 +34,32 @@ interface OsrmBody {
 const COMPLETE_CACHE = 'public, max-age=86400';
 const DEG = /^-?\d{1,3}(?:\.\d{1,12})?$/;
 const BCC: readonly ResortId[] = VIA_BCC_MOUTH;
+const LEASE_MS = 60_000; // six calls of at most 8 s plus the gaps
+const BUSY_RETRY_S = 10;
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 const lonLat = (p: Point): string => `${p.lon},${p.lat}`;
 
+/** Brighton/Solitude via the BCC mouth: from east of Guardsman Pass, or from farther away than the mouth is. */
+function viaMouth(from: Point, r: ResortId): boolean {
+  const to = RESORTS[r].base;
+  return BCC.includes(r) && (from.lon > GUARDSMAN.lon || haversineKm(from, to) > haversineKm(BCC_MOUTH, to));
+}
+
 function osrmUrl(from: Point, r: ResortId): string {
   const to = RESORTS[r].base;
-  return BCC.includes(r)
+  return viaMouth(from, r)
     ? `${OSRM.route}${lonLat(from)};${lonLat(BCC_MOUTH)};${lonLat(to)}?overview=false`
     : `${OSRM.route}${lonLat(from)};${lonLat(to)}?overview=full&geometries=geojson`;
 }
 
 /** One resort's leg from an OSRM route body, or null when it holds no usable route. */
-function legOf(body: OsrmBody, r: ResortId): DriveLeg | null {
+function legOf(body: OsrmBody, from: Point, r: ResortId): DriveLeg | null {
   const route = body.code === 'Ok' ? body.routes?.[0] : undefined;
   const s = route?.duration;
   const m = route?.distance;
   if (typeof s !== 'number' || typeof m !== 'number' || !Number.isFinite(s) || !Number.isFinite(m)) return null;
   const leg: DriveLeg = { min: Math.round(s / 60), mi: Math.round(m / 160.9344) / 10 };
-  if (BCC.includes(r)) leg.via = 'bcc-mouth';
+  if (viaMouth(from, r)) leg.via = 'bcc-mouth';
   else if (passesNear(route?.geometry?.coordinates ?? [], GUARDSMAN, GUARDSMAN.radiusKm))
     leg.warning = GUARDSMAN.warning;
   return leg;
@@ -60,7 +72,7 @@ async function routeAll(from: Point, deps: DriveDeps): Promise<Partial<Record<Re
   for (const [i, r] of RESORT_IDS.entries()) {
     if (i > 0) await delay(OSRM.gapMs);
     try {
-      const leg = legOf((await fx<OsrmBody>(osrmUrl(from, r), { body: 'json' })).data, r);
+      const leg = legOf((await fx<OsrmBody>(osrmUrl(from, r), { body: 'json' })).data, from, r);
       if (leg) results[r] = leg;
       else logLine({ route: '/api/drive', resort: r, ok: false, err: 'no route' });
     } catch (err) {
@@ -73,8 +85,29 @@ async function routeAll(from: Point, deps: DriveDeps): Promise<Partial<Record<Re
 const complete = (text: string): Response =>
   new Response(text, { headers: { 'Content-Type': JSON_TYPE, 'Cache-Control': COMPLETE_CACHE } });
 
+type Limits = ReturnType<typeof driveCounters>;
+const untilReset = (c: Limits, now: number): Response => rateLimited(Math.ceil((c.resetAt - now) / 1000));
+
+/** A cache miss while holding the lease: the cache again (a twin request may have just filled it), then OSRM. */
+async function miss(env: Env, origin: Point, c: Limits, deps: DriveDeps, now: number): Promise<Response> {
+  const key = driveKey(origin);
+  const hit = await readDrive(env.DB, key, now);
+  if (hit) return complete(hit);
+  const [ok] = await bumpUnder(env.DB, [c.misses]);
+  if (!ok) return untilReset(c, now);
+  const results = await routeAll(origin, deps);
+  const routed = Object.keys(results).length;
+  if (routed === 0) return apiError(502, 'upstream', { message: 'OSRM returned no route' });
+  const body: DriveResponse = { origin, results };
+  if (routed < RESORT_IDS.length) return json({ ...body, partial: true });
+  const text = JSON.stringify(body);
+  await writeDrive(env.DB, key, text, now);
+  return complete(text);
+}
+
 export function makeDrive(deps: DriveDeps = {}) {
-  return async (_req: Request, env: Env, _ctx: ExecutionContext, url: URL): Promise<Response> => {
+  return async (req: Request, env: Env, _ctx: ExecutionContext, url: URL): Promise<Response> => {
+    if (req.headers.get('X-Requested-With') !== 'utahsnow') return apiError(403, 'forbidden');
     const lat = url.searchParams.get('lat') ?? '';
     const lon = url.searchParams.get('lon') ?? '';
     if (!DEG.test(lat) || !DEG.test(lon))
@@ -82,19 +115,24 @@ export function makeDrive(deps: DriveDeps = {}) {
     const origin = wasatchPoint(Number(lat), Number(lon));
     if (!origin) return apiError(422, 'validation', { code: 'outside-wasatch', message: 'Outside the Wasatch area' });
     const now = Date.now();
-    const key = driveKey(origin);
-    const hit = await readDrive(env.DB, key, now);
+    const hash = await ipHash(req.headers.get('CF-Connecting-IP') ?? '', env.IP_HASH_SALT);
+    const c = driveCounters(hash, now);
+    const [ok] = await bumpUnder(env.DB, [c.lookups]);
+    if (!ok) return untilReset(c, now);
+    const hit = await readDrive(env.DB, driveKey(origin), now);
     if (hit) return complete(hit);
-    const { count, resetAt } = await bumpDriveMisses(env.DB, now);
-    if (count > OSRM.missesPerDay) return rateLimited(Math.ceil((resetAt - now) / 1000));
-    const results = await routeAll(origin, deps);
-    const routed = Object.keys(results).length;
-    if (routed === 0) return apiError(502, 'upstream', { message: 'OSRM returned no route' });
-    const body: DriveResponse = { origin, results, computedAt: isoUtc(Date.now()) };
-    if (routed < RESORT_IDS.length) return json({ ...body, partial: true });
-    const text = JSON.stringify(body);
-    await writeDrive(env.DB, key, text, now);
-    return complete(text);
+    const until = now + LEASE_MS;
+    if (!(await takeDriveLease(env.DB, now, until))) {
+      return json(
+        { error: 'busy', retryAfterS: BUSY_RETRY_S },
+        { status: 503, headers: { 'Retry-After': String(BUSY_RETRY_S) } },
+      );
+    }
+    try {
+      return await miss(env, origin, c, deps, now);
+    } finally {
+      await releaseDriveLease(env.DB, until);
+    }
   };
 }
 

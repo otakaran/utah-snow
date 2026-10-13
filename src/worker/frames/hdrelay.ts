@@ -1,6 +1,7 @@
 // HDRelay frame lists (spec §6.3): GET img.hdrelay.com/api/frames/next from now − hours -> epoch ms, ascending (GET
-// only: HEAD returns 500). step=15 adds &interval=900; the server still answers some 5/10-min gaps, so the list is
-// thinned again here. Frames: IMG/{cameraId}/{position}/{ms}/:/rs=h:270 (thumb) and the original (full), or the
+// only: HEAD returns 500). n counts from the oldest end, so &interval=300 (900 at step 15) always bounds it by time:
+// without it bursts of duplicate captures (seconds apart, in winter) fill n before now. The server still answers
+// some 5/10-min gaps at 900, so the list is thinned again here. Frames: IMG/{cameraId}/{position}/{ms}/:/rs=h:270 (thumb) and the original (full), or the
 // archive's fullRs. `last-snow` marks hdrelay:config hotlink.time only while the overlay is enabled, the time is
 // inside the window and not older than the archive's first frame (this hides years-old "Last Snow" bookmarks).
 // Gating (archive.enabled) is the caller's: frames/available.ts.
@@ -35,11 +36,10 @@ export function cameraIdOf(def: CamDef, cfg: Partial<HdrelayCamConfig> | undefin
   return id && CAMERA_RE.test(id) ? id : null;
 }
 
-/** frames/next for the window; n has one spare so a 5-min cadence never drops the newest frame. */
+/** frames/next for the window, one frame per step at most; n has one spare so the newest frame is never dropped. */
 export function nextUrl(cameraId: string, position: string, q: FramesQuery, now: number): string {
   const n = q.hours * PER_HOUR + 1;
-  const interval = q.step === 15 ? '&interval=900' : '';
-  return `${NEXT}?camera=${cameraId}&position=${position}&time=${now - q.hours * HOUR}&n=${n}${interval}`;
+  return `${NEXT}?camera=${cameraId}&position=${position}&time=${now - q.hours * HOUR}&n=${n}&interval=${q.step * 60}`;
 }
 
 export interface HdrelayInput {

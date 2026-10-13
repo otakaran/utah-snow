@@ -6,8 +6,7 @@
 //      at the 08Z maintenance tick, the D1 prune (store/prune.ts);
 //   4. run admitted jobs under Promise.allSettled; each writes its own rows as soon as it settles (cron/job.ts);
 //   5. one log line per job.
-import { BUDGET, MAINT, MORNING_HOURS, PRIORITY, SLOTS, TICK_DEADLINE_MS } from '../../../config/schedule.ts';
-import { DAY, HOUR, localHour, MIN } from '../../shared/time.ts';
+import { BUDGET, PRIORITY, TICK_DEADLINE_MS } from '../../../config/schedule.ts';
 import { createFetchx } from '../lib/fetchx.ts';
 import { errorText, logLine } from '../lib/log.ts';
 import { SOURCES } from '../sources/index.ts';
@@ -17,27 +16,11 @@ import { pruneStmts } from '../store/prune.ts';
 import { type CronLast, writeTickStart } from '../store/source-state.ts';
 import { readTickState } from '../store/tick-state.ts';
 import { type JobEnv, type JobLog, readsOf, rowsAt, runJob } from './job.ts';
+import { isMaintenance, isMorning, isPruneTick, slotJobIds, slotOf } from './slots.ts';
 
 export type { JobLog } from './job.ts';
+export { isMaintenance, isMorning, isPruneTick, slotJobIds, slotOf } from './slots.ts';
 export type CronEnv = JobEnv & { YT_API_KEY?: string; UDOT_API_KEY?: string };
-
-/** 0-11 = UTC minute / 5. */
-export const slotOf = (ms: number): number => Math.floor((ms % HOUR) / (5 * MIN));
-export const isMorning = (ms: number): boolean => {
-  const h = localHour(ms);
-  return h >= MORNING_HOURS.from && h <= MORNING_HOURS.to;
-};
-/** Slot 10 at 08-11Z, plus Mondays at 12Z. */
-export function isMaintenance(ms: number): boolean {
-  if (slotOf(ms) !== MAINT.slot) return false;
-  const h = Math.floor(ms / HOUR) % 24;
-  const monday = (Math.floor(ms / DAY) + 4) % 7 === 1; // 1970-01-01 was a Thursday
-  return (MAINT.utcHours as readonly number[]).includes(h) || (monday && h === MAINT.mondayUtcHour);
-}
-
-/** The daily D1 prune rides on the first maintenance hour (08Z, with hdrelay-config). */
-export const isPruneTick = (ms: number): boolean =>
-  isMaintenance(ms) && Math.floor(ms / HOUR) % 24 === MAINT.utcHours[0];
 
 function priorityOf(id: string): number {
   const key = id.startsWith('nws-grid:') ? 'nws-grid' : id;
@@ -51,14 +34,6 @@ export interface TickPlan {
   maintenance: boolean;
   admitted: Source[];
   deferred: Source[];
-}
-
-/** Job ids scheduled in a slot (config/schedule.ts), registered or not. */
-export function slotJobIds(slot: number, morning: boolean, maintenance: boolean): string[] {
-  const def = SLOTS[slot] ?? { always: [], morning: [] };
-  return [...new Set([...def.always, ...(morning ? def.morning : [])])].filter(
-    (id) => id !== 'maintenance' || maintenance,
-  );
 }
 
 /** Pure admission. Job ids without a registered source are skipped (adapters not written yet). */

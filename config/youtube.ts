@@ -21,6 +21,9 @@ export const CHANNELS = {
   'deer-valley': { channelId: 'UCTqz2P_u5ewpc7ICo9p-TMg', uploads: 'UUTqz2P_u5ewpc7ICo9p-TMg' },
 } as const satisfies Record<YtResort, YtChannel>;
 
+// IFrame player error codes a browser reports to POST /api/cams/report (removed, private, not embeddable, ...).
+export const YT_REPORT_CODES = [2, 5, 100, 101, 150, 153] as const;
+
 // ORDERED per channel: first regex match wins.
 export const SLOTS = {
   brighton: [

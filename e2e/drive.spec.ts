@@ -14,7 +14,6 @@ const DRIVE = {
     'deer-valley': { min: 41, mi: 34.5 },
     snowbasin: { min: 52, mi: 47.8 },
   },
-  computedAt: '2026-10-13T12:00:00Z',
 };
 const LINK = 'https://www.google.com/maps/place/Hotel/@40.7601,-111.8952,15z/data=!4m6!3m5!3d40.76084!4d-111.89104';
 

@@ -3,8 +3,9 @@
 // GET /api/drive (data/drive.ts); until they arrive, or when it fails, the nearest preset's row shows as "≈".
 import { useState } from 'preact/hooks';
 import { CUSTOM_BOUNDS, GEO_OPTIONS } from '../../../../config/bases.ts';
+import { roundPoint } from '../../../shared/geo.ts';
 import { type DriveStatus, driveStatus } from '../../data/drive.ts';
-import { base, checkCustomBase, setBase } from '../../data/settings.ts';
+import { base, checkCustomBase, labelOk, setBase } from '../../data/settings.ts';
 import { parseMapsLink } from './parse-maps-link.ts';
 
 const OUTSIDE = 'Outside the Wasatch area';
@@ -18,8 +19,6 @@ const STATUS: Record<DriveStatus, string> = {
   error: 'Drive times are unavailable right now; ≈ the nearest preset.',
 };
 
-const dp3 = (n: number): string => String(Math.round(n * 1000) / 1000);
-
 export function CustomBase() {
   const b = base.value;
   const cur = 'custom' in b ? b.custom : null;
@@ -31,8 +30,9 @@ export function CustomBase() {
   const [locating, setLocating] = useState(false);
 
   const fill = (p: { lat: number; lon: number }) => {
-    setLat(dp3(p.lat));
-    setLon(dp3(p.lon));
+    const r = roundPoint(p);
+    setLat(String(r.lat));
+    setLon(String(r.lon));
     setMsg(null);
   };
 
@@ -63,11 +63,8 @@ export function CustomBase() {
 
   const save = (e: Event) => {
     e.preventDefault();
-    const name = label.trim();
-    if (name.length < MIN_NAME || name.length > MAX_NAME)
-      return setMsg(`Name the base (${MIN_NAME}-${MAX_NAME} characters)`);
-    const ok = lat.trim() && lon.trim() ? checkCustomBase(Number(lat), Number(lon), name) : null;
-    if (!ok) return setMsg(OUTSIDE);
+    const ok = checkCustomBase(Number(lat), Number(lon), label); // an empty field is 0, outside the bounds
+    if (!ok) return setMsg(labelOk(label) ? OUTSIDE : `Name the base (${MIN_NAME}-${MAX_NAME} characters)`);
     setMsg(null);
     setLat(String(ok.lat));
     setLon(String(ok.lon));

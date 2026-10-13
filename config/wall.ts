@@ -1,8 +1,9 @@
-// TV wall (spec §8.4). Data only: the `set` -> resorts / ★ road-cam corridors table (★ = CORRIDORS[c].briefingCams
-// in config/roads.ts), the pinned row, the featured YouTube cell's first cam, the day window and the reload time.
-// Keys of WALL_SET_DEFS match router.ts WallSet; features/wall/rotation.ts checks that at compile time.
+// TV wall (spec §8.4). Data only: the `set` -> resorts / ★ road-cam corridors / labels table (★ =
+// CORRIDORS[c].briefingCams in config/roads.ts; its keys are the #/wall `set` values), the pinned row, the featured
+// YouTube cell's first cam, the day window and the reload time.
 import type { Corridor, ResortId } from '../src/shared/types.ts';
 import type { CamId } from './cams/index.ts';
+import { RESORT_IDS } from './resorts.ts';
 
 export interface WallSetDef {
   resorts: readonly ResortId[];
@@ -10,18 +11,40 @@ export interface WallSetDef {
   corridors: readonly Corridor[];
   /** Stake cams only (no heroes, no road cams). */
   stakesOnly?: boolean;
+  /** The wall footer's name and the settings select's longer label. */
+  short: string;
+  long: string;
 }
 
-const EVERY_RESORT = ['alta', 'snowbird', 'brighton', 'solitude', 'deer-valley', 'snowbasin'] as const;
-
-export const WALL_SET_DEFS = {
-  all: { resorts: EVERY_RESORT, corridors: ['lcc', 'bcc', 'parleys', 'snowbasin'] },
-  stakes: { resorts: EVERY_RESORT, corridors: [], stakesOnly: true },
-  lcc: { resorts: ['alta', 'snowbird'], corridors: ['lcc'] },
-  bcc: { resorts: ['brighton', 'solitude'], corridors: ['bcc'] },
-  pc: { resorts: ['deer-valley'], corridors: ['parleys'] },
-  ogden: { resorts: ['snowbasin'], corridors: ['snowbasin'] },
+const SETS = {
+  all: {
+    resorts: RESORT_IDS,
+    corridors: ['lcc', 'bcc', 'parleys', 'snowbasin'],
+    short: 'All resorts',
+    long: 'Every resort + every starred road cam',
+  },
+  stakes: { resorts: RESORT_IDS, corridors: [], stakesOnly: true, short: 'Stakes', long: 'Stake cams only' },
+  lcc: {
+    resorts: ['alta', 'snowbird'],
+    corridors: ['lcc'],
+    short: 'Little Cottonwood',
+    long: 'Little Cottonwood (Alta, Snowbird)',
+  },
+  bcc: {
+    resorts: ['brighton', 'solitude'],
+    corridors: ['bcc'],
+    short: 'Big Cottonwood',
+    long: 'Big Cottonwood (Brighton, Solitude)',
+  },
+  pc: { resorts: ['deer-valley'], corridors: ['parleys'], short: 'Park City', long: 'Park City (Deer Valley)' },
+  ogden: { resorts: ['snowbasin'], corridors: ['snowbasin'], short: 'Ogden', long: 'Ogden (Snowbasin)' },
 } as const satisfies Record<string, WallSetDef>;
+
+/** A #/wall `set`. */
+export type WallSet = keyof typeof SETS;
+export const WALL_SET_DEFS: Readonly<Record<WallSet, WallSetDef>> = SETS;
+/** ←/→ order on the wall and the settings select's order. */
+export const WALL_SETS: readonly WallSet[] = Object.keys(SETS) as WallSet[];
 
 /** Row 1: Alta Collins (newest archived frame), Snowbird and Snowbasin stakes (HLS by day, stills at night). */
 export const WALL_PINNED = [

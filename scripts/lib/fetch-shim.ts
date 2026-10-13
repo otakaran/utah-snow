@@ -2,15 +2,18 @@
 // HttpError) over Node's fetch, so scripts run each adapter's own fetch(). Every response is recorded in `hits`.
 // Wayback mode sends every request to https://web.archive.org/web/{ts}id_/{url}, one at a time, 3-5 s apart,
 // follows Wayback's snap-to-capture redirects itself, gunzips raw gzip bodies and renames x-archive-orig-* headers.
+// It is always keyless: API keys never go to web.archive.org, and recorded URLs are redacted.
 import { setTimeout as sleep } from 'node:timers/promises';
 import { gunzipSync } from 'node:zlib';
-import { MORNING_HOURS, SLOTS } from '../../config/schedule.ts';
-import { HOUR, isoToMs, localHour, MIN } from '../../src/shared/time.ts';
+import { SLOTS } from '../../config/schedule.ts';
+import { isoToMs } from '../../src/shared/time.ts';
+import { isMorning, slotOf } from '../../src/worker/cron/slots.ts';
 import { createFetchx } from '../../src/worker/lib/fetchx.ts';
+import { redact } from '../../src/worker/lib/log.ts';
 import type { FetchCtx, PrevRows, Source } from '../../src/worker/sources/types.ts';
 
 export interface Hit {
-  url: string; // what the adapter asked for
+  url: string; // what the adapter asked for, `key=` redacted
   status: number; // 0 = the request threw
   bytes: number; // decoded body
   type: string;
@@ -27,10 +30,14 @@ const WAYBACK_GAP_MS = 3_000; // plus up to 2 s of jitter
 const WAYBACK_TIMEOUT_MS = 60_000; // Wayback is slower than fetchx's 8-10 s upstream timeouts
 const NO_BODY = new Set([101, 204, 205, 304]);
 
-/** Wayback `id_` URL (raw capture, no toolbar); the fetchx cache-buster `_=` never matches a capture. */
+/**
+ * Wayback `id_` URL (raw capture, no toolbar). The fetchx cache-buster `_=` never matches a capture, and an API
+ * `key` never leaves this machine.
+ */
 export function waybackUrl(ts: string, url: string): string {
   const u = new URL(url);
   u.searchParams.delete('_');
+  u.searchParams.delete('key');
   return `https://web.archive.org/web/${ts}id_/${u.href}`;
 }
 
@@ -56,7 +63,7 @@ let waybackLast = 0;
 function shimFetch(wayback: string | undefined, hits: Hit[]): typeof fetch {
   const run = async (url: string, init: RequestInit | undefined): Promise<Response> => {
     const t0 = performance.now();
-    const hit: Hit = { url, status: 0, bytes: 0, type: '', ms: 0 };
+    const hit: Hit = { url: redact(url), status: 0, bytes: 0, type: '', ms: 0 };
     hits.push(hit);
     try {
       const res = wayback
@@ -101,18 +108,18 @@ export function fullestSlot(src: Source, ctx: FetchCtx): number {
   return best;
 }
 
-/** A FetchCtx for one adapter run, keyless unless YT_API_KEY / UDOT_API_KEY are set in the environment. */
+/** A FetchCtx for one adapter run, keyless unless YT_API_KEY / UDOT_API_KEY are set (never in Wayback mode). */
 export function shimCtx(o: ShimOptions): { ctx: FetchCtx; hits: Hit[] } {
   const hits: Hit[] = [];
   const fx = createFetchx({ budget: Number.POSITIVE_INFINITY, fetchImpl: shimFetch(o.wayback, hits) });
-  const yt = process.env.YT_API_KEY || undefined;
-  const udot = process.env.UDOT_API_KEY || undefined;
-  const hour = localHour(o.now);
+  const env = (name: string) => (o.wayback ? undefined : process.env[name] || undefined);
+  const yt = env('YT_API_KEY');
+  const udot = env('UDOT_API_KEY');
   const ctx: FetchCtx = {
     fetch: fx,
     now: o.now,
-    slot: o.slot ?? Math.floor((o.now % HOUR) / (5 * MIN)),
-    morning: hour >= MORNING_HOURS.from && hour <= MORNING_HOURS.to,
+    slot: o.slot ?? slotOf(o.now),
+    morning: isMorning(o.now),
     keyed: { yt: !!yt, udot: !!udot },
     secrets: { yt, udot },
     prev: o.prev ?? {},

@@ -1,7 +1,7 @@
 // What a cam tile shows (spec §4.3, §7 /api/cams, §8.3): which cam's still (fallback chains), its URL, the live
 // source a tap opens, the status word and the caption age. Inputs are a CamDef plus its /api/cams state, which may
-// be missing (route not deployed yet, or still loading): everything then comes from config/cams alone.
-import { CAMS } from '../../../../config/cams/index.ts';
+// be missing (still loading or failed): everything then comes from config/cams alone.
+import { CAM_BY_ID } from '../../../../config/cams/index.ts';
 import { RESORTS } from '../../../../config/resorts.ts';
 import { expandCamUrl, hasTimeBucket, hlsOrigin } from '../../../shared/cam-url.ts';
 import { isoToMs } from '../../../shared/time.ts';
@@ -18,7 +18,7 @@ export type LiveSource =
 export type TileStatus = 'live' | 'ok' | 'stale' | 'offline' | 'unknown' | 'off';
 type States = ReadonlyMap<string, CamApiState>;
 
-export const CAM_BY_ID: ReadonlyMap<string, CamDef> = new Map(CAMS.map((c): [string, CamDef] => [c.id, c]));
+export { CAM_BY_ID };
 
 const DOWN: ReadonlySet<CamApiState['status']> = new Set(['stale', 'offline', 'seasonal-off']);
 

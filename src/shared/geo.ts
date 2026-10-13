@@ -27,9 +27,15 @@ const rad = (deg: number): number => (deg * Math.PI) / 180;
 const SCALE = 10 ** CUSTOM_BOUNDS.dp;
 const within = (n: number, [lo, hi]: readonly [number, number]): boolean => n >= lo && n <= hi;
 
-/** A custom-base point rounded to 3 dp, or null when it is not finite or outside CUSTOM_BOUNDS. */
+/** A point rounded to CUSTOM_BOUNDS.dp (3 dp), the precision of every custom base and /api/drive key. */
+export const roundPoint = (p: Point): Point => ({
+  lat: Math.round(p.lat * SCALE) / SCALE,
+  lon: Math.round(p.lon * SCALE) / SCALE,
+});
+
+/** A custom-base point rounded to 3 dp, or null when it is not finite or (once rounded) outside CUSTOM_BOUNDS. */
 export function wasatchPoint(lat: number, lon: number): Point | null {
-  const p = { lat: Math.round(lat * SCALE) / SCALE, lon: Math.round(lon * SCALE) / SCALE };
+  const p = roundPoint({ lat, lon });
   return within(p.lat, CUSTOM_BOUNDS.lat) && within(p.lon, CUSTOM_BOUNDS.lon) ? p : null;
 }
 

@@ -1,7 +1,7 @@
 // Tracker store (spec §9.3, §9.5, §8.8): GET /api/tracker fills the signals; every POST op is applied optimistically,
 // sent one at a time with its optimistic-concurrency token, and the response state replaces the local copy.
 // Polls while the page is visible: every 30 s while the tracker page watches, otherwise every 10 min (the pick
-// reads it), plus on focus. A 404 (route not deployed) keeps the empty crew and retries every 10 min.
+// reads it), plus on focus.
 // 409: apply the fresh state, then finish, retry once or show "Changed on another phone – updated"
 // (optimistic.ts `conflictPlan`). 422 / 429 / 403 / offline: revert and show an inline notice.
 import { batch, computed, signal } from '@preact/signals';
@@ -35,12 +35,11 @@ export type {
   TrackerState,
 } from './tracker/wire.ts';
 
-export type TrackerStatus = 'idle' | 'ok' | 'missing' | 'error';
+export type TrackerStatus = 'idle' | 'ok' | 'error';
 
 const API = '/api/tracker';
 const PAGE_MS = 30_000;
 const BACKGROUND_MS = 10 * 60_000;
-const MISSING_MS = 10 * 60_000;
 const TICK_MS = 5_000;
 const FOCUS_GAP_MS = 10_000;
 
@@ -106,11 +105,6 @@ async function refresh(): Promise<void> {
   trackerLoading.value = true;
   try {
     const res = await fetch(API, { cache: 'no-store' });
-    if (res.status === 404) {
-      void res.body?.cancel();
-      trackerStatus.value = 'missing';
-      return;
-    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const state = parseState(await res.json().catch(() => null));
     if (!state) throw new Error('bad data');
@@ -203,10 +197,7 @@ export function mutate(op: TrackerOp): Promise<boolean> {
 }
 
 const visible = (): boolean => document.visibilityState === 'visible';
-function period(): number {
-  if (trackerStatus.peek() === 'missing') return MISSING_MS;
-  return watchers > 0 ? PAGE_MS : BACKGROUND_MS;
-}
+const period = (): number => (watchers > 0 ? PAGE_MS : BACKGROUND_MS);
 
 /** Starts polling once (main.tsx for the pick and briefing; the tracker page also calls it). */
 export function startTracker(): void {
@@ -216,8 +207,7 @@ export function startTracker(): void {
     if (visible() && queue.peek().length === 0 && Date.now() - lastAt >= period()) void refresh();
   }, TICK_MS);
   const soon = () => {
-    if (!visible() || trackerStatus.peek() === 'missing') return;
-    if (Date.now() - lastAt >= FOCUS_GAP_MS) void refresh();
+    if (visible() && Date.now() - lastAt >= FOCUS_GAP_MS) void refresh();
   };
   document.addEventListener('visibilitychange', soon);
   addEventListener('focus', soon);

@@ -1,23 +1,14 @@
 // Pure wall paging (spec §8.4): which cams cells 1–5 page through for a `set` (heroes first, then the set's other
 // cams, then its ★ road cams), one page of them, the featured YouTube cell's order (Solitude stake first) and the
 // night stake list. Cams the Worker reports hidden right now are filtered by the caller (camHidden).
-import { CAMS, HEROES, RESORT_CAMS, STAKE_ORDER } from '../../../../config/cams/index.ts';
+import { CAM_BY_ID, CAMS, HEROES, RESORT_CAMS, STAKE_ORDER } from '../../../../config/cams/index.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
-import {
-  WALL_NIGHT_STILL,
-  WALL_PINNED,
-  WALL_SET_DEFS,
-  WALL_YT_FIRST,
-  type WallSetDef,
-} from '../../../../config/wall.ts';
+import { WALL_NIGHT_STILL, WALL_PINNED, WALL_SET_DEFS, WALL_YT_FIRST, type WallSet } from '../../../../config/wall.ts';
 import type { CamDef } from '../../../shared/types.ts';
-import type { WallSet } from '../../router.ts';
 
-const DEFS: Record<WallSet, WallSetDef> = WALL_SET_DEFS; // fails tsc when a WallSet has no row
-const BY_ID: ReadonlyMap<string, CamDef> = new Map(CAMS.map((c): [string, CamDef] => [c.id, c]));
 const PINNED: ReadonlySet<string> = new Set(WALL_PINNED);
 
-const defs = (ids: readonly string[]): CamDef[] => ids.flatMap((id) => BY_ID.get(id) ?? []);
+const defs = (ids: readonly string[]): CamDef[] => ids.flatMap((id) => CAM_BY_ID.get(id) ?? []);
 const uniq = (list: readonly CamDef[]): CamDef[] => [...new Map(list.map((c): [string, CamDef] => [c.id, c])).values()];
 
 /**
@@ -25,7 +16,7 @@ const uniq = (list: readonly CamDef[]): CamDef[] => [...new Map(list.map((c): [s
  * detail-only and seasonal (live-only) cams are left out.
  */
 export function setCams(set: WallSet): CamDef[] {
-  const def = DEFS[set];
+  const def = WALL_SET_DEFS[set];
   const own = def.resorts.flatMap((r): readonly CamDef[] => RESORT_CAMS[r]);
   const usable = (c: CamDef) => !PINNED.has(c.id) && !c.detailOnly && !c.seasonal; // seasonal slots: live only
   if (def.stakesOnly) return own.filter((c) => c.isStake && usable(c));
@@ -52,7 +43,7 @@ const isYt = (c: CamDef): boolean => c.live?.type === 'youtube';
  * only for `stakes`); a set without YouTube cams of its own (lcc, ogden) borrows every other one.
  */
 export function ytOrder(set: WallSet): CamDef[] {
-  const def = DEFS[set];
+  const def = WALL_SET_DEFS[set];
   const first = defs([WALL_YT_FIRST]);
   const all = CAMS.filter((c) => isYt(c) && (!def.stakesOnly || c.isStake));
   const own = all.filter((c) => c.resort !== null && def.resorts.includes(c.resort));

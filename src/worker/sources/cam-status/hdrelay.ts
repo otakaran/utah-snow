@@ -13,11 +13,8 @@ const GATE_MS = 30 * MIN;
 const MIN_MS = 1_500_000_000_000; // 2017: anything older is junk
 const INFO = 'https://img.hdrelay.com/api/frames/info';
 
-/** The 9 archive positions (§6.4) live in config; re-exported for cam-status.ts. */
-export const ARCHIVES = HDRELAY_ARCHIVES;
-
-type ArchiveId = keyof typeof ARCHIVES;
-const isArchive = (id: string): id is ArchiveId => Object.hasOwn(ARCHIVES, id);
+type ArchiveId = keyof typeof HDRELAY_ARCHIVES;
+const isArchive = (id: string): id is ArchiveId => Object.hasOwn(HDRELAY_ARCHIVES, id);
 
 /** All HDRelay cams with their camera id (from the registry's live block). */
 export const HDRELAY_CAMS = (CAMS as readonly CamDef[])
@@ -37,14 +34,14 @@ export const hdrelay: KindCheck = {
   requests: () =>
     HDRELAY_CAMS.filter((c) => isArchive(c.id)).map((c) => ({
       key: `hdrelay:${c.id}`,
-      url: frameInfoUrl(c.cameraId, ARCHIVES[c.id as ArchiveId].position),
+      url: frameInfoUrl(c.cameraId, HDRELAY_ARCHIVES[c.id as ArchiveId].position),
       method: 'GET',
       json: true,
     })),
   read(id, probe, { now }) {
     const body = probe.body as { first?: unknown; last?: unknown } | null | undefined;
     if (probe.status !== 200 || !isArchive(id) || !body || typeof body !== 'object') return null;
-    const { position, gated } = ARCHIVES[id];
+    const { position, gated } = HDRELAY_ARCHIVES[id];
     const first = ms(body.first, now);
     const last = ms(body.last, now);
     const enabled = last !== null && (!gated || now - last < GATE_MS);

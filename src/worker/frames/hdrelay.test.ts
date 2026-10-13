@@ -31,10 +31,11 @@ describe('HDRelay frame lists', () => {
     expect(strawberry?.full).toBe(`https://img.hdrelay.com/frames/${CAMERA}/panorama/1791916800572/:/rs=h:720`);
   });
 
-  it('step=15 keeps frames at least 15 min apart, newest kept; a shorter window drops older frames', () => {
+  it('step=15 keeps every third 5-min frame despite ms jitter, newest kept; a shorter window drops older frames', () => {
     const got = buildHdrelay(body, inp(), { hours: 3, step: 15 }, NOW).frames.map((f) => f.t);
     expect(got.at(-1)).toBe(1_791_927_300_829);
-    for (let i = 1; i < got.length; i++) expect((got[i] ?? 0) - (got[i - 1] ?? 0)).toBeGreaterThanOrEqual(15 * MIN);
+    expect(got).toHaveLength(12); // 36 frames: no 20/30-min holes where a gap lands a few ms under 15 min
+    for (let i = 1; i < got.length; i++) expect(Math.round(((got[i] ?? 0) - (got[i - 1] ?? 0)) / MIN)).toBe(15);
     const hour = buildHdrelay(body, inp(), { hours: 1, step: 5 }, NOW).frames;
     expect(hour.every((f) => f.t >= NOW - HOUR)).toBe(true);
     expect(hour).toHaveLength(12);
@@ -55,9 +56,9 @@ describe('HDRelay frame lists', () => {
     expect(() => buildHdrelay({ error: 'nope' }, inp(), { hours: 3, step: 5 }, NOW)).toThrow(/not an array/);
   });
 
-  it('nextUrl asks from now − hours with one spare frame, and interval=900 for step 15', () => {
+  it('nextUrl asks from now − hours with one spare frame, bounded by interval=300 (900 for step 15)', () => {
     expect(nextUrl(CAMERA, 'default', { hours: 3, step: 5 }, NOW)).toBe(
-      `https://img.hdrelay.com/api/frames/next?camera=${CAMERA}&position=default&time=${NOW - 3 * HOUR}&n=37`,
+      `https://img.hdrelay.com/api/frames/next?camera=${CAMERA}&position=default&time=${NOW - 3 * HOUR}&n=37&interval=300`,
     );
     expect(nextUrl(CAMERA, 'panorama', { hours: 24, step: 15 }, NOW)).toMatch(
       /position=panorama&.*&n=289&interval=900$/,

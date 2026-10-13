@@ -3,9 +3,11 @@
 // may import `route` and the href helpers without an import cycle.
 // Views are wired in app.tsx `Outlet` (briefing, resort, cams, tracker, settings, wall).
 import { signal } from '@preact/signals';
+import { RESORT_IDS } from '../../config/resorts.ts';
+import { WALL_SETS, type WallSet } from '../../config/wall.ts';
 import type { ResortId } from '../shared/types.ts';
 
-export type WallSet = 'all' | 'stakes' | 'lcc' | 'bcc' | 'pc' | 'ogden';
+export { WALL_SETS, type WallSet };
 
 export interface WallParams {
   rotate: number; // seconds per page
@@ -24,15 +26,6 @@ export type Route =
 
 export type RouteName = Route['name'];
 
-const RESORT_IDS = [
-  'alta',
-  'snowbird',
-  'brighton',
-  'solitude',
-  'deer-valley',
-  'snowbasin',
-] as const satisfies readonly ResortId[];
-export const WALL_SETS: readonly WallSet[] = ['all', 'stakes', 'lcc', 'bcc', 'pc', 'ogden'];
 export const WALL_DEFAULTS: WallParams = { rotate: 20, yt: 180, set: 'all', hls: 2 };
 const BRIEFING: Route = { name: 'briefing' };
 const SIMPLE = ['cams', 'tracker', 'settings'] as const;

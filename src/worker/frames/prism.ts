@@ -4,32 +4,19 @@
 // MP4: the first of today's dated folder, yesterday's and running/ whose segmentlist.txt answers 200 (Prism writes
 // it next to the MP4); its first and last `YYYYMMDD_HH.mp4` lines are Denver hours, `to` = last hour + 1 h. When no
 // segmentlist answers there is no MP4. MP4 lookups never fail the list.
-import { SITE } from '../../../config/site.ts';
 import { num } from '../../shared/num.ts';
 import { addDays, HOUR, localDate, zonedToUtc } from '../../shared/time.ts';
 import type { CamDef, StakeFramesBody, TimelapseFrame } from '../../shared/types.ts';
 import type { FetchX } from '../lib/fetchx.ts';
+import { camInitUrl, PRISM_MIN_EPOCH_S, PRISM_PATH_RE, prismCam } from '../sources/cam-status/prism.ts';
 import { type FramesQuery, thin } from './archive.ts';
 import { UPSTREAM_TIMEOUT_MS } from './hdrelay.ts';
 
-const CAM_INIT = 'https://php.prismcam.com/public/helpers/cam_init.php';
 const GCS = 'https://storage.googleapis.com';
-const PATH_RE = /^\d{4}\/\d{2}\/\d{2}\/\d{2}-\d{2}$/;
 const SEG_RE = /(\d{4})(\d{2})(\d{2})_(\d{2})\.mp4$/;
-const MIN_EPOCH_S = 1_600_000_000;
 
 type List = Pick<StakeFramesBody, 'frames' | 'markers' | 'mp4'>;
 type Mp4 = NonNullable<StakeFramesBody['mp4']>;
-
-/** The cam's Prism number from its still URL: { n: '88', pad: '00088' }. */
-export function prismCam(def: CamDef): { n: string; pad: string } | null {
-  const pad = /\/prism-cam-(\d{5})\//.exec(def.still.card)?.[1];
-  return pad ? { n: String(Number(pad)), pad } : null;
-}
-
-// `url` is mandatory (an empty body without it); no `callback`, so the answer is JSON.
-export const camInitUrl = (n: string): string =>
-  `${CAM_INIT}?cams=${n}&pages=&url=${encodeURIComponent(`${SITE.origin.replace(/^https?:/, '')}/`)}`;
 
 /** Pure: the cam_init body -> frames inside [now − hours, now], oldest first. Throws when the cam is missing. */
 export function buildPrism(body: unknown, cam: { n: string; pad: string }, q: FramesQuery, now: number): List {
@@ -42,7 +29,7 @@ export function buildPrism(body: unknown, cam: { n: string; pad: string }, q: Fr
   for (const img of images) {
     const { time, path } = (img ?? {}) as { time?: unknown; path?: unknown };
     const s = num(time);
-    if (s === null || s < MIN_EPOCH_S || typeof path !== 'string' || !PATH_RE.test(path)) continue;
+    if (s === null || s < PRISM_MIN_EPOCH_S || typeof path !== 'string' || !PRISM_PATH_RE.test(path)) continue;
     const t = s * 1000;
     if (t >= from && t <= now + HOUR) rows.push({ t, path });
   }
@@ -95,7 +82,7 @@ export async function prismFrames(fx: FetchX, def: CamDef, q: FramesQuery, now: 
   const cam = prismCam(def);
   if (!cam) throw new Error(`prism: ${def.id} has no cam number`);
   const [init, mp4] = await Promise.all([
-    fx<unknown>(camInitUrl(cam.n), { body: 'json', timeoutMs: UPSTREAM_TIMEOUT_MS }),
+    fx<unknown>(camInitUrl([cam.n]), { body: 'json', timeoutMs: UPSTREAM_TIMEOUT_MS }),
     def.timelapse.mp4 ? prismMp4(fx, cam.pad, now) : null,
   ]);
   const list = buildPrism(init.data, cam, q, now);

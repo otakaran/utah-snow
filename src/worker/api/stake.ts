@@ -2,9 +2,10 @@
 // frames: one scrubber list per timelapse provider, `public, max-age=120`, edge copy 120 s (key: hours, step, build).
 //   archive: the KV archive's index (frames younger than 120 s omitted); a live stake whose timelapse is its `-still`
 //   twin's archive also gets the live `videoId`. hdrelay / prism / roundshot: built per request from the upstream
-//   (frames/<provider>.ts, all I/O through fetchx), only while frames/available.ts allows it.
-//   404 `no-timelapse` for a cam without one (or gated off now); 502 `upstream` when the provider fails; neither
-//   is cached.
+//   (frames/<provider>.ts, all I/O through fetchx), only while frames/available.ts allows it, always for the last
+//   24 h (`hours` is ignored), so a cam has two edge keys and a client cannot fan requests out to the provider.
+//   404 `no-timelapse` for a cam without one (or gated off now), never cached; 502 `upstream` when the provider
+//   fails, no-store, but the edge remembers the failure for 60 s so the provider is asked at most once a minute.
 // frame: the JPEG from KV `cam:{id}:{t}`, immutable for a year (+ caches.default); a miss is a no-store 404.
 import { HDRELAY_CONFIG_ROW } from '../../../config/cams/index.ts';
 import { isObj, tryJson } from '../../shared/json.ts';
@@ -14,6 +15,7 @@ import {
   archiveFrames,
   archiveSource,
   camDef,
+  DEFAULT_HOURS,
   type FramesQuery,
   parseQuery,
   parseT,
@@ -34,10 +36,12 @@ import { edgeJson } from './edge.ts';
 /** Router pattern for both stake routes. */
 export const STAKE_PATH = /^\/api\/stake\/([a-z0-9-]+)\/(?:(frames)|frame\/([^/]+))$/;
 const LIST_TTL_S = 120;
+const FAILED_TTL_S = 60;
 const IMMUTABLE = 'public, max-age=31536000, immutable';
 
 class NoTimelapse extends Error {}
 class UpstreamError extends Error {}
+class RecentFailure extends UpstreamError {} // answered from the edge's failure note, not the provider
 
 type List = Omit<StakeFramesBody, 'camId'>;
 
@@ -93,11 +97,20 @@ async function frames(req: Request, env: Env, ctx: ExecutionContext, url: URL, c
   const { provider } = def.timelapse;
   const source = provider === 'archive' ? archiveSource(def) : null;
   if (provider === 'none' || (provider === 'archive' && !source)) return noTimelapse();
-  const q = parseQuery(url.searchParams);
+  const parsed = parseQuery(url.searchParams);
+  const q = source ? parsed : { ...parsed, hours: DEFAULT_HOURS };
   const path = `/api/stake/${camId}/frames?hours=${q.hours}&step=${q.step}&b=${encodeURIComponent(BUILD_ID)}`;
+  const failed = new Request(new URL(`${path}&failed=1`, url).href);
   try {
     return await edgeJson(req, ctx, { key: new URL(path, url).href, ttlS: LIST_TTL_S }, async () => {
       const now = Date.now();
+      if (!source) {
+        const note = await caches.default.match(failed);
+        if (note) {
+          await note.body?.cancel();
+          throw new RecentFailure('failed in the last minute');
+        }
+      }
       const list = source ? await archiveList(env, def, source, q, now) : await providerList(env, def, q, now);
       const body: StakeFramesBody = { camId, ...list };
       return JSON.stringify(body);
@@ -105,7 +118,11 @@ async function frames(req: Request, env: Env, ctx: ExecutionContext, url: URL, c
   } catch (err) {
     if (err instanceof NoTimelapse) return noTimelapse();
     if (!(err instanceof UpstreamError)) throw err;
-    logLine({ route: 'stake-frames', camId, provider, ok: false, err: err.message });
+    if (!(err instanceof RecentFailure)) {
+      logLine({ route: 'stake-frames', camId, provider, ok: false, err: err.message });
+      const note = new Response('', { headers: { 'Cache-Control': `public, max-age=${FAILED_TTL_S}` } });
+      ctx.waitUntil(caches.default.put(failed, note));
+    }
     return apiError(502, 'upstream', { code: provider });
   }
 }

@@ -13,6 +13,7 @@ describe('settings', () => {
     expect(checkCustomBase(40.29, -111.9, 'South')).toBeNull();
     expect(checkCustomBase(40.7, -112.21, 'West')).toBeNull();
     expect(checkCustomBase(41.4, -111.2, 'Corner')).not.toBeNull();
+    expect(checkCustomBase(40.2996, -111.9, 'Edge')).toEqual({ lat: 40.3, lon: -111.9, label: 'Edge' }); // as /api/drive
     expect(checkCustomBase(40.7, -111.9, '')).toBeNull();
     expect(checkCustomBase(40.7, -111.9, 'x'.repeat(31))).toBeNull();
   });

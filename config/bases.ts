@@ -117,15 +117,18 @@ export const MAPS_LINK_RES = [
   /[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/,
 ] as const;
 
-// GET /api/drive (spec §7): OSRM demo server (<= 1 req/s), one call per resort to its base lot, 1.1 s apart. Results are
-// cached in D1 drive_cache for 30 days; at most 20 cache misses per Denver day (global).
+// GET /api/drive (spec §7): OSRM demo server (<= 1 req/s), one call per resort to its base lot, 1.1 s apart, one miss
+// at a time. Results are cached in D1 drive_cache for 30 days; per Denver day at most 20 cache misses (global) and
+// 10 lookups per client (cache hits too).
 export const OSRM = {
   route: 'https://router.project-osrm.org/route/v1/driving/',
   gapMs: 1100,
   missesPerDay: 20,
+  lookupsPerIpDay: 10,
   cacheDays: 30,
 } as const;
-// Brighton and Solitude route through the BCC mouth, so OSRM never sends them over Guardsman Pass.
+// Brighton and Solitude route through the BCC mouth, so OSRM never sends them over Guardsman Pass; not from a base
+// west of the pass that is already nearer the resort than the mouth is (up the canyon, or over the ridge in LCC).
 export const BCC_MOUTH = { via: 'bcc-mouth', label: 'BCC mouth', lat: 40.6197, lon: -111.7869 } as const;
 export const VIA_BCC_MOUTH = ['brighton', 'solitude'] as const satisfies readonly ResortId[];
 // Any other route with a vertex within radiusKm of the pass gets this warning (the pass is closed in winter).

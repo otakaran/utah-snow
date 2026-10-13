@@ -20,6 +20,9 @@ const SUBS: readonly Sub[] = [
 ];
 const BY_ID = new Map(SUBS.map((s) => [s.src.id, s]));
 
+/** The sub-jobs (the fixtures and bench scripts run each on its own). */
+export const MAINT_SUBS: readonly Source[] = SUBS.map((s) => s.src);
+
 /** Raw: sub-job id -> that sub's raw, for the subs whose fetch succeeded. */
 export type MaintenanceRaw = Record<string, unknown>;
 

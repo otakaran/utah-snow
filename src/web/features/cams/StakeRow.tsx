@@ -5,6 +5,7 @@
 // (CamTile opens the Scrubber in its Lightbox).
 import type { ComponentChildren } from 'preact';
 import { useEffect } from 'preact/hooks';
+import { ALTA_BOARD } from '../../../../config/cams/alta.ts';
 import { STAKE_ORDER } from '../../../../config/cams/index.ts';
 import { isBetweenLocal } from '../../../shared/time.ts';
 import type { CamDef, ResortId } from '../../../shared/types.ts';
@@ -23,9 +24,11 @@ interface Props {
   overlay?: (cam: CamDef) => ComponentChildren;
 }
 
-/** Alta clears the Collins board at 04:00 and 16:00 local. */
-const altaBoard = (now: number): string =>
-  isBetweenLocal(now, '04:00', '16:00') ? 'since 04:00 board clear' : 'since 16:00 board clear';
+/** Alta clears the Collins board twice a day (ALTA_BOARD.clears, local). */
+const altaBoard = (now: number): string => {
+  const [am, pm] = ALTA_BOARD.clears;
+  return `since ${isBetweenLocal(now, am, pm) ? am : pm} board clear`;
+};
 
 export function StakeRow({ pick = null, no, overlay }: Props) {
   useEffect(ensureCams, []);
@@ -44,7 +47,7 @@ export function StakeRow({ pick = null, no, overlay }: Props) {
               variant="card"
               pick={pick}
               keepFresh
-              note={def.id === 'alta-collins-stake' ? altaBoard(now) : undefined}
+              note={def.id === ALTA_BOARD.cam ? altaBoard(now) : undefined}
               overlay={overlay?.(def)}
             />
           </li>

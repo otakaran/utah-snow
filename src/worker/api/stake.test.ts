@@ -19,8 +19,8 @@ async function get(path: string, headers: Record<string, string> = {}): Promise<
   return res;
 }
 
-const listKey = (cam: string, hours: number, step: number) =>
-  new Request(`${ORIGIN}/api/stake/${cam}/frames?hours=${hours}&step=${step}&b=dev`);
+const listKey = (cam: string, hours: number, step: number, suffix = '') =>
+  new Request(`${ORIGIN}/api/stake/${cam}/frames?hours=${hours}&step=${step}&b=dev${suffix}`);
 
 async function seed(cam: string, ts: readonly number[]): Promise<void> {
   const stmt = env.DB.prepare('INSERT INTO stake_frames (cam_id, t, bytes) VALUES (?1, ?2, ?3)');
@@ -52,13 +52,13 @@ beforeEach(async () => {
     ['alta-collins-stake', 24, 5],
     ['alta-collins-stake', 2, 15],
     ['solitude-snowstake', 24, 5],
-    ['snowbird-snowstake', 3, 5],
+    ['snowbird-snowstake', 24, 5],
     ['alta-mount-baldy', 24, 5],
-    ['alta-mount-baldy', 2, 5],
-    ['snowbird-hidden-peak', 3, 15],
+    ['snowbird-hidden-peak', 24, 15],
     ['snowbird-hidden-peak-360', 24, 5],
   ] as const) {
     await caches.default.delete(listKey(cam, h, s));
+    await caches.default.delete(listKey(cam, h, s, '&failed=1'));
   }
 });
 afterEach(() => vi.restoreAllMocks());
@@ -126,7 +126,7 @@ describe('/api/stake/:id/frames from providers (fixtures captured 2026-10-13)', 
     vi.spyOn(Date, 'now').mockReturnValue(NOW);
   });
 
-  it('hdrelay: frames/next with our UA and no Referer, last-snow from hdrelay:config', async () => {
+  it('hdrelay: frames/next for the last 24 h (hours ignored) with our UA and no Referer, last-snow', async () => {
     const archive = { position: 'default', first: isoUtc(1_782_323_700_577), last: isoUtc(NOW), enabled: true };
     await env.DB.batch([
       row('cams:status', { 'snowbird-snowstake': { online: true, asOf: null, checkedAt: isoUtc(NOW), archive } }),
@@ -144,7 +144,7 @@ describe('/api/stake/:id/frames from providers (fixtures captured 2026-10-13)', 
     expect(b.frames[0]?.thumb).toBe(`https://img.hdrelay.com/frames/${CAMERA}/default/1791916800572/:/rs=h:270`);
     expect(b.markers).toEqual([{ t: NOW - HOUR, kind: 'last-snow', label: 'Last snow · 2:40 PM' }]);
     expect(seen).toHaveLength(1);
-    expect(seen[0]?.url).toContain(`camera=${CAMERA}&position=default&time=${NOW - 3 * HOUR}&n=37`);
+    expect(seen[0]?.url).toContain(`camera=${CAMERA}&position=default&time=${NOW - 24 * HOUR}&n=289&interval=300`);
     expect(seen[0]?.headers.get('Referer')).toBeNull();
     expect(seen[0]?.headers.get('User-Agent')).toMatch(/^utah-snow\/1\.0 /);
   });
@@ -181,7 +181,7 @@ describe('/api/stake/:id/frames from providers (fixtures captured 2026-10-13)', 
       await get('/api/stake/snowbird-hidden-peak/frames?hours=3&step=15')
     ).json()) as StakeFramesBody;
     expect(flat).toMatchObject({ provider: 'roundshot', markers: [] });
-    expect(flat.frames).toHaveLength(9);
+    expect(flat.frames).toHaveLength(32); // 24 h of daylight 10-min slots, every 20 min at step 15
     expect(flat.frames.at(-1)?.full).toBe(location);
     expect(seen).toHaveLength(1); // no HEAD checks of slot URLs
     const pano = (await (await get('/api/stake/snowbird-hidden-peak-360/frames')).json()) as StakeFramesBody;
@@ -190,16 +190,20 @@ describe('/api/stake/:id/frames from providers (fixtures captured 2026-10-13)', 
     );
   });
 
-  it('an upstream failure is a no-store 502 that is never cached', async () => {
-    upstream([['https://php.prismcam.com/', () => new Response('oops', { status: 500 })]]);
+  it('an upstream failure is a no-store 502; the provider is asked again only after a minute', async () => {
+    const failing = upstream([['https://php.prismcam.com/', () => new Response('oops', { status: 500 })]]);
     const bad = await get('/api/stake/alta-mount-baldy/frames?hours=2');
     expect(bad.status).toBe(502);
     expect(bad.headers.get('Cache-Control')).toBe('no-store');
     expect(await bad.json()).toEqual({ error: 'upstream', code: 'prism' });
+    const asked = failing.length;
+    expect((await get('/api/stake/alta-mount-baldy/frames?hours=5')).status).toBe(502); // same key: hours ignored
+    expect(failing).toHaveLength(asked);
+    await caches.default.delete(listKey('alta-mount-baldy', 24, 5, '&failed=1')); // the minute is up
     upstream([['https://php.prismcam.com/', json(camInit)]]);
-    const good = await get('/api/stake/alta-mount-baldy/frames?hours=2');
+    const good = await get('/api/stake/alta-mount-baldy/frames');
     expect(good.status).toBe(200);
-    expect(((await good.json()) as StakeFramesBody).frames).toHaveLength(23);
+    expect(((await good.json()) as StakeFramesBody).frames).toHaveLength(37);
   });
 });
 

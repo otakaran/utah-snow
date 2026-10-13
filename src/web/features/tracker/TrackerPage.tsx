@@ -11,7 +11,6 @@ import {
   trackerNotice,
   trackerSaving,
   trackerServerTime,
-  trackerStatus,
   watchTracker,
 } from '../../data/tracker.ts';
 import { clock } from '../../lib/format.ts';
@@ -33,9 +32,6 @@ function SyncLine() {
   if (trackerSaving.value) {
     tone = 'warn';
     word = 'Saving…';
-  } else if (trackerStatus.value === 'missing') {
-    tone = 'off';
-    word = 'Tracker not live yet';
   } else if (trackerError.value) {
     tone = 'bad';
     word = trackerLoaded.value ? `Can't sync (${trackerError.value}) – showing last data` : "Can't load the tracker";

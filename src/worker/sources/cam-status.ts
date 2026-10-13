@@ -3,11 +3,12 @@
 // = 20 requests, each one subrequest (redirects are never followed). Should the registry outgrow CAP, a window of
 // CAP requests rotates every hour and unchecked cams keep their previous entry. One kind file per provider in
 // cam-status/. YouTube (yt:state), UDOT (udot:cams) and archived stakes (stake_frames) are merged by /api/cams.
+import { HDRELAY_ARCHIVES } from '../../../config/cams/hdrelay-archives.ts';
 import { CAMS, HDRELAY_CONFIG_ROW } from '../../../config/cams/index.ts';
 import { HOUR, isoUtc } from '../../shared/time.ts';
 import type { CamDef, CamStatusEntry, CamStatusRow } from '../../shared/types.ts';
 import { doStill } from './cam-status/do-still.ts';
-import { ARCHIVES, applyHdrelayOnline, frameInfoUrl, HDRELAY_CAMS, hdrelay } from './cam-status/hdrelay.ts';
+import { applyHdrelayOnline, frameInfoUrl, HDRELAY_CAMS, hdrelay } from './cam-status/hdrelay.ts';
 import { CAM_INIT_URL, prism } from './cam-status/prism.ts';
 import { runProbe } from './cam-status/probe.ts';
 import { roundshot } from './cam-status/roundshot.ts';
@@ -82,7 +83,7 @@ export const camStatus: Source<CamStatusRaw> = {
     { hostId: 'prism-caminit', url: CAM_INIT_URL },
     {
       hostId: 'hdrelay-img',
-      url: frameInfoUrl(firstArchive?.cameraId ?? '', ARCHIVES['snowbasin-snowstake'].position),
+      url: frameInfoUrl(firstArchive?.cameraId ?? '', HDRELAY_ARCHIVES['snowbasin-snowstake'].position),
     },
     { hostId: 'roundshot', url: 'https://backend.roundshot.com/cams/09123258cc29cd6e86d3af9a3836c150/medium' },
     { hostId: 'skiutah', url: 'https://www.skiutah.com/files/blob/webcam/LBSKmCQHw9GVGF5AcHnE2o' },

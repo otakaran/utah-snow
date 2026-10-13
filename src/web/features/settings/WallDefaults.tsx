@@ -1,16 +1,8 @@
 // Wall defaults (spec §8.5 item 6, §8.4): rotate / yt seconds, HLS cap and cam set, stored in utahsnow.wall.
 // #/wall URL params override them; "Open wall" carries the current values as params.
+import { WALL_SET_DEFS, WALL_SETS } from '../../../../config/wall.ts';
 import { setWallDefaults, wallDefaults } from '../../data/settings.ts';
-import { type WallParams, type WallSet, wallHref, wallParams } from '../../router.ts';
-
-const SET_LABEL: Record<WallSet, string> = {
-  all: 'Every resort + every starred road cam',
-  stakes: 'Stake cams only',
-  lcc: 'Little Cottonwood (Alta, Snowbird)',
-  bcc: 'Big Cottonwood (Brighton, Solitude)',
-  pc: 'Park City (Deer Valley)',
-  ogden: 'Ogden (Snowbasin)',
-};
+import { type WallParams, wallHref, wallParams } from '../../router.ts';
 
 const NUMBERS: { key: 'rotate' | 'yt' | 'hls'; label: string; min: number; max: number; unit: string }[] = [
   { key: 'rotate', label: 'Page every', min: 5, max: 600, unit: 's' },
@@ -46,9 +38,9 @@ export function WallDefaults() {
         <label class="field field-wide">
           <span class="field-label">Cam set</span>
           <select value={w.set} onChange={(e) => update('set', e.currentTarget.value)}>
-            {(Object.keys(SET_LABEL) as WallSet[]).map((s) => (
+            {WALL_SETS.map((s) => (
               <option key={s} value={s}>
-                {SET_LABEL[s]}
+                {WALL_SET_DEFS[s].long}
               </option>
             ))}
           </select>
