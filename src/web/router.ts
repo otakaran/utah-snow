@@ -1,8 +1,7 @@
 // Hash routes (spec §8.1). `route` is a signal; app.tsx `Outlet` maps each route to its view.
 // Unknown paths and unknown resort ids redirect to '#/'. This module stays pure (no feature imports), so features
 // may import `route` and the href helpers without an import cycle.
-// Views are wired in app.tsx `Outlet` (briefing, resort, cams, tracker, settings). TODO(assemble): wall ->
-// features/wall through its index.ts once it exists (a "coming soon" stub until then).
+// Views are wired in app.tsx `Outlet` (briefing, resort, cams, tracker, settings, wall).
 import { signal } from '@preact/signals';
 import type { ResortId } from '../shared/types.ts';
 

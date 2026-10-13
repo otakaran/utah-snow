@@ -1,4 +1,4 @@
-// App shell (spec §8.1): Header, route outlet, Footer.
+// App shell (spec §8.1): Header, route outlet, Footer; the #/wall route renders full-bleed without them (§8.4).
 // Header order: brand, Denver date + clock, global freshness dot (tap: every source with its age), base chip,
 // "I am" chip, then units + theme (inside the ⋯ popover under 600 px), and the nav row.
 
@@ -13,6 +13,7 @@ import { crewPick } from './features/pick-card/index.ts';
 import { Resort } from './features/resort/index.ts';
 import { BaseChip, IAmChip, Settings, ThemeToggle, UnitsToggle } from './features/settings/index.ts';
 import { TrackerPage } from './features/tracker/index.ts';
+import { Wall } from './features/wall/index.ts';
 import { clock, shortDate, tzAbbr } from './lib/format.ts';
 import { type Route, type RouteName, route } from './router.ts';
 import { Attribution } from './ui/Attribution.tsx';
@@ -102,19 +103,6 @@ function OfflineBanner() {
   );
 }
 
-function Stub({ testid, title, detail }: { testid: string; title: string; detail: string }) {
-  return (
-    <section class="stub" data-testid={testid} aria-labelledby={`${testid}-title`}>
-      <p class="stub-kicker">Coming soon</p>
-      <h1 id={`${testid}-title`}>{title}</h1>
-      <p>{detail}</p>
-      <a class="btn" href="#/">
-        Back to the briefing
-      </a>
-    </section>
-  );
-}
-
 /** Keeps a crash inside one page from blanking the whole app; keyed per route so navigating resets it. */
 function RouteBoundary({ children }: { children: ComponentChildren }) {
   const [error] = useErrorBoundary((err: unknown) => console.error('route render failed', err));
@@ -143,14 +131,8 @@ function Outlet({ r }: { r: Route }) {
       return <CamsPage pick={crewPick.value?.pick ?? null} />;
     case 'tracker':
       return <TrackerPage />;
-    case 'wall': // TODO(assemble): features/wall (§8.4); render it without the header and footer
-      return (
-        <Stub
-          testid="wall-stub"
-          title="TV wall"
-          detail={`Stake cams, pick and roads for the TV. Set ${r.params.set}, page every ${r.params.rotate} s.`}
-        />
-      );
+    case 'wall':
+      return <Wall params={r.params} />;
   }
 }
 
@@ -162,6 +144,16 @@ function skipToMain() {
 export function App() {
   const r = route.value;
   const now = serverNow.value;
+  if (r.name === 'wall') {
+    // The TV wall is full-bleed: no header, banner or footer (its sidebar shows the clock and freshness).
+    return (
+      <main id="main" class="wall-main" tabIndex={-1}>
+        <RouteBoundary key="wall">
+          <Outlet r={r} />
+        </RouteBoundary>
+      </main>
+    );
+  }
   return (
     <>
       <button type="button" class="skip-link" onClick={skipToMain}>
