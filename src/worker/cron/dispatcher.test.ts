@@ -1,8 +1,10 @@
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { BUDGET, SLOTS } from '../../../config/schedule.ts';
+import { SOURCES } from '../sources/index.ts';
 import { type FetchCtx, type Source, ValidationError } from '../sources/types.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
-import { isMaintenance, isMorning, planTick, runTick, slotOf } from './dispatcher.ts';
+import { isMaintenance, isMorning, planTick, runTick, slotJobIds, slotOf } from './dispatcher.ts';
 
 const at = (iso: string) => Date.parse(iso);
 // 2026-12-28 is a Monday; Denver is UTC-7 in winter.
@@ -53,6 +55,34 @@ describe('admission', () => {
     const src = [fake('maintenance', 17)];
     expect(planTick(at('2026-12-29T08:50:00Z'), src, ctx).admitted).toHaveLength(1);
     expect(planTick(at('2026-12-29T14:50:00Z'), src, ctx).admitted).toHaveLength(0);
+  });
+});
+
+/** Worst case over every slot x keyed/keyless x morning x maintenance: sum of the scheduled jobs' maxSubrequests. */
+function worstSlotLoad(sources: readonly Source[]): { load: number; at: string } {
+  let worst = { load: 0, at: '' };
+  for (let slot = 0; slot < SLOTS.length; slot++)
+    for (const keyed of [true, false])
+      for (const morning of [true, false])
+        for (const maintenance of [true, false]) {
+          const c = { ...ctx, slot, morning, keyed: { yt: keyed, udot: keyed } } as FetchCtx;
+          const load = slotJobIds(slot, morning, maintenance)
+            .map((id) => sources.find((s) => s.id === id)?.maxSubrequests(c) ?? 0)
+            .reduce((a, b) => a + b, 0);
+          if (load > worst.load)
+            worst = { load, at: `slot ${slot} keyed=${keyed} morning=${morning} maint=${maintenance}` };
+        }
+  return worst;
+}
+
+describe('budget matrix', () => {
+  it(`no slot schedules more than ${BUDGET} subrequests for the registered sources`, () => {
+    const worst = worstSlotLoad(SOURCES);
+    expect(worst.load, worst.at).toBeLessThanOrEqual(BUDGET);
+  });
+
+  it('the matrix sees scheduled jobs (guard against a vacuous pass)', () => {
+    expect(worstSlotLoad([fake('roads', BUDGET + 1)]).load).toBe(BUDGET + 1);
   });
 });
 

@@ -54,16 +54,20 @@ export interface TickPlan {
   deferred: Source[];
 }
 
+/** Job ids scheduled in a slot (config/schedule.ts), registered or not. */
+export function slotJobIds(slot: number, morning: boolean, maintenance: boolean): string[] {
+  const def = SLOTS[slot] ?? { always: [], morning: [] };
+  return [...new Set([...def.always, ...(morning ? def.morning : [])])].filter(
+    (id) => id !== 'maintenance' || maintenance,
+  );
+}
+
 /** Pure admission. Job ids without a registered source are skipped (adapters not written yet). */
 export function planTick(ms: number, sources: readonly Source[], ctx: FetchCtx): TickPlan {
   const slot = slotOf(ms);
   const morning = isMorning(ms);
   const maintenance = isMaintenance(ms);
-  const def = SLOTS[slot] ?? { always: [], morning: [] };
-  const ids = [...new Set([...def.always, ...(morning ? def.morning : [])])].filter(
-    (id) => id !== 'maintenance' || maintenance,
-  );
-  const jobs = ids
+  const jobs = slotJobIds(slot, morning, maintenance)
     .map((id) => sources.find((s) => s.id === id))
     .filter((s): s is Source => s !== undefined)
     .sort((a, b) => priorityOf(a.id) - priorityOf(b.id));

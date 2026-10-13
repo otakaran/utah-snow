@@ -1,7 +1,7 @@
 # src/worker
 
-Status: skeleton. `index.ts` routes `/api/*` (health, snapshot, debug/probe) and runs `runTick` on cron.
-`SOURCES` in `sources/index.ts` is empty: adapters, frames and the D1 prune are next. Lines below are the contract.
+Skeleton: `index.ts` routes `/api/*` (health, snapshot, debug/probe) and runs `runTick` on cron; `SOURCES` is empty.
+Next: adapters, `Output.frames` KV writer, offseason status (`writeJobOk` always writes 'ok'), `health.cams` (zeros).
 
 ## Source contract (`sources/types.ts`)
 - One adapter per source: `sources/<id>.ts` + `<id>.test.ts` + `fixtures/<id>/<YYYYMMDD>-<tag>.<ext>`.
@@ -16,7 +16,7 @@ Status: skeleton. `index.ts` routes `/api/*` (health, snapshot, debug/probe) and
 - Slots and job ids come from `config/schedule.ts`; admit jobs while `sum(maxSubrequests) <= 45` (redirects and `caches.*` count).
 - `MAX_CONN` = 5 outbound fetches (the platform's 6th slot stays free for KV). Write `cron:last` first, then rows per job.
 - `runTick(env, scheduledTime, { sources, fetchImpl })` returns `{ cron, ext, internal, logs }` for tests.
-- To add: a matrix test over every slot x keyed/keyless x morning x maintenance that fails over 45.
+- `dispatcher.test.ts` budget matrix: every slot x keyed/keyless x morning x maintenance must stay <= 45.
 - `sources/index.ts` `STALE_FALLBACK` and `probe-seed.ts` cover sources without adapters; delete entries as adapters land.
 
 ## Storage
