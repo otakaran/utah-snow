@@ -1,7 +1,7 @@
 // Data saver switch (spec §8.3). The preference ('auto' | 'on' | 'off') is the settings store's `dataSaver`;
 // 'auto' turns it on when the browser asks to save data or the connection is 2g/3g. While on: no auto-refresh of cam
 // stills except the stake row, no live video unless tapped, the smallest still variant, heavy GIFs wait for a tap,
-// and (Phase 2) the scrubber steps every 15 min.
+// and the timelapse scrubber steps every 15 min (features/cams/scrubber.ts).
 import { computed, signal } from '@preact/signals';
 import { dataSaver } from '../data/settings.ts';
 

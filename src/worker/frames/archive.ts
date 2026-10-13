@@ -1,9 +1,9 @@
 // Archive frame lists (spec §6.3): the stake_frames index of one KV-archived cam -> scrubber frames and markers,
 // plus the KV read of one frame. Frames newer than READY_MS are never listed, because a fresh KV put may not have
-// propagated yet. HDRelay, Prism and Roundshot lists are Phase 2 (their cams get no list yet).
+// propagated yet. Shared by the provider lists: FramesQuery, parseQuery and thin. Wire types: src/shared/types/cams.ts.
 import { CAMS } from '../../../config/cams/index.ts';
 import { addDays, formatClock, HOUR, localDate, MIN, zonedToUtc } from '../../shared/time.ts';
-import type { CamDef } from '../../shared/types.ts';
+import type { CamDef, FrameMarker, TimelapseFrame } from '../../shared/types.ts';
 import { listFrames, readFrame } from '../store/frames.ts';
 
 export const READY_MS = 2 * MIN;
@@ -14,17 +14,6 @@ const ALTA_STAKE = 'alta-collins-stake'; // cleared at 04:00 and 16:00 local; ot
 const CLEARS = ['04:00', '16:00'] as const;
 const PRE_CLEAR_MS = 30 * MIN;
 
-export interface ArchiveFrame {
-  t: number;
-  thumb: string;
-  full: string;
-  bytes: number;
-}
-export interface Marker {
-  t: number;
-  kind: 'clear' | 'pre-clear' | 'last-snow';
-  label: string;
-}
 export interface FramesQuery {
   hours: number;
   step: 5 | 15;
@@ -67,8 +56,8 @@ export function thin<T extends { t: number }>(rows: readonly T[], stepMin: numbe
 }
 
 /** Alta: `clear` at 04:00/16:00 local inside [from, to]; `pre-clear` = the last frame in the 30 min before each. */
-export function altaMarkers(frames: readonly { t: number }[], from: number, to: number): Marker[] {
-  const out: Marker[] = [];
+export function altaMarkers(frames: readonly { t: number }[], from: number, to: number): FrameMarker[] {
+  const out: FrameMarker[] = [];
   const last = localDate(to);
   for (let date = localDate(from); date && date <= last; date = addDays(date, 1)) {
     for (const hm of CLEARS) {
@@ -88,7 +77,7 @@ export function buildArchive(
   rows: readonly { t: number; bytes: number }[],
   q: FramesQuery,
   window: { from: number; to: number },
-): { frames: ArchiveFrame[]; markers: Marker[] } {
+): { frames: TimelapseFrame[]; markers: FrameMarker[] } {
   const frames = thin(rows, q.step).map((r) => {
     const url = frameUrl(source, r.t);
     return { t: r.t, thumb: url, full: url, bytes: r.bytes };
@@ -103,7 +92,7 @@ export async function archiveFrames(
   source: string,
   q: FramesQuery,
   now: number,
-): Promise<{ frames: ArchiveFrame[]; markers: Marker[] }> {
+): Promise<{ frames: TimelapseFrame[]; markers: FrameMarker[] }> {
   const window = { from: now - q.hours * HOUR, to: now - READY_MS };
   return buildArchive(source, await listFrames(db, source, window.from, window.to), q, window);
 }

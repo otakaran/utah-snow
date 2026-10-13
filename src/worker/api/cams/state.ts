@@ -4,12 +4,15 @@
 //   archive stakes: asOf = the newest stake_frames t (or the stake row's newest picture).
 //   others: the cams:status entry. Then: online false -> offline; hiddenUntilFresh -> stale; no asOf -> live while
 //   online with a live player, else unknown; asOf <= 45 min -> ok (Roundshot at night too), else stale.
+// timelapse.available: archive cams while their index has a servable frame from the last 24 h; HDRelay, Prism and
+// Roundshot by frames/available.ts (the same rule /api/stake/:id/frames applies).
 // The server fills only the placeholders it knows: {id} (the slot's video ID) and {hls} (the HDRelay host). Time
 // placeholders ({m}, {m5}, {h}, {s}) stay for the client's cam-url expansion.
 import { CAMS } from '../../../../config/cams/index.ts';
 import { HOUR, isBetweenLocal, isoToMs, isoUtc, MIN } from '../../../shared/time.ts';
 import type { CamDef, CamState, YtSlotState, YtUnmapped } from '../../../shared/types.ts';
 import { archiveSource, DEFAULT_HOURS, frameUrl } from '../../frames/archive.ts';
+import { providerAvailable } from '../../frames/available.ts';
 import { DEFAULT_HOST } from '../../sources/hdrelay-config.ts';
 import type { CamInputs } from './inputs.ts';
 
@@ -121,8 +124,10 @@ function camState(def: CamDef, inp: CamInputs, now: number): CamOut {
           : generic(def, inp, now);
   const src = archiveSource(def);
   const ready = src ? (inp.frames.get(src)?.ready ?? null) : null;
-  // Only archive lists are served today (§6.3); HDRelay, Prism and Roundshot lists arrive in Phase 2.
-  const available = ready !== null && now - ready <= DEFAULT_HOURS * HOUR;
+  const available =
+    def.timelapse.provider === 'archive'
+      ? ready !== null && now - ready <= DEFAULT_HOURS * HOUR
+      : providerAvailable(def, inp.status[def.id]);
   const out: CamOut = { id: def.id, ...body, timelapse: { provider: def.timelapse.provider, available } };
   if (src && ready !== null) out.latestFrame = frameUrl(src, ready);
   return out;

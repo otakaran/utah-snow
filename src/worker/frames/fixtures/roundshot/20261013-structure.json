@@ -1,0 +1,73 @@
+{
+ "camera": "Snowbird",
+ "images": [
+  {
+   "id": 238087366,
+   "status": "finished",
+   "datetime": 1791905400,
+   "structure": {
+    "quarter": {
+     "w": 2644,
+     "h": 512,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/15-30-00/2026-10-13-15-30-00_quarter.jpg"
+    },
+    "thumbnail": {
+     "w": 775,
+     "h": 150,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/15-30-00/2026-10-13-15-30-00_thumbnail.jpg"
+    }
+   }
+  },
+  {
+   "id": 238086889,
+   "status": "finished",
+   "datetime": 1791904800,
+   "structure": {
+    "quarter": {
+     "w": 2644,
+     "h": 512,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/15-20-00/2026-10-13-15-20-00_quarter.jpg"
+    },
+    "thumbnail": {
+     "w": 775,
+     "h": 150,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/15-20-00/2026-10-13-15-20-00_thumbnail.jpg"
+    }
+   }
+  },
+  {
+   "id": 238086578,
+   "status": "finished",
+   "datetime": 1791904200,
+   "structure": {
+    "quarter": {
+     "w": 2644,
+     "h": 512,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/15-10-00/2026-10-13-15-10-00_quarter.jpg"
+    },
+    "thumbnail": {
+     "w": 775,
+     "h": 150,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/15-10-00/2026-10-13-15-10-00_thumbnail.jpg"
+    }
+   }
+  },
+  {
+   "id": 238057771,
+   "status": "finished",
+   "datetime": 1791875400,
+   "structure": {
+    "quarter": {
+     "w": 2644,
+     "h": 512,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/07-10-00/2026-10-13-07-10-00_quarter.jpg"
+    },
+    "thumbnail": {
+     "w": 775,
+     "h": 150,
+     "url_full": "https://storage4.roundshot.com/5d7715f0795180.06920267/2026-10-13/07-10-00/2026-10-13-07-10-00_thumbnail.jpg"
+    }
+   }
+  }
+ ]
+}

@@ -98,6 +98,9 @@ describe('/api/cams', () => {
           'alta-sugarloaf-peak': { ...ok, asOf: iso(now - 120 * MIN) },
           'alta-east-greeley': { ...ok, online: false, asOf: iso(now - 5 * MIN) },
           'brighton-snowstake-skiutah': { ...ok, asOf: iso(now - 5 * MIN), hidden: true },
+          'snowbasin-snowstake': { ...ok, asOf: null, archive: { first: null, last: null, enabled: false } },
+          'snowbird-little-cloud': { ...ok, asOf: null, archive: { first: null, last: iso(now), enabled: true } },
+          'alta-albion-basin': { ...ok, asOf: null, archive: { first: null, last: null, enabled: false } },
         },
         now - MIN,
       ),
@@ -176,7 +179,16 @@ describe('/api/cams', () => {
       latestFrame: `/api/stake/solitude-snowstake-still/frame/${now - 20 * MIN}`,
       timelapse: { provider: 'archive', available: true },
     });
-    expect(cams.get('snowbird-snowstake')?.timelapse).toEqual({ provider: 'hdrelay', available: false }); // Phase 2
+    // Provider timelapses (frames/available.ts): active HDRelay archives unless cam-status disabled them, gated ones
+    // only once it enabled them; Prism unless cam_init listed nothing; Roundshot unless offline.
+    const tl = (id: string) => cams.get(id)?.timelapse;
+    expect(tl('snowbird-snowstake')).toEqual({ provider: 'hdrelay', available: true });
+    expect(tl('snowbasin-snowstake')).toEqual({ provider: 'hdrelay', available: false });
+    expect(tl('snowbird-little-cloud')).toEqual({ provider: 'hdrelay', available: true });
+    expect(tl('snowbird-mineral-basin')).toEqual({ provider: 'hdrelay', available: false });
+    expect(tl('alta-mount-baldy')).toEqual({ provider: 'prism', available: true });
+    expect(tl('alta-albion-basin')).toEqual({ provider: 'prism', available: false });
+    expect(tl('snowbird-hidden-peak')).toEqual({ provider: 'roundshot', available: true });
   });
 
   it('200 with a weak ETag, then 304 with the same ETag and an empty body', async () => {

@@ -1,5 +1,6 @@
-// Presentational pieces of a cam tile: the caption (★ for the pick resort, resort and cam name, age), the status
-// plate (shape + word + color, never color alone), the player switch for a tile's live source and the zoomed still.
+// Presentational pieces of a cam tile: the caption (★ for the pick resort, resort and cam name, age, Timelapse and
+// Stop live actions), the status plate (shape + word + color, never color alone), the player switch for a tile's
+// live source and the zoomed still.
 import type { ComponentChildren } from 'preact';
 import type { CamDef } from '../../../shared/types.ts';
 import { StatusChip } from '../../ui/StatusChip.tsx';
@@ -17,9 +18,11 @@ interface CaptionProps {
   extra?: ComponentChildren;
   /** A Stop button while live video plays in the tile. */
   onStop?: (() => void) | null;
+  /** A Timelapse button while the cam has a scrubbable list (opens the Scrubber). */
+  onTimelapse?: (() => void) | null;
 }
 
-export function Caption({ star, resort, name, age, note, extra, onStop }: CaptionProps) {
+export function Caption({ star, resort, name, age, note, extra, onStop, onTimelapse }: CaptionProps) {
   return (
     <figcaption class="cam-cap">
       <span class="cam-title">
@@ -35,6 +38,11 @@ export function Caption({ star, resort, name, age, note, extra, onStop }: Captio
       <span class="cam-age">{age}</span>
       {note ? <span class="cam-note">{note}</span> : null}
       {extra ? <span class="cam-extra">{extra}</span> : null}
+      {onTimelapse ? (
+        <button type="button" class="btn cam-tl" onClick={onTimelapse} aria-label={`Timelapse of ${name}`}>
+          Timelapse
+        </button>
+      ) : null}
       {onStop ? (
         <button type="button" class="btn cam-stop" onClick={onStop}>
           Stop live

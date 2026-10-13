@@ -62,6 +62,32 @@ export interface StakeRow {
   cams: Record<string, StakeCam>;
 }
 
+// GET /api/stake/:id/frames (spec §6.3, §7): the scrubber's wire shape.
+
+export type TimelapseProvider = 'archive' | 'hdrelay' | 'prism' | 'roundshot';
+
+/** One scrubber frame. Archive frames: thumb === full (`/api/stake/{source}/frame/{t}`) and `bytes` is set. */
+export interface TimelapseFrame {
+  t: number; // epoch ms
+  thumb: string;
+  full: string;
+  bytes?: number;
+}
+export interface FrameMarker {
+  t: number;
+  kind: 'clear' | 'pre-clear' | 'last-snow';
+  label: string;
+}
+export interface StakeFramesBody {
+  camId: string;
+  provider: TimelapseProvider;
+  frames: TimelapseFrame[]; // oldest first
+  markers: FrameMarker[];
+  /** Prism: the newest whole-day MP4 and the span it covers (epoch ms, `to` exclusive). */
+  mp4?: { url: string; from: number; to: number };
+  videoId?: string; // live stakes whose list is their `-still` twin's archive
+}
+
 // Cam status rows (spec §6.2, §6.4): cams:status (cam-status job), hdrelay:config and udot:cams (maintenance).
 
 /** Archive bounds: HDRelay frames/info (one position) or the Prism cam_init 24 h image list. */
