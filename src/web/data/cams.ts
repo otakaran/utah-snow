@@ -1,7 +1,7 @@
 // Cam status store (spec §7 GET /api/cams): status, asOf and resolved live sources per cam, polled every 60 s
 // while visible (the response is public max-age=60). Starts lazily on the first ensureCams() call from a cam view.
-// Until the route exists (404) or while it fails, `camStates` stays empty and tiles render from config/cams alone;
-// a 404 is retried every 10 min. Also sends YouTube player errors to POST /api/cams/report (one per cam per 10 min).
+// Until the first answer, or while it fails, tiles render from config/cams alone (an error keeps the last good
+// states). Also sends YouTube player errors to POST /api/cams/report (one per cam per 10 min).
 import { signal } from '@preact/signals';
 import type { CamState, YtUnmapped } from '../../shared/types.ts';
 
@@ -14,10 +14,9 @@ export interface CamsPayload {
   cams: CamApiState[];
   unmapped: YtUnmapped[];
 }
-export type CamsApiStatus = 'idle' | 'ok' | 'missing' | 'error';
+export type CamsApiStatus = 'idle' | 'ok' | 'error';
 
 const PERIOD_MS = 60_000;
-const MISSING_RETRY_MS = 10 * 60_000;
 const TICK_MS = 15_000;
 const REPORT_GAP_MS = 10 * 60_000;
 export const YT_REPORT_CODES: ReadonlySet<number> = new Set([2, 5, 100, 101, 150, 153]);
@@ -44,11 +43,6 @@ async function refresh(): Promise<void> {
     // Default cache mode: the response is public max-age=60. Its Date header can be that old, so it never feeds the
     // server clock (snapshot/health do).
     const res = await fetch('/api/cams');
-    if (res.status === 404) {
-      void res.body?.cancel();
-      camsStatus.value = 'missing';
-      return;
-    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const body: unknown = await res.json();
     if (!isPayload(body)) throw new Error('unexpected payload');
@@ -66,17 +60,17 @@ async function refresh(): Promise<void> {
 }
 
 const visible = () => document.visibilityState === 'visible';
-const period = () => (camsStatus.peek() === 'missing' ? MISSING_RETRY_MS : PERIOD_MS);
+const due = () => visible() && Date.now() - lastAt >= PERIOD_MS;
 
 /** Starts polling /api/cams once; every cam view calls it on mount. */
 export function ensureCams(): void {
   if (started || typeof document === 'undefined') return;
   started = true;
   setInterval(() => {
-    if (visible() && Date.now() - lastAt >= period()) void refresh();
+    if (due()) void refresh();
   }, TICK_MS);
   document.addEventListener('visibilitychange', () => {
-    if (visible() && Date.now() - lastAt >= period()) void refresh();
+    if (due()) void refresh();
   });
   void refresh();
 }

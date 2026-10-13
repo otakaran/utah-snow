@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { BASES } from '../../config/bases.ts';
-import { destMatches, driveMatrix, haversineKm, liveDelayMin, nearestPreset, routeCorridors, signFor } from './geo.ts';
+import { BASES, GUARDSMAN } from '../../config/bases.ts';
+import {
+  destMatches,
+  driveKey,
+  driveMatrix,
+  haversineKm,
+  liveDelayMin,
+  nearestPreset,
+  passesNear,
+  routeCorridors,
+  signFor,
+  wasatchPoint,
+} from './geo.ts';
 import type { Meta, RoadStatus, Snapshot } from './types.ts';
 
 const NOW = Date.parse('2026-12-27T13:00:00Z');
@@ -63,7 +74,38 @@ describe('driveMatrix', () => {
     expect(driveMatrix({ id: 'sandy', ...BASES.sandy })).toMatchObject({ approx: false, min: { alta: 27 } });
     const custom = { id: 'custom', lat: 40.64, lon: -111.5 };
     expect(nearestPreset(custom)).toBe('park-city-old-town');
-    expect(driveMatrix(custom)).toMatchObject({ approx: true, min: { 'deer-valley': 4 } });
+    expect(driveMatrix(custom)).toMatchObject({ approx: true, min: { 'deer-valley': 4 }, exact: {} });
+  });
+
+  it('uses /api/drive results for a custom base, the nearest preset row for resorts it lacks', () => {
+    const custom = { id: 'custom', lat: 40.761, lon: -111.891 };
+    const api = { alta: { min: 48, mi: 31.2 }, brighton: { min: 46, mi: 31, via: 'bcc-mouth' as const } };
+    const m = driveMatrix(custom, api);
+    expect(m.min).toMatchObject({ alta: 48, brighton: 46, snowbird: 43 }); // snowbird: downtown-slc row
+    expect(m.exact).toEqual({ alta: { mi: 31.2 }, brighton: { mi: 31, via: 'BCC mouth' } });
+    expect(m.approx).toBe(true);
+    const all = Object.fromEntries(Object.keys(m.min).map((r) => [r, { min: 30, mi: 20 }]));
+    expect(driveMatrix(custom, all).approx).toBe(false);
+    expect(driveMatrix({ id: 'sandy', ...BASES.sandy }, api).min.alta).toBe(27); // presets ignore api results
+  });
+});
+
+describe('custom points and route scans', () => {
+  it('rounds to 3 dp, keys the cache and rejects points outside the Wasatch', () => {
+    const p = wasatchPoint(40.76084, -111.89104);
+    expect(p).toEqual({ lat: 40.761, lon: -111.891 });
+    expect(p && driveKey(p)).toBe('40.761,-111.891');
+    expect(wasatchPoint(40.29, -111.9)).toBeNull();
+    expect(wasatchPoint(40.7, -111.1)).toBeNull();
+    expect(wasatchPoint(Number.NaN, -111.9)).toBeNull();
+  });
+
+  it('flags a geometry vertex within the radius of a point', () => {
+    const near = [-111.5549 + 0.008, 40.6067]; // ~0.68 km east of Guardsman
+    const far = [-111.5549 + 0.015, 40.6067]; // ~1.27 km east
+    expect(passesNear([[-111.8, 40.62], near], GUARDSMAN, GUARDSMAN.radiusKm)).toBe(true);
+    expect(passesNear([[-111.8, 40.62], far], GUARDSMAN, GUARDSMAN.radiusKm)).toBe(false);
+    expect(passesNear([], GUARDSMAN, 1)).toBe(false);
   });
 });
 

@@ -1,11 +1,12 @@
 // D1 `counters` (key, value, expires_at) plus the /api/health quota reads (spec §5.3, §7, §9.1).
 // Every write refreshes expires_at = now + ttl, so `expires_at - ttl` is the last write time.
 import { CPU_SUSPECT_TTL_MS } from '../../../config/schedule.ts';
-import { DAY, localDate, ptDate } from '../../shared/time.ts';
+import { addDays, DAY, HOUR, localDate, ptDate, zonedToUtc } from '../../shared/time.ts';
 
 export const YT_PENDING = 'yt:pending'; // ctx.prev key: cam ids of the yt:pending:{camId} counters
 export const YT_UNITS = 'yt:units'; // ctx.prev key: units spent today (America/Los_Angeles quota day)
 const YT_UNITS_TTL_MS = 2 * DAY;
+const YT_PENDING_TTL_MS = 2 * HOUR; // six youtube ticks: a report outlives a failed job or two
 
 export function counterIncStmt(db: D1Database, key: string, by: number, expiresAt: number): D1PreparedStatement {
   return db
@@ -37,6 +38,21 @@ export async function incrementCounter(
 /** `cpu-suspect:{job}:{Denver date}` increment for the dispatcher's tick-start batch. */
 export function cpuSuspectStmt(db: D1Database, job: string, now: number): D1PreparedStatement {
   return counterIncStmt(db, `cpu-suspect:${job}:${localDate(now)}`, 1, now + CPU_SUSPECT_TTL_MS);
+}
+
+/** POST /api/cams/report: one more `yt:pending:{camId}` report for the next youtube tick (spec §6.1). */
+export const bumpYtPending = (db: D1Database, camId: string, now: number): Promise<number> =>
+  incrementCounter(db, `${YT_PENDING}:${camId}`, 1, YT_PENDING_TTL_MS, now);
+
+/**
+ * GET /api/drive cache misses today: `drive:{YYYYMMDD}` (Denver day), expiring at the next Denver midnight.
+ * Returns the new count and that midnight (epoch ms) for the 429's retryAfterS.
+ */
+export async function bumpDriveMisses(db: D1Database, now: number): Promise<{ count: number; resetAt: number }> {
+  const today = localDate(now);
+  const resetAt = zonedToUtc(`${addDays(today, 1)} 00:00`) ?? now + DAY;
+  const count = await incrementCounter(db, `drive:${today.replace(/-/g, '')}`, 1, resetAt - now, now);
+  return { count, resetAt };
 }
 
 /** YouTube quota counter key: the quota day is Pacific. */

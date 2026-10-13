@@ -1,8 +1,10 @@
-// /api path table (spec §7): exact paths (tracker: GET state, POST one op), then patterns (the stake routes carry
-// ids in the path; the handler parses them). Unknown path -> 404, wrong method -> 405 (both no-store); a thrown
-// handler -> 500.
+// /api path table (spec §7): exact paths (tracker: GET state, POST one op; cams/report: POST a YouTube failure;
+// drive: GET custom-base drive times), then patterns (the stake routes carry ids in the path; the handler parses
+// them). Unknown path -> 404, wrong method -> 405 (both no-store); a thrown handler -> 500.
 // Security headers and X-Build are applied to every response here, after the handler (and its cache lookup).
 import { cams } from './api/cams.ts';
+import { camsReport } from './api/cams-report.ts';
+import { drive } from './api/drive.ts';
 import { health } from './api/health.ts';
 import { probe } from './api/probe.ts';
 import { snapshot } from './api/snapshot.ts';
@@ -20,6 +22,8 @@ const ROUTES: Record<string, Route> = {
   '/api/health': { GET: health },
   '/api/snapshot': { GET: snapshot },
   '/api/cams': { GET: cams },
+  '/api/cams/report': { POST: camsReport },
+  '/api/drive': { GET: drive },
   '/api/debug/probe': { GET: probe },
   '/api/tracker': { GET: trackerGet, POST: trackerPost },
 };

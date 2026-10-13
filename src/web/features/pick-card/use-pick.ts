@@ -3,6 +3,7 @@
 import { computed } from '@preact/signals';
 import { driveMatrix, liveDelays } from '../../../shared/geo.ts';
 import type { PickArgs, PickResult, PickScope } from '../../../shared/types.ts';
+import { customDrive } from '../../data/drive.ts';
 import { baseInfo, skiFraction, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { people, pickTracker } from '../../data/tracker.ts';
@@ -11,10 +12,10 @@ import { crewIds, effectiveView, me } from './prefs.ts';
 
 const minute = computed(() => Math.floor(serverNow.value / 60_000) * 60_000);
 
-/** Free-flow minutes and live delays for the active base. */
+/** Free-flow minutes (a custom base: /api/drive results, else the nearest preset's row) and live delays. */
 export const drive = computed(() => {
   const b = baseInfo.value;
-  const m = driveMatrix(b);
+  const m = driveMatrix(b, customDrive.value?.results);
   return { ...m, live: liveDelays(snapshot.value, b, minute.value) };
 });
 

@@ -50,16 +50,19 @@ describe('resort page helpers', () => {
 
   it('builds the drive line and the days left', () => {
     const min = { alta: 26, snowbird: 23, brighton: 32, solitude: 28, 'deer-valley': 44, snowbasin: 72 };
-    const matrix = { min, approx: false };
-    expect(driveInfo({ id: 'cottonwood-heights', label: 'Cottonwood Heights' }, 'alta', matrix, 4)).toEqual({
+    const matrix = { min, exact: { alta: { mi: 13.3 }, brighton: { mi: 31, via: 'BCC mouth', warning: 'w' } } };
+    expect(driveInfo({ label: 'Cottonwood Heights' }, 'alta', matrix, 4)).toEqual({
       min: 26,
       mi: 13.3,
       via: null,
+      warning: null,
       from: 'Cottonwood Heights',
       approx: false,
       delayMin: 4,
     });
-    expect(driveInfo({ id: 'custom', label: 'Cabin' }, 'alta', { ...matrix, approx: true }, undefined)).toMatchObject({
+    expect(driveInfo({ label: 'Cabin' }, 'brighton', matrix, 0)).toMatchObject({ via: 'BCC mouth', warning: 'w' });
+    expect(driveInfo({ label: 'Cabin' }, 'snowbird', matrix, undefined)).toMatchObject({
+      min: 23,
       mi: null,
       approx: true,
       delayMin: null,
