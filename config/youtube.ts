@@ -53,7 +53,7 @@ export const SLOTS = {
     {
       cam: 'deer-valley-ontario-snowstake-live',
       re: /snow\s*stake|ontario/i,
-      camstreamer: '7v1terTMcMZfFAMOp8Gauh1H4PYtk6sP3FDMQuzI',
+      camstreamer: 'yDfseDxIMslaR2Ae0x4rur2uWvwFjBKNOIZu0CqW',
     },
     {
       cam: 'deer-valley-snow-park',

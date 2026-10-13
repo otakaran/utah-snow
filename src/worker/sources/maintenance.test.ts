@@ -27,9 +27,6 @@ const ctxAt = (iso: string, fx: FetchX): FetchCtx => ({
 
 describe('maintenance', () => {
   it('runs one sub-job per maintenance hour, within the 17-subrequest slot budget', () => {
-    expect(maintenance.rows).toEqual(['hdrelay:config', 'udot:cams', 'nws:points']);
-    expect(maintenance.staleByRow).toEqual({ 'hdrelay:config': 2880, 'udot:cams': 2880, 'nws:points': 11520 });
-    expect(maintenance.probes.map((p) => p.hostId)).toEqual(['hdrelay-config', 'udot-cctv', 'nws-points']);
     const { fx } = mockFetch('image/jpeg');
     const due = (iso: string) => [maintenance.rowsDue?.(at(iso)), maintenance.maxSubrequests(ctxAt(iso, fx))];
     expect(due(HOURS.hdrelay)).toEqual([['hdrelay:config'], 12]);

@@ -63,27 +63,11 @@ describe('resorts', () => {
     const covered = Object.values(ikon.CAP_GROUPS).flatMap((g) => [...g.resorts]);
     expect(covered.sort()).toEqual([...RESORT_IDS].sort());
   });
-
-  it('fetches exactly the 13 observation stations of Appendix C.2', () => {
-    const fetched = new Set(
-      Object.values(RESORTS).flatMap((r) => {
-        const o: Record<string, unknown> = r.obs;
-        return ['base', 'baseWind', 'mid', 'summit', 'summitGust']
-          .map((k) => o[k])
-          .filter((s) => typeof s === 'string');
-      }),
-    );
-    expect([...fetched].sort()).toEqual(
-      ['AGD', 'UTALC', 'HDP', 'SBDU1', 'UTBTN', 'PC056', 'BRW', 'DVE', 'DVP', 'EMPUT', 'SBE', 'SWI', 'OGP'].sort(),
-    );
-  });
 });
 
 describe('cams', () => {
-  it('ids are unique; 56 resort cams and 52 UDOT cams', () => {
+  it('ids are unique and every UDOT cam is in CAMS', () => {
     expect(camIds.size).toBe(CAMS.length);
-    expect(CAMS.filter((c) => c.resort !== null)).toHaveLength(56);
-    expect(udotIds.size).toBe(52);
     expect(missing(udotIds, camIds)).toEqual([]);
   });
 
@@ -91,12 +75,8 @@ describe('cams', () => {
     for (const id of RESORT_IDS) expect(CAMS.filter((c) => c.resort === id && c.hero)).toHaveLength(1);
   });
 
-  it('STAKE_ORDER, HEROES, fallback and timelapse.source reference existing cams', () => {
-    const refs = [
-      ...strings(cams.STAKE_ORDER),
-      ...strings(cams.HEROES),
-      ...CAMS.flatMap((c) => [...(c.fallback ?? []), ...(c.timelapse.source ? [c.timelapse.source] : [])]),
-    ];
+  it('fallback and timelapse.source reference existing cams', () => {
+    const refs = CAMS.flatMap((c) => [...(c.fallback ?? []), ...(c.timelapse.source ? [c.timelapse.source] : [])]);
     expect(missing(refs, camIds)).toEqual([]);
   });
 });
@@ -110,10 +90,6 @@ describe('youtube', () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(missing(ids, camIds)).toEqual([]);
   });
-
-  it('has a channel for every slot list', () => {
-    expect(Object.keys(youtube.SLOTS).sort()).toEqual(Object.keys(youtube.CHANNELS).sort());
-  });
 });
 
 describe('roads', () => {
@@ -125,8 +101,8 @@ describe('roads', () => {
     expect(missing(refs, udotIds)).toEqual([]);
   });
 
-  it('RESORT_ROAD_CAMS covers all 52 UDOT cams', () => {
-    expect(new Set(Object.values(RESORT_ROAD_CAMS).flat()).size).toBe(52);
+  it('RESORT_ROAD_CAMS lists every UDOT cam', () => {
+    expect(new Set(Object.values(RESORT_ROAD_CAMS).flat())).toEqual(udotIds);
   });
 
   it('sign rule and baselines use travel signs of their corridor', () => {

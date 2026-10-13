@@ -36,7 +36,7 @@ export const DEER_VALLEY_CAMS = [
   { ...CS_CAM, id: 'deer-valley-revelator', name: 'Revelator' },
   { ...CS_CAM, id: 'deer-valley-sultan', name: 'Sultan' }, // unlisted; reachable only through CamStreamer
   { ...CS_CAM, id: 'deer-valley-hoodoo', name: 'Hoodoo' },
-  // STAKE (live). Not live today (the handle points to the unavailable _-jBmcnsK6s). Accepted only when LIVE and the
+  // STAKE (live). Live since 2026-10-13 (the handle points to 4vi7EiWba7E). Accepted only when LIVE and the
   // title matches /snow\s*stake|ontario/i; otherwise falls back to the -still. Last season's stream started 2025-12-31 (O13).
   { ...CS_CAM, id: 'deer-valley-ontario-snowstake-live', name: 'Ontario Snow Stake', isStake: true,
     live: { type: 'youtube', dvr: true }, fallback: ['deer-valley-ontario-snowstake-still'],

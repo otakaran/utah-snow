@@ -1,10 +1,10 @@
 {
- "_note": "Live capture 2026-10-13 ~02:00Z (2026-10-12 MDT) from a laptop with the fetchx UA. Two rounds of HEAD https://camstreamer.com/embed/{handle} (redirect not followed: status + Location) and HEAD https://i.ytimg.com/vi/{id}/hqdefault_live.jpg (status + ETag), about 6 min apart, so live counters moved and custom-thumbnail ETags (10 digits) did not. api403 is the real keyless answer of GET https://www.googleapis.com/youtube/v3/videos (no key). maxres is HEAD maxresdefault_live.jpg.",
+ "_note": "Live capture 2026-10-13 ~02:00Z (2026-10-12 MDT) from a laptop with the fetchx UA. Two rounds of HEAD https://camstreamer.com/embed/{handle} (redirect not followed: status + Location) and HEAD https://i.ytimg.com/vi/{id}/hqdefault_live.jpg (status + ETag), about 6 min apart, so live counters moved and custom-thumbnail ETags (10 digits) did not. api403 is the real keyless answer of GET https://www.googleapis.com/youtube/v3/videos (no key). maxres is HEAD maxresdefault_live.jpg. The DV stake handle key is the 2026-10-13 replacement (config/youtube.ts); its answers are the old handle's.",
  "rounds": [
   {
    "at": "2026-10-13T01:59:38Z",
    "camstreamer": {
-    "7v1terTMcMZfFAMOp8Gauh1H4PYtk6sP3FDMQuzI": {
+    "yDfseDxIMslaR2Ae0x4rur2uWvwFjBKNOIZu0CqW": {
      "status": 302,
      "location": "https://www.youtube.com/embed/_-jBmcnsK6s?autoplay=1&mute=1"
     },
@@ -135,7 +135,7 @@
   {
    "at": "2026-10-13T02:05:50Z",
    "camstreamer": {
-    "7v1terTMcMZfFAMOp8Gauh1H4PYtk6sP3FDMQuzI": {
+    "yDfseDxIMslaR2Ae0x4rur2uWvwFjBKNOIZu0CqW": {
      "status": 302,
      "location": "https://www.youtube.com/embed/_-jBmcnsK6s?autoplay=1&mute=1"
     },

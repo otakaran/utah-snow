@@ -1,7 +1,7 @@
 // Keyless UDOT Traffic lists (spec §5.4, Appendix B udot-list): DataTables JSON from /List/GetData/{Layer}.
 // Undocumented front-end endpoints; a start past the end silently returns page 0, so paging follows
 // recordsFiltered. Validation gate: recordsTotal > 0 (recordsFiltered may be 0).
-import { obj } from '../../../shared/json.ts';
+import { type Obj, obj } from '../../../shared/json.ts';
 import { num, range, text } from '../../../shared/num.ts';
 import { hm24, isoToMs, isoUtc, zonedToUtc } from '../../../shared/time.ts';
 import type { RoadStatus } from '../../../shared/types.ts';
@@ -63,11 +63,11 @@ export async function fetchPages(
 }
 
 /** Rows of all valid pages, deduped by DT_RowId/id; null when no page passed the gate. */
-export function listRows(pages: unknown[] | null): unknown[] | null {
+export function listRows(pages: unknown[] | null): Obj[] | null {
   const valid = (pages ?? []).map(asPage).filter((p): p is ListPage => p !== null);
   if (!valid.length) return null;
   const seen = new Set<string>();
-  const out: unknown[] = [];
+  const out: Obj[] = [];
   for (const row of valid.flatMap((p) => p.data)) {
     const o = obj(row);
     const id = str(o?.DT_RowId ?? o?.id);

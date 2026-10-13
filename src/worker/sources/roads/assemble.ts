@@ -1,6 +1,6 @@
 // Per-corridor assembly (spec §5.6): base state from the newest state-bearing post, overlays, escalation,
 // tractionLaw, advisories and the display blocks. Pure; inputs are already normalized by roads/parse.ts.
-import { HOUR, isBetweenLocal, isoToMs, localDate, MIN } from '../../../shared/time.ts';
+import { HOUR, isBetweenLocal, isoToMs, localDate } from '../../../shared/time.ts';
 import type { Corridor, ResortId, RoadState, RoadStatus } from '../../../shared/types.ts';
 import { type PostFacts, parkingIn } from './classify.ts';
 import { type Signal, worse } from './raw.ts';
@@ -33,10 +33,6 @@ const ESCALATES = (s: Signal): boolean =>
 const TRACTION_FROM = (s: Signal): boolean =>
   s.state === 'traction' && s.source !== 'Brighton comments' && s.source !== 'Snowbird alert';
 
-function ago(ms: number): string {
-  const m = Math.max(0, Math.round(ms / MIN));
-  return m < 60 ? `${m}m` : `${Math.round(m / 60)}h`;
-}
 const firstLine = (p: PostFacts): string => p.headline ?? p.text.split('\n')[0] ?? '';
 const msOf = (s: string | null | undefined): number => isoToMs(s) ?? 0;
 
@@ -52,9 +48,8 @@ function baseState(posts: PostFacts[], now: number): { state: RoadState; headlin
       return { state: 'closed', headline: `${firstLine(st)} (stale)`, src: st };
     }
   }
-  const newest = posts[0];
-  const headline = newest ? `Last UDOT update ${ago(now - newest.ms)} ago` : 'No active UDOT alerts';
-  return { state: 'open', headline, src: null };
+  // No age in the text: the client renders it from latestPost.at, so it never goes stale in a cached row.
+  return { state: 'open', headline: posts.length ? 'Latest UDOT update' : 'No active UDOT alerts', src: null };
 }
 
 /** Standing-advisory posts, one chip per route (the newest text, the latest end), while unexpired. */

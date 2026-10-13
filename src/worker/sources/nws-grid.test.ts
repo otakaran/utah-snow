@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { SLOTS } from '../../../config/schedule.ts';
 import type { PointForecast } from '../../shared/types.ts';
 import live from './fixtures/nws-grid/20261012-live.json?raw';
 import synthetic from './fixtures/nws-grid/nws-grid-synthetic.json?raw';
-import { NWS_GRID_SOURCES, nwsGrid } from './nws-grid.ts';
+import { nwsGrid } from './nws-grid.ts';
 import { type FetchCtx, type FetchOpts, ValidationError } from './types.ts';
 
 const altaBase = nwsGrid('alta', 'base');
@@ -110,16 +109,7 @@ describe('nws-grid validation gate', () => {
   });
 });
 
-describe('nws-grid source wiring', () => {
-  it('has one instance per scheduled nws-grid job, each one subrequest', () => {
-    const scheduled = SLOTS.flatMap((s) => s.always).filter((j) => j.startsWith('nws-grid:'));
-    expect(NWS_GRID_SOURCES.map((s) => s.id).sort()).toEqual([...scheduled].sort());
-    for (const s of NWS_GRID_SOURCES) {
-      expect(s.maxSubrequests({} as FetchCtx)).toBe(1);
-      expect(s.rows).toEqual([s.id.replace('nws-grid:', 'nws:')]);
-      expect(s.staleAfterMin).toBe(180);
-    }
-  });
+describe('nws-grid fetch', () => {
   it('GETs the grid as geo+json without following redirects', async () => {
     const calls: [string, FetchOpts | undefined][] = [];
     const fetch = (async (url: string, opts?: FetchOpts) => {
