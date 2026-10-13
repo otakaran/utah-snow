@@ -1,10 +1,10 @@
 // Pure view helpers for the resort page (spec §8.7): season and snow-level status words, lift grouping, C.8 lift
 // hours, days left and the drive line. No Date/Intl; times are 'HH:MM'.
-import { type BaseId, DRIVE } from '../../../../config/bases.ts';
 import { CAP_GROUPS } from '../../../../config/ikon.ts';
 import { type LiftHours, type LiftWindow, RESORTS } from '../../../../config/resorts.ts';
 import { type CapDay, crewRemaining, group, remaining } from '../../../shared/caps.ts';
 import type { Badge } from '../../../shared/freshness.ts';
+import type { DriveMatrix } from '../../../shared/geo.ts';
 import type { ParkingDay } from '../../../shared/parking.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { LiftStatus, NwsDay, PointForecast, ResortId, ResortSnapshot } from '../../../shared/types.ts';
@@ -87,27 +87,29 @@ export const hoursSource = (id: ResortId): string => (RESORTS[id].liftHours as L
 
 export interface DriveInfo {
   min: number;
-  mi: number | null; // presets only
+  mi: number | null; // exact drives only (a preset row or /api/drive)
   via: string | null;
+  warning: string | null; // /api/drive: the route crosses Guardsman Pass
   from: string;
-  approx: boolean; // custom base: the nearest preset's row (C.6)
+  approx: boolean; // custom base without an /api/drive result for this resort: the nearest preset's row (C.6)
   delayMin: number | null; // live sign delay over its baseline (C.10); null = no sign or no usable reading
 }
 
 /** The head's drive line from the pick card's drive matrix and live delays for the active base. */
 export function driveInfo(
-  base: { id: string; label: string },
+  base: { label: string },
   id: ResortId,
-  matrix: { min: Record<ResortId, number>; approx: boolean },
+  matrix: Pick<DriveMatrix, 'min' | 'exact'>,
   live: number | null | undefined,
 ): DriveInfo {
-  const row: { mi: number; via?: string } | null = base.id in DRIVE ? DRIVE[base.id as BaseId][id] : null;
+  const exact = matrix.exact[id];
   return {
     min: matrix.min[id],
-    mi: row?.mi ?? null,
-    via: row?.via ?? null,
+    mi: exact?.mi ?? null,
+    via: exact?.via ?? null,
+    warning: exact?.warning ?? null,
     from: base.label,
-    approx: matrix.approx,
+    approx: !exact,
     delayMin: live ?? null,
   };
 }

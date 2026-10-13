@@ -9,7 +9,6 @@ import { CREDITS, REPO_URL } from '../../ui/Attribution.tsx';
 
 const STATUS_NOTE = {
   idle: 'Loading…',
-  missing: 'Unavailable: /api/cams is not deployed yet.',
   error: 'Unavailable: /api/cams failed; retrying.',
 } as const;
 

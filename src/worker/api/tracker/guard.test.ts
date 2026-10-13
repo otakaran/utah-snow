@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import worker from '../../index.ts';
 import { ipHash } from '../../lib/hash.ts';
 import { clearStore, migrate } from '../../store/test-db.ts';
-import { rateCounters } from './guard.ts';
+import { rateCounters } from '../post-guard.ts';
 
 const ORIGIN = 'https://utah.otakar.dev';
 const IP = '203.0.113.7';

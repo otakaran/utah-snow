@@ -1,5 +1,5 @@
-// Base presets, drive matrix, live-sign rule and custom-base bounds (spec §4.6, Appendix C.1, C.6, C.10).
-// Read by src/shared/geo.ts. Drive values are OSRM free-flow minutes / miles.
+// Base presets, drive matrix, live-sign rule, custom-base bounds and the /api/drive OSRM constants (spec §4.6, §7,
+// Appendix C.1, C.6, C.10). Read by src/shared/geo.ts and api/drive.ts. Drive values are OSRM free-flow min / miles.
 import type { Corridor, ResortId } from '../src/shared/types.ts';
 import { WASATCH_BACK_LON } from './roads.ts';
 
@@ -110,7 +110,31 @@ export const CUSTOM_BOUNDS = {
   dp: 3, // lat/lon rounding
 } as const;
 export const GEO_OPTIONS = { enableHighAccuracy: false, timeout: 10000 } as const;
-export const MAPS_LINK_RES = [/@(-?\d+\.\d+),(-?\d+\.\d+)/, /[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/] as const;
+// Google Maps URL patterns, tried in order: the place pin (!3d lat !4d lon), the map center (@lat,lon), a ?q=/ll= query.
+export const MAPS_LINK_RES = [
+  /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
+  /@(-?\d+\.\d+),(-?\d+\.\d+)/,
+  /[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/,
+] as const;
+
+// GET /api/drive (spec §7): OSRM demo server (<= 1 req/s), one call per resort to its base lot, 1.1 s apart. Results are
+// cached in D1 drive_cache for 30 days; at most 20 cache misses per Denver day (global).
+export const OSRM = {
+  route: 'https://router.project-osrm.org/route/v1/driving/',
+  gapMs: 1100,
+  missesPerDay: 20,
+  cacheDays: 30,
+} as const;
+// Brighton and Solitude route through the BCC mouth, so OSRM never sends them over Guardsman Pass.
+export const BCC_MOUTH = { via: 'bcc-mouth', label: 'BCC mouth', lat: 40.6197, lon: -111.7869 } as const;
+export const VIA_BCC_MOUTH = ['brighton', 'solitude'] as const satisfies readonly ResortId[];
+// Any other route with a vertex within radiusKm of the pass gets this warning (the pass is closed in winter).
+export const GUARDSMAN = {
+  lat: 40.6067,
+  lon: -111.5549,
+  radiusKm: 1.0,
+  warning: 'route uses seasonally closed Guardsman Pass',
+} as const;
 
 // NWS alerts never depend on the base: always these zones, no per-point query.
 export const ALERT_ZONES = ['UTZ105', 'UTZ108', 'UTZ110', 'UTZ111'] as const;
