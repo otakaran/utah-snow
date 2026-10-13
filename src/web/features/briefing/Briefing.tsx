@@ -1,70 +1,61 @@
-// Morning briefing (spec §8.2). For now: the `header` section, then a plain system-status list.
-// The pick, stakes, roads and the rest of the §8.2 order slot in below the header as they land.
-import { ageMin, badge } from '../../../shared/freshness.ts';
-import { CLIENT_BUILD, health, healthError, sources } from '../../data/health.ts';
-import { serverNow, snapshot, snapshotError } from '../../data/snapshot.ts';
-import { clock, clockRel, longDate, tripLine } from '../../lib/format.ts';
-import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
+// Morning briefing (spec §8.2). Fixed order inside <main>, each section root carrying its data-testid: header, pick,
+// stakes, resorts, roads, avalanche, forecast, then the system-status line; `footer` is app.tsx's <footer> right
+// after <main>. Nothing autoplays here.
+import { HEROES } from '../../../../config/cams/index.ts';
+import { CORRIDORS } from '../../../../config/roads.ts';
+import type { CamDef, Corridor } from '../../../shared/types.ts';
+import { fmt } from '../../../shared/units.ts';
+import { units } from '../../data/settings.ts';
+import { serverNow, snapshot } from '../../data/snapshot.ts';
+import { longDate, tripLine } from '../../lib/format.ts';
+import { CAM_BY_ID, CamGallery, CamTile, StakeRow } from '../cams/index.ts';
+import { AvalanchePanel, ForecastPanel, RoadsPanel } from '../conditions/index.ts';
+import { crewPick, overnightOf, PickCard } from '../pick-card/index.ts';
+import { ResortCards } from './ResortCards.tsx';
+import { SystemStatus } from './SystemStatus.tsx';
 import './briefing.css';
+
+/** A corridor's ★ briefing cams (A.7), plus the VMS sign GIFs for LCC. */
+function roadCams(c: Corridor): CamDef[] {
+  const def = CORRIDORS[c];
+  const ids: readonly string[] = [...def.briefingCams, ...('vmsCams' in def ? def.vmsCams : [])];
+  return ids.flatMap((id) => CAM_BY_ID.get(id) ?? []);
+}
 
 function BriefingHeader({ now }: { now: number }) {
   return (
-    <section data-testid="header" class="briefing-header" aria-labelledby="briefing-title">
+    <section data-testid="header" class="brief-head" aria-labelledby="briefing-title">
       <h1 id="briefing-title">Morning briefing</h1>
-      <p class="briefing-when">
-        {longDate(now)} · {clock(now)} Denver
+      <p>
+        {longDate(now)} · {tripLine(now)}
       </p>
-      <p class="briefing-trip">{tripLine(now)}</p>
-    </section>
-  );
-}
-
-function StatusList({ now }: { now: number }) {
-  const h = health.value;
-  const hErr = healthError.value;
-  const snap = snapshot.value;
-  const sErr = snapshotError.value;
-  const metas = sources.value;
-  return (
-    <section data-testid="status" class="briefing-status" aria-labelledby="status-title">
-      <h2 id="status-title">System status</h2>
-      <dl class="status-facts">
-        <dt>Build</dt>
-        <dd data-testid="status-build">
-          web {CLIENT_BUILD} · api {h?.version ?? (hErr ? `unavailable (${hErr})` : 'loading…')}
-        </dd>
-        <dt>Last cron tick</dt>
-        <dd data-testid="status-cron">{clockRel(h?.cron?.lastTickAt, now)}</dd>
-        <dt>Snapshot generated</dt>
-        <dd data-testid="status-snapshot">
-          {snap ? clockRel(snap.generatedAt, now) : sErr ? `unavailable (${sErr})` : 'loading…'}
-          {snap && sErr ? ` (refresh failed: ${sErr})` : ''}
-        </dd>
-      </dl>
-      <h3>Sources</h3>
-      {metas.length === 0 ? (
-        <p class="status-empty">No sources reported yet.</p>
-      ) : (
-        <ul class="source-list">
-          {metas.map((m) => (
-            <li key={m.source} data-testid="source" class="source-row">
-              <code class="source-id">{m.source}</code>
-              <FreshnessBadge badge={badge(m, now)} age={ageMin(m, now)} />
-              {m.error ? <span class="source-error">{m.error}</span> : null}
-            </li>
-          ))}
-        </ul>
-      )}
     </section>
   );
 }
 
 export function Briefing() {
-  const now = serverNow.value;
+  const u = units.value;
+  const snap = snapshot.value;
+  const pick = crewPick.value?.pick ?? null;
+  const stakeInches = (cam: CamDef) => {
+    const q = cam.resort ? fmt('snow', overnightOf(snap, cam.resort), u) : null;
+    return q && q.value !== '—' ? (
+      <span class="brief-stake-in num">
+        {q.value}
+        <small>{q.unit}</small>
+      </span>
+    ) : null;
+  };
   return (
     <>
-      <BriefingHeader now={now} />
-      <StatusList now={now} />
+      <BriefingHeader now={serverNow.value} />
+      <PickCard />
+      <StakeRow pick={pick} no="02" overlay={stakeInches} />
+      <ResortCards hero={(id, isPick) => <CamTile id={HEROES[id]} variant="card" star={isPick} />} />
+      <RoadsPanel units={u} no="04" cams={(c) => <CamGallery cams={roadCams(c)} variant="card" pick={pick} />} />
+      <AvalanchePanel no="05" />
+      <ForecastPanel units={u} no="06" />
+      <SystemStatus />
     </>
   );
 }

@@ -38,3 +38,61 @@ export async function putFrames(kv: KVNamespace, db: D1Database, frames: readonl
   if (frames.length > MAX_FRAMES_PER_JOB) out.errors.push(`${frames.length - MAX_FRAMES_PER_JOB} frames over the cap`);
   return out;
 }
+
+// Reads for /api/cams and /api/stake/* (spec §6.3, §6.4, §7).
+
+export interface FrameRow {
+  t: number; // epoch ms (the picture's Last-Modified)
+  bytes: number;
+}
+/** Per archived cam: the newest frame and the newest one old enough to serve (KV may lag a fresh put). */
+export interface FrameStat {
+  cam_id: string;
+  newest: number;
+  ready: number | null;
+}
+export interface PayloadRow {
+  source_id: string;
+  payload: string | null;
+  fetched_at: number;
+}
+
+export const frameKey = (camId: string, t: number): string => `cam:${camId}:${t}`;
+
+/** One archived JPEG from KV, or null when it expired or was never written. */
+export function readFrame(kv: KVNamespace, camId: string, t: number): Promise<ArrayBuffer | null> {
+  return kv.get(frameKey(camId, t), 'arrayBuffer');
+}
+
+/** Index rows of one cam with from <= t <= to, oldest first. */
+export async function listFrames(db: D1Database, camId: string, from: number, to: number): Promise<FrameRow[]> {
+  const sql = 'SELECT t, bytes FROM stake_frames WHERE cam_id = ?1 AND t BETWEEN ?2 AND ?3 ORDER BY t';
+  return (await db.prepare(sql).bind(camId, from, to).all<FrameRow>()).results;
+}
+
+const payloadsStmt = (db: D1Database, rowIds: readonly string[]): D1PreparedStatement =>
+  db
+    .prepare(
+      'SELECT source_id, payload, fetched_at FROM source_state WHERE source_id IN (SELECT value FROM json_each(?1))',
+    )
+    .bind(JSON.stringify(rowIds));
+
+/** source_state payloads of the given rows (absent rows are simply missing). */
+export async function readPayloads(db: D1Database, rowIds: readonly string[]): Promise<PayloadRow[]> {
+  return (await payloadsStmt(db, rowIds).all<PayloadRow>()).results;
+}
+
+/** /api/cams inputs in one D1 round trip: the status rows plus per-cam frame stats (ready = t <= readyBefore). */
+export async function readCamInputs(
+  db: D1Database,
+  rowIds: readonly string[],
+  readyBefore: number,
+): Promise<{ rows: PayloadRow[]; frames: FrameStat[] }> {
+  const stats = db
+    .prepare(
+      'SELECT cam_id, MAX(t) AS newest, MAX(CASE WHEN t <= ?1 THEN t END) AS ready FROM stake_frames GROUP BY cam_id',
+    )
+    .bind(readyBefore);
+  const [rows, frames] = await db.batch<unknown>([payloadsStmt(db, rowIds), stats]);
+  return { rows: (rows?.results ?? []) as PayloadRow[], frames: (frames?.results ?? []) as FrameStat[] };
+}

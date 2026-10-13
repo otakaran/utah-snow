@@ -2,6 +2,7 @@
 // config/ may `import type` from here and nowhere else in src/.
 export type * from './types/cams.ts';
 export type * from './types/forecast.ts';
+export type * from './types/pick.ts';
 export type * from './types/resort.ts';
 export type * from './types/roads.ts';
 export type * from './types/snapshot.ts';

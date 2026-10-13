@@ -4,6 +4,7 @@ import { TRIP } from '../../../config/ikon.ts';
 import type { When } from '../../shared/time.ts';
 import {
   daysBetween,
+  denverOffsetMin,
   formatClock,
   formatClockRel,
   formatLocalDate,
@@ -17,6 +18,9 @@ const orDash = (s: string): string => s || DASH;
 
 /** '6:05 AM' (Denver). */
 export const clock = (when: When): string => orDash(formatClock(when));
+
+/** 'MST' or 'MDT', the Denver zone abbreviation at that instant. */
+export const tzAbbr = (nowMs: number): string => (denverOffsetMin(nowMs) === -360 ? 'MDT' : 'MST');
 
 /** 'Sat, Dec 27' (Denver). */
 export const shortDate = (when: When): string => orDash(formatLocalDate(when, 'short'));
@@ -37,6 +41,16 @@ export function ageText(min: number | null | undefined): string {
   if (m < 60) return `${m} min ago`;
   const h = Math.floor(m / 60);
   return h < 48 ? `${h} h ago` : `${Math.floor(h / 24)} d ago`;
+}
+
+/** Compact age for captions: 'now', '7 min', '3 h', '2 d'; '—' when unknown. */
+export function ageShort(min: number | null | undefined): string {
+  if (min === null || min === undefined || !Number.isFinite(min)) return DASH;
+  const m = Math.max(0, Math.round(min));
+  if (m < 1) return 'now';
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  return h < 48 ? `${h} h` : `${Math.floor(h / 24)} d`;
 }
 
 /** An imperial value in the chosen units: qty('snow', 3.46, 'imperial') === '3.5″'. */

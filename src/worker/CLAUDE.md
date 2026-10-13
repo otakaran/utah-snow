@@ -1,7 +1,7 @@
 # src/worker
 
-`index.ts` routes `/api/*` (health, snapshot, debug/probe) and runs `runTick` on cron over every registered adapter.
-Next: `/api/cams`, `/api/stake/*`. Row types other jobs read live in `src/shared/types/` (cams, forecast, youtube).
+`index.ts` routes `/api/*` (health, snapshot, cams, stake, debug/probe; `api/edge.ts` caches + ETags cams/stake,
+`frames/` reads the stake archive) and runs `runTick` on cron. Next: `/api/tracker`. Shared row types: `src/shared/types/`.
 
 ## Source contract (`sources/types.ts`)
 - One adapter per source: `sources/<id>.ts` + `<id>.test.ts` + `fixtures/<id>/<YYYYMMDD>-<tag>.<ext>` (+ `<id>/` helpers).

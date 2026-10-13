@@ -13,6 +13,7 @@ export default defineConfig({
             'src/worker/sources/**/*.test.ts',
             'src/worker/lib/**/*.test.ts',
             'config/**/*.test.ts',
+            'src/web/**/*.test.ts',
           ],
         },
       },

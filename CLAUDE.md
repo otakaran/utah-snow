@@ -9,27 +9,27 @@
 - `config/`: typed registries, data only (ikon, resorts, cams/, youtube, roads, bases, parking, strategy, schedule, site).
 - `migrations/`: D1 SQL, `0001_init.sql` (state, histories, frames index, counters) and `0002_tracker.sql`.
 - `src/shared/`: pure, runtime-agnostic logic with colocated tests: `types.ts` (+ `types/`), time (+ `time/`), units, num,
-  caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page. `config.test.ts` checks the
-  registries. Planned: `pick/`, geo, cam-url.
+  caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page, parking (`parkingCal`), cam-url,
+  `pick/` (the pick engine). `config.test.ts` checks the registries. Planned: geo.
 - `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
-- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, debug/probe), JSON/ETag/cache/header helpers.
+- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams, stake, debug/probe), JSON/ETag helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
 - `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
   `probe-seed.ts` (hosts no adapter probes). Adapters: `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/` (+ `<id>/` helpers).
 - `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs against the budget; 08Z D1 prune), `job.ts` (one job's writes).
 - `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, tick-state, row-meta, history, frames, counters,
   prune; `test-db.ts` for tests).
-- `src/worker/api/`: one file per route, each with a contract test.
-- `src/web/`: Preact SPA: `main.tsx`, `app.tsx`, `router.ts`, `data/` (snapshot, health), `lib/format.ts`, `ui/`,
-  `features/briefing/`, `styles/` (tokens.css, base.css).
-- `e2e/`: Playwright `smoke.spec.ts` and `seed.sql` for local D1.
+- `src/worker/api/`: one file per route, each with a contract test (`edge.ts`: caches.default + ETag); `frames/`: archive.
+- `src/web/`: Preact SPA (map in `src/web/CLAUDE.md`): shell, `data/` stores, `lib/`, `ui/`, `features/` (briefing,
+  pick-card, cams, conditions, resort, settings), `styles/` (tokens.css, base.css).
+- `e2e/`: Playwright `smoke.spec.ts`, `fixtures.ts` (console-error gate, network stubs) and `seed.sql` for local D1.
 - `scripts/`: plain-node tools; `check-repo.ts` (+ `check-repo/`) enforces the rules below.
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`.
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
 - `.github/workflows/`: ci (check, e2e, deploy on main) and health (twice daily `/api/health?strict=1`).
 - Status now: all source adapters registered and writing D1 (resorts, roads, NWS, avy, snotel, YouTube, stakes + KV
-  frames, cam status, maintenance). The web shell shows the header and briefing status rows.
-- Not yet built: the MtnPowder browser fallback UI, `/api/cams|stake|tracker`, web features other than briefing, the drift workflow and
+  frames, cam status, maintenance); `/api/cams` and `/api/stake/*`; web briefing, pick, cams, resort and settings pages.
+- Not yet built: the MtnPowder browser fallback UI, `/api/tracker` + tracker page, the wall, the drift workflow and
   Phase 2 `scripts/{refresh-fixtures,drift-check,bench-parsers}.ts` (`pnpm fixtures|drift|bench`).
 
 ## Commands

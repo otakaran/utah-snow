@@ -1,9 +1,11 @@
 // Snapshot store (spec §8.8): polls /api/snapshot with cache:'no-cache' so the browser revalidates via
 // If-None-Match; an unchanged ETag skips parsing. Polls only while visible, plus once on focus.
-// Also owns the server clock: skew = response Date header - local time, and serverNow = Date.now() + skew.
+// X-Build feeds the redeploy guard. Also owns the server clock: skew = response Date header - local time, and
+// serverNow = Date.now() + skew.
 import { signal } from '@preact/signals';
 import { isoToMs } from '../../shared/time.ts';
 import type { Snapshot } from '../../shared/types.ts';
+import { noteBuildHeader } from '../lib/build-guard.ts';
 
 const CACHE_KEY = 'utahsnow.snap';
 const TICK_MS = 15_000;
@@ -63,6 +65,7 @@ async function refresh(): Promise<void> {
   offline.value = false;
   try {
     noteServerDate(res);
+    noteBuildHeader(res); // X-Build differs after a redeploy: reload rules in build-guard.ts
     if (!res.ok) {
       snapshotError.value = `HTTP ${res.status}`;
       return;

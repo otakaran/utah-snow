@@ -1,0 +1,108 @@
+/* Popover panels, SourceList and Lightbox. Only tokens.css variables. */
+
+/* Popover panel (header source list; shell.css styles the ⋯ menu alike). Light-dismiss: popover="auto". */
+.pop {
+  inset: 60px var(--gutter) auto auto;
+  width: min(28rem, calc(100vw - 2 * var(--gutter)));
+  max-height: 70vh;
+  margin: 0;
+  padding: var(--space-3);
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 12px 40px var(--shadow);
+}
+
+.pop-title {
+  margin-bottom: var(--space-2);
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* SourceList */
+.src-list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.src-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-3);
+  padding-block: 2px;
+  border-bottom: 1px dotted var(--line);
+}
+
+.src-id {
+  font: var(--fs-caption) var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.src-row .fresh {
+  margin-left: auto;
+}
+
+.src-error {
+  flex-basis: 100%;
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  overflow-wrap: anywhere;
+}
+
+.src-empty {
+  color: var(--text-dim);
+}
+
+/* Lightbox (native modal dialog) */
+.lightbox {
+  width: min(96vw, 1400px);
+  max-width: none;
+  max-height: 94vh;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.lightbox::backdrop {
+  background: var(--scrim);
+}
+
+.lightbox-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.lightbox-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: 800 var(--fs-body) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lightbox-body {
+  padding: var(--space-2);
+}
+
+.lightbox-body :is(img, video, iframe) {
+  display: block;
+  width: 100%;
+  max-height: calc(94vh - 80px);
+  object-fit: contain;
+}

@@ -1,80 +1,246 @@
-/* Briefing feature styles. Only tokens.css variables; structure only until the design sprint lands. */
-.briefing-header {
-  padding-block: var(--space-4);
-}
-
-.briefing-header h1 {
+/* Briefing: header, resort cards and the footer status line. tokens.css variables only (B Topo Night). */
+.brief-head h1 {
   margin: 0;
-  font-size: var(--text-xl);
+  font: 800 var(--fs-3) / 1.1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-.briefing-when,
-.briefing-trip {
+.brief-head p {
   margin: var(--space-1) 0 0;
-  color: var(--text-muted);
+  color: var(--text-dim);
+  font-size: var(--fs-5);
 }
 
-.briefing-status {
-  padding: var(--space-4);
-  border: 1px solid var(--border);
+/* resort cards */
+.rc-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 720px) {
+  .rc-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .rc-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rc {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
 }
 
-.briefing-status h2 {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-lg);
+.rc.is-pick {
+  margin-top: var(--space-2);
+  border: 2px solid var(--accent);
+  box-shadow:
+    0 0 0 4px var(--bg),
+    0 0 0 5px var(--accent);
 }
 
-.briefing-status h3 {
-  margin: var(--space-4) 0 var(--space-2);
-  font-size: var(--text-md);
+.rc-flag {
+  position: absolute;
+  top: -12px;
+  left: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 900 var(--fs-5) / 1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-.status-facts {
+.rc-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rc-name {
+  margin: 0;
+  font: 900 var(--fs-2) / 1 var(--font-display);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.rc-mid {
   display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: var(--space-1) var(--space-3);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.rc-hero {
+  min-width: 0;
+}
+
+.rc-snow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2) var(--space-3);
   margin: 0;
 }
 
-.status-facts dt {
-  color: var(--text-muted);
+.rc-snow div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
 }
 
-.status-facts dd {
+.rc-snow-main {
+  grid-column: 1 / -1;
+}
+
+.rc-snow dt,
+.rc-facts dt {
+  color: var(--text-dim);
+  font: 700 var(--fs-5) / 1.2 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rc-snow dd {
   margin: 0;
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-size: var(--fs-3);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.rc-snow .rc-big {
+  color: var(--snow);
+  font-size: var(--fs-resort-num);
+  font-weight: 900;
+  text-shadow: 0 0 14px var(--snow-glow);
+}
+
+.rc-unit,
+.brief-stake-in small {
+  margin-left: 0.04em;
+  font-size: 0.5em;
+  vertical-align: 0.7em;
+}
+
+.rc-pre {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: var(--fs-4);
+}
+
+.rc-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.rc-facts div {
+  min-width: 0;
+  padding-bottom: var(--space-1);
+  border-bottom: 1px dotted var(--line);
+}
+
+.rc-facts .rc-wide {
+  grid-column: 1 / -1;
+}
+
+.rc-facts dd {
+  margin: 0;
+  font-size: var(--fs-4);
+  font-weight: 600;
   overflow-wrap: anywhere;
 }
 
-.source-list {
-  display: grid;
+.rc-foot {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  align-items: center;
 }
 
-.source-row {
+.rc-tag {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-chip);
+  color: var(--text-dim);
+  font-size: var(--fs-5);
+  white-space: nowrap;
+}
+
+.rc-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  margin-left: auto;
+  font: 700 var(--fs-5) / 1 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* footer: compact system status line, sources disclosure, attribution */
+.brief-foot {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: var(--fs-5);
+}
+
+.brief-status {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
   align-items: baseline;
-}
-
-.source-id {
-  font-family: var(--font-mono);
-  overflow-wrap: anywhere;
-}
-
-.source-error {
-  flex-basis: 100%;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-  overflow-wrap: anywhere;
-}
-
-.status-empty {
   margin: 0;
-  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.brief-sources summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+/* overnight-inches plate drawn over each stake still (StakeRow overlay) */
+.brief-stake-in {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-1) var(--space-2) 2px;
+  border-radius: var(--radius-chip);
+  background: var(--scrim);
+  color: var(--snow);
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-size: var(--fs-1);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.rc-snow .rc-old {
+  grid-column: 1 / -1;
+}
+
+.rc-snow .rc-old dd {
+  color: var(--warn-text);
+  font: 700 var(--fs-5) / 1.2 var(--font-body);
 }

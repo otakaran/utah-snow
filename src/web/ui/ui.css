@@ -1,0 +1,192 @@
+/* Shared ui/ primitives: icons, status glyphs, StatusChip, FreshnessBadge, Section heading, buttons.
+   Only tokens.css variables. Form controls: forms.css; popovers, SourceList, Lightbox: overlays.css. */
+
+.icon {
+  flex: none;
+}
+
+/* Status shapes: ok ● circle, warn ▲ triangle, bad ◆ diamond, off ◌ dashed ring (shape + word + color). */
+.glyph {
+  display: inline-block;
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
+  background: currentColor;
+}
+
+.glyph-ok {
+  border-radius: 50%;
+}
+
+.glyph-warn {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.glyph-bad {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.glyph-off {
+  background: transparent;
+  border: 2px dashed currentColor;
+  border-radius: 50%;
+}
+
+/* StatusChip: solid plates for ok/warn/bad, dashed outline for off/stale. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.2em 0.6em;
+  border: 2px solid var(--chip-edge);
+  border-radius: var(--radius-chip);
+  font: 800 var(--fs-caption) / 1.25 var(--font-display);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chip-lg {
+  font-size: var(--fs-body);
+}
+
+.chip-ok {
+  background: var(--ok);
+  color: var(--on-ok);
+}
+
+.chip-warn {
+  background: var(--warn);
+  color: var(--on-warn);
+}
+
+.chip-bad {
+  background: var(--bad);
+  color: var(--on-bad);
+}
+
+.chip-off {
+  border: 2px dashed var(--off);
+  background: transparent;
+  color: var(--text);
+}
+
+.chip-off .glyph {
+  color: var(--off);
+}
+
+/* FreshnessBadge: plain text; glyph in the status color, warn text uses --warn-text. */
+.fresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  white-space: nowrap;
+}
+
+.fresh-green .glyph {
+  color: var(--ok);
+}
+
+.fresh-amber,
+.fresh-amber .glyph {
+  color: var(--warn-text);
+}
+
+.fresh-red,
+.fresh-red .glyph {
+  color: var(--bad);
+}
+
+.fresh-grey .glyph {
+  color: var(--off);
+}
+
+/* Section heading: index number, title, dashed rule, sub-line. */
+.section {
+  min-width: 0;
+}
+
+.sec-h {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font: 800 var(--fs-body) / 1.2 var(--font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sec-no {
+  color: var(--accent);
+  font-feature-settings: var(--num-features);
+}
+
+.sec-h::after {
+  content: "";
+  flex: 1;
+  order: 2;
+  height: 0;
+  border-top: 1px dashed var(--line-strong);
+  transform: translateY(-4px);
+}
+
+.sec-sub {
+  order: 3;
+  margin-left: auto;
+  color: var(--text-dim);
+  font: 500 var(--fs-caption) / 1 var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: var(--tap);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  color: var(--text);
+  font: 700 var(--fs-caption) / 1 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  border-color: transparent;
+  background: var(--accent-gradient);
+  color: var(--accent-ink);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.link-btn {
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

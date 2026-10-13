@@ -1,0 +1,244 @@
+/* Resort detail page (spec §8.7): tokens only; chips, glyphs and section headings come from ui/ui.css. The name
+   (--fs-pick-name) outranks the overnight number (--fs-pick-num), OVERNIGHT right under it; no contour texture. */
+.rs {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.rs-num {
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-weight: 800;
+}
+
+.rs-u {
+  margin-left: 0.06em;
+  font-size: 0.55em;
+}
+
+.rs-snow {
+  color: var(--snow);
+  text-shadow: 0 0 18px var(--snow-glow);
+}
+
+.rs-small {
+  font-size: var(--fs-caption);
+}
+
+.rs-strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.rs-warn {
+  color: var(--warn-text);
+  font-weight: 700;
+}
+
+/* condensed caps labels */
+.rs-label,
+.rs-table th,
+.rs-tile dt {
+  font: 700 var(--fs-caption) / 1.25 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rs-dim,
+.rs-tile dt,
+.rs-table thead {
+  color: var(--text-dim);
+}
+
+.rs-head p,
+.rs-name {
+  margin: 0;
+}
+
+.rs-head {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: radial-gradient(90% 70% at 85% 20%, var(--bg-glow), transparent 70%), var(--surface);
+}
+
+.rs-name {
+  font: 900 var(--fs-pick-name) / 0.9 var(--font-display);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.rs-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+}
+
+.rs-hero {
+  gap: var(--space-4) var(--space-5);
+  align-items: flex-end;
+}
+
+.rs-big {
+  display: grid;
+  justify-items: start;
+}
+
+.rs-big .rs-num {
+  font-size: var(--fs-pick-num);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.rs-tiles {
+  display: grid;
+  flex: 1 1 260px;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.rs-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.rs-tile {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.rs-tile dd {
+  margin: 0;
+  font: 900 var(--fs-1) / 1 var(--font-num);
+}
+
+/* rows: facts, lifts, gates, hours */
+.rs-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rs-rows > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  min-height: var(--tap);
+  border-bottom: 1px dotted var(--line);
+}
+
+.rs-facts > li {
+  grid-template-columns: 7.5em minmax(0, 1fr);
+}
+
+.rs-wide {
+  grid-column: 1 / -1;
+}
+
+.rs-tap {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+}
+
+.rs-btn {
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* cards, notes, tables */
+.rs-card,
+.rs-list,
+.rs-details {
+  margin: var(--space-3) 0 0;
+}
+
+.rs-card {
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rs-tile.rs-card {
+  margin: 0;
+  padding: var(--space-2);
+}
+
+.rs-h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font: 800 var(--fs-3) / 1.15 var(--font-display);
+  text-transform: uppercase;
+}
+
+.rs-card > .rs-h3 {
+  margin-top: 0;
+}
+
+.rs-h3 .rs-dim {
+  font: 500 var(--fs-caption) var(--font-body);
+  text-transform: none;
+}
+
+.rs-notice,
+.rs-periods dd {
+  margin: 0 0 var(--space-3);
+}
+
+.rs-notice {
+  padding: var(--space-3);
+  border-left: 4px solid var(--warn);
+  background: var(--warn-soft);
+}
+
+.rs-list {
+  padding-left: 1.2em;
+}
+
+.rs-table-wrap {
+  overflow-x: auto;
+}
+
+.rs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-caption);
+}
+
+.rs-table th,
+.rs-table td {
+  padding: var(--space-2) var(--space-1);
+  border-bottom: 1px dotted var(--line);
+  text-align: right;
+}
+
+.rs-table th:first-child {
+  text-align: left;
+}
+
+.rs-details summary {
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.rs-park-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 var(--space-3);
+}
+
+@media (max-width: 420px) {
+  .rs-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
