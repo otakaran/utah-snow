@@ -72,6 +72,13 @@ export async function removePerson(api: Api, who: Who): Promise<void> {
 export const planDay = (api: Api, who: Who, date: string, resortId: string) =>
   api.post({ op: 'upsertDay', personId: who.id, date, resortId, status: 'planned', prevUpdatedAt: null });
 
-/** The grid cell of `who` on `date` (trip date 'YYYY-MM-DD'). */
+/**
+ * The day of `who` on `date` (trip date 'YYYY-MM-DD'): the grid cell from 900 px, the day list chip below it; only
+ * the visible one matches. Pin the clock (pinTime) so `date` is not under the collapsed "Past days".
+ */
 export const cell = (page: Page, who: Who, date: string) =>
-  page.locator(`tr[data-date="${date}"] [data-testid="tracker-cell"][aria-label^="${who.name},"]`);
+  page
+    .locator(
+      `[data-date="${date}"] :is([data-testid="tracker-cell"], [data-testid="tracker-chip"])[aria-label^="${who.name},"]`,
+    )
+    .filter({ visible: true });

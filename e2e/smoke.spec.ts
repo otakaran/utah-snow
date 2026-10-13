@@ -131,6 +131,10 @@ test('no horizontal scroll on any page', async ({ page }) => {
   }
 });
 
+// The tracker tests run before the trip, so every trip date is upcoming: on the phone's day list none is collapsed
+// under "Past days", and the same cell() reaches the grid cell or the list chip.
+const BEFORE_TRIP = '2026-12-20T17:00:00Z';
+
 // Spec §9.6 / §13: two browsers share one tracker, and undo restores the previous value.
 test('tracker: a day set in one browser shows in another, and undo restores it', async ({
   page,
@@ -145,6 +149,8 @@ test('tracker: a day set in one browser shows in another, and undo restores it',
   try {
     const pageB = await other.newPage();
     await guardPage(pageB, errors);
+    await pinTime(page, BEFORE_TRIP);
+    await pinTime(pageB, BEFORE_TRIP);
     await useIp(page, api);
     await useIp(pageB, api);
     await page.goto('/#/tracker');
@@ -188,6 +194,7 @@ test('tracker: an 8th Alta/Snowbird day is refused with 422 cap-exceeded and the
   const api = trackerApi(request, baseURL ?? '');
   const who = await freshPerson(api, info.project.name);
   try {
+    await pinTime(page, BEFORE_TRIP);
     await useIp(page, api);
     await page.goto('/#/tracker');
     await expect(cell(page, who, '2027-01-03')).toBeVisible();

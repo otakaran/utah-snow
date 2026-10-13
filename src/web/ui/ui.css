@@ -106,6 +106,7 @@
 /* Section heading: index number, title, dashed rule, sub-line. */
 .section {
   min-width: 0;
+  scroll-margin-top: var(--jump-h, 48px); /* clear of a sticky JumpBar */
 }
 
 .sec-h {
