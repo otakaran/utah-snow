@@ -54,14 +54,14 @@ export function About() {
   return (
     <div class="about">
       <dl class="facts">
-        <dt>Build</dt>
+        <dt class="field-label">Build</dt>
         <dd>
-          <button type="button" class="link-btn num" onClick={onBuildTap} data-testid="about-build">
+          <button type="button" class="link-btn build-id num" onClick={onBuildTap} data-testid="about-build">
             web {CLIENT_BUILD}
           </button>{' '}
           · api <span class="num">{health.value?.version ?? '…'}</span>
         </dd>
-        <dt>Code</dt>
+        <dt class="field-label">Code</dt>
         <dd>
           <a href={REPO_URL} target="_blank" rel="noreferrer">
             GitHub
@@ -72,26 +72,34 @@ export function About() {
           </a>
         </dd>
       </dl>
-      <h3>Data sources</h3>
-      <ul class="plain-list">
-        {CREDITS.map((c) => (
-          <li key={c.name}>
-            <a href={c.href} target="_blank" rel="noreferrer">
-              {c.name}
-            </a>{' '}
-            <span class="dim">· {c.what}</span>
-          </li>
-        ))}
-        {Object.values(RESORTS).map((r) => (
-          <li key={r.name}>
-            <a href={r.links.conditions} target="_blank" rel="noreferrer">
-              {r.name}
-            </a>{' '}
-            <span class="dim">· snow report, lifts and cams</span>
-          </li>
-        ))}
-      </ul>
-      <p class="field-note">Not affiliated with any resort. Cams © resorts and their providers.</p>
+      <div class="about-lists">
+        <div>
+          <h3>Data sources</h3>
+          <ul class="plain-list">
+            {CREDITS.map((c) => (
+              <li key={c.name}>
+                <a href={c.href} target="_blank" rel="noreferrer">
+                  {c.name}
+                </a>{' '}
+                <span class="dim">· {c.what}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3>Resorts</h3>
+          <ul class="plain-list">
+            {Object.values(RESORTS).map((r) => (
+              <li key={r.name}>
+                <a href={r.links.conditions} target="_blank" rel="noreferrer">
+                  {r.name}
+                </a>{' '}
+                <span class="dim">· Snow report, lifts and cams</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
       {admin.value ? <AdminPanel /> : null}
     </div>
   );

@@ -3,9 +3,10 @@
 // GET /api/drive (data/drive.ts); until they arrive, or when it fails, the nearest preset's row shows as "≈".
 import { useState } from 'preact/hooks';
 import { CUSTOM_BOUNDS, GEO_OPTIONS } from '../../../../config/bases.ts';
-import { roundPoint } from '../../../shared/geo.ts';
-import { type DriveStatus, driveStatus } from '../../data/drive.ts';
-import { base, checkCustomBase, labelOk, setBase } from '../../data/settings.ts';
+import { driveMatrix, roundPoint } from '../../../shared/geo.ts';
+import { customDrive, type DriveStatus, driveStatus } from '../../data/drive.ts';
+import { base, baseInfo, checkCustomBase, labelOk, setBase } from '../../data/settings.ts';
+import { DriveChips } from './DriveChips.tsx';
 import { parseMapsLink } from './parse-maps-link.ts';
 
 const OUTSIDE = 'Outside the Wasatch area';
@@ -22,6 +23,7 @@ const STATUS: Record<DriveStatus, string> = {
 export function CustomBase() {
   const b = base.value;
   const cur = 'custom' in b ? b.custom : null;
+  const drive = cur ? driveMatrix(baseInfo.value, customDrive.value?.results) : null;
   const [label, setLabel] = useState(cur?.label ?? '');
   const [lat, setLat] = useState(cur ? String(cur.lat) : '');
   const [lon, setLon] = useState(cur ? String(cur.lon) : '');
@@ -74,10 +76,13 @@ export function CustomBase() {
   return (
     <form class={`base-custom${cur ? ' is-on' : ''}`} onSubmit={save} noValidate data-testid="base-custom">
       <p class="base-name">Custom base</p>
-      {cur ? (
-        <p class="base-drive" data-testid="base-custom-active">
-          In use: {cur.label} ({cur.lat}, {cur.lon})
-        </p>
+      {cur && drive ? (
+        <>
+          <p class="base-drive" data-testid="base-custom-active">
+            In use: {cur.label} ({cur.lat}, {cur.lon})
+          </p>
+          <DriveChips min={drive.min} approx={(r) => !drive.exact[r]} />
+        </>
       ) : null}
       <div class="field-grid">
         <label class="field field-wide">

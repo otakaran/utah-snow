@@ -1,16 +1,40 @@
 /* Settings feature: header controls (settings/header.css) and the #/settings page. Only tokens.css variables. */
 @import "./settings/header.css";
 
-/* Page */
+/* Page: every section is a --surface console panel, so the topo texture shows only in the gutters. */
 .settings {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
   max-width: 760px;
 }
 
 .page-sub {
-  margin-top: calc(-1 * var(--space-4));
+  margin-top: calc(-1 * var(--space-3));
   color: var(--text-dim);
+}
+
+.settings > .section {
+  padding: var(--space-4) clamp(var(--space-3), 3vw, var(--space-5));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.settings .sec-h {
+  flex-wrap: wrap;
+}
+
+/* "✓ Saved" / "▲ Saved: 5 s (min)" in a section heading for 2 s (Flash.tsx). */
+.flash {
+  font-weight: 700;
+}
+
+.flash-ok {
+  color: var(--ok);
+}
+
+.flash-warn {
+  color: var(--warn-text);
 }
 
 /* Base */
@@ -27,16 +51,16 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 2px var(--space-3);
+  gap: var(--space-1) var(--space-3);
   min-height: var(--tap);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--surface);
   cursor: pointer;
 }
 
-.base-option.is-on {
+.base-option.is-on,
+.base-custom.is-on {
   border-color: var(--accent);
   box-shadow: inset 0 0 0 1px var(--accent);
 }
@@ -55,9 +79,49 @@
 }
 
 .base-drive {
-  grid-column: 2;
   color: var(--text-dim);
   font-size: var(--fs-caption);
+}
+
+/* Drive minutes per resort (DriveChips.tsx); the fastest says "closest" in --accent with an --accent edge. */
+.drive-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1);
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+}
+
+.base-option .drive-chips {
+  grid-column: 2;
+}
+
+.drive-label {
+  margin-right: var(--space-1);
+}
+
+.drive-chip {
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+
+.drive-chip .num {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.drive-chip.is-closest {
+  border-color: var(--accent);
+}
+
+.drive-closest {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .base-custom {
@@ -68,16 +132,6 @@
   padding: var(--space-3);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.base-custom.is-on {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
-}
-
-.base-custom .base-drive {
-  grid-column: auto;
 }
 
 .base-custom-actions {
@@ -91,16 +145,39 @@
   font-weight: 700;
 }
 
-/* Wall, advanced, about */
+/* I am: the tracker person's ski/board mode, read-only */
+.ride-locked a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+}
+
+/* Wall: three number fields in one row, the cam set below */
 .wall-form {
   display: grid;
   gap: var(--space-3);
   justify-items: start;
 }
 
+.wall-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+}
+
+.wall-grid input {
+  width: 100%;
+}
+
+.wall-form select {
+  width: 100%;
+  max-width: 26rem;
+}
+
+/* Advanced, about */
 .advanced summary {
   display: flex;
   align-items: center;
+  gap: var(--space-1);
   min-height: var(--tap);
   color: var(--text-dim);
   font: 700 var(--fs-caption) / 1.2 var(--font-display);
@@ -126,6 +203,12 @@
   text-transform: uppercase;
 }
 
+.about-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-3) var(--space-5);
+}
+
 .facts {
   display: grid;
   grid-template-columns: max-content 1fr;
@@ -133,8 +216,10 @@
   gap: var(--space-1) var(--space-3);
 }
 
-.facts dt {
-  color: var(--text-dim);
+/* The build id is a hidden 5-tap admin switch, not a link. */
+.about .build-id {
+  color: var(--text);
+  text-decoration: none;
 }
 
 .plain-list {
