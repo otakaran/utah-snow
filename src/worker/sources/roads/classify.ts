@@ -41,7 +41,10 @@ export interface PostFacts {
 }
 
 const SPLIT_RE = /(?<=[.!?])\s+|(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{203C}\u{2049}]|\u{FE0F})+|\n/u;
-const GUARDSMAN_RE = /\bGUARDSMAN\b/;
+export const GUARDSMAN_RE = /\bGUARDSMAN\b/;
+// Extension of §5.6 step 4: a bare heading ('🚧Road Closure Alert🚧') in a post with Guardsman sentences announces the
+// pass closure, so it is dropped from S too (seen live 2026-10-12: it closed BCC for a Guardsman-only post).
+const HEADING_RE = /^(?:\S+ ){0,4}(?:ALERT|UPDATE):?$/;
 const TRACTION_RE = /\b(TRACTION (DEVICES|LAW)|CHAINS|4X4|4WD|3PMSF|M\+S)\b/;
 const REQUIRED_RE = /\b(REQUIRED|IN EFFECT)\b/;
 const DELAY_RE = /\b(DELAYS?|STOPPED TRAFFIC|SLIDE[- ]?OFFS?|CRASH)\b/;
@@ -143,7 +146,9 @@ export function classifyPost(post: unknown, site: string): PostFacts | null {
   const U = text.toUpperCase();
   const all = sentences(text);
   const guard = all.filter((s) => GUARDSMAN_RE.test(s.toUpperCase()));
-  const keep = all.filter((s) => !GUARDSMAN_RE.test(s.toUpperCase()));
+  const keep = all.filter(
+    (s) => !GUARDSMAN_RE.test(s.toUpperCase()) && !(guard.length && HEADING_RE.test(s.toUpperCase())),
+  );
   const S = keep.map((s) => s.toUpperCase()).join('\n');
 
   const lifted = TRACTION_LIFT_RE.test(S);

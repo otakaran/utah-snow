@@ -114,6 +114,11 @@ describe('roads: 20261012-guardsman fixture (§5.6 expectations)', () => {
     expect([both?.state, both?.latestPost?.id]).toEqual(['open', 13271]);
   });
 
+  it('10/13 03:33Z "Road Closure Alert" heading of a Guardsman-only closure -> BCC open with the note', () => {
+    const bcc = run(at([13276, 13273]), '2026-10-13T21:00:00Z')['roads:bcc'];
+    expect([bcc?.state, bcc?.guardsman]).toEqual(['open', expect.stringMatching(/CLOSED Monday \(10\/12\) at 9:30pm/)]);
+  });
+
   it('00:40:16Z alone -> uphill-restricted, eto UNKNOWN, reason weather', () => {
     const bcc = run(at([13255]), '2026-10-12T01:00:00Z')['roads:bcc'];
     expect([bcc?.state, bcc?.eto, bcc?.reason]).toEqual(['uphill-restricted', 'UNKNOWN', 'weather']);

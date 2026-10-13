@@ -21,6 +21,10 @@ export interface CorridorDef {
 // Bases at or east of this longitude are "Wasatch Back" (routeCorridors and SIGN_RULE).
 export const WASATCH_BACK_LON = -111.7;
 
+// SR-190 at or beyond this milepost is Guardsman Pass Rd, closed every winter and never the way to Brighton or
+// Solitude (the Brighton RWIS sits at MP 16; UDOT's seasonal gate event is at MP 20). Used by roads/traffic.ts.
+export const GUARDSMAN_MP = 17;
+
 export const CORRIDORS = {
   lcc: {
     label: 'Little Cottonwood',
