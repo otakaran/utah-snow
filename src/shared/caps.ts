@@ -1,9 +1,9 @@
 // Ikon cap-group math (spec §9.2), pure. Groups and caps come only from config/ikon.ts.
 // A planned day reserves a day; an 'alta-snowbird' row (both resorts, same day) counts once.
 import { CAP_GROUPS, SKIERS_ONLY } from '../../config/ikon.ts';
-import type { CapGroupId, TrackerResort } from './types.ts';
+import type { CapGroupId, DayStatus, TrackerCapCount, TrackerResort } from './types.ts';
 
-export type DayStatus = 'planned' | 'skied';
+export type { DayStatus };
 
 /** The fields of a tracker day row that cap math needs (GET /api/tracker `days[]`). */
 export interface CapDay {
@@ -13,12 +13,8 @@ export interface CapDay {
   status: DayStatus;
 }
 
-export interface CapCount {
-  cap: number | null; // null = unlimited (JSON-safe)
-  skied: number;
-  planned: number;
-  remaining: number | null; // null = unlimited
-}
+/** Days used in one cap group (the wire shape of GET `summary`). */
+export type CapCount = TrackerCapCount;
 
 export const GROUP_IDS = Object.keys(CAP_GROUPS) as CapGroupId[];
 

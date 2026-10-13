@@ -206,6 +206,9 @@ test('tracker: an 8th Alta/Snowbird day is refused with 422 cap-exceeded and the
     await expect(cell(page, who, '2027-01-03')).toHaveAttribute('aria-label', /no day recorded/);
 
     await page.reload(); // with fresh data the picker offers no 8th Alta/Snowbird day
+    const thresholds = page.getByTestId('tracker-threshold-table'); // §9.5: crew row, then one row per person
+    await expect(thresholds.locator('tr[data-person="crew"]')).toBeVisible();
+    await expect(thresholds.locator(`tr[data-person="${who.id}"] th`)).toHaveText(who.name);
     await cell(page, who, '2027-01-03').click();
     await expect(page.getByTestId('tracker-picker').locator('[data-resort="alta"]')).toBeDisabled();
   } finally {

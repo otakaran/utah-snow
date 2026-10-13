@@ -30,7 +30,7 @@
 - No CORS headers. `caches.default` only for snapshot, cams and stake.
 - `/api/snapshot` sends `X-Build` = `BUILD_ID` (`http.ts`: Vite `define` `__BUILD_ID__`, `'dev'` under Vitest); the wall reloads on change.
 - `/api/debug/probe`: the unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`. `/api/health?strict=1`: 503 until `cron:last`.
-- `/api/tracker` (`api/tracker/`; SQL in `store/tracker.ts` + `tracker/writes.ts`): GET no-store; POST one op. `guard.ts`: 403
+- `/api/tracker` (`api/tracker/`; SQL in `store/tracker.ts` + `tracker/writes.ts`; wire types `shared/types/tracker.ts`): GET no-store; POST one op. `guard.ts`: 403
   headers/Origin (localhost if `DEV=1`), 503 `no-salt` (empty `IP_HASH_SALT`), 429, 422; 409 carries the full `current`.
 
 ## Tests

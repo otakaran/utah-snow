@@ -3,49 +3,27 @@
 // client_id and updated_by are never selected. A commit is ONE batch: guarded write, guarded audit insert (+ undo mark),
 // then the four state reads, so the response state is the post-write state and costs no extra D1 call.
 import { tryJson } from '../../shared/json.ts';
-import type { BookingKind, SkiMode, TrackerResort } from '../../shared/types.ts';
+import type {
+  DayStatus,
+  TrackerAuditRow,
+  TrackerBookingRow,
+  TrackerDayRow,
+  TrackerEntity,
+  TrackerPerson,
+} from '../../shared/types.ts';
 
 export * from './tracker/writes.ts';
 
 export const AUDIT_LIMIT = 50;
 
-export type DayStatus = 'planned' | 'skied';
-export type Entity = 'ski_days' | 'people' | 'bookings';
+export type { DayStatus };
+export type Entity = TrackerEntity;
+export type DayRow = TrackerDayRow;
+export type BookingRow = TrackerBookingRow;
+export type AuditEntry = TrackerAuditRow;
 
-export interface PersonRow {
-  id: string;
-  name: string;
-  mode: SkiMode;
-  color: string;
-  updatedAt: number;
+export interface PersonRow extends TrackerPerson {
   deletedAt: number | null; // soft delete (removePerson); never sent by GET
-}
-
-export interface DayRow {
-  personId: string;
-  date: string;
-  resortId: TrackerResort;
-  status: DayStatus;
-  updatedAt: number;
-}
-
-export interface BookingRow {
-  date: string;
-  kind: BookingKind;
-  personId: string; // '*' = car-level parking
-  note: string | null;
-  updatedAt: number;
-}
-
-export interface AuditEntry {
-  id: number;
-  at: number;
-  action: string;
-  entity: Entity;
-  key: string;
-  before: unknown;
-  after: unknown;
-  undoneBy: number | null;
 }
 
 /** Everything in the tracker, deleted people (and their days) included; GET filters (api/tracker/get.ts). */

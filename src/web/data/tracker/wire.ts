@@ -2,48 +2,29 @@
 // dropped, so a partial or newer payload never crashes a view. The API never sends ip_hash, client_id or updated_by.
 import type { DayStatus } from '../../../shared/caps.ts';
 import { isoToMs } from '../../../shared/time.ts';
-import type { BookingKind, PickTracker, SkiMode, TrackerResort } from '../../../shared/types.ts';
+import type {
+  BookingKind,
+  PickTracker,
+  SkiMode,
+  TrackerAuditRow,
+  TrackerBookingRow,
+  TrackerDayRow,
+  TrackerEntity,
+  TrackerPerson,
+  TrackerResort,
+  TrackerState as WireState,
+} from '../../../shared/types.ts';
 
-/** One crew member (`people` row without the timestamps). */
-export interface Person {
-  id: string;
-  name: string;
-  mode: SkiMode;
-  color?: string;
-}
-export interface PersonRow extends Person {
-  updatedAt: number; // optimistic-concurrency token
-}
-
+/** One crew member (`people` row without its token). */
+export type Person = Omit<TrackerPerson, 'updatedAt'>;
+export type PersonRow = TrackerPerson;
 export type TrackerDay = PickTracker['days'][number];
-export interface DayRow extends TrackerDay {
-  updatedAt: number;
-}
-
+export type DayRow = TrackerDayRow;
 export type TrackerBooking = NonNullable<PickTracker['bookings']>[number];
-export interface BookingRow extends TrackerBooking {
-  note: string | null;
-  updatedAt: number;
-}
-
-export interface AuditEntry {
-  id: number;
-  at: number; // ms
-  action: string;
-  entity: string;
-  key: string;
-  before: unknown;
-  after: unknown;
-  undoneBy: number | null;
-}
-
-export interface TrackerState {
-  people: PersonRow[];
-  days: DayRow[];
-  bookings: BookingRow[];
-  audit: AuditEntry[];
-  serverTime: number;
-}
+export type BookingRow = TrackerBookingRow;
+export type AuditEntry = TrackerAuditRow;
+/** The client keeps everything but `summary` (it recomputes caps from `days`). */
+export type TrackerState = Omit<WireState, 'summary'>;
 
 export const EMPTY_STATE: TrackerState = { people: [], days: [], bookings: [], audit: [], serverTime: 0 };
 
@@ -59,6 +40,7 @@ export type TrackerOp =
   | { op: 'undo'; auditId: number };
 
 const MODES: readonly string[] = ['ski', 'board', 'unknown'];
+const ENTITIES: readonly string[] = ['ski_days', 'people', 'bookings'];
 const RESORTS: readonly string[] = [
   'alta',
   'snowbird',
@@ -97,7 +79,7 @@ const person = (o: Obj): PersonRow | null =>
         id: o.id,
         name: o.name,
         mode: o.mode as SkiMode,
-        color: str(o.color) ? o.color : undefined,
+        color: str(o.color) ? o.color : '',
         updatedAt: o.updatedAt,
       }
     : null;
@@ -135,12 +117,12 @@ function json(v: unknown): unknown {
 }
 
 const auditRow = (o: Obj): AuditEntry | null =>
-  num(o.id) && num(o.at) && str(o.action) && str(o.entity) && str(o.key)
+  num(o.id) && num(o.at) && str(o.action) && str(o.entity) && ENTITIES.includes(o.entity) && str(o.key)
     ? {
         id: o.id,
         at: o.at,
         action: o.action,
-        entity: o.entity,
+        entity: o.entity as TrackerEntity,
         key: o.key,
         before: json(o.before),
         after: json(o.after),

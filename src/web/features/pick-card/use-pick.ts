@@ -5,7 +5,7 @@ import { driveMatrix, liveDelays } from '../../../shared/geo.ts';
 import type { PickArgs, PickResult, PickScope } from '../../../shared/types.ts';
 import { baseInfo, skiFraction, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
-import { pickTracker } from '../../data/tracker.ts';
+import { people, pickTracker } from '../../data/tracker.ts';
 import { type PickTarget, runPick } from './pick-adapter.ts';
 import { crewIds, effectiveView, me } from './prefs.ts';
 
@@ -45,6 +45,11 @@ export const mePick = computed<PickResult | null>(() => {
   const m = me.value;
   return m ? run('me', [m.id], 'today') : null;
 });
+
+/** One "as me" pick per tracker person (the tracker's thresholds table); lazy, so only that page pays for it. */
+export const personPicks = computed(() =>
+  people.value.map((p) => ({ id: p.id, name: p.name, pick: run('me', [p.id], 'today') })),
+);
 
 /** What the card shows for the current [Crew | As me] choice. */
 export const shownPick = computed<PickResult | null>(() =>

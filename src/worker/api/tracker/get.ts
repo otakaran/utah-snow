@@ -1,19 +1,12 @@
 // GET /api/tracker (spec §7, §9.3), no-store. Fields are mapped explicitly, so ip_hash, client_id and updated_by
 // (never selected by store/tracker.ts) can never leak. Removed people, their days and their DV bookings are hidden.
 // publicState() is also the `state` of every POST answer and the `current` of every 409.
-import { type CapCount, summary } from '../../../shared/caps.ts';
-import type { CapGroupId } from '../../../shared/types.ts';
+import { summary } from '../../../shared/caps.ts';
+import type { TrackerState } from '../../../shared/types.ts';
 import { json } from '../../http.ts';
-import { type AuditEntry, type BookingRow, type DayRow, readTracker, type TrackerRaw } from '../../store/tracker.ts';
+import { readTracker, type TrackerRaw } from '../../store/tracker.ts';
 
-export interface TrackerState {
-  people: { id: string; name: string; mode: string; color: string; updatedAt: number }[];
-  days: DayRow[];
-  bookings: BookingRow[];
-  audit: AuditEntry[]; // newest first, last 50
-  summary: Record<string, Record<CapGroupId, CapCount>>;
-  serverTime: number; // epoch ms
-}
+export type { TrackerState };
 
 export function publicState(raw: TrackerRaw, now: number): TrackerState {
   const active = raw.people.filter((p) => p.deletedAt === null);

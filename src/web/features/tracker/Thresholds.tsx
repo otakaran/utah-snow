@@ -1,5 +1,5 @@
-// Save thresholds (spec §9.5, §10): for each capped group, the days left (crew minimum, and mine when "I am" is
-// set), today's save-threshold (spend a day only on at least this much snow) and the first use-it-or-lose-it date.
+// Save thresholds (spec §9.5, §10): for each capped group, the days left (crew minimum, then each person; "I am"
+// is marked), today's save-threshold (spend a day only on at least this much snow) and the first use-it-or-lose-it date.
 // Values come from the pick engine through the pick-card feature.
 import { CAP_GROUPS } from '../../../../config/ikon.ts';
 import { GROUP_IDS } from '../../../shared/caps.ts';
@@ -7,7 +7,7 @@ import { formatLocalDate } from '../../../shared/time.ts';
 import type { GroupThreshold, PickResult } from '../../../shared/types.ts';
 import { units } from '../../data/settings.ts';
 import { qty } from '../../lib/format.ts';
-import { crewPick, me, mePick } from '../pick-card/index.ts';
+import { crewPick, me, personPicks } from '../pick-card/index.ts';
 
 const CAPPED = GROUP_IDS.filter((g) => CAP_GROUPS[g].cap !== null);
 
@@ -17,9 +17,9 @@ function thresholdText(t: GroupThreshold | undefined): string {
   return t.threshold <= 0 ? 'free: use it' : `≥ ${qty('snow', t.threshold, units.value)}`;
 }
 
-function Row({ who, pick }: { who: string; pick: PickResult }) {
+function Row({ id, who, pick }: { id: string; who: string; pick: PickResult }) {
   return (
-    <tr>
+    <tr data-person={id}>
       <th scope="row">{who}</th>
       {CAPPED.map((g) => {
         const t = pick.thresholds[g];
@@ -39,8 +39,7 @@ function Row({ who, pick }: { who: string; pick: PickResult }) {
 
 export function Thresholds() {
   const crew = crewPick.value;
-  const mine = mePick.value;
-  const self = me.value;
+  const selfId = me.value?.id;
   if (!crew) return <p class="field-note">Thresholds appear once today's conditions have loaded.</p>;
   return (
     <div class="trk-table-wrap">
@@ -56,8 +55,10 @@ export function Thresholds() {
           </tr>
         </thead>
         <tbody>
-          <Row who="Crew" pick={crew} />
-          {mine && self ? <Row who={`${self.name} (me)`} pick={mine} /> : null}
+          <Row id="crew" who="Crew" pick={crew} />
+          {personPicks.value.map(({ id, name, pick }) =>
+            pick ? <Row key={id} id={id} who={id === selfId ? `${name} (me)` : name} pick={pick} /> : null,
+          )}
         </tbody>
       </table>
       <p class="field-note">Spend a capped day only when the snow reaches its threshold; Solitude is never capped.</p>

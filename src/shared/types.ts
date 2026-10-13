@@ -6,4 +6,5 @@ export type * from './types/pick.ts';
 export type * from './types/resort.ts';
 export type * from './types/roads.ts';
 export type * from './types/snapshot.ts';
+export type * from './types/tracker.ts';
 export type * from './types/youtube.ts';

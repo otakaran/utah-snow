@@ -9,7 +9,7 @@ routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker`, `#/wall` stub;
 - briefing (spec 8.2 order: header, pick, stakes, resorts, roads, avalanche, forecast, then `status`; `footer` is the
   shell's), pick-card (PickCard, PickCompact, Ridge; the only caller of `src/shared/pick/`), cams (CamTile, CamGallery,
   StakeRow, CamsPage, players), conditions (Roads/Avalanche/Forecast panels), resort (8 sections of spec 8.7),
-  settings (page + header chips), tracker (§9.5 grid + DayPicker sheet, caps, bookings, crew, undo log). To come: wall.
+  settings (page + header chips), tracker (§9.5 grid, DayPicker, caps, per-person thresholds, bookings, crew, undo). To come: wall.
 - `ui/`: presentational pieces (+ ui, forms, overlays, shell css), never imports a feature; nor `src/web/` the worker.
   Unit tests only for pure helpers (vitest `unit` includes `src/web/**/*.test.ts`); UI is covered by Playwright.
 
@@ -17,8 +17,8 @@ routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker`, `#/wall` stub;
 - `snapshot.ts`: `/api/snapshot` with ETag, 120 s (60 s on the wall), visible only; server clock (`serverNow` from the
   Date header) and X-Build -> `lib/build-guard.ts`. `health.ts`: `/api/health`, global badge.
 - `cams.ts`: `/api/cams` every 60 s once a cam view calls `ensureCams()`. `open-meteo.ts`: browser-only, 30 min,
-  shared localStorage cache, 429 backoff. `tracker.ts` (+ `tracker/`): `/api/tracker` every 10 min (30 s on #/tracker)
-  + focus; ops apply optimistically, sent in order with `prevUpdatedAt` + `clientId`; a 200/409 state replaces the copy.
+  shared localStorage cache, 429 backoff. `tracker.ts` (+ `tracker/`; wire types `shared/types/tracker.ts`): 10 min
+  (30 s on #/tracker) + focus; ops apply optimistically, in order, with `prevUpdatedAt` + `clientId`; 200/409 replace it.
 
 ## Settings keys (`data/settings.ts`, localStorage `utahsnow.<key>`, per device)
 - units, theme (dark|sun|auto), base, me, ride, pickView, crewToday, dataSaver, wall, skiFraction, admin, clientId.
