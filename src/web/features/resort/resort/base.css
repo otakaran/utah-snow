@@ -1,0 +1,158 @@
+/* Resort page, leading sections (imported first by resort.css): type helpers, the head, stat tiles. Tokens only. */
+.rs {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.rs-num {
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-weight: 800;
+}
+
+.rs-u {
+  margin-left: 0.06em;
+  font-size: 0.55em;
+}
+
+.rs-snow {
+  color: var(--snow);
+  text-shadow: 0 0 18px var(--snow-glow);
+}
+
+/* a missing value: thin dim dash, never the heavy glowing snow bar (it would read as a loading skeleton) */
+.rs .rs-num.rs-none {
+  color: var(--text-dim);
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-shadow: none;
+}
+
+.rs-small {
+  font-size: var(--fs-caption);
+}
+
+.rs-strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.rs-warn {
+  color: var(--warn-text);
+  font-weight: 700;
+}
+
+/* condensed caps labels */
+.rs-label,
+.rs-table th,
+.rs-tile dt {
+  font: 700 var(--fs-caption) / 1.25 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rs-dim,
+.rs-tile dt,
+.rs-table thead {
+  color: var(--text-dim);
+}
+
+.rs-head p,
+.rs-name {
+  margin: 0;
+}
+
+.rs-head {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: radial-gradient(90% 70% at 85% 20%, var(--bg-glow), transparent 70%), var(--surface);
+}
+
+.rs-name {
+  font: 900 var(--fs-pick-name) / 0.9 var(--font-display);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.rs-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+}
+
+.rs-hero {
+  gap: var(--space-4) var(--space-5);
+  align-items: flex-end;
+}
+
+.rs-big {
+  display: grid;
+  justify-items: start;
+}
+
+.rs-big .rs-num {
+  font-size: var(--fs-pick-num);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.rs-tiles {
+  display: grid;
+  flex: 1 1 260px;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.rs-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* counts such as '80 / 118': two per row on a phone, never wrapped mid-number */
+.rs-tiles-wide {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.rs-tile {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.rs-tile dd {
+  margin: 0;
+  font: 900 var(--fs-1) / 1 var(--font-num);
+}
+
+/* head facts: label above value, dotted rule under each, as on the briefing resort cards (.rc-facts) */
+.rs-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rs-facts > li {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px dotted var(--line);
+  overflow-wrap: anywhere;
+}
+
+/* inline links keep a 44 px tap area without growing the line (and pushing the value off its label) */
+.rs-facts .rs-tap {
+  display: inline-block;
+  min-height: 0;
+  padding-block: calc((var(--tap) - 1.5em) / 2);
+  margin-block: calc((1.5em - var(--tap)) / 2);
+}

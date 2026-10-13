@@ -45,6 +45,16 @@ function ParkingCard({ label, p }: { label: string; p: ParkingDay }) {
   );
 }
 
+/** The C.8 hours source in plain words (config keeps the technical note, e.g. 'live window.Alta.liftStatus'). */
+function hoursFrom(id: ResortId): string {
+  const src = hoursSource(id);
+  const name = RESORTS[id].name;
+  if (src.startsWith('live')) return `${name}'s live lift status`;
+  if (src.startsWith('historic')) return `last season (${name} has not posted this season's hours yet)`;
+  if (src === 'FAQ') return `the ${name} FAQ`;
+  return `the ${name} website`;
+}
+
 function credits(id: ResortId): string {
   return [...new Set(RESORT_CAMS[id].map((c) => c.credit))].join(', ');
 }
@@ -71,7 +81,7 @@ export function ParkingInfo({ id, today }: { id: ResortId; today: string }) {
           ))}
         </ul>
         <p class="rs-dim rs-small">
-          Source: {hoursSource(id)}. Live per-lift hours, when the report has them, show under Lifts.
+          Hours from {hoursFrom(id)}. When the resort posts today's hours per lift, they show under Lifts.
         </p>
       </div>
       <div class="rs-park-grid">
