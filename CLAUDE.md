@@ -8,29 +8,33 @@
 ## Repo map
 - `config/`: typed registries, data only (ikon, resorts, cams/, youtube, roads, bases, parking, strategy, schedule, site).
 - `migrations/`: D1 SQL, `0001_init.sql` (state, histories, frames index, counters) and `0002_tracker.sql`.
-- `src/shared/`: pure, runtime-agnostic logic with colocated tests (types, time, units, num, caps, pick/, geo, freshness...).
-- `src/worker/index.ts`: `export default { fetch, scheduled }`; non-`/api` requests that reach it get 404 text/plain.
-- `src/worker/{router,http}.ts`: `/api` path table, JSON/ETag/cache/security-header helpers.
+- `src/shared/`: pure, runtime-agnostic logic with colocated tests: `types.ts` (+ `types/`), time, units, num, caps, freshness.
+  `config.test.ts` checks registry integrity. Planned: `pick/`, geo, cam-url, mtnpowder.
+- `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
+- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, debug/probe), JSON/ETag/cache/header helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
-- `src/worker/sources/`: one adapter per data source, `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/`.
-- `src/worker/cron/`: dispatcher (subrequest budget) and D1 prune.
-- `src/worker/frames/`: per-request frame lists (archive, hdrelay, prism, roundshot).
-- `src/worker/store/`: the ONLY code touching D1/KV.
+- `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES registry, empty so far), `probe-seed.ts`.
+  Adapters go here as `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/`.
+- `src/worker/cron/dispatcher.ts`: `runTick` admits jobs against the subrequest budget. D1 prune comes later.
+- `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, counters; `test-db.ts` for tests).
 - `src/worker/api/`: one file per route, each with a contract test.
-- `src/web/`: Preact SPA: `main.tsx`, `app.tsx`, `router.ts`, `data/` signal stores, `lib/`, `ui/`, `features/<f>/`, `styles/`.
+- `src/web/`: Preact SPA: `main.tsx`, `app.tsx`, `router.ts`, `data/` (snapshot, health), `lib/format.ts`, `ui/`,
+  `features/briefing/`, `styles/` (tokens.css, base.css).
 - `e2e/`: Playwright `smoke.spec.ts` and `seed.sql` for local D1.
 - `scripts/`: plain-node tools; `check-repo.ts` (+ `check-repo/`) enforces the rules below.
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`.
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
-- Status now: scaffold only. `src/worker/index.ts`, `src/web/main.tsx`, `config/site.ts` are placeholders.
-- Not yet built: the rest of `config/`, `migrations/`, `src/shared/`, worker modules, web features, `e2e/`.
+- Status now: skeleton. Config registries, migrations, worker shell (router, cron dispatcher, store, health/snapshot/probe)
+  and the web shell (header, briefing status rows) work. No source adapters yet: `SOURCES` is empty.
+- Not yet built: adapters, `src/worker/frames/`, D1 prune, `/api/cams|stake|tracker`, web features other than briefing.
 - Phase 2 adds `scripts/{refresh-fixtures,drift-check,bench-parsers}.ts` with their `pnpm fixtures|drift|bench` scripts.
 - `.github/workflows/` (ci, drift, health) comes later; not yet built.
 
 ## Commands
 - `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm deploy` runs from CI on main.
 - `pnpm check` = `node scripts/check-repo.ts && biome check . && tsc -b && vitest run`. Must pass before commit.
-- `pnpm test` (vitest projects `unit` = node, `worker` = workerd). `pnpm e2e` (Playwright on `vite preview :4173`).
+- `pnpm test` (vitest projects `unit` = node, `worker` = workerd). `pnpm e2e` (Playwright on `vite preview :4173`;
+  `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused).
 - `pnpm exec biome check --write .` formats and applies safe fixes.
 - `pnpm cf-typegen` after any `wrangler.jsonc` change; commit `worker-configuration.d.ts`.
 - `pnpm db:local`: local D1 migrations + `e2e/seed.sql`.
@@ -96,7 +100,8 @@
 - YouTube IDs churn: ordered regexes, CamStreamer and discovery; IDs are only seeds in `config/youtube.ts`.
 - HDRelay needs an explicit UA and never a Referer.
 - KV allows 1,000 writes/day, used only for frames (about 480).
-- Subrequest budget is 45 per tick (redirects and `caches.*` count), 6 connections at a time.
+- Subrequest budget is 45 per tick (redirects and `caches.*` count), 6 connections at a time (fetchx uses 5; the 6th
+  stays free for KV).
 - CPU is 10 ms: no DOM parsing, no un-memoized Intl.
 - Snowbird's API returns 500 for any foreign Origin. NWS returns 403 without a UA.
 - MtnPowder sits behind Imperva; the browser fallback uses the same pure parser (`src/shared/mtnpowder.ts`).
@@ -104,3 +109,5 @@
 - D1 allows <= 50 queries per invocation.
 - Vitest 5's fs module cache breaks the workerd pool; the `worker` project sets `fsModuleCache: false`.
 - `biome migrate` rewrote `recommended: true` to `preset: "none"`; keep `"preset": "recommended"`.
+- `CamId` (`config/cams/index.ts`) is the union of real cam ids, so a wrong id in `STAKE_ORDER`/`HEROES` fails `tsc -b`.
+- Local D1 state is keyed by `database_id`; after changing it in `wrangler.jsonc`, rerun `pnpm db:local`.

@@ -1,6 +1,19 @@
-// Placeholder: replaced by the real Worker entry (router + cron dispatcher).
-export default {
-  fetch: () =>
-    new Response('Not found', { status: 404, headers: { 'content-type': 'text/plain', 'cache-control': 'no-store' } }),
-  scheduled: () => {},
+// Worker entry: /api/* -> router; any other request that reaches the Worker (an asset miss, e.g. a chunk
+// deleted by a redeploy) -> 404 text/plain no-store so the client's chunk-load handler reloads.
+// scheduled (*/5) -> cron dispatcher.
+import { runTick } from './cron/dispatcher.ts';
+import { plainNotFound } from './http.ts';
+import { route } from './router.ts';
+
+const handler = {
+  fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> | Response {
+    const { pathname } = new URL(req.url);
+    if (pathname === '/api' || pathname.startsWith('/api/')) return route(req, env, ctx);
+    return plainNotFound();
+  },
+  async scheduled(controller: ScheduledController, env: Env): Promise<void> {
+    await runTick(env, controller.scheduledTime);
+  },
 } satisfies ExportedHandler<Env>;
+
+export default handler;

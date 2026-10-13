@@ -1,0 +1,72 @@
+/*
+ * PLACEHOLDER TOKENS. The design sprint (spec §8.9) replaces this whole file with the locked palette.
+ * Neutral greys plus four status hues, just enough for a readable page. This is the only file in
+ * src/web allowed to hold raw colors; everything else uses these variables. Keep the variable names
+ * (or update their users) when the sprint swaps in the real values.
+ * Themes via [data-theme] on <html>: dark (default), sun (light, high contrast), auto (follows the OS).
+ */
+:root {
+  color-scheme: dark;
+  --bg: #121417;
+  --surface: #1b1e23;
+  --border: #343941;
+  --text: #f2f3f5;
+  --text-muted: #b4b9c2;
+  --link: #9cc7ff;
+  --focus: #ffd166;
+  --status-green: #4cc38a;
+  --status-amber: #f0b429;
+  --status-red: #ff6b6b;
+  --status-grey: #9aa0a8;
+  --banner-bg: #3a2f12;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --radius: 8px;
+  --gutter: 16px;
+  --max-width: 1200px;
+  --touch: 44px;
+}
+
+:root[data-theme="sun"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f4f5f7;
+  --border: #c9cdd3;
+  --text: #0b0d10;
+  --text-muted: #3d434b;
+  --link: #0645ad;
+  --focus: #0645ad;
+  --status-green: #116b3c;
+  --status-amber: #8a5a00;
+  --status-red: #b3261e;
+  --status-grey: #5c626a;
+  --banner-bg: #fff3cd;
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-theme="auto"] {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #f4f5f7;
+    --border: #c9cdd3;
+    --text: #0b0d10;
+    --text-muted: #3d434b;
+    --link: #0645ad;
+    --focus: #0645ad;
+    --status-green: #116b3c;
+    --status-amber: #8a5a00;
+    --status-red: #b3261e;
+    --status-grey: #5c626a;
+    --banner-bg: #fff3cd;
+  }
+}

@@ -1,6 +1,7 @@
 # src/worker
 
-Status: `index.ts` is a placeholder (404 text/plain, no-store; empty `scheduled`). Everything below is the contract to build.
+Status: skeleton. `index.ts` routes `/api/*` (health, snapshot, debug/probe) and runs `runTick` on cron.
+`SOURCES` in `sources/index.ts` is empty: adapters, frames and the D1 prune are next. Lines below are the contract.
 
 ## Source contract (`sources/types.ts`)
 - One adapter per source: `sources/<id>.ts` + `<id>.test.ts` + `fixtures/<id>/<YYYYMMDD>-<tag>.<ext>`.
@@ -13,8 +14,10 @@ Status: `index.ts` is a placeholder (404 text/plain, no-store; empty `scheduled`
 
 ## Dispatcher and budget (`cron/dispatcher.ts`)
 - Slots and job ids come from `config/schedule.ts`; admit jobs while `sum(maxSubrequests) <= 45` (redirects and `caches.*` count).
-- At most 6 concurrent connections. Write `cron:last` first, then each job's rows as it settles.
-- The matrix test covers every slot x keyed/keyless x morning x maintenance and fails over 45.
+- `MAX_CONN` = 5 outbound fetches (the platform's 6th slot stays free for KV). Write `cron:last` first, then rows per job.
+- `runTick(env, scheduledTime, { sources, fetchImpl })` returns `{ cron, ext, internal, logs }` for tests.
+- To add: a matrix test over every slot x keyed/keyless x morning x maintenance that fails over 45.
+- `sources/index.ts` `STALE_FALLBACK` and `probe-seed.ts` cover sources without adapters; delete entries as adapters land.
 
 ## Storage
 - Only `store/` touches D1 and KV (`check-repo` flags `env.DB.*`, `env.FRAMES.*`, `.prepare('...')` elsewhere).
@@ -25,11 +28,13 @@ Status: `index.ts` is a placeholder (404 text/plain, no-store; empty `scheduled`
 - `http.ts` helpers: `json()`, ETag/304, cache helpers. Every `/api` response sends `X-Robots-Tag`, `Referrer-Policy`, `X-Content-Type-Options`.
 - No CORS headers. `caches.default` only for snapshot, cams and stake.
 - `/api/snapshot` sends `X-Build` (the wall reloads when it differs from `__BUILD_ID__`).
-- `/api/debug/probe` returns 404 unless `X-Probe-Key` equals `PROBE_KEY`.
+- `/api/debug/probe` returns the same 404 JSON as an unknown route unless `X-Probe-Key` equals `PROBE_KEY`.
+- `/api/health?strict=1` returns 503 with `failures[]` until the first cron tick has written `cron:last`.
 
 ## Tests
 - `unit` project (node): `sources/**/*.test.ts` parse fixtures; field assertions plus one validation-gate failure.
 - `worker` project (workerd, `cloudflare:workers` `env`/`exports`): `api/**` and `cron/**` contract tests.
 - The `worker` project sets `fsModuleCache: false` (Vitest 5 cache is unreadable from workerd).
 - Fixtures: one live file plus <= 5 Wayback in-season files per source, each <= 30 KB, trimmed by `pnpm fixtures`.
-- Read migrations in tests with `import sql from '../../migrations/0001_init.sql?raw'` (`raw.d.ts`).
+- Worker tests call `migrate(env.DB)` / `clearStore(env.DB)` from `store/test-db.ts` (migrations via `?raw`, `raw.d.ts`).
+- `BUILD_ID` (`http.ts`) reads `__BUILD_ID__` (Vite `define`, `globals.d.ts`) and falls back to `'dev'` under Vitest.

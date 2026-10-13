@@ -3,7 +3,7 @@
 A private, link-only ski dashboard for one crew's Utah Ikon trip: resort reports, road and avalanche
 conditions, forecasts, live cams and a day-by-day pass tracker, at https://utah.otakar.dev.
 
-Status: scaffold. The app is being built now.
+Status: early build. The site shell and health checks work; data sources are being added now.
 
 ## Using it
 - **Briefing**: the morning view. It shows the crew pick (where the people skiing today should go)

@@ -1,0 +1,80 @@
+/* Briefing feature styles. Only tokens.css variables; structure only until the design sprint lands. */
+.briefing-header {
+  padding-block: var(--space-4);
+}
+
+.briefing-header h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.briefing-when,
+.briefing-trip {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+}
+
+.briefing-status {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.briefing-status h2 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-lg);
+}
+
+.briefing-status h3 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--text-md);
+}
+
+.status-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.status-facts dt {
+  color: var(--text-muted);
+}
+
+.status-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.source-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+}
+
+.source-id {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.source-error {
+  flex-basis: 100%;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.status-empty {
+  margin: 0;
+  color: var(--text-muted);
+}

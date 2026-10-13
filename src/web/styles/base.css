@@ -1,0 +1,141 @@
+/* Base layout, the app shell and shared ui/ primitives. Only tokens.css variables (spec §8.6, §8.9). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--link);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Shell */
+.app-header,
+.app-main,
+.app-footer,
+.app-banner {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-brand {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.app-nav a,
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding-inline: var(--space-2);
+}
+
+.app-nav a[aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.app-clock {
+  margin: 0 0 0 auto;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-banner {
+  margin-block: var(--space-2) 0;
+  padding-block: var(--space-2);
+  background: var(--banner-bg);
+  border-radius: var(--radius);
+}
+
+.app-main {
+  display: grid;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+}
+
+.app-footer {
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.attribution {
+  margin: 0;
+}
+
+.stub h1 {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+/* ui/FreshnessBadge: glyph + text, colored by status */
+.fresh {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.fresh-green {
+  color: var(--status-green);
+}
+
+.fresh-amber {
+  color: var(--status-amber);
+}
+
+.fresh-red {
+  color: var(--status-red);
+}
+
+.fresh-grey {
+  color: var(--status-grey);
+}
