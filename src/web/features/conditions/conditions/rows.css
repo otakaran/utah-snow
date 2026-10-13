@@ -1,0 +1,171 @@
+/* Imported first by ../conditions.css: tones, labels, road rows, expandable blocks. */
+.cond-t-ok {
+  --tone: var(--ok);
+}
+.cond-t-warn {
+  --tone: var(--warn);
+}
+.cond-t-bad {
+  --tone: var(--bad);
+}
+.cond-t-off {
+  --tone: var(--off);
+}
+.cond-nac-low {
+  --nac: var(--nac-low);
+}
+.cond-nac-moderate {
+  --nac: var(--nac-moderate);
+}
+.cond-nac-considerable {
+  --nac: var(--nac-considerable);
+}
+.cond-nac-high {
+  --nac: var(--nac-high);
+}
+.cond-nac-extreme {
+  --nac: var(--nac-extreme);
+  --nac-text: var(--nac-ink-extreme);
+}
+.cond-num,
+.cond-fc-table td {
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.cond-dim,
+.cond-empty,
+.cond-age,
+.cond-road-route,
+.cond-post,
+.cond-note,
+.cond-road-min,
+.cond-eto,
+.cond-more > summary {
+  color: var(--text-dim);
+}
+.cond-road-route,
+.cond-road p.cond-dim,
+.cond-post,
+.cond-age,
+.cond-note,
+.cond-zone-t p,
+.cond-zone-foot,
+.cond-fc-table {
+  font-size: var(--fs-caption);
+}
+.cond-empty,
+.cond-road-code,
+.cond-zone-advice,
+.cond-zone-title {
+  margin: 0;
+}
+.cond-src {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+/* uppercase condensed labels */
+.cond-link,
+.cond-eto,
+.cond-road-min,
+.cond-more > summary,
+.cond-fc-table th,
+.cond-wall-row {
+  font: 800 var(--fs-caption) / 1.25 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cond-list,
+.cond-wall-list,
+.cond-scale,
+.cond-afd {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cond-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.cond-link,
+.cond-tag {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--tap);
+}
+.cond-link {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+/* roads */
+.cond-road {
+  padding: var(--space-3);
+  border-left: 6px solid var(--tone);
+}
+.cond-road.cond-t-off {
+  border-left-style: dashed;
+}
+.cond-road-h,
+.cond-road-s,
+.cond-tags,
+.cond-zone-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cond-road-h {
+  align-items: baseline;
+  margin: 0;
+}
+.cond-road-code {
+  font: 900 var(--fs-3) / 1 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cond-road-min {
+  margin-left: auto;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cond-road-min .cond-num,
+.cond-eto .cond-num {
+  color: var(--text);
+  font-size: var(--fs-3);
+  font-weight: 900;
+}
+.cond-road p,
+.cond-zone-t p,
+.cond-note {
+  margin: var(--space-2) 0 0;
+  overflow-wrap: anywhere;
+}
+.cond-tag a {
+  color: var(--text);
+  font-weight: 600;
+}
+.cond-tag {
+  padding: 0 0.6em;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-chip);
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+/* expandable blocks: road cams, AFD key messages */
+.cond-more {
+  margin-top: var(--space-2);
+}
+.cond-more > summary {
+  line-height: var(--tap);
+  cursor: pointer;
+}

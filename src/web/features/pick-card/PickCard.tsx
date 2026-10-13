@@ -5,12 +5,12 @@
 import { RESORTS } from '../../../../config/resorts.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { PickResult, PickScope } from '../../../shared/types.ts';
-import { fmt, type Units } from '../../../shared/units.ts';
+import type { Units } from '../../../shared/units.ts';
 import { setPickView, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { people } from '../../data/tracker.ts';
 import { Toggle, type ToggleOption } from '../../ui/Toggle.tsx';
-import { crewNames, previewLabel, TIER_LABEL } from './labels.ts';
+import { crewNames, previewLabel, scoreText, snowQty, TIER_LABEL } from './labels.ts';
 import { PickMore } from './PickMore.tsx';
 import { Actions, Alternatives, Divergences, Reasons } from './PickParts.tsx';
 import { effectiveView, me } from './prefs.ts';
@@ -51,7 +51,7 @@ function Who({ r }: { r: PickResult }) {
 export function PickHero({ r, units: u }: { r: PickResult; units: Units }) {
   const top = r.ranked.find((x) => x.resort === r.pick);
   const o = pickOvernight(snapshot.value, r);
-  const snow = fmt('snow', o.inches, u);
+  const snow = snowQty(o.inches, u);
   return (
     <>
       <h2 id="pick-title" class="pick-name">
@@ -68,7 +68,7 @@ export function PickHero({ r, units: u }: { r: PickResult; units: Units }) {
         <div class="pick-side">
           {r.tier ? <span class="pick-tier">{TIER_LABEL[r.tier]}</span> : null}
           <span class="pick-stat">
-            <span class="num">{top ? top.net.toFixed(1) : '—'}</span> <small>score</small>
+            <span class="num">{top ? scoreText(top.net) : '—'}</span> <small>score</small>
           </span>
           <span class="pick-stat">
             <span class="num">{top ? Math.round(top.driveMin) : '—'}</span> <small>min drive</small>

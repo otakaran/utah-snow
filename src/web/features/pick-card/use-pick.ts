@@ -1,11 +1,11 @@
 // Pick signals (spec §8.2, §10): the crew pick, the "as me" pick and the 15:00 tomorrow outlook, recomputed once a
 // minute or when the snapshot, tracker, settings or crew choice change. The wall reads `crewPick` only.
 import { computed } from '@preact/signals';
+import { driveMatrix, liveDelays } from '../../../shared/geo.ts';
 import type { PickArgs, PickResult, PickScope } from '../../../shared/types.ts';
 import { baseInfo, skiFraction, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { pickTracker } from '../../data/tracker.ts';
-import { driveMatrix, liveDelays } from './drive.ts';
 import { type PickTarget, runPick } from './pick-adapter.ts';
 import { crewIds, effectiveView, me } from './prefs.ts';
 

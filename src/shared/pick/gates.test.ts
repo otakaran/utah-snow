@@ -1,8 +1,7 @@
 // Live gates of the pick (spec §10.2 steps 4-5) and the date/route rules behind them (C.7, §4.5).
 import { describe, expect, it } from 'vitest';
-import { BASES } from '../../../config/bases.ts';
 import type { PickArgs, PickResult, ResortId, RoadStatus } from '../types.ts';
-import { parkingRequired, routeCorridors } from './calendar.ts';
+import { parkingRequired } from './calendar.ts';
 import { pick } from './index.ts';
 import { all, scenario } from './test-snap.ts';
 
@@ -33,10 +32,6 @@ describe('road gates', () => {
   });
 
   it('adds Parleys for a Wasatch Back base going to the Cottonwoods', () => {
-    const pc = BASES['park-city-old-town'].lon;
-    expect(routeCorridors(pc, 'alta')).toEqual(['lcc', 'parleys']);
-    expect(routeCorridors(BASES['cottonwood-heights'].lon, 'alta')).toEqual(['lcc']);
-    expect(routeCorridors(BASES['cottonwood-heights'].lon, 'deer-valley')).toEqual(['parleys']);
     const args = scenario('2027-01-05 06:30', { o: lccStorm, roads: { parleys: 'interlodge' } });
     expect(pick({ ...args, base: 'park-city-old-town' }).excluded.map((x) => x.resort)).toContain('alta');
     expect(pick(args).excluded.map((x) => x.resort)).toEqual(['deer-valley']);

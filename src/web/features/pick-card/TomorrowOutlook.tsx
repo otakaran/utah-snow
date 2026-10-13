@@ -2,7 +2,7 @@
 // Forecast only: no live roads, holds or avalanche danger.
 import { RESORTS } from '../../../../config/resorts.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
-import { TIER_LABEL } from './labels.ts';
+import { scoreText, TIER_LABEL } from './labels.ts';
 import { tomorrowPick } from './use-pick.ts';
 
 export function TomorrowOutlook() {
@@ -17,7 +17,7 @@ export function TomorrowOutlook() {
       <p class="pick-tomorrow-line">
         <b>{RESORTS[t.pick].name}</b>
         {t.tier ? <span class="pick-tier pick-tier--sm">{TIER_LABEL[t.tier]}</span> : null}
-        {top ? <span class="num">{top.net.toFixed(1)}</span> : null}
+        {top ? <span class="num">{scoreText(top.net)}</span> : null}
       </p>
       {top?.reasons[0] ? <p class="pick-tomorrow-why">{top.reasons[0]}</p> : null}
     </aside>

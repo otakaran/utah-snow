@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { BASES } from '../../../../config/bases.ts';
-import type { Meta, RoadStatus, Snapshot } from '../../../shared/types.ts';
-import { destMatches, driveMatrix, liveDelayMin, nearestPreset, signFor } from './drive.ts';
+import { BASES } from '../../config/bases.ts';
+import { destMatches, driveMatrix, haversineKm, liveDelayMin, nearestPreset, routeCorridors, signFor } from './geo.ts';
+import type { Meta, RoadStatus, Snapshot } from './types.ts';
 
 const NOW = Date.parse('2026-12-27T13:00:00Z');
 const CH = BASES['cottonwood-heights'];
@@ -64,5 +64,18 @@ describe('driveMatrix', () => {
     const custom = { id: 'custom', lat: 40.64, lon: -111.5 };
     expect(nearestPreset(custom)).toBe('park-city-old-town');
     expect(driveMatrix(custom)).toMatchObject({ approx: true, min: { 'deer-valley': 4 } });
+  });
+});
+
+describe('haversineKm and routeCorridors', () => {
+  it('measures great-circle km', () => {
+    expect(haversineKm(BASES['downtown-slc'], BASES['downtown-slc'])).toBe(0);
+    expect(haversineKm(CH, BASES['park-city-old-town'])).toBeCloseTo(26.9, 0);
+  });
+
+  it('adds Parleys for a Wasatch Back base going to the Cottonwoods', () => {
+    expect(routeCorridors(BASES['park-city-old-town'].lon, 'alta')).toEqual(['lcc', 'parleys']);
+    expect(routeCorridors(CH.lon, 'alta')).toEqual(['lcc']);
+    expect(routeCorridors(CH.lon, 'deer-valley')).toEqual(['parleys']);
   });
 });

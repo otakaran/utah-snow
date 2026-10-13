@@ -4,7 +4,8 @@ Shell: `main.tsx` (build guard, router, stores, theme effect), `app.tsx` (header
 routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker` + `#/wall` stubs; bad paths redirect to `#/`).
 
 ## Feature folders (`features/<f>/`)
-- `index.ts` is the only import surface; components are `PascalCase.tsx`; one `<f>.css` using only `tokens.css` variables.
+- `index.ts` is the only import surface; components are `PascalCase.tsx`; one `<f>.css` using only `tokens.css` variables
+  (over 250 lines it `@import`s its leading sections from `<f>/`, which keeps the cascade order).
 - briefing (spec 8.2 order: header, pick, stakes, resorts, roads, avalanche, forecast, then `status`; `footer` is the
   shell's), pick-card (PickCard, PickCompact, Ridge; the only caller of `src/shared/pick/`), cams (CamTile, CamGallery,
   StakeRow, CamsPage, players), conditions (Roads/Avalanche/Forecast panels), resort (8 sections of spec 8.7),

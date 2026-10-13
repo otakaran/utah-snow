@@ -1,0 +1,70 @@
+/* six-peak overnight ridge: full names, pick peak lit; --baseline puts every number on one line (wall) */
+.ridge {
+  --ridge-h: calc(72px * var(--wall-scale));
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+  overflow: hidden;
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--line-strong);
+}
+
+.pick .ridge {
+  margin-inline: calc(-1 * var(--space-4));
+}
+
+.ridge-pk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.ridge--baseline .ridge-pk {
+  height: calc(var(--ridge-h) + 2 * var(--fs-2) + 3em);
+}
+
+.ridge-num {
+  margin-bottom: 3px;
+  color: var(--snow);
+  font: 800 var(--fs-2) / 1 var(--font-num);
+  font-feature-settings: var(--num-features);
+  text-shadow: 0 0 14px var(--snow-glow);
+}
+
+.ridge--baseline .ridge-num {
+  margin-bottom: auto;
+}
+
+.ridge-num.is-empty {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
+.ridge-mtn {
+  display: block;
+  width: 150%;
+  height: calc(var(--h) * var(--ridge-h));
+  min-height: 2px;
+  background: linear-gradient(var(--peak-cap) 0 28%, var(--peak) 28%);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.is-pick .ridge-mtn {
+  background: linear-gradient(var(--peak-cap) 0 28%, var(--accent) 28%);
+}
+
+.ridge-name {
+  align-self: stretch;
+  min-height: calc(2.3em + 6px);
+  padding-top: var(--space-1);
+  border-top: 2px solid var(--line-strong);
+  color: var(--text-dim);
+  font: 700 var(--fs-5) / 1.15 var(--font-display);
+  text-align: center;
+}
+
+.is-pick .ridge-name {
+  border-top: 4px solid var(--accent);
+  color: var(--accent);
+}

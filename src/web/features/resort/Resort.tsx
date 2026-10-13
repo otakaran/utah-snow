@@ -3,7 +3,7 @@
 import { useEffect } from 'preact/hooks';
 import { RESORTS } from '../../../../config/resorts.ts';
 import { badge } from '../../../shared/freshness.ts';
-import { routeCorridors } from '../../../shared/pick/calendar.ts';
+import { routeCorridors } from '../../../shared/geo.ts';
 import { localDate } from '../../../shared/time.ts';
 import type { ResortId } from '../../../shared/types.ts';
 import { baseInfo, units } from '../../data/settings.ts';

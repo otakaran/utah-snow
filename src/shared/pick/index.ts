@@ -14,7 +14,7 @@ import { rankWithPick, scoreAll, tierOf } from './rank.ts';
 import { PREVIEW_REASON, signed } from './reasons.ts';
 import { thresholdsOut } from './threshold.ts';
 
-export { parkingRequired, routeCorridors } from './calendar.ts';
+export { parkingRequired } from './calendar.ts';
 export { invExceed, skiDaysLeft } from './threshold.ts';
 
 function divergences(args: PickArgs, ctx: Ctx, top: RankedResort): PickResult['divergences'] {

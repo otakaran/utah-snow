@@ -10,7 +10,7 @@
 - `migrations/`: D1 SQL, `0001_init.sql` (state, histories, frames index, counters) and `0002_tracker.sql`.
 - `src/shared/`: pure, runtime-agnostic logic with colocated tests: `types.ts` (+ `types/`), time (+ `time/`), units, num,
   caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page, parking (`parkingCal`), cam-url,
-  `pick/` (the pick engine). `config.test.ts` checks the registries. Planned: geo.
+  geo (drive matrix, corridors, live-sign delay), `pick/` (the pick engine). `config.test.ts` checks the registries.
 - `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
 - `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams, stake, debug/probe), JSON/ETag helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.

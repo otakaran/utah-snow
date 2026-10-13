@@ -1,0 +1,135 @@
+/* Imported first by ../pick-card.css: card frame, caption faces, sunrise band, hero (name > number). */
+.pick {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: radial-gradient(90% 70% at 80% 30%, var(--bg-glow), transparent 72%), var(--surface);
+  box-shadow: 0 12px 40px var(--shadow);
+}
+
+.pick .num {
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-weight: 800;
+}
+
+.pick :is(p, ul, ol, h2, h3) {
+  margin: 0;
+}
+
+/* shared caption face: condensed, upper-case, tracked */
+.pick-mode,
+.pick-who,
+.pick-cap,
+.pick-more-h,
+.pick-more summary,
+.pick-action {
+  font-family: var(--font-display);
+  font-size: var(--fs-5);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* sunrise band: mode label + [Crew | As me] (ui/Toggle markup) */
+.pick-band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent-gradient);
+  color: var(--accent-ink);
+}
+
+.pick-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.pick-who {
+  color: var(--accent);
+}
+
+.pick-who span,
+.pick-cap,
+.pick-stat small,
+.pick-alt-net small,
+.pick-diverge,
+.pick-alt-why,
+.pick-compact-why,
+.pick-tomorrow-why,
+.pick-more summary,
+.pick-more-body {
+  color: var(--text-dim);
+  font-size: var(--fs-5);
+}
+
+/* hero: the resort name outranks the overnight number (--fs-pick-name > --fs-pick-num) */
+.pick-name {
+  font: 900 var(--fs-pick-name) / 0.92 var(--font-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.pick-hero,
+.pick-side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: flex-end;
+}
+
+.pick-side {
+  align-items: baseline;
+}
+
+.pick-big {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.pick .pick-num {
+  color: var(--snow);
+  font-size: var(--fs-pick-num);
+  font-weight: 900;
+  line-height: 0.9;
+  text-shadow: 0 0 18px var(--snow-glow);
+}
+
+.pick-unit,
+.ridge-unit {
+  margin-left: 0.04em;
+  font-size: 0.5em;
+  vertical-align: 0.7em;
+}
+
+.pick-tier {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 900 var(--fs-3) / 1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pick-tier--sm {
+  font-size: var(--fs-5);
+}
+
+.pick-stat .num {
+  font-size: var(--fs-1);
+}
+
+.pick-low {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-5);
+  border-radius: var(--radius-chip);
+  background: var(--warn-soft);
+}

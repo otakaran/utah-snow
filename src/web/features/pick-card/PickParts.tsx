@@ -1,12 +1,12 @@
 // Pick card pieces below the hero (spec §8.2): reasons (the crew day-cost line expands per member), divergences,
 // the top-3 alternatives with one reason each, and booking action links.
 import { RESORTS } from '../../../../config/resorts.ts';
-import type { PickResult } from '../../../shared/types.ts';
-import { fmt, type Units } from '../../../shared/units.ts';
+import type { PickResult, ResortId } from '../../../shared/types.ts';
+import type { Units } from '../../../shared/units.ts';
 import { snapshot } from '../../data/snapshot.ts';
 import { skiDays } from '../../data/tracker.ts';
-import { altReason, isDayCost, memberCosts } from './labels.ts';
-import { overnightOf } from './snow-values.ts';
+import { altReason, isDayCost, memberCosts, scoreText, snowQty } from './labels.ts';
+import { overnightFor } from './snow-values.ts';
 
 const MINUS = /\([−-]\d/;
 
@@ -56,7 +56,7 @@ export function Divergences({ r }: { r: PickResult }) {
       {r.divergences.map((d, i) => (
         <span key={d.personId}>
           {i > 0 ? ' · ' : ''}
-          <b>{d.name}</b> would rather {RESORTS[d.resort].name} (+{d.gain.toFixed(1)})
+          <b>{d.name}</b> would rather {RESORTS[d.resort].name} (+{scoreText(d.gain)})
         </span>
       ))}
     </p>
@@ -66,15 +66,19 @@ export function Divergences({ r }: { r: PickResult }) {
 export function Alternatives({ r, units }: { r: PickResult; units: Units }) {
   const alts = r.ranked.filter((x) => x.resort !== r.pick).slice(0, 3);
   if (alts.length === 0) return null;
+  const alt = (id: ResortId) => {
+    const inches = overnightFor(snapshot.value, r, id).inches;
+    return inches === null ? null : <span class="num pick-alt-in">{snowQty(inches, units).text}</span>;
+  };
   return (
     <ol class="pick-alts" aria-label="Alternatives">
       {alts.map((a) => (
         <li key={a.resort}>
           <span class="pick-alt-head">
             <b>{RESORTS[a.resort].name}</b>
-            <span class="num pick-alt-in">{fmt('snow', overnightOf(snapshot.value, a.resort), units).text}</span>
+            {alt(a.resort)}
             <span class="num pick-alt-net">
-              {a.net.toFixed(1)}
+              {scoreText(a.net)}
               <small> score</small>
             </span>
           </span>

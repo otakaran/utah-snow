@@ -2,8 +2,9 @@
 import { LIFT_RESERVATION } from '../../../config/ikon.ts';
 import { RESORT_IDS, RESORTS } from '../../../config/resorts.ts';
 import { ageMin, badge } from '../freshness.ts';
+import { routeCorridors } from '../geo.ts';
 import type { Meta, PickResult, PickSourceRow, RankedResort, ResortId } from '../types.ts';
-import { parkingBooking, parkingRequired, routeCorridors } from './calendar.ts';
+import { parkingBooking, parkingRequired } from './calendar.ts';
 import { type Ctx, lackingDvLift, parkingBooked } from './crew.ts';
 import { clockAt } from './reasons.ts';
 

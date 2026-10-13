@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CapDay } from '../../../shared/caps.ts';
-import { altReason, crewNames, memberCosts, peakFractions } from './labels.ts';
+import { altReason, crewNames, memberCosts, peakFractions, scoreText, snowQty } from './labels.ts';
 
 describe('altReason', () => {
   it('prefers a scored effect, then the day cost, then the first reason', () => {
@@ -50,5 +50,22 @@ describe('crewNames', () => {
       { id: 'p', name: 'Petr', mode: 'unknown' },
     ]);
     expect(names).toBe('Ana, Kuba (board), Petr (ski/board?)');
+  });
+});
+
+describe('scoreText and snowQty', () => {
+  it('prints scores with a real minus and trims a trailing .0 from snow', () => {
+    expect([scoreText(-0.34), scoreText(15.94), scoreText(-0.01), scoreText(2)]).toEqual([
+      '−0.3',
+      '15.9',
+      '0.0',
+      '2.0',
+    ]);
+    expect(snowQty(0, 'imperial')).toMatchObject({ value: '0', unit: '″', text: '0″' });
+    expect(snowQty(1.04, 'imperial').text).toBe('1″');
+    expect(snowQty(4.2, 'imperial').text).toBe('4.2″');
+    expect(snowQty(14, 'imperial').text).toBe('14″');
+    expect(snowQty(3, 'metric').text).toBe('8 cm');
+    expect(snowQty(null, 'imperial').text).toBe('—');
   });
 });

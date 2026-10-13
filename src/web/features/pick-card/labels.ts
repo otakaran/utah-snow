@@ -4,8 +4,22 @@ import type { CapDay } from '../../../shared/caps.ts';
 import { remaining } from '../../../shared/caps.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { CapGroupId, PickMember, Tier } from '../../../shared/types.ts';
+import { fmt, type Qty, type Units } from '../../../shared/units.ts';
 
 export const TIER_LABEL: Record<Tier, string> = { deep: 'Deep', good: 'Good', soft: 'Soft', quiet: 'Quiet' };
+
+/** A score with one decimal and a real minus sign, like the reasons: '15.9', '−0.3', '0.0'. */
+export function scoreText(v: number): string {
+  const t = (Math.round(v * 10) / 10 || 0).toFixed(1);
+  return t.startsWith('-') ? `−${t.slice(1)}` : t;
+}
+
+/** Snow depth without a trailing '.0' (as the reasons print it): '0″', '1″', '4.2″', '8 cm'; '—' when unknown. */
+export function snowQty(inches: number | null | undefined, units: Units): Qty {
+  const q = fmt('snow', inches, units);
+  const value = q.value.replace(/\.0$/, '');
+  return { ...q, value, text: q.text.replace(q.value, value) };
+}
 
 /** 'Preview (trip starts Dec 27)'. */
 export const previewLabel = (): string => `Preview (trip starts ${formatLocalDate(TRIP.start, 'md')})`;

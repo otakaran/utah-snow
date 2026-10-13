@@ -1,23 +1,35 @@
-// Drive minutes for the active base (spec §4.6, C.6, C.10): the free-flow matrix plus the live sign delay
-// (liveDelayMin = max(0, signMin - baselineMin)). Pure. TODO(geo): move to src/shared/geo.ts once it exists.
-import { BASES, type BaseId, DRIVE, SIGN_BASELINES, SIGN_RULE } from '../../../../config/bases.ts';
-import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
-import { usable } from '../../../shared/freshness.ts';
-import type { ResortId, Snapshot } from '../../../shared/types.ts';
+// Drive helpers (spec §4.5, §4.6, C.6, C.10): haversine, the nearest preset, the free-flow drive matrix, the
+// corridors on the way from a base to a resort, the live travel-time sign for a base and its delay
+// (liveDelayMin = max(0, signMin - baselineMin)). Pure; read by the pick, the pick card and the resort page.
+import { BASES, type BaseId, DEFAULT_BASE, DRIVE, SIGN_BASELINES, SIGN_RULE } from '../../config/bases.ts';
+import { RESORT_IDS, RESORTS } from '../../config/resorts.ts';
+import { WASATCH_BACK_LON } from '../../config/roads.ts';
+import { usable } from './freshness.ts';
+import type { Corridor, ResortId, Snapshot } from './types.ts';
 
 export interface Point {
   lat: number;
   lon: number;
 }
 
-/** The preset nearest to a point (equirectangular distance is plenty at Wasatch scale). */
+const EARTH_KM = 6371;
+const rad = (deg: number): number => (deg * Math.PI) / 180;
+
+/** Great-circle distance in km. */
+export function haversineKm(a: Point, b: Point): number {
+  const dLat = rad(b.lat - a.lat);
+  const dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_KM * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+/** The preset nearest to a point. */
 export function nearestPreset(p: Point): BaseId {
-  const k = Math.cos((p.lat * Math.PI) / 180);
-  let best: BaseId = 'cottonwood-heights';
-  let bestD = Number.POSITIVE_INFINITY;
+  let best: BaseId = DEFAULT_BASE;
+  let bestKm = Number.POSITIVE_INFINITY;
   for (const [id, b] of Object.entries(BASES) as [BaseId, Point][]) {
-    const d = (b.lat - p.lat) ** 2 + ((b.lon - p.lon) * k) ** 2;
-    if (d < bestD) [best, bestD] = [id, d];
+    const km = haversineKm(p, b);
+    if (km < bestKm) [best, bestKm] = [id, km];
   }
   return best;
 }
@@ -28,6 +40,14 @@ export function driveMatrix(base: Point & { id: string }): { min: Record<ResortI
   const row = DRIVE[preset];
   const min = Object.fromEntries(RESORT_IDS.map((r) => [r, row[r].min])) as Record<ResortId, number>;
   return { min, approx: !(base.id in BASES) };
+}
+
+/** The resort's corridor, plus Parleys when the drive crosses the Wasatch (base lon >= -111.70 to LCC/BCC). */
+export function routeCorridors(baseLon: number, r: ResortId): Corridor[] {
+  const own: Corridor = RESORTS[r].corridor;
+  const back = baseLon >= WASATCH_BACK_LON;
+  const cross = back ? own === 'lcc' || own === 'bcc' : r === 'deer-valley';
+  return cross && own !== 'parleys' ? [own, 'parleys'] : [own];
 }
 
 /** The live travel-time sign for a base and resort, or null (Wasatch Back bases, Snowbasin). */
@@ -51,7 +71,8 @@ const words = (s: string): string[] =>
 
 /**
  * A sign line matches a baseline when it holds every baseline word, with LCC/BCC spelled out: the live signs read
- * 'LITTLE COTTONWOOD CANYON TOP' and 'TIME TO PARK CITY' for the config's 'LCC top' and 'Park City'.
+ * 'LITTLE COTTONWOOD CANYON TOP' and 'TIME TO PARK CITY' for the config's 'LCC top' and 'Park City'. Whole words,
+ * never substrings, so 'lcc top' does not miss the spelled-out line and 'BCC top' never matches the LCC line.
  */
 export function destMatches(signDest: string, baselineDest: string): boolean {
   const have = new Set(words(signDest));
