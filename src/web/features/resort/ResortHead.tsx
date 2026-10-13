@@ -1,5 +1,6 @@
-// Resort page `head` (spec §8.7.1): name (outranks the number), season status + freshness, the big overnight number
-// with the OVERNIGHT caption right under it, 24 h / base / lifts / trails, days left, drive, today's parking, links.
+// Resort page `head` (spec §8.7.1): name (outranks the number), season status, the big overnight number with the
+// OVERNIGHT caption right under it, 24 h / base / lifts / trails, days left, drive, today's parking, then the source
+// links with their freshness. Pre-season hides the (empty) snow numbers; a missing value is a dim dash, never glowing.
 import { RESORTS } from '../../../../config/resorts.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
 import { ageMin, badge } from '../../../shared/freshness.ts';
@@ -10,7 +11,7 @@ import type { Units } from '../../../shared/units.ts';
 import { clockRel } from '../../lib/format.ts';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
-import { Amount, Tile } from './Amount.tsx';
+import { Amount, Count, Tile } from './Amount.tsx';
 import {
   bookLabel,
   type DaysLeft,
@@ -90,6 +91,7 @@ export function ResortHead({ id, block, drive, today, now, units, days }: Props)
   const r = resortData(block?.data);
   const fresh = block ? badge(block.meta, now) : null;
   const season = seasonStatus(r?.season);
+  const pre = r?.season === 'preseason'; // every snow field is null until the first report (spec §5.5)
   const links: { conditions: string; lifts?: string } = def.links;
   return (
     <section data-testid="head" class="rs-head" aria-labelledby="rs-name">
@@ -101,35 +103,40 @@ export function ResortHead({ id, block, drive, today, now, units, days }: Props)
       </h1>
       <div class="rs-flex">
         <StatusChip tone={season.tone} word={season.word} stale={isStale(fresh) && season.tone !== 'off'} size="lg" />
-        {block ? <FreshnessBadge badge={fresh ?? 'grey'} age={ageMin(block.meta, now)} /> : null}
-        {r?.season === 'preseason' ? (
+        {pre ? (
           <span class="rs-dim">
             projected open {def.projectedOpen ? formatLocalDate(def.projectedOpen, 'md') : 'TBA'}
           </span>
         ) : null}
       </div>
       <div class="rs-flex rs-hero">
-        <p class="rs-big">
-          <Amount kind="snow" value={r?.snow.overnightIn} units={units} class="rs-snow" />
-          <span class="rs-label">Overnight</span>
-          <span class="rs-dim rs-small">report {clockRel(r?.snow.reportAt, now)}</span>
-        </p>
+        {pre ? null : (
+          <p class="rs-big">
+            <Amount kind="snow" value={r?.snow.overnightIn} units={units} class="rs-snow" />
+            <span class="rs-label">Overnight</span>
+            {r?.snow.reportAt ? <span class="rs-dim rs-small">report {clockRel(r.snow.reportAt, now)}</span> : null}
+          </p>
+        )}
         <dl class="rs-tiles rs-cols-4">
-          <Tile label="24 h">
-            <Amount kind="snow" value={r?.snow.new24hIn} units={units} class="rs-snow" />
-          </Tile>
-          <Tile label="Base">
-            <Amount kind="snow" value={r?.snow.baseDepthIn} units={units} />
-          </Tile>
+          {pre ? null : (
+            <>
+              <Tile label="24 h">
+                <Amount kind="snow" value={r?.snow.new24hIn} units={units} class="rs-snow" />
+              </Tile>
+              <Tile label="Base">
+                <Amount kind="snow" value={r?.snow.baseDepthIn} units={units} />
+              </Tile>
+            </>
+          )}
           <Tile label="Lifts open">
-            <span class="rs-num">{ofTotal(r?.lifts.open, r?.lifts.total)}</span>
+            <Count text={ofTotal(r?.lifts.open, r?.lifts.total)} />
           </Tile>
           <Tile label="Trails open">
-            <span class="rs-num">{ofTotal(r?.trails.open, r?.trails.total)}</span>
+            <Count text={ofTotal(r?.trails.open, r?.trails.total)} />
           </Tile>
         </dl>
       </div>
-      <ul class="rs-rows rs-facts">
+      <ul class="rs-facts">
         <li>
           <b class="rs-label rs-dim">Days left</b>
           <DaysLine d={days} />
@@ -152,6 +159,7 @@ export function ResortHead({ id, block, drive, today, now, units, days }: Props)
             Lifts &amp; trails ↗
           </a>
         ) : null}
+        {block ? <FreshnessBadge badge={fresh ?? 'grey'} age={ageMin(block.meta, now)} /> : null}
       </p>
     </section>
   );

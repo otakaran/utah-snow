@@ -4,6 +4,7 @@ import { useEffect } from 'preact/hooks';
 import { RESORTS } from '../../../../config/resorts.ts';
 import { badge } from '../../../shared/freshness.ts';
 import { routeCorridors } from '../../../shared/geo.ts';
+import { liftsRunning } from '../../../shared/lifts.ts';
 import { localDate } from '../../../shared/time.ts';
 import type { ResortId } from '../../../shared/types.ts';
 import { baseInfo, units } from '../../data/settings.ts';
@@ -49,8 +50,8 @@ export function Resort({ id }: { id: ResortId }) {
         days={days}
       />
       <ResortCams id={id} pick={pick} />
-      <SnowReport id={id} r={r} now={now} units={u} />
-      <LiftList r={r} now={now} stale={stale} />
+      <SnowReport id={id} r={r} today={today} now={now} units={u} />
+      <LiftList r={r} today={today} stale={stale} running={liftsRunning(id, r?.season, now)} />
       <WeatherPanel id={id} r={r} forecast={snap?.forecast} today={today} now={now} units={u} />
       <RoadsPanel
         units={u}

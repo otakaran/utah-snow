@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { liftHours, liftId } from './lifts.ts';
+import { RESORTS } from '../../config/resorts.ts';
+import { dayWindow, liftHours, liftId, liftsRunning } from './lifts.ts';
+import { zonedToUtc } from './time.ts';
 
 describe('liftId', () => {
   it('slugs display names and trims edge dashes', () => {
@@ -19,5 +21,27 @@ describe('liftHours', () => {
   it('returns nulls without a range', () => {
     expect(liftHours('TBD')).toEqual({ opensAt: null, closesAt: null });
     expect(liftHours(null)).toEqual({ opensAt: null, closesAt: null });
+  });
+});
+
+describe('liftsRunning (closed is red only in season, during C.8 lift hours)', () => {
+  const at = (hm: string) => zonedToUtc(`2026-12-28 ${hm}`) ?? Number.NaN;
+
+  it('spans the earliest opening to the latest closing', () => {
+    expect(dayWindow(RESORTS.snowbird.liftHours)).toEqual({ open: '09:00', close: '17:00' });
+    expect(dayWindow(RESORTS.solitude.liftHours)).toEqual({ open: '08:00', close: '16:00' });
+  });
+
+  it('is off pre-season and without a report, even at 10:00', () => {
+    expect(liftsRunning('alta', 'preseason', at('10:00'))).toBe(false);
+    expect(liftsRunning('alta', 'unknown', at('10:00'))).toBe(false);
+    expect(liftsRunning('alta', undefined, at('10:00'))).toBe(false);
+  });
+
+  it('is on in season inside lift hours and off outside them', () => {
+    expect(liftsRunning('alta', 'open', at('10:00'))).toBe(true);
+    expect(liftsRunning('alta', 'closed-for-day', at('10:00'))).toBe(true);
+    expect(liftsRunning('alta', 'open', at('20:00'))).toBe(false);
+    expect(liftsRunning('alta', 'open', at('08:30'))).toBe(false);
   });
 });

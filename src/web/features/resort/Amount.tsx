@@ -7,11 +7,13 @@ interface Props {
   kind: Kind;
   value: number | null | undefined;
   units: Units;
+  /** Extra class for a real value (e.g. the glowing rs-snow); a missing value is always the plain dim dash. */
   class?: string;
 }
 
 export function Amount({ kind, value, units, class: cls }: Props) {
   const q = fmt(kind, value, units);
+  if (q.text === '—') return <span class="rs-num rs-none">—</span>;
   return (
     <span class={`rs-num${cls ? ` ${cls}` : ''}`}>
       {q.value}
@@ -19,6 +21,11 @@ export function Amount({ kind, value, units, class: cls }: Props) {
     </span>
   );
 }
+
+/** A plain count such as '7 / 12'; '—' is the dim dash. */
+export const Count = ({ text }: { text: string }) => (
+  <span class={text === '—' ? 'rs-num rs-none' : 'rs-num'}>{text}</span>
+);
 
 /** One <dl> entry; CSS shows the caption under the number. `card` adds the tile frame. */
 export function Tile({ label, card, children }: { label: string; card?: boolean; children: ComponentChildren }) {
