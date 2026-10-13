@@ -43,13 +43,13 @@ describe('peakFractions', () => {
 });
 
 describe('crewNames', () => {
-  it('marks boarders and unknown modes', () => {
+  it('marks boarders and unknown modes, the mark kept on its name’s line', () => {
     const names = crewNames([
       { id: 'a', name: 'Ana', mode: 'ski' },
       { id: 'k', name: 'Kuba', mode: 'board' },
       { id: 'p', name: 'Petr', mode: 'unknown' },
     ]);
-    expect(names).toBe('Ana, Kuba (board), Petr (ski/board?)');
+    expect(names).toBe('Ana, Kuba\u00a0(board), Petr\u00a0(ski/board?)');
   });
 });
 

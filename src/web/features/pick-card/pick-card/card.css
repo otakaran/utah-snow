@@ -53,6 +53,13 @@
 
 .pick-who {
   color: var(--accent);
+  text-wrap: balance;
+}
+
+/* section number 01, like ui/Section's index, in the band's ink */
+.pick-band .pick-no {
+  margin-right: var(--space-2);
+  font-weight: 900;
 }
 
 .pick-who span,

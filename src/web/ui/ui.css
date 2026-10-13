@@ -1,4 +1,4 @@
-/* Shared ui/ primitives: icons, status glyphs, StatusChip, FreshnessBadge, Section heading, buttons.
+/* Shared ui/ primitives: icons, status glyphs, StatusChip, FreshnessBadge, Section heading, buttons, disclosures.
    Only tokens.css variables. Form controls: forms.css; popovers, SourceList, Lightbox: overlays.css. */
 
 .icon {
@@ -103,6 +103,10 @@
   color: var(--off);
 }
 
+.fresh-short {
+  display: none;
+}
+
 /* Section heading: index number, title, dashed rule, sub-line. */
 .section {
   min-width: 0;
@@ -149,15 +153,17 @@
   justify-content: center;
   gap: var(--space-1);
   min-height: var(--tap);
-  padding: 0 var(--space-4);
+  padding: var(--space-1) var(--space-4);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-chip);
   background: var(--surface-2);
   color: var(--text);
-  font: 700 var(--fs-caption) / 1 var(--font-display);
+  font: 700 var(--fs-caption) / 1.1 var(--font-display);
   letter-spacing: 0.06em;
+  text-align: center;
   text-transform: uppercase;
   text-decoration: none;
+  text-wrap: balance;
   cursor: pointer;
 }
 
@@ -190,4 +196,31 @@
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
+}
+
+/* Disclosure summaries (class="disclosure"): one ▸ marker that turns when open, since a flex summary loses ::marker. */
+summary.disclosure {
+  list-style: none;
+}
+
+summary.disclosure::-webkit-details-marker {
+  display: none;
+}
+
+summary.disclosure::before {
+  content: "▸";
+  display: inline-block;
+  flex: none;
+  margin-right: 0.4em;
+  transition: rotate 0.15s;
+}
+
+details[open] > summary.disclosure::before {
+  rotate: 90deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  summary.disclosure::before {
+    transition: none;
+  }
 }

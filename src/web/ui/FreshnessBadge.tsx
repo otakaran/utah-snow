@@ -12,17 +12,24 @@ interface Props {
   age?: number | null;
   /** Overrides the default status word ('OK', 'Stale', ...). */
   label?: string;
-  /** Glyph only, the word kept for screen readers (the header dot). */
-  compact?: boolean;
+  /** A shorter word for narrow rows ('Down' for 'Data down'); the container's CSS picks .fresh-short or .fresh-long. */
+  short?: string;
 }
 
-export function FreshnessBadge({ badge, age, label, compact = false }: Props) {
+export function FreshnessBadge({ badge, age, label, short }: Props) {
   const text = label ?? TEXT[badge];
   const full = age === undefined ? text : `${text} · ${ageText(age)}`;
   return (
     <span class={`fresh fresh-${badge}`} data-badge={badge}>
       <Glyph tone={BADGE_TONE[badge]} />
-      <span class={compact ? 'sr-only' : 'fresh-text'}>{full}</span>
+      {short ? (
+        <span class="fresh-text">
+          <span class="fresh-long">{full}</span>
+          <span class="fresh-short">{short}</span>
+        </span>
+      ) : (
+        <span class="fresh-text">{full}</span>
+      )}
     </span>
   );
 }

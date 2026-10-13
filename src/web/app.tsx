@@ -1,6 +1,7 @@
 // App shell (spec §8.1): Header, route outlet, Footer; the #/wall route renders full-bleed without them (§8.4).
-// Header order: brand, Denver date + clock, global freshness dot (tap: every source with its age), base chip,
-// "I am" chip, then units + theme (inside the ⋯ popover under 600 px), and the nav row.
+// Header order: brand, Denver date + clock, global freshness badge (tap: every source with its age; a short word
+// under 600 px), base chip, "I am" chip, then units + theme (inside the ⋯ popover under 600 px), and the nav row.
+// Wall leaves the nav below 1024 px (phones open it from Settings → Wall defaults).
 
 import type { ComponentChildren } from 'preact';
 import { useErrorBoundary } from 'preact/hooks';
@@ -21,12 +22,12 @@ import { FreshnessBadge } from './ui/FreshnessBadge.tsx';
 import { Icon } from './ui/Icon.tsx';
 import { SourceList, type SourceRow } from './ui/SourceList.tsx';
 
-const NAV: { href: string; label: string; name: RouteName }[] = [
+const NAV: { href: string; label: string; name: RouteName; wide?: true }[] = [
   { href: '#/', label: 'Briefing', name: 'briefing' },
   { href: '#/cams', label: 'Cams', name: 'cams' },
   { href: '#/tracker', label: 'Tracker', name: 'tracker' },
   { href: '#/settings', label: 'Settings', name: 'settings' },
-  { href: '#/wall', label: 'Wall', name: 'wall' },
+  { href: '#/wall', label: 'Wall', name: 'wall', wide: true },
 ];
 const GLOBAL_LABEL: Record<Badge, string> = {
   green: 'Data OK',
@@ -34,6 +35,7 @@ const GLOBAL_LABEL: Record<Badge, string> = {
   red: 'Data down',
   grey: 'Off-season',
 };
+const GLOBAL_SHORT: Record<Badge, string> = { green: 'OK', amber: 'Stale', red: 'Down', grey: 'Off' };
 const RANK: Record<Badge, number> = { red: 0, amber: 1, green: 2, grey: 3 };
 
 function GlobalFreshness({ now }: { now: number }) {
@@ -44,7 +46,11 @@ function GlobalFreshness({ now }: { now: number }) {
   return (
     <>
       <button type="button" class="hdr-fresh" popovertarget="fresh-pop" data-testid="global-fresh">
-        <FreshnessBadge badge={g ?? 'grey'} label={g ? GLOBAL_LABEL[g] : 'No data yet'} />
+        <FreshnessBadge
+          badge={g ?? 'grey'}
+          label={g ? GLOBAL_LABEL[g] : 'No data yet'}
+          short={g ? GLOBAL_SHORT[g] : 'No data'}
+        />
       </button>
       <div id="fresh-pop" popover="auto" class="pop">
         <p class="pop-title">Sources · worst first</p>
@@ -84,7 +90,12 @@ function Header({ current, now }: { current: RouteName; now: number }) {
       </div>
       <nav class="app-nav" aria-label="Main">
         {NAV.map((n) => (
-          <a key={n.name} href={n.href} aria-current={n.name === current ? 'page' : undefined}>
+          <a
+            key={n.name}
+            href={n.href}
+            class={n.wide ? 'nav-wide' : undefined}
+            aria-current={n.name === current ? 'page' : undefined}
+          >
             {n.label}
           </a>
         ))}

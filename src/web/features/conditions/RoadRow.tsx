@@ -1,20 +1,24 @@
 // One corridor of RoadsPanel (spec §8.2): state chip, ETO / closing time, traction and parking chips,
 // headline, pass surface, Guardsman note, standing advisories, the latest UDOT post with its age, canyon-top minutes.
+// Ages are computed at render time from timestamps, never read from text the cron baked in.
 // Stale rows keep the last known facts, but the chip reads 'Last known: Open?' on the dashed off plate.
 import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import { RESORTS } from '../../../../config/resorts.ts';
-import { formatLocalDate, isoToMs } from '../../../shared/time.ts';
+import { formatLocalDate } from '../../../shared/time.ts';
 import type { Block, Corridor, RoadStatus } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
-import { ageText, qty } from '../../lib/format.ts';
+import { ageSince, ageText, qty } from '../../lib/format.ts';
 import { StatusChip } from '../../ui/StatusChip.tsx';
 import {
+  advisoryViews,
   CORRIDOR_NAME,
   corridorResorts,
+  guardsmanText,
   postSnippet,
   type RoadView,
   roadData,
+  roadHeadline,
   roadView,
   showEto,
   travelMin,
@@ -32,11 +36,10 @@ interface Props {
 const external = { target: '_blank', rel: 'noreferrer' } as const;
 
 function Post({ post, now }: { post: NonNullable<RoadStatus['latestPost']>; now: number }) {
-  const at = isoToMs(post.at);
   return (
     <div class="cond-post">
       <a class="cond-link" href={post.link} {...external}>
-        UDOT post · {at === null ? '—' : ageText((now - at) / 60_000)} ↗
+        UDOT post · {ageSince(post.at, now)} ↗
       </a>
       <p>“{postSnippet(post.text)}”</p>
     </div>
@@ -48,27 +51,29 @@ function Facts({ r, units }: { r: RoadStatus; units: Units }) {
   const surface = pass?.surface ? `${pass.surface.toLowerCase()} road` : null;
   const air = pass?.airF !== null && pass?.airF !== undefined ? `air ${qty('temp', pass.airF, units)}` : null;
   const passLine = [surface, air].filter(Boolean).join(', ');
+  const headline = roadHeadline(r);
+  const advisories = advisoryViews(r);
   return (
     <>
-      {r.headline ? <p class="cond-road-text">{r.headline}</p> : null}
+      {headline ? <p class="cond-road-text">{headline}</p> : null}
       {pass && passLine ? (
         <p class="cond-dim">
           {pass.name}: {passLine}
         </p>
       ) : null}
-      {r.guardsman ? <p class="cond-dim">{r.guardsman}</p> : null}
-      {r.advisories?.length ? (
+      {r.guardsman ? <p class="cond-dim">{guardsmanText(r.guardsman)}</p> : null}
+      {advisories.length > 0 ? (
         <ul class="cond-tags" aria-label="Standing advisories">
-          {r.advisories.map((a) => (
+          {advisories.map((a) => (
             <li key={a.id} class="cond-tag">
               {a.link ? (
                 <a href={a.link} {...external}>
-                  {postSnippet(a.text, 90)}
+                  {a.text}
                 </a>
               ) : (
-                postSnippet(a.text, 90)
+                <span>{a.text}</span>
               )}
-              <span class="cond-dim"> · until {formatLocalDate(a.until, 'md') || '—'}</span>
+              <span class="cond-until">until {formatLocalDate(a.until, 'md') || '—'}</span>
             </li>
           ))}
         </ul>
@@ -102,7 +107,7 @@ function RoadCams({ corridor, cams }: { corridor: Corridor; cams: (c: Corridor) 
   const [open, setOpen] = useState(false);
   return (
     <details class="cond-more" onToggle={(e) => setOpen(e.currentTarget.open)}>
-      <summary>Road cams</summary>
+      <summary class="disclosure">Road cams</summary>
       {open ? cams(corridor) : null}
     </details>
   );

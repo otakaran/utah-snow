@@ -53,19 +53,25 @@ export function driveText(min: number | undefined, live: number | undefined, app
   return `${approx ? '≈ ' : ''}${min} min${live ? ` (+${live} live)` : ''}`;
 }
 
-/** 'me 6 · crew min 4', 'crew min 4', 'Unlimited', or the full cap before the crew is entered. */
-export function daysLeftText(
+/** One number-first part of the days-left line: { n: 4, label: 'crew min' }; n null for 'Unlimited'. */
+export interface DaysPart {
+  n: number | null;
+  label: string;
+}
+
+/** Days left, number first: [6 me, 4 crew min], [4 crew min], [Unlimited], or [7 each (no crew yet)]. */
+export function daysLeft(
   id: ResortId,
   days: readonly CapDay[],
   crewIds: readonly string[],
   meId: string | null,
-): string {
+): DaysPart[] {
   const g = group(id);
   const cap = CAP_GROUPS[g].cap;
-  if (cap === null) return 'Unlimited';
-  if (crewIds.length === 0 && !meId) return `${cap} each (no crew yet)`;
-  const parts: string[] = [];
-  if (meId) parts.push(`me ${remaining(days, meId, g)}`);
-  if (crewIds.length > 0) parts.push(`crew min ${crewRemaining(days, crewIds, g)}`);
-  return parts.join(' · ');
+  if (cap === null) return [{ n: null, label: 'Unlimited' }];
+  if (crewIds.length === 0 && !meId) return [{ n: cap, label: 'each (no crew yet)' }];
+  const parts: DaysPart[] = [];
+  if (meId) parts.push({ n: remaining(days, meId, g), label: 'me' });
+  if (crewIds.length > 0) parts.push({ n: crewRemaining(days, crewIds, g), label: 'crew min' });
+  return parts;
 }

@@ -8,7 +8,9 @@ import {
   formatClock,
   formatClockRel,
   formatLocalDate,
+  isoToMs,
   localDate,
+  MIN,
   tripDayNumber,
 } from '../../shared/time.ts';
 import { fmt, type Kind, type Units } from '../../shared/units.ts';
@@ -43,6 +45,12 @@ export function ageText(min: number | null | undefined): string {
   return h < 48 ? `${h} h ago` : `${Math.floor(h / 24)} d ago`;
 }
 
+/** The age of an ISO timestamp at render time ('7 min ago'), so it never goes stale; '—' when missing or invalid. */
+export function ageSince(iso: string | null | undefined, nowMs: number): string {
+  const at = iso ? isoToMs(iso) : null;
+  return at === null ? DASH : ageText((nowMs - at) / MIN);
+}
+
 /** Compact age for captions: 'now', '7 min', '3 h', '2 d'; '—' when unknown. */
 export function ageShort(min: number | null | undefined): string {
   if (min === null || min === undefined || !Number.isFinite(min)) return DASH;
@@ -57,13 +65,10 @@ export function ageShort(min: number | null | undefined): string {
 export const qty = (kind: Kind, imperial: number | null | undefined, units: Units): string =>
   fmt(kind, imperial, units).text;
 
-/** 'Trip day 3 of 36', '76 days until the trip' or 'Trip over'. */
-export function tripLine(nowMs: number): string {
+/** 'Trip day 3 of 36' or 'Trip over'; null before the trip (ui/Countdown counts those days) or without a date. */
+export function tripLine(nowMs: number): string | null {
   const today = localDate(nowMs);
-  if (!today) return DASH;
+  if (!today || daysBetween(today, TRIP.start) > 0) return null;
   const day = tripDayNumber(today);
-  if (day !== null) return `Trip day ${day} of ${TRIP.days}`;
-  const until = daysBetween(today, TRIP.start);
-  if (until > 0) return until === 1 ? 'Trip starts tomorrow' : `${until} days until the trip`;
-  return 'Trip over';
+  return day === null ? 'Trip over' : `Trip day ${day} of ${TRIP.days}`;
 }

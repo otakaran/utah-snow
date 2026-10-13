@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CapDay } from '../../../shared/caps.ts';
 import type { ResortSnapshot } from '../../../shared/types.ts';
-import { daysLeftText, driveText, liftsText, preseasonLine, resortStatus, windText } from './resort-facts.ts';
+import { daysLeft, driveText, liftsText, preseasonLine, resortStatus, windText } from './resort-facts.ts';
 
 describe('resortStatus', () => {
   it('maps season and holds to a tone and word, tolerating empty rows', () => {
@@ -28,17 +28,20 @@ describe('card facts', () => {
   });
 });
 
-describe('daysLeftText', () => {
+describe('daysLeft', () => {
   const days: CapDay[] = [
     { personId: 'ana', date: '2026-12-27', resortId: 'brighton', status: 'skied' },
     { personId: 'eva', date: '2026-12-27', resortId: 'brighton', status: 'skied' },
     { personId: 'eva', date: '2026-12-28', resortId: 'brighton', status: 'planned' },
   ];
 
-  it('shows me and the crew minimum, unlimited for Solitude, full caps without a crew', () => {
-    expect(daysLeftText('brighton', days, ['ana', 'eva'], 'ana')).toBe('me 6 · crew min 5');
-    expect(daysLeftText('brighton', days, ['ana', 'eva'], null)).toBe('crew min 5');
-    expect(daysLeftText('solitude', days, ['ana'], 'ana')).toBe('Unlimited');
-    expect(daysLeftText('alta', [], [], null)).toBe('7 each (no crew yet)');
+  it('shows me and the crew minimum number first, unlimited for Solitude, full caps without a crew', () => {
+    expect(daysLeft('brighton', days, ['ana', 'eva'], 'ana')).toEqual([
+      { n: 6, label: 'me' },
+      { n: 5, label: 'crew min' },
+    ]);
+    expect(daysLeft('brighton', days, ['ana', 'eva'], null)).toEqual([{ n: 5, label: 'crew min' }]);
+    expect(daysLeft('solitude', days, ['ana'], 'ana')).toEqual([{ n: null, label: 'Unlimited' }]);
+    expect(daysLeft('alta', [], [], null)).toEqual([{ n: 7, label: 'each (no crew yet)' }]);
   });
 });

@@ -1,5 +1,6 @@
 // The `resorts` section (spec §8.2): six ResortCards in the fixed order alta, snowbird, brighton, solitude,
-// deer-valley, snowbasin. Never re-sorted by score; the crew pick only gets the outline.
+// deer-valley, snowbasin. Never re-sorted by score; the crew pick only gets the outline. The heading's sub-line
+// carries the worst freshness among the resort reports, like the conditions panels.
 import type { ComponentChildren } from 'preact';
 import { RESORT_IDS } from '../../../../config/resorts.ts';
 import { localDate } from '../../../shared/time.ts';
@@ -8,9 +9,10 @@ import { me as meSetting, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { people, skiDays } from '../../data/tracker.ts';
 import { Section } from '../../ui/Section.tsx';
+import { SourceLine, worstMeta } from '../conditions/index.ts';
 import { crewIds, crewPick, drive } from '../pick-card/index.ts';
 import { ResortCard } from './ResortCard.tsx';
-import { daysLeftText, driveText } from './resort-facts.ts';
+import { daysLeft, driveText } from './resort-facts.ts';
 
 export function ResortCards({ hero }: { hero: (id: ResortId, isPick: boolean) => ComponentChildren }) {
   const snap = snapshot.value;
@@ -21,8 +23,12 @@ export function ResortCards({ hero }: { hero: (id: ResortId, isPick: boolean) =>
   const crew = crewIds.value;
   const meId = people.value.some((p) => p.id === meSetting.value) ? meSetting.value : null;
   const date = pick?.date ?? localDate(now);
+  const fresh = worstMeta(
+    RESORT_IDS.map((id) => snap?.resorts?.[id]?.meta),
+    now,
+  );
   return (
-    <Section testid="resorts" index="03" title="Resorts" sub="fixed order">
+    <Section testid="resorts" index="03" title="Resorts" sub={<SourceLine source="Reports" fresh={fresh} />}>
       <div class="rc-list">
         {RESORT_IDS.map((id) => {
           const isPick = pick?.pick === id;
@@ -36,7 +42,7 @@ export function ResortCards({ hero }: { hero: (id: ResortId, isPick: boolean) =>
               isPick={isPick}
               date={date}
               drive={driveText(d.min[id], d.live[id], !d.exact[id])}
-              daysLeft={daysLeftText(id, skiDays.value, crew, meId)}
+              daysLeft={daysLeft(id, skiDays.value, crew, meId)}
               hero={hero(id, isPick)}
             />
           );

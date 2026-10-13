@@ -1,6 +1,8 @@
-// Pure view logic for AvalanchePanel (spec §8.2, C.4): NAC level words, zone order and the resorts per zone.
-// Colors come only from the --nac-* tokens (keyed by level), never from the payload's hex fields.
-import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
+// Pure view logic for AvalanchePanel (spec §8.2, C.4): NAC level words, zone order, the resorts per zone and the
+// stand-in zones shown while UAC has no ratings. Colors come only from the --nac-* tokens (keyed by level), never
+// from the payload's hex fields.
+import { RESORT_IDS, RESORTS, UAC_ZONES } from '../../../../config/resorts.ts';
+import type { Badge } from '../../../shared/freshness.ts';
 import type { AvalancheZone } from '../../../shared/types.ts';
 
 export type NacLevel = 1 | 2 | 3 | 4 | 5;
@@ -42,4 +44,28 @@ export function orderZones(zones: readonly AvalancheZone[], only?: readonly numb
     return i === -1 ? ZONE_ORDER.length : i;
   };
   return zones.filter((z) => !only || only.includes(z.zoneId)).sort((a, b) => rank(a.zoneId) - rank(b.zoneId));
+}
+
+/** Unrated stand-ins for the UAC zones (names, the unlit scale and the forecast link) while the feed has no zones. */
+export function placeholderZones(only?: readonly number[]): AvalancheZone[] {
+  const zones = ZONE_ORDER.map((zoneId) => ({
+    zoneId,
+    name: UAC_ZONES[zoneId].name,
+    link: UAC_ZONES[zoneId].url,
+    level: -1,
+    danger: 'no rating',
+    color: '',
+    fontColor: '',
+    travelAdvice: '',
+    validFrom: null,
+    validTo: null,
+    offSeason: false,
+  }));
+  return orderZones(zones, only);
+}
+
+/** Why the stand-ins have no rating, from the panel's freshness badge: off-season, the feed down, or neither. */
+export function noRatingTitle(b: Badge | null | undefined): string {
+  if (b === 'grey') return 'No rating (off-season)';
+  return b === 'red' ? 'No rating – UAC feed down' : 'No rating';
 }

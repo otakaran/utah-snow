@@ -39,7 +39,7 @@ export function PickMore({ r }: { r: PickResult }) {
   ].filter(Boolean);
   return (
     <details class="pick-more">
-      <summary>
+      <summary class="disclosure">
         <span>{parts.join(' · ')}</span>
         {stale > 0 ? (
           <span class="pick-stale">

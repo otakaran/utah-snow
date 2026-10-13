@@ -1,16 +1,19 @@
 // ResortCard (spec §8.2 `resorts`): hero still, overnight / 24 h / base, days left, drive with live delay, lifts and
-// trails, summit wind, parking chip, freshness and a link to #/resort/:id. Pre-season hides the snow numbers.
-// The picked resort gets the "Today's pick" outline and flag. The hero still comes in as a slot (the cams feature).
+// trails, summit wind, parking chip, freshness and a link to #/resort/:id. Pre-season hides the snow numbers, lifts
+// and trails, and counts the days to the projected opening. The picked resort gets the "Today's pick" outline and
+// flag. The hero still comes in as a slot (the cams feature). A flex column, so every card's foot lines up.
 import type { ComponentChildren } from 'preact';
 import { RESORTS } from '../../../../config/resorts.ts';
 import { ageMin, badge } from '../../../shared/freshness.ts';
 import { parkingCal } from '../../../shared/parking.ts';
+import { localDate } from '../../../shared/time.ts';
 import type { Block, ResortId, ResortSnapshot } from '../../../shared/types.ts';
 import { fmt, type Units } from '../../../shared/units.ts';
 import { clockRel } from '../../lib/format.ts';
+import { Countdown } from '../../ui/Countdown.tsx';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
-import { liftsText, preseasonLine, resortStatus, trailsText, windText } from './resort-facts.ts';
+import { type DaysPart, liftsText, preseasonLine, resortStatus, trailsText, windText } from './resort-facts.ts';
 
 export interface ResortCardProps {
   id: ResortId;
@@ -21,8 +24,33 @@ export interface ResortCardProps {
   /** Local date the parking rules apply to (the pick's target date). */
   date: string;
   drive: string;
-  daysLeft: string;
+  daysLeft: DaysPart[];
   hero: ComponentChildren;
+}
+
+/** '6 me · 4 crew min', each number first. */
+function DaysLeft({ parts }: { parts: DaysPart[] }) {
+  return (
+    <>
+      {parts.map((x, i) => (
+        <span key={x.label}>
+          {i > 0 ? ' · ' : ''}
+          {x.n === null ? null : <span class="num">{x.n} </span>}
+          {x.label}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function PreSeason({ id, now }: { id: ResortId; now: number }) {
+  const open = RESORTS[id].projectedOpen;
+  return (
+    <div class="rc-pre">
+      {open ? <Countdown today={localDate(now)} to={open} word="to opening" /> : null}
+      <p>{preseasonLine(id)}</p>
+    </div>
+  );
 }
 
 function Snow({ data, units, now }: { data: Partial<ResortSnapshot> | null; units: Units; now: number }) {
@@ -64,6 +92,11 @@ export function ResortCard(p: ResortCardProps) {
   const st = resortStatus(data);
   const pre = data?.season === 'preseason';
   const park = p.date ? parkingCal(p.id, p.date) : null;
+  const tags = [
+    park?.required ? 'P · Parking reservation' : null,
+    park?.liftReservation ? 'Ikon lift reservation' : null,
+    def.skiersOnly ? 'Skiers only' : null,
+  ].filter((t) => t !== null);
   return (
     <article
       class={`rc${p.isPick ? ' is-pick' : ''}`}
@@ -82,17 +115,21 @@ export function ResortCard(p: ResortCardProps) {
       </div>
       <div class="rc-mid">
         <div class="rc-hero">{p.hero}</div>
-        {pre ? <p class="rc-pre">{preseasonLine(p.id)}</p> : <Snow data={data} units={p.units} now={p.now} />}
+        {pre ? <PreSeason id={p.id} now={p.now} /> : <Snow data={data} units={p.units} now={p.now} />}
       </div>
       <dl class="rc-facts">
-        <div>
-          <dt>Lifts</dt>
-          <dd>{liftsText(data?.lifts)}</dd>
-        </div>
-        <div>
-          <dt>Trails</dt>
-          <dd>{trailsText(data?.trails)}</dd>
-        </div>
+        {pre ? null : (
+          <>
+            <div>
+              <dt>Lifts</dt>
+              <dd>{liftsText(data?.lifts)}</dd>
+            </div>
+            <div>
+              <dt>Trails</dt>
+              <dd>{trailsText(data?.trails)}</dd>
+            </div>
+          </>
+        )}
         <div>
           <dt>Drive</dt>
           <dd>{p.drive}</dd>
@@ -103,13 +140,21 @@ export function ResortCard(p: ResortCardProps) {
         </div>
         <div class="rc-wide">
           <dt>Days left</dt>
-          <dd>{p.daysLeft}</dd>
+          <dd>
+            <DaysLeft parts={p.daysLeft} />
+          </dd>
         </div>
       </dl>
+      {tags.length > 0 ? (
+        <p class="rc-tags">
+          {tags.map((t) => (
+            <span key={t} class="rc-tag">
+              {t}
+            </span>
+          ))}
+        </p>
+      ) : null}
       <div class="rc-foot">
-        {park?.required ? <span class="rc-tag">P · Parking reservation</span> : null}
-        {park?.liftReservation ? <span class="rc-tag">Ikon lift reservation</span> : null}
-        {def.skiersOnly ? <span class="rc-tag">Skiers only</span> : null}
         {meta ? <FreshnessBadge badge={b} age={ageMin(meta, p.now)} /> : null}
         <a class="rc-link" href={`#/resort/${p.id}`}>
           Details →

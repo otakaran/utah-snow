@@ -1,5 +1,6 @@
 // Page section with the B "map legend" heading: optional index number, title, dashed rule, sub-line on the right.
-// Every briefing/resort/settings section root carries the data-testid the spec names. Presentational only.
+// Every briefing/resort/settings section root carries the data-testid the spec names, also as its id (a JumpBar
+// target; .section keeps it clear of the sticky bar). Presentational only.
 import type { ComponentChildren } from 'preact';
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 export function Section({ testid, title, index, sub, class: cls, children }: Props) {
   const id = `${testid}-title`;
   return (
-    <section data-testid={testid} class={cls ? `section ${cls}` : 'section'} aria-labelledby={id}>
+    <section id={testid} data-testid={testid} class={cls ? `section ${cls}` : 'section'} aria-labelledby={id}>
       <h2 class="sec-h" id={id}>
         {index ? <span class="sec-no">{index}</span> : null}
         <span class="sec-title">{title}</span>

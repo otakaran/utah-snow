@@ -118,13 +118,13 @@
 }
 
 @media (max-width: 599px) {
-  .hdr-fresh .fresh-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  .hdr-fresh .fresh-long {
+    display: none;
+  }
+
+  .hdr-fresh .fresh-short {
+    display: inline;
+    font-size: var(--fs-5);
   }
 
   .hdr-menu:popover-open {
@@ -180,6 +180,13 @@
 .app-nav a[aria-current="page"] {
   border-bottom-color: var(--accent);
   color: var(--text);
+}
+
+/* The wall is made for a TV: below 1024 px it is reached from Settings → Wall defaults. */
+@media (max-width: 1023px) {
+  .app-nav .nav-wide {
+    display: none;
+  }
 }
 
 .app-banner {
