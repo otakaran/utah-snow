@@ -1,0 +1,56 @@
+# Scheduled strict health check (spec §11): 14:00 and 23:00 UTC. On failure, open one "health" issue or comment on it.
+name: Health
+
+on:
+  schedule:
+    - cron: '0 14,23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # --fail-with-body is curl -f that still saves the JSON body (failures[]) for the issue below.
+      - name: Strict health check
+        shell: bash
+        run: |
+          curl -sS --fail-with-body --max-time 30 -o health.json 'https://utah.otakar.dev/api/health?strict=1' \
+            2> curl.err || rc=$?
+          cat curl.err
+          jq -c '{ok, version, failures, lastTickAt: .cron.lastTickAt}' health.json 2>/dev/null || true
+          exit "${rc:-0}"
+      - name: Open or update the health issue
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create health --color B60205 --description 'Scheduled health check failures' --force || true
+          jq . health.json > out.txt 2>/dev/null || cp health.json out.txt 2>/dev/null || echo '(no response body)' > out.txt
+          {
+            echo "Strict health check failed at $(date -u +%Y-%m-%dT%H:%MZ) ([run]($RUN_URL))."
+            echo
+            echo '```'
+            cat curl.err 2>/dev/null || true
+            head -c 60000 out.txt
+            echo
+            echo '```'
+          } > body.md
+          open=$(gh issue list --label health --state open --json number --jq length)
+          if [ "$open" = 0 ]; then
+            gh issue create --title 'Health check failed' --label health --body-file body.md
+          else
+            num=$(gh issue list --label health --state open --limit 1 --json number --jq '.[0].number')
+            gh issue comment "$num" --body-file body.md
+          fi
