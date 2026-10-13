@@ -20,7 +20,7 @@ export default defineConfig({
       {
         plugins: [cloudflareTest({ wrangler: { configPath: './wrangler.jsonc' } })],
         // Vitest 5's default fs module cache is unreadable from workerd (plugin 1.4.0): "readAll .vitest-cache/...".
-        test: { name: 'worker', include: ['src/worker/{api,cron}/**/*.test.ts'], fsModuleCache: false },
+        test: { name: 'worker', include: ['src/worker/{api,cron,frames}/**/*.test.ts'], fsModuleCache: false },
       },
     ],
     passWithNoTests: true,

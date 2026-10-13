@@ -2,72 +2,49 @@
 // name, age and ★ for the pick resort, and a status plate. A tap goes live (HLS, YouTube or the Roundshot 360
 // iframe) in the tile, or in a Lightbox when the tile is under 200x200; still-only cams open the detail still.
 // Nothing plays by itself except `autoLive` (the wall), within playerManager caps and never in data saver.
-// Phase 2 seam: a [Timelapse] action goes in the caption when def.timelapse.provider !== 'none'; it opens the
-// Scrubber for /api/stake/{def.timelapse.source ?? def.id}/frames in the same Lightbox.
-import type { ComponentChildren } from 'preact';
+// A [Timelapse] caption action (not on the wall) opens the Scrubber in the same Lightbox while /api/cams reports
+// the cam's timelapse available; the server resolves `-still` twins itself, so the list is asked for by this cam's id.
+// Pieces live in cam-tile/ (props and modes, the still button).
 import { useEffect, useRef, useState } from 'preact/hooks';
-import type { CamDef, ResortId } from '../../../shared/types.ts';
-import { camStates, ensureCams } from '../../data/cams.ts';
+import type { CamDef } from '../../../shared/types.ts';
+import { type CamApiState, camStates, ensureCams } from '../../data/cams.ts';
 import { serverNow } from '../../data/snapshot.ts';
 import { dataSaverOn } from '../../lib/data-saver.ts';
 import { hasRoom } from '../../lib/player-manager.ts';
-import { Icon } from '../../ui/Icon.tsx';
 import { Lightbox } from '../../ui/Lightbox.tsx';
+import { type CamTileProps, MIN_PLAYER_PX, type Mode, STILL } from './cam-tile/props.ts';
+import { StillButton } from './cam-tile/StillButton.tsx';
 import {
   ageLabel,
   CAM_BY_ID,
+  type LiveSource,
   liveSource,
   resortName,
   shownCam,
   stillUrl,
+  type TileStatus,
   tileStatus,
   type Variant,
 } from './cam-view.ts';
 import { KINDS } from './kinds/index.ts';
 import { NOTE } from './notes.ts';
+import { Scrubber } from './Scrubber.tsx';
 import { Caption, LivePlayer, StatusPlate, Zoom } from './TileParts.tsx';
 import { useStill } from './use-still.ts';
 
-export interface CamTileProps {
-  /** A cam id from config/cams (unknown ids render nothing), or pass `cam`. */
-  id?: string;
-  cam?: CamDef;
-  /** Which still template: 'card' (default, smallest), 'detail' or 'wall' (skips the on-screen checks). */
-  variant?: Variant;
-  /** ★ in the caption; defaults to `cam.resort === pick`. */
-  star?: boolean;
-  pick?: ResortId | null;
-  /** Start live by itself (wall stake tiles by day), only within the HLS/YouTube caps and never in data saver. */
-  autoLive?: boolean;
-  /** Keep refreshing in data saver (the stake row). */
-  keepFresh?: boolean;
-  /** Seconds between still refreshes instead of the cam's refreshS (the wall's night stills: 120). */
-  everyS?: number;
-  /** Show the newest archived frame when /api/cams has one (wall Alta Collins). */
-  archive?: boolean;
-  /** YouTube DVR Rewind buttons (resort detail page only). */
-  rewind?: boolean;
-  /** Caption under the image (default) or on a plate over it (default on the wall). */
-  caption?: 'below' | 'overlay';
-  /** Caption name instead of the cam's own. */
-  label?: string;
-  /** An extra caption line, e.g. Alta's "since 04:00 board clear". */
-  note?: ComponentChildren;
-  /** Drawn over the still, e.g. an inch plate. */
-  overlay?: ComponentChildren;
-}
-
-type Mode =
-  | { m: 'still'; note: string | null }
-  | { m: 'live'; inBox: boolean; auto: boolean }
-  | { m: 'zoom'; src: string | null };
-
-const MIN_PLAYER_PX = 200;
-const STILL: Mode = { m: 'still', note: null };
+export type { CamTileProps } from './cam-tile/props.ts';
 
 export function CamTile(props: CamTileProps) {
   const def = props.cam ?? (props.id ? CAM_BY_ID.get(props.id) : undefined);
   return def ? <Tile key={def.id} {...props} def={def} /> : null;
+}
+
+/** The "▶" hint on a still a tap plays. */
+function liveHint(live: LiveSource | null, own: CamApiState | undefined, status: TileStatus | null): string | null {
+  if (!live) return null;
+  if (own?.status === 'unknown' && live.type === 'youtube') return NOTE.ytUnknown;
+  if (own?.thumbKind === 'custom') return 'Live · tap';
+  return status === 'live' ? 'Play' : 'Live'; // the plate already says LIVE
 }
 
 function Tile(p: CamTileProps & { def: CamDef }) {
@@ -144,15 +121,7 @@ function Tile(p: CamTileProps & { def: CamDef }) {
   const ytInTile = inTile && live?.type === 'youtube'; // no overlays on a YouTube player (§8.3)
   const status = mode.m === 'live' ? 'live' : tileStatus(state, still.failed);
   const note = mode.m === 'still' ? mode.note : null;
-  const hint = !playable
-    ? null
-    : ownState?.status === 'unknown' && live?.type === 'youtube'
-      ? NOTE.ytUnknown
-      : ownState?.thumbKind === 'custom'
-        ? 'Live · tap'
-        : status === 'live'
-          ? 'Play' // the plate already says LIVE
-          : 'Live';
+  const timelapse = !wall && ownState?.timelapse.available === true;
   const capBelow = ytInTile || (p.caption ?? (wall ? 'overlay' : 'below')) === 'below';
   const player = () =>
     live ? (
@@ -175,6 +144,7 @@ function Tile(p: CamTileProps & { def: CamDef }) {
       note={note}
       extra={p.note}
       onStop={inTile && !wall ? () => setMode(STILL) : null}
+      onTimelapse={timelapse ? () => setMode({ m: 'scrub' }) : null}
     />
   );
 
@@ -187,53 +157,42 @@ function Tile(p: CamTileProps & { def: CamDef }) {
   ]
     .filter(Boolean)
     .join(' ');
+  const boxed = (mode.m === 'live' && mode.inBox) || mode.m === 'zoom' || mode.m === 'scrub';
   return (
     <figure ref={root} class={cls} data-testid="cam-tile" data-cam={def.id} data-status={status ?? 'ok'}>
       <div class="cam-media" ref={media}>
         {inTile ? (
           player()
         ) : (
-          <button
-            type="button"
-            class="cam-hit"
-            onClick={tap}
-            aria-label={playable ? `Play ${title} live` : `Enlarge ${title}`}
-          >
-            {still.src && !still.broken ? (
-              <img
-                class="cam-img"
-                src={still.src}
-                alt={`${title} webcam, ${age}`}
-                decoding="async"
-                loading={wall ? 'eager' : 'lazy'}
-                referrerpolicy="no-referrer"
-                onLoad={still.onLoad}
-                onError={still.onError}
-              />
-            ) : (
-              <span class="cam-empty">
-                {deferred && !still.src ? NOTE.tapToLoad : still.broken ? 'No picture' : ''}
-              </span>
-            )}
-            {hint ? (
-              <span class="cam-play">
-                <Icon name="play" size={14} />
-                {hint}
-              </span>
-            ) : null}
-          </button>
+          <StillButton
+            title={title}
+            age={age}
+            still={still}
+            playable={playable}
+            deferred={deferred}
+            eager={wall}
+            hint={playable ? liveHint(live, ownState, status) : null}
+            onTap={tap}
+          />
         )}
         {ytInTile ? null : <StatusPlate status={status} />}
         {ytInTile ? null : p.overlay}
         {capBelow ? null : caption}
       </div>
       {capBelow ? caption : null}
-      {(mode.m === 'live' && mode.inBox) || mode.m === 'zoom' ? (
-        <Lightbox open onClose={() => setMode(STILL)} label={`${title} webcam`} testid="cam-lightbox">
+      {boxed ? (
+        <Lightbox
+          open
+          onClose={() => setMode(STILL)}
+          label={mode.m === 'scrub' ? `${title} timelapse` : `${title} webcam`}
+          testid="cam-lightbox"
+        >
           {mode.m === 'live' ? (
             <div class="cam-box">{player()}</div>
+          ) : mode.m === 'scrub' ? (
+            <Scrubber camId={def.id} title={title} />
           ) : (
-            <Zoom def={shown} src={mode.src} title={title} />
+            <Zoom def={shown} src={mode.m === 'zoom' ? mode.src : null} title={title} />
           )}
         </Lightbox>
       ) : null}

@@ -1,7 +1,8 @@
 // Snow stakes (spec §8.2 `stakes`): STAKE_ORDER tiles in a horizontal scroll-snap strip on phones (the only element
 // allowed to scroll sideways). DV's live stake falls back to its still; Brighton's Ski Utah stake is omitted until
 // /api/cams calls it fresh. Live is offered only where the cam streams (not Alta, DV-still or Brighton). Stake tiles
-// keep refreshing in data saver. Phase 2 seam: [Timelapse] per tile when def.timelapse.provider !== 'none'.
+// keep refreshing in data saver. Each tile's caption carries [Timelapse] while /api/cams reports its list available
+// (CamTile opens the Scrubber in its Lightbox).
 import type { ComponentChildren } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { STAKE_ORDER } from '../../../../config/cams/index.ts';

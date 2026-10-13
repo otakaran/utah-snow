@@ -2,7 +2,8 @@
 // Active archives (their card is frames/last.jpg) scrub always and their asOf = archive.last. Gated archives scrub
 // only while last is < 30 min old; their card is the live snapshot, so asOf stays null and freshness = `online`.
 // `online` for all 12 HDRelay cams comes from the daily hdrelay:config row (maintenance, 08Z).
-import { CAMS, type CamId } from '../../../../config/cams/index.ts';
+import { HDRELAY_ARCHIVES } from '../../../../config/cams/hdrelay-archives.ts';
+import { CAMS } from '../../../../config/cams/index.ts';
 import { num } from '../../../shared/num.ts';
 import { HOUR, isoUtc, MIN } from '../../../shared/time.ts';
 import type { CamDef, CamStatusRow } from '../../../shared/types.ts';
@@ -12,21 +13,8 @@ const GATE_MS = 30 * MIN;
 const MIN_MS = 1_500_000_000_000; // 2017: anything older is junk
 const INFO = 'https://img.hdrelay.com/api/frames/info';
 
-/**
- * The 9 archive positions (§6.4), verified against frames/info on 2026-10-12. Not taken from the player config:
- * Peruvian's config says `panorama`, but its frames live under `default`.
- */
-export const ARCHIVES = {
-  'snowbird-snowstake': { position: 'default', gated: false },
-  'snowbird-tram-bullpen': { position: 'default', gated: false },
-  'snowbasin-snowstake': { position: 'default', gated: false },
-  'snowbasin-middle-bowl-base': { position: 'default', gated: false },
-  'snowbird-peruvian-gulch': { position: 'default', gated: true },
-  'snowbird-little-cloud': { position: 'default', gated: true },
-  'snowbird-mineral-basin': { position: 'default', gated: true },
-  'snowbasin-strawberry-patio': { position: 'panorama', gated: true },
-  'snowbasin-base-of-wildcat': { position: 'panorama', gated: true },
-} as const satisfies Partial<Record<CamId, { position: 'default' | 'panorama'; gated: boolean }>>;
+/** The 9 archive positions (§6.4) live in config; re-exported for cam-status.ts. */
+export const ARCHIVES = HDRELAY_ARCHIVES;
 
 type ArchiveId = keyof typeof ARCHIVES;
 const isArchive = (id: string): id is ArchiveId => Object.hasOwn(ARCHIVES, id);

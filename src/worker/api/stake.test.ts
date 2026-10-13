@@ -1,11 +1,14 @@
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { MIN, zonedToUtc } from '../../shared/time.ts';
-import { altaMarkers, parseQuery, thin } from '../frames/archive.ts';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { HOUR, isoUtc, MIN, zonedToUtc } from '../../shared/time.ts';
+import type { StakeFramesBody } from '../../shared/types.ts';
+import next from '../frames/fixtures/hdrelay/20261013-next.json?raw';
+import camInit from '../frames/fixtures/prism/20261013-cam-init.json?raw';
+import segments from '../frames/fixtures/prism/20261013-segmentlist.txt?raw';
+import structure from '../frames/fixtures/roundshot/20261013-structure.json?raw';
 import worker from '../index.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
-import type { StakeFramesBody } from './stake.ts';
 
 const ORIGIN = 'https://utah.otakar.dev';
 
@@ -26,6 +29,22 @@ async function seed(cam: string, ts: readonly number[]): Promise<void> {
 
 const at = (local: string): number => zonedToUtc(local) ?? Number.NaN;
 
+const row = (id: string, payload: unknown) =>
+  env.DB.prepare(
+    "INSERT INTO source_state (source_id, payload, fetched_at, ok_at, status, fail_count) VALUES (?1, ?2, ?3, ?3, 'ok', 0)",
+  ).bind(id, JSON.stringify(payload), Date.now());
+
+/** Answers outbound fetches by URL prefix (else 404) and records them. */
+function upstream(routes: [prefix: string, res: () => Response][]): Request[] {
+  const seen: Request[] = [];
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+    const req = new Request(input, init);
+    seen.push(req);
+    return routes.find(([prefix]) => req.url.startsWith(prefix))?.[1]() ?? new Response('', { status: 404 });
+  });
+  return seen;
+}
+
 beforeEach(async () => {
   await migrate(env.DB);
   await clearStore(env.DB);
@@ -33,10 +52,16 @@ beforeEach(async () => {
     ['alta-collins-stake', 24, 5],
     ['alta-collins-stake', 2, 15],
     ['solitude-snowstake', 24, 5],
+    ['snowbird-snowstake', 3, 5],
+    ['alta-mount-baldy', 24, 5],
+    ['alta-mount-baldy', 2, 5],
+    ['snowbird-hidden-peak', 3, 15],
+    ['snowbird-hidden-peak-360', 24, 5],
   ] as const) {
     await caches.default.delete(listKey(cam, h, s));
   }
 });
+afterEach(() => vi.restoreAllMocks());
 
 describe('/api/stake/:id/frames', () => {
   it('lists the archive window oldest first, without frames younger than 120 s or older than the window', async () => {
@@ -79,16 +104,102 @@ describe('/api/stake/:id/frames', () => {
     expect(b.frames.map((f) => f.full)).toEqual([`/api/stake/solitude-snowstake-still/frame/${now - 15 * MIN}`]);
   });
 
-  it('404 for an unknown cam and for cams without an archive timelapse', async () => {
+  it('404 for an unknown cam, a cam without a timelapse and a gated HDRelay archive not enabled yet', async () => {
     const unknown = await get('/api/stake/nope/frames');
     expect(unknown.status).toBe(404);
     expect(await unknown.json()).toEqual({ error: 'not-found' });
-    for (const cam of ['alta-mount-superior', 'snowbird-hidden-peak', 'snowbird-snowstake']) {
+    for (const cam of ['alta-mount-superior', 'brighton-snowstake-skiutah', 'snowbird-peruvian-gulch']) {
       const res = await get(`/api/stake/${cam}/frames`);
       expect(res.status).toBe(404);
       expect(res.headers.get('Cache-Control')).toBe('no-store');
       expect(await res.json()).toEqual({ error: 'not-found', code: 'no-timelapse' });
     }
+  });
+});
+
+describe('/api/stake/:id/frames from providers (fixtures captured 2026-10-13)', () => {
+  const NOW = 1_791_927_600_000; // 15:40 MDT
+  const CAMERA = '8611e276-7ee5-42c0-b8cd-d9e1890e1cd4';
+  const GCS = 'https://storage.googleapis.com/prism-cam-00088';
+  const json = (text: string) => () => new Response(text, { headers: { 'content-type': 'application/json' } });
+  beforeEach(() => {
+    vi.spyOn(Date, 'now').mockReturnValue(NOW);
+  });
+
+  it('hdrelay: frames/next with our UA and no Referer, last-snow from hdrelay:config', async () => {
+    const archive = { position: 'default', first: isoUtc(1_782_323_700_577), last: isoUtc(NOW), enabled: true };
+    await env.DB.batch([
+      row('cams:status', { 'snowbird-snowstake': { online: true, asOf: null, checkedAt: isoUtc(NOW), archive } }),
+      row('hdrelay:config', {
+        'snowbird-snowstake': { cameraId: CAMERA, hotlink: { enabled: true, time: NOW - HOUR } },
+      }),
+    ]);
+    const seen = upstream([['https://img.hdrelay.com/api/frames/next?', json(next)]]);
+    const res = await get('/api/stake/snowbird-snowstake/frames?hours=3');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Cache-Control')).toBe('public, max-age=120');
+    const b = (await res.json()) as StakeFramesBody;
+    expect(b).toMatchObject({ camId: 'snowbird-snowstake', provider: 'hdrelay' });
+    expect(b.frames).toHaveLength(36);
+    expect(b.frames[0]?.thumb).toBe(`https://img.hdrelay.com/frames/${CAMERA}/default/1791916800572/:/rs=h:270`);
+    expect(b.markers).toEqual([{ t: NOW - HOUR, kind: 'last-snow', label: 'Last snow · 2:40 PM' }]);
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.url).toContain(`camera=${CAMERA}&position=default&time=${NOW - 3 * HOUR}&n=37`);
+    expect(seen[0]?.headers.get('Referer')).toBeNull();
+    expect(seen[0]?.headers.get('User-Agent')).toMatch(/^utah-snow\/1\.0 /);
+  });
+
+  it('prism: cam_init frames plus the first MP4 folder whose segmentlist answers', async () => {
+    const seen = upstream([
+      ['https://php.prismcam.com/public/helpers/cam_init.php?cams=88&', json(camInit)],
+      [`${GCS}/2026/10/12/timelapse/segmentlist.txt?`, () => new Response(segments)],
+    ]);
+    const b = (await (await get('/api/stake/alta-mount-baldy/frames')).json()) as StakeFramesBody;
+    expect(b.provider).toBe('prism');
+    expect(b.frames).toHaveLength(37);
+    expect(b.mp4).toEqual({
+      url: `${GCS}/2026/10/12/timelapse/00088_timelapse_720.mp4?t=${Math.floor(NOW / HOUR)}`,
+      from: at('2026-10-12 15:00'),
+      to: at('2026-10-13 14:00') + HOUR,
+    });
+    const paths = seen.map((r) => new URL(r.url).pathname);
+    expect(paths).toContain('/prism-cam-00088/2026/10/13/timelapse/segmentlist.txt'); // tried first, 404
+    expect(paths.some((p) => p.includes('/running/'))).toBe(false);
+  });
+
+  it('roundshot: one backend GET, redirects off -> daylight slots; the 360 strip reads structure.json', async () => {
+    const location =
+      'https://storage4.roundshot.com/5da7581da7f568.58906703/2026-10-13/15-30-00/2026-10-13-15-30-00_default.jpg';
+    const seen = upstream([
+      [
+        'https://backend.roundshot.com/cams/44cfff4ff2a218a1178dbb105d95846a/default',
+        () => new Response(null, { status: 302, headers: { location } }),
+      ],
+      ['https://snowbird.roundshot.com/structure.json', json(structure)],
+    ]);
+    const flat = (await (
+      await get('/api/stake/snowbird-hidden-peak/frames?hours=3&step=15')
+    ).json()) as StakeFramesBody;
+    expect(flat).toMatchObject({ provider: 'roundshot', markers: [] });
+    expect(flat.frames).toHaveLength(9);
+    expect(flat.frames.at(-1)?.full).toBe(location);
+    expect(seen).toHaveLength(1); // no HEAD checks of slot URLs
+    const pano = (await (await get('/api/stake/snowbird-hidden-peak-360/frames')).json()) as StakeFramesBody;
+    expect(pano.frames.map((f) => f.t)).toEqual(
+      ['07:10', '15:10', '15:20', '15:30'].map((hm) => at(`2026-10-13 ${hm}`)),
+    );
+  });
+
+  it('an upstream failure is a no-store 502 that is never cached', async () => {
+    upstream([['https://php.prismcam.com/', () => new Response('oops', { status: 500 })]]);
+    const bad = await get('/api/stake/alta-mount-baldy/frames?hours=2');
+    expect(bad.status).toBe(502);
+    expect(bad.headers.get('Cache-Control')).toBe('no-store');
+    expect(await bad.json()).toEqual({ error: 'upstream', code: 'prism' });
+    upstream([['https://php.prismcam.com/', json(camInit)]]);
+    const good = await get('/api/stake/alta-mount-baldy/frames?hours=2');
+    expect(good.status).toBe(200);
+    expect(((await good.json()) as StakeFramesBody).frames).toHaveLength(23);
   });
 });
 
@@ -120,29 +231,5 @@ describe('/api/stake/:id/frame/:t', () => {
       expect(res.status, path).toBe(404);
       expect(res.headers.get('Cache-Control')).toBe('no-store');
     }
-  });
-});
-
-describe('archive helpers', () => {
-  it('Alta markers: clear at 04:00/16:00 local inside the window, pre-clear = last frame in the 30 min before', () => {
-    const frames = ['2026-12-28 03:20', '2026-12-28 03:40', '2026-12-28 03:55', '2026-12-28 04:05'].map((l) => ({
-      t: at(l),
-    }));
-    const markers = altaMarkers(frames, at('2026-12-28 02:00'), at('2026-12-28 15:00'));
-    expect(markers).toEqual([
-      { t: at('2026-12-28 03:55'), kind: 'pre-clear', label: 'Before clear · 3:55 AM' },
-      { t: at('2026-12-28 04:00'), kind: 'clear', label: 'Cleared · 4:00 AM' },
-    ]);
-    const overnight = altaMarkers([], at('2026-12-27 15:00'), at('2026-12-28 05:00'));
-    expect(overnight.map((m) => m.t)).toEqual([at('2026-12-27 16:00'), at('2026-12-28 04:00')]);
-  });
-
-  it('thin and parseQuery', () => {
-    const rows = [0, 5, 10, 15, 20, 31].map((m) => ({ t: m * MIN }));
-    expect(thin(rows, 15).map((r) => r.t / MIN)).toEqual([0, 15, 31]); // walks back from the newest
-    expect(thin(rows, 5)).toEqual(rows);
-    expect(parseQuery(new URLSearchParams('hours=99&step=15'))).toEqual({ hours: 26, step: 15 });
-    expect(parseQuery(new URLSearchParams('hours=0&step=7'))).toEqual({ hours: 1, step: 5 });
-    expect(parseQuery(new URLSearchParams(''))).toEqual({ hours: 24, step: 5 });
   });
 });

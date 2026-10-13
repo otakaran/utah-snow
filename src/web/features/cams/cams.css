@@ -1,6 +1,7 @@
 /* Cams feature (spec §8.3): tiles, players, galleries, the stake strip. tokens.css variables only.
    Captions carry name + age (+ ★ for the pick resort); status plates are shape + word + color. */
 @import "./cams/tile.css";
+@import "./cams/scrubber.css";
 
 /* Caption: under the media, or a scrim plate over it (the wall) */
 .cam-cap {
@@ -62,8 +63,14 @@
   flex-basis: 100%;
 }
 
-.cam-stop {
+.cam-stop,
+.cam-tl {
   margin-left: auto;
+}
+
+.cam-tl {
+  padding: 0 var(--space-3);
+  font-size: var(--fs-caption);
 }
 
 /* Players: at least 200 px wide; YouTube keeps 16:9 with its credit line and Rewind under it */
