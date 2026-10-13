@@ -5,7 +5,7 @@ import type { Corridor, ResortId, RoadState, RoadStatus } from '../../../shared/
 import { type PostFacts, parkingIn } from './classify.ts';
 import { type Signal, worse } from './raw.ts';
 import type { SignView } from './signs.ts';
-import type { Advisory } from './traffic.ts';
+import { type Advisory, GUARDSMAN_SOURCE } from './traffic.ts';
 
 export interface CorridorInput {
   corridor: Corridor;
@@ -69,6 +69,13 @@ function postAdvisories(posts: PostFacts[], now: number): Advisory[] {
     else if (msOf(p.advisory.until) > msOf(have.until)) have.until = p.advisory.until;
   }
   return [...byRoute.values()].filter((a) => msOf(a.until) > now);
+}
+
+/** BCC note: the newest Guardsman-only post, else an active Guardsman Pass event (never a closure). */
+function guardsmanNote(posts: PostFacts[], signals: Signal[], carried: string | null): string | null {
+  const post = posts.find((p) => p.guardsman)?.guardsman;
+  const event = signals.find((s) => s.source === GUARDSMAN_SOURCE)?.raw;
+  return post ?? (event ? `Guardsman Pass: ${event}`.slice(0, 300) : carried);
 }
 
 export function assembleCorridor(inp: CorridorInput): RoadStatus {
@@ -146,8 +153,7 @@ export function assembleCorridor(inp: CorridorInput): RoadStatus {
       : up
         ? null
         : (prev?.latestPost ?? null),
-    guardsman:
-      c === 'bcc' ? (list.find((p) => p.guardsman)?.guardsman ?? (up ? null : (prev?.guardsman ?? null))) : null,
+    guardsman: c === 'bcc' ? guardsmanNote(list, signals, up ? null : (prev?.guardsman ?? null)) : null,
     advisories: [...advisories, ...inp.advisories].slice(0, 8),
     segments: inp.segments,
     signs: inp.signs,
