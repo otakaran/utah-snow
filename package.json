@@ -14,6 +14,7 @@
     "check": "node scripts/check-repo.ts && biome check . && tsc -b && vitest run",
     "test": "vitest run",
     "e2e": "playwright test",
+    "drift": "node scripts/drift-check.ts",
     "cf-typegen": "wrangler types -c wrangler.jsonc",
     "db:local": "wrangler d1 migrations apply DB --local -c wrangler.jsonc && wrangler d1 execute DB --local -c wrangler.jsonc --file e2e/seed.sql"
   },

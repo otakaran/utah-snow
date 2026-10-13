@@ -14,6 +14,7 @@ export default defineConfig({
             'src/worker/lib/**/*.test.ts',
             'config/**/*.test.ts',
             'src/web/**/*.test.ts',
+            'scripts/**/*.test.ts',
           ],
         },
       },

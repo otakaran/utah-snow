@@ -1,0 +1,63 @@
+# Weekly cam drift check (spec §11): Mondays 15:00 UTC, plus manual dispatch. On drift, comment on the open "drift"
+# issue or create one. Hosts that block the runner are reported as unreachable and do not fail the run.
+name: Drift
+
+on:
+  schedule:
+    - cron: '0 15 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: drift
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      # No install: the script imports only config/ and src/shared/, and Node 24 runs .ts directly.
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+      # Exit 1 = drift (or a crashed check, whose error lands in drift.err).
+      - name: Drift check
+        shell: bash
+        run: |
+          node scripts/drift-check.ts > drift.md 2> drift.err || rc=$?
+          cat drift.md drift.err
+          cat drift.md >> "$GITHUB_STEP_SUMMARY"
+          exit "${rc:-0}"
+      - name: Open or update the drift issue
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create drift --color FBCA04 --description 'Weekly cam drift check' --force || true
+          {
+            echo "Cam drift check failed at $(date -u +%Y-%m-%dT%H:%MZ) ([run]($RUN_URL))."
+            echo
+            head -c 60000 drift.md 2>/dev/null || echo '(no report)'
+            if [ -s drift.err ]; then
+              echo
+              echo '```'
+              head -c 5000 drift.err
+              echo
+              echo '```'
+            fi
+          } > body.md
+          open=$(gh issue list --label drift --state open --json number --jq length)
+          if [ "$open" = 0 ]; then
+            gh issue create --title 'Cam drift' --label drift --body-file body.md
+          else
+            num=$(gh issue list --label drift --state open --limit 1 --json number --jq '.[0].number')
+            gh issue comment "$num" --body-file body.md
+          fi
