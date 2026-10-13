@@ -5,7 +5,11 @@ import { BUDGET, MAX_CONN } from '../../../config/schedule.ts';
 import { redact } from './log.ts';
 
 export const UA = 'utah-snow/1.0 (+https://utah.otakar.dev; https://github.com/otakaran/utah-snow)';
-export const BLOCKED_RE = /cf-mitigated|incap_ses|captcha|Access Denied|Just a moment/i;
+// Challenge/WAF markers in the response headers (set-cookie excluded) or the first 2 KB of the body. Imperva marks
+// every successful response too (incap_ses_*/visid_incap_* cookies, X-CDN/X-Iinfo headers), so its markers count
+// only in the body: block pages say 'Request unsuccessful. Incapsula incident ID', challenges load /_Incapsula_Resource.
+const BLOCKED_RE = /cf-mitigated|captcha|Access Denied|Just a moment/i;
+const BODY_BLOCKED_RE = /Incapsula|Request unsuccessful/i;
 const DEFAULT_TIMEOUT_MS = 8_000; // 10_000 for HTML scrapes (callers pass timeoutMs)
 const MAX_HOPS = 2;
 const SNIFF_BYTES = 2048;
@@ -88,10 +92,11 @@ function cleanHeaders(h: Record<string, string> = {}): Record<string, string> {
   return out;
 }
 
-function headerText(h: Headers): string {
-  let s = '';
-  for (const [k, v] of h) s += `${k}: ${v}\n`;
-  return s;
+/** True when the headers (set-cookie excluded) or the body sniff carry a challenge/WAF marker. */
+export function looksBlocked(h: Headers, sniff: string): boolean {
+  let text = '';
+  for (const [k, v] of h) if (k !== 'set-cookie') text += `${k}: ${v}\n`;
+  return BLOCKED_RE.test(text) || BLOCKED_RE.test(sniff) || BODY_BLOCKED_RE.test(sniff);
 }
 
 const isRedirect = (s: number) => s === 301 || s === 302 || s === 303 || s === 307 || s === 308;
@@ -158,7 +163,7 @@ export function createFetchx(o: FetchxOptions = {}): FetchX {
       }
       const kind = opts.body ?? (opts.method === 'HEAD' ? 'none' : 'text');
       const { data, bytes, sniff } = await readBody(res, kind);
-      const blocked = BLOCKED_RE.test(headerText(res.headers)) || BLOCKED_RE.test(sniff);
+      const blocked = looksBlocked(res.headers, sniff);
       if (blocked && !opts.allowBlocked) throw new BlockedError(`blocked: ${redact(url)}`);
       if (res.status >= 400 && !opts.allowStatus) throw new HttpError(res.status, url);
       const parsed = kind === 'json' ? JSON.parse(data as string) : data;

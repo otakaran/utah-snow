@@ -1,6 +1,7 @@
 -- Local/e2e seed (pnpm db:local): one source_state row per row id the slot table writes, fetched "now",
 -- a fresh cron:last (so /api/health?strict=1 is green), a crew of 4 and one cached drive. Re-runnable.
--- Payloads are minimal: '{}' / '[]' placeholders, realistic RoadStatus rows for the four corridors.
+-- Payloads are minimal: '{}' / '[]' placeholders (every adapter that reads its last-good row tolerates them),
+-- realistic RoadStatus rows for the four corridors.
 INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, status, fail_count) VALUES
   ('resort:alta', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
   ('resort:snowbird', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
@@ -29,6 +30,10 @@ INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, stat
   ('yt:state', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
   ('cams:status', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
   ('hdrelay:config', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
+  ('udot:cams', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
+  ('nws:points', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
+  ('stake:alta', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
+  ('stake:skiutah', '{}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
   ('roads:lcc', '{"corridor":"lcc","state":"traction","tractionLaw":true,"eto":null,"closesAt":null,"reason":"weather","headline":"Traction law in effect","latestPost":null,"guardsman":null,"advisories":[],"segments":[],"signs":[],"pass":null,"parkingFull":[],"crossChecks":[]}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
   ('roads:bcc', '{"corridor":"bcc","state":"open","tractionLaw":false,"eto":null,"closesAt":null,"reason":null,"headline":"Open","latestPost":null,"guardsman":null,"advisories":[],"segments":[],"signs":[],"pass":null,"parkingFull":[],"crossChecks":[]}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),
   ('roads:parleys', '{"corridor":"parleys","state":"open","tractionLaw":false,"eto":null,"closesAt":null,"reason":null,"headline":"Open","latestPost":null,"guardsman":null,"advisories":[],"segments":[],"signs":[],"pass":null,"parkingFull":[],"crossChecks":[]}', unixepoch() * 1000, unixepoch() * 1000, 'ok', 0),

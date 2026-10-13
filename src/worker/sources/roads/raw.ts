@@ -25,13 +25,8 @@ export interface Signal {
   state: RoadState;
 }
 
-export const HOUR = 3_600_000;
-
-export type Obj = Record<string, unknown>;
-export const obj = (v: unknown): Obj | null =>
-  v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : null;
+/** UDOT fields arrive as string or number: either as text ('' otherwise). Unlike shared/json.ts `str`, never null. */
 export const str = (v: unknown): string => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '');
-export const iso = (ms: number): string => new Date(ms).toISOString();
 export const redactKey = (s: string): string => s.replace(/key=[^&\s"']*/gi, 'key=***');
 
 /** Severity order used by overlays and escalation (higher wins). */

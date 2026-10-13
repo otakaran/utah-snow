@@ -2,10 +2,22 @@
 // corridor and advisory tests run on U, the whole uppercased text. The WP title is a timestamp and is ignored.
 // O4: the winter wording is unverified, so every result keeps the raw text for display.
 import { CORRIDORS } from '../../../../config/roads.ts';
+import { obj } from '../../../shared/json.ts';
 import { decodeEntities, stripHtml } from '../../../shared/num.ts';
-import { addDays, daysBetween, hm24, isoToMs, localDate, localHM, zonedToUtc } from '../../../shared/time.ts';
+import {
+  addDays,
+  DAY,
+  daysBetween,
+  hm24,
+  isoToMs,
+  isoUtc,
+  localDate,
+  localHM,
+  monthNum,
+  zonedToUtc,
+} from '../../../shared/time.ts';
 import type { Corridor, ResortId, RoadState, RoadStatus } from '../../../shared/types.ts';
-import { HOUR, iso, obj, str } from './raw.ts';
+import { str } from './raw.ts';
 
 export interface PostFacts {
   id: number;
@@ -58,7 +70,6 @@ const ADV_WORK_RE = /\b(CONSTRUCTION|BRIDGE REPLACEMENT|LANE CLOSURE)\b/;
 const ADV_END_RE = /\b(THROUGH|UNTIL|COMPLETE (IN )?(LATE )?(SPRING|SUMMER|[A-Z]{3,9} \d{1,2}))\b/;
 const ADV_DATE_RE =
   /\b(?:THROUGH|UNTIL|COMPLETE(?: IN)?)\s+(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[A-Z]*\.?\s+(\d{1,2})\b/g;
-const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const ROUTE_RE = /\b(I|SR|US)-?\s?(\d{1,3})\b/;
 const ADVISORY_DEFAULT_DAYS = 60;
 
@@ -94,23 +105,23 @@ function closesAtIso(clock: string, postMs: number): string | null {
   if (!hm) return null;
   const day = localDate(postMs);
   const ms = zonedToUtc(`${hm < localHM(postMs) ? addDays(day, 1) : day} ${hm}`);
-  return ms === null ? null : iso(ms);
+  return ms === null ? null : isoUtc(ms);
 }
 
 /** Standing-advisory end: the latest stated month-day (end of that local day), else date_gmt + 60 days. */
 function advisoryUntil(u: string, postMs: number): string {
   const day = localDate(postMs);
   const dates = [...u.matchAll(ADV_DATE_RE)];
-  let best = /\b(SPRING|SUMMER)\b/.test(u) || !dates.length ? postMs + ADVISORY_DEFAULT_DAYS * 24 * HOUR : 0;
+  let best = /\b(SPRING|SUMMER)\b/.test(u) || !dates.length ? postMs + ADVISORY_DEFAULT_DAYS * DAY : 0;
   for (const m of dates) {
-    const mo = MONTHS.indexOf(m[1] ?? '') + 1;
+    const mo = monthNum(m[1] ?? '');
     const d = Number(m[2]);
     if (mo < 1 || d < 1 || d > 31) continue;
     let date = `${day.slice(0, 4)}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
     if (daysBetween(day, date) < -60) date = `${Number(day.slice(0, 4)) + 1}${date.slice(4)}`;
     best = Math.max(best, zonedToUtc(`${date} 23:59`) ?? 0);
   }
-  return iso(best);
+  return isoUtc(best);
 }
 
 const routeOf = (u: string): string | null => ROUTE_RE.exec(u)?.slice(1, 3).join('-') ?? null;

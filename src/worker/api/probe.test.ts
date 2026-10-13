@@ -2,7 +2,7 @@ import { createExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import worker from '../index.ts';
-import { PROBE_SEED } from '../sources/probe-seed.ts';
+import { probeList } from '../sources/index.ts';
 
 const KEY = 'test-probe-key';
 const testEnv = { ...env, PROBE_KEY: KEY };
@@ -48,8 +48,9 @@ describe('/api/debug/probe', () => {
       count: number;
       rows: { hostId: string; status: number; blockedHint: boolean }[];
     };
-    expect(body.count).toBe(PROBE_SEED.length);
-    expect(seen).toHaveLength(PROBE_SEED.length);
+    const allow = probeList();
+    expect(body.count).toBe(allow.length);
+    expect(seen).toHaveLength(allow.length);
     for (const r of seen) {
       expect(r.headers.get('Origin')).toBeNull();
       expect(r.headers.get('Referer')).toBeNull();

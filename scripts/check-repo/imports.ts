@@ -12,6 +12,7 @@ interface Imp {
 const STATIC_RE = /(?<=^|[\s;])(?:import|export)\s+(type\s+)?(?:[^'";()=]*?\s*from\s*)?['"]([^'"\n]+)['"]/gm;
 const DYNAMIC_RE = /\bimport\s*\(\s*['"]([^'"\n]+)['"]\s*\)/g;
 const STORE_ONLY_RE = /\b(?:DB|FRAMES)\s*\.\s*\w+\s*\(|\.prepare\s*\(\s*['"`]/;
+const MAINT_SUBS = ['hdrelay-config', 'udot-cam-check', 'nws-points'].map((id) => `src/worker/sources/${id}.ts`);
 
 function parseImports(path: string, src: string): Imp[] {
   const imps: Imp[] = [];
@@ -32,7 +33,14 @@ function adapterRule(file: string, imp: Imp, test: boolean): string | null {
   for (const d of ['store', 'api', 'cron']) {
     if (under(t, `src/worker/${d}`)) return `adapters may not import src/worker/${d}/`;
   }
-  if (test || file === 'src/worker/sources/types.ts' || file === 'src/worker/sources/index.ts') return null;
+  // sources/types.ts is the one bridge to lib/: adapters get fetchx's types and error classes only through it.
+  if (file === 'src/worker/sources/types.ts') {
+    if (imp.typeOnly || t === 'src/worker/lib/fetchx.ts' || under(t, 'src/shared') || under(t, 'config')) return null;
+    return 'sources/types.ts may value-import only lib/fetchx.ts, src/shared/ and config/';
+  }
+  if (test || file === 'src/worker/sources/index.ts') return null;
+  // The maintenance job composes its three sub-jobs (spec §5.3); no other adapter may import a sibling.
+  if (file === 'src/worker/sources/maintenance.ts' && MAINT_SUBS.includes(t)) return null;
   if (under(t, 'src/shared') || under(t, 'config') || t === 'src/worker/sources/types.ts') return null;
   if (imp.typeOnly && under(t, 'src/worker/lib')) return null;
   const rel = file.slice('src/worker/sources/'.length);

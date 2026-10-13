@@ -1,8 +1,10 @@
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { isoUtc } from '../../shared/time.ts';
 import { runTick } from '../cron/dispatcher.ts';
 import worker from '../index.ts';
+import { ytUnitsKey } from '../store/counters.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
 
 async function get(path: string): Promise<Response> {
@@ -43,6 +45,37 @@ describe('/api/health', () => {
     const body = (await res.json()) as { ok: boolean; cron: { lastTickAt: string | null } };
     expect(body.ok).toBe(true);
     expect(body.cron.lastTickAt).not.toBeNull();
+  });
+
+  it('cams from cams:status, youtube from yt:state + units, nws:points changes fail strict', async () => {
+    const now = Date.now();
+    const ago = (min: number) => isoUtc(now - min * 60_000);
+    const cams = {
+      'alta-superior': { online: true, asOf: ago(10), checkedAt: ago(1) }, // ok
+      'alta-wildcat': { online: false, asOf: ago(10), checkedAt: ago(1) }, // offline
+      'snowbird-peruvian-gulch': { online: true, asOf: null, checkedAt: ago(1) }, // live (HDRelay snapshot)
+      'brighton-snowstake-skiutah': { online: true, asOf: ago(5), hidden: true, checkedAt: ago(1) }, // stale
+      'alta-collins': { online: null, asOf: ago(120), checkedAt: ago(1) }, // stale
+    };
+    const yt = { v: 1, mode: 'api', unmapped: [{ videoId: 'a' }, { videoId: 'b' }] };
+    const points = { checkedAt: ago(60), points: [], changes: [{ id: 'alta:base', field: 'grid' }], failed: [] };
+    const put = env.DB.prepare(
+      'INSERT INTO source_state (source_id, payload, fetched_at, ok_at, status, fail_count) VALUES (?1, ?2, ?3, ?3, ?4, 0)',
+    );
+    await env.DB.batch([
+      put.bind('cams:status', JSON.stringify(cams), now, 'ok'),
+      put.bind('yt:state', JSON.stringify(yt), now, 'ok'),
+      put.bind('nws:points', JSON.stringify(points), now, 'ok'),
+      env.DB.prepare('INSERT INTO counters (key, value, expires_at) VALUES (?1, 1200, ?2)').bind(
+        ytUnitsKey(now),
+        now + 9e6,
+      ),
+    ]);
+    await runTick(env, now, { sources: [] });
+    const body = (await (await get('/api/health')).json()) as Record<string, unknown>;
+    expect(body.cams).toEqual({ total: 5, live: 1, ok: 1, stale: 2, offline: 1 });
+    expect(body.youtube).toEqual({ mode: 'api', unitsToday: 1200, unmapped: 2, anomaly: true });
+    expect(body.failures).toEqual(['nws-points:1']);
   });
 
   it('unknown routes: /api 404 and 405 are no-store JSON, other paths 404 text/plain', async () => {

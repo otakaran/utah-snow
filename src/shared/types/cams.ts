@@ -45,3 +45,19 @@ export interface CamDef {
   /** From master-playlist BANDWIDTH (Appendix A). */
   bitrateMbps?: number;
 }
+
+/** Archive state of one snow-stake cam (spec §6.3): `cams[camId]` of the stake:alta / stake:skiutah rows. */
+export interface StakeCam {
+  t: number; // Last-Modified (ms) of the newest distinct picture; its KV key is cam:{camId}:{t}
+  asOf: string; // the same instant, ISO
+  hash: string; // upstream ETag digest, or SHA-1 of the body
+  bytes: number;
+  archived: boolean; // a frame for `t` went to Output.frames (false when the picture was older than 24 h)
+  lm: string; // validators of the last 200; they move on unchanged uploads too
+  etag: string | null;
+  err?: string; // this cam failed in the last run (multi-cam rows only)
+}
+export interface StakeRow {
+  asOf: string | null; // newest `t` over the cams
+  cams: Record<string, StakeCam>;
+}

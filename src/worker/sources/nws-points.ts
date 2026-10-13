@@ -4,13 +4,12 @@
 import { BASES } from '../../../config/bases.ts';
 import { RESORT_IDS, RESORTS } from '../../../config/resorts.ts';
 import { MAINT } from '../../../config/schedule.ts';
+import { DAY, HOUR, isoUtc } from '../../shared/time.ts';
 import { type FetchCtx, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 const API = 'https://api.weather.gov';
 const ROW = 'nws:points';
 const STALE_AFTER_MIN = 8 * 24 * 60; // weekly job plus a day of slack
-const HOUR = 3_600_000;
-const DAY = 86_400_000;
 
 export interface NwsPointDef {
   id: string; // 'alta:base' ... or 'base:<BaseId>'
@@ -105,7 +104,7 @@ export function parsePoints(raw: unknown, ctx: ParseCtx): NwsPointsRow {
   if (failed.length * 2 > NWS_POINTS.length) {
     throw new ValidationError(`nws-points: ${failed.length}/${NWS_POINTS.length} lookups failed`);
   }
-  return { checkedAt: new Date(ctx.now).toISOString(), points, changes, failed };
+  return { checkedAt: isoUtc(ctx.now), points, changes, failed };
 }
 
 export const nwsPoints: Source<unknown> = {

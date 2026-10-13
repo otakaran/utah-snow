@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { toMs } from '../../shared/time.ts';
 import { BlockedError, createFetchx } from '../lib/fetchx.ts';
-import { liftState, roadState } from './brighton/feed.ts';
+import { liftState } from './brighton/feed.ts';
 import { BRIGHTON_URL, type BrightonRow, brighton } from './brighton.ts';
 import jan from './fixtures/brighton/20260120-inseason.json?raw';
 import mar from './fixtures/brighton/20260328-inseason.json?raw';
@@ -122,21 +122,19 @@ describe('brighton normalizers', () => {
     expect(liftState('constructor', null)).toBe('closed');
     expect(liftState(null, undefined)).toBe('unknown');
   });
-
-  it('classifies the Road comment conservatively', () => {
-    expect(roadState('SR-190 is open with no traction restrictions.')).toBe('open');
-    expect(roadState('Traction law in effect: 4WD/AWD required')).toBe('traction');
-    expect(roadState('SR-190 is closed for avalanche control')).toBe('closed');
-    expect(roadState('Check conditions before you go')).toBe('unknown');
-  });
 });
 
 describe('brighton validation gate', () => {
-  it('throws ValidationError on garbage, HTML, a foreign feed or a feed without location[0]', () => {
+  it('throws ValidationError on garbage, a foreign feed or a feed without location[0]', () => {
     const now = toMs('2026-01-20T23:30:00Z');
-    for (const raw of ['garbage', '<html>Service unavailable</html>', '{"name":"Solitude"}', '{"name":"Brighton"}']) {
+    for (const raw of ['garbage', '{"name":"Solitude"}', '{"name":"Brighton"}']) {
       expect(() => brighton.parse(raw, { now, prev: {} })).toThrow(ValidationError);
     }
+  });
+
+  it('throws BlockedError on an HTML body (row status blocked)', () => {
+    const ctx = { now: toMs('2026-01-20T23:30:00Z'), prev: {} };
+    expect(() => brighton.parse('<html>Service unavailable</html>', ctx)).toThrow(BlockedError);
   });
 });
 

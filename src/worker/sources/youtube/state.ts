@@ -1,6 +1,8 @@
 // yt:state shape and pure helpers shared by the youtube job's steps (spec §6.1).
 // Times are epoch ms (lastDiscovery included) so no Date logic lives outside src/shared/time.ts.
 import { CHANNELS, SLOTS, type YtSlot } from '../../../../config/youtube.ts';
+import { isObj } from '../../../shared/json.ts';
+import { HOUR } from '../../../shared/time.ts';
 
 export type YtChannel = keyof typeof CHANNELS;
 export type YtStatus = 'live' | 'offline' | 'unknown';
@@ -50,8 +52,6 @@ export interface SlotDef extends YtSlot {
   channelId: string;
 }
 
-export const MIN = 60_000;
-export const HOUR = 3_600_000;
 export const API_FRESH_MS = HOUR; // an API status older than this decays to unknown
 export const ETAG_FRESH_MS = 4 * HOUR; // an ETag hint younger than this still applies
 const SEEN_TTL_MS = 30 * 24 * HOUR;
@@ -106,7 +106,6 @@ export function setVideo(s: YtSlotState, id: string | null, source: YtSource): v
   });
 }
 
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 const STATUSES = new Set(['live', 'offline', 'unknown']);
 
 function isSlotState(v: unknown): v is YtSlotState {

@@ -1,29 +1,12 @@
 // Request runner and small helpers shared by the cam-status kind checks.
-import { isoToMs } from '../../../shared/time.ts';
+import { tryJson } from '../../../shared/json.ts';
 import type { FetchX } from '../types.ts';
 import type { CheckReq, Probe } from './types.ts';
 
 const HEAD_TIMEOUT_MS = 6_000;
 
-export const iso = (ms: number): string => new Date(ms).toISOString();
-
-/** HTTP date (Last-Modified) -> ISO, or null when missing/unparseable. */
-export function httpDateIso(v: string | undefined): string | null {
-  const ms = isoToMs(v);
-  return ms === null ? null : iso(ms);
-}
-
 /** A still template without its query (`…/Superior.jpg?t={m}` -> `…/Superior.jpg`); the check adds its own buster. */
 export const stillBase = (template: string): string => template.split('?')[0] ?? template;
-
-function safeJson(text: unknown): unknown {
-  if (typeof text !== 'string') return undefined;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return undefined;
-  }
-}
 
 /**
  * One request, never thrown: redirects are not followed (one subrequest each, Location is read instead),
@@ -49,7 +32,7 @@ export async function runProbe(fx: FetchX, req: CheckReq): Promise<Probe> {
     if (etag) p.etag = etag;
     if (loc) p.location = loc;
     if (ct) p.contentType = ct;
-    if (req.json && res.status === 200) p.body = safeJson(res.data);
+    if (req.json && res.status === 200) p.body = tryJson(res.data);
     return p;
   } catch (err) {
     return { status: 0, err: err instanceof Error ? err.name : 'Error' };

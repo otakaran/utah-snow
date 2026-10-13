@@ -4,6 +4,7 @@
 // CPU: the page is ~700 KB in season, so each spec regex runs on a small window located with indexOf first
 // (a cold regex is interpreted and would otherwise scan hundreds of KB).
 import { decodeEntities, num, range, text } from '../../../shared/num.ts';
+import { monthNum } from '../../../shared/time.ts';
 
 export const SNOW_LABELS = ['Overnight', '24 hours', '7 days', 'Base', 'Season'] as const;
 export type SnowLabel = (typeof SNOW_LABELS)[number];
@@ -51,7 +52,6 @@ const NARRATIVE_TAG = '<div class="mc__cell mc__cell-forecast-1 forecast-text">'
 const NARRATIVE_RE =
   /^<div class="mc__cell mc__cell-forecast-1 forecast-text">\s*<div>([\s\S]*?)<p class="mc__timestamp/;
 const PARKING_RE = /^mc-parking__graph-value">(\d+)<\/span>\s*%\s*Full/;
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** `s.slice(i, i + n)`, or '' when the marker was not found. */
 const win = (s: string, i: number, n: number) => (i < 0 ? '' : s.slice(i, i + n));
@@ -69,7 +69,7 @@ export function scope(html: string): Page | null {
 
 function stampOf(s: string): Stamp | null {
   const m = STAMP_RE.exec(s);
-  const month = MONTHS.indexOf(m?.[1] ?? '') + 1;
+  const month = monthNum(m?.[1] ?? '');
   const day = Number(m?.[2]);
   if (!m?.[3] || month < 1 || day < 1 || day > 31) return null;
   return { month, day, clock: m[3] };

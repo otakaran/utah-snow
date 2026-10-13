@@ -76,4 +76,5 @@ export interface ResortSnapshot {
   parking: ParkingNow;
   alerts: string[];
   roadHint?: { raw: string; state: RoadState };
+  resortStatus?: string | null; // Brighton only: raw feed operations.resortStatus (O21)
 }

@@ -1,7 +1,9 @@
 // NWS Area Forecast Discussion (SLC) and active alerts (spec §5.4 'nws-text', Appendix B nws-afd/nws-alerts).
 // Job id 'nws-text', rows 'nws:afd' and 'nws:alerts'. Two GETs; either failing fails the job (rows keep last-good).
+
+import { obj, str } from '../../shared/json.ts';
 import { text } from '../../shared/num.ts';
-import { isoToMs } from '../../shared/time.ts';
+import { isoToMs, isoUtc } from '../../shared/time.ts';
 import type { Afd, NwsAlert } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
@@ -17,7 +19,7 @@ const SPLIT_RE = /^[ \t]*&&[ \t]*$/m;
 const BULLET_RE = /\n(?=[ \t]*(?:[-*•]|\d+\.)[ \t])/g;
 const ZONE_RE = /([A-Z]{2}[CZ]\d{3})\/?$/;
 
-/** Per-row staleAfterMin from §5.4 (the Source carries one number; integration may map these per row). */
+/** Per-row staleAfterMin from §5.4 (Source.staleByRow). */
 export const STALE_BY_ROW = { 'nws:afd': 720, 'nws:alerts': 60 } as const;
 
 export interface NwsTextRaw {
@@ -25,13 +27,9 @@ export interface NwsTextRaw {
   alerts: unknown; // /alerts/active?zone=... body
 }
 
-type Obj = Record<string, unknown>;
-const obj = (v: unknown): Obj | null => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : null);
-const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null);
-
 function isoZ(v: unknown): string | null {
   const ms = isoToMs(typeof v === 'string' ? v : null);
-  return ms === null ? null : new Date(ms).toISOString();
+  return ms === null ? null : isoUtc(ms);
 }
 
 /** Body of the '.NAME...' section: blocks are split on '&&' lines and named by their first header. */
@@ -110,7 +108,8 @@ async function getJson(ctx: FetchCtx, url: string, label: string): Promise<unkno
 
 export const nwsText: Source<NwsTextRaw> = {
   id: 'nws-text',
-  staleAfterMin: STALE_BY_ROW['nws:alerts'], // the stricter of the two rows; both are written together
+  staleAfterMin: STALE_BY_ROW['nws:alerts'], // the default; staleByRow gives nws:afd its own 720
+  staleByRow: STALE_BY_ROW,
   rows: ['nws:afd', 'nws:alerts'],
   maxSubrequests: () => 2, // AFD + alerts; redirects are not followed
   probes: [

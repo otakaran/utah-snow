@@ -4,11 +4,12 @@
 // CAP requests rotates every hour and unchecked cams keep their previous entry. One kind file per provider in
 // cam-status/. YouTube (yt:state), UDOT (udot:cams) and archived stakes (stake_frames) are merged by /api/cams.
 import { CAMS } from '../../../config/cams/index.ts';
+import { HOUR, isoUtc } from '../../shared/time.ts';
 import type { CamDef } from '../../shared/types.ts';
 import { doStill } from './cam-status/do-still.ts';
 import { ARCHIVES, applyHdrelayOnline, frameInfoUrl, HDRELAY_CAMS, hdrelay } from './cam-status/hdrelay.ts';
 import { CAM_INIT_URL, prism } from './cam-status/prism.ts';
-import { iso, runProbe } from './cam-status/probe.ts';
+import { runProbe } from './cam-status/probe.ts';
 import { roundshot } from './cam-status/roundshot.ts';
 import { skiutah } from './cam-status/skiutah.ts';
 import type { CamStatusEntry, CamStatusRaw, CamStatusRow, CheckReq, KindCheck } from './cam-status/types.ts';
@@ -20,7 +21,6 @@ export const CAM_STATUS_ROW = 'cams:status';
 /** Read (not written) by this job: `online` for the 12 HDRelay cams. */
 export const HDRELAY_CONFIG_ROW = 'hdrelay:config';
 export const CAP = 20; // §6.4 / §5.3 slot 11: cam-status <= 20 subrequests
-const HOUR = 3_600_000;
 
 const KINDS: readonly KindCheck[] = [doStill, prism, hdrelay, roundshot, skiutah];
 const KIND_BY_NAME = new Map(KINDS.map((k) => [k.name, k]));
@@ -55,7 +55,7 @@ export function parseCamStatus(raw: unknown, ctx: ParseCtx): CamStatusRow {
   if (!probes || typeof probes !== 'object') throw new ValidationError('cam-status: no probes');
   const prev = prevRow(ctx.prev[CAM_STATUS_ROW]);
   const row: CamStatusRow = { ...prev };
-  const checkedAt = iso(ctx.now);
+  const checkedAt = isoUtc(ctx.now);
   let answered = 0;
   for (const [key, probe] of Object.entries(probes)) {
     const sep = key.indexOf(':');
@@ -73,11 +73,11 @@ export function parseCamStatus(raw: unknown, ctx: ParseCtx): CamStatusRow {
 
 const firstArchive = HDRELAY_CAMS.find((c) => c.id === 'snowbasin-snowstake');
 
-export const camStatus: Source<CamStatusRaw> & { reads: readonly string[] } = {
+export const camStatus: Source<CamStatusRaw> = {
   id: 'cam-status',
   staleAfterMin: 120,
   rows: [CAM_STATUS_ROW],
-  reads: [HDRELAY_CONFIG_ROW], // the dispatcher must load this row into ctx.prev (see the integration notes)
+  reads: [HDRELAY_CONFIG_ROW], // last-good HDRelay config: `online` for the 12 HDRelay cams
   maxSubrequests: (ctx) => pickRequests(allRequests(ctx.now), ctx.now).length, // 20; no redirect hops
   probes: [
     { hostId: 'alta-do', url: 'https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Superior.jpg' },

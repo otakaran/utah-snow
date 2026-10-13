@@ -1,8 +1,10 @@
 // Brighton (Boyne FeedService) raw shape and pure field mappers (spec §5.4 'resort:brighton', §5.5).
 // The feed is loose JSON: every reader checks types itself and never trusts the declared shape.
+import { str } from '../../../shared/json.ts';
+import { liftId } from '../../../shared/lifts.ts';
 import { num, range, text } from '../../../shared/num.ts';
 import { hm24 } from '../../../shared/time.ts';
-import type { Gate, LiftState, LiftStatus, ParkingNow, RoadState } from '../../../shared/types.ts';
+import type { Gate, LiftState, LiftStatus, ParkingNow } from '../../../shared/types.ts';
 
 export interface FeedStatusItem {
   name?: unknown;
@@ -46,7 +48,6 @@ export interface BrightonFeed {
   } | null;
 }
 
-const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
 const list = <T>(v: T[] | null | undefined): T[] => (Array.isArray(v) ? v : []);
 
 // statusIcon values from brightonresort.com's own sort table (§5.5). Unlisted values map to closed;
@@ -62,10 +63,7 @@ const ICON = new Map<string, LiftState>([
   ['event', 'closed'],
   ['sign-out', 'closed'],
 ]);
-const slugIcon = (v: unknown): string =>
-  str(v)
-    .toLowerCase()
-    .replace(/[\s_]+/g, '-');
+const slugIcon = (v: unknown): string => (str(v) ?? '').toLowerCase().replace(/[\s_]+/g, '-');
 
 /** statusIcon first, then the status text ('On Hold' -> on-hold); unlisted -> closed; both missing -> unknown. */
 export function liftState(icon: unknown, status: unknown): LiftState {
@@ -76,17 +74,11 @@ export function liftState(icon: unknown, status: unknown): LiftState {
 
 /** '09:00' / '9:00' / '9:00 AM' -> 'HH:MM', else null. */
 function clock(v: unknown): string | null {
-  const s = str(v);
+  const s = str(v) ?? '';
   const m = /^(\d{1,2}):(\d{2})$/.exec(s);
   if (m && Number(m[1]) < 24 && Number(m[2]) < 60) return `${m[1]?.padStart(2, '0')}:${m[2]}`;
   return s ? hm24(s) : null;
 }
-
-const slug = (name: string): string =>
-  name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
 
 /** facilities.areas.area[].lifts.lift[], skipping null areas, null lift arrays and nameless lifts. */
 export function lifts(feed: BrightonFeed): LiftStatus[] {
@@ -96,11 +88,11 @@ export function lifts(feed: BrightonFeed): LiftStatus[] {
       const name = str(l?.name);
       if (!l || !name) continue;
       out.push({
-        id: slug(name),
+        id: liftId(name),
         name,
         state: liftState(l.statusIcon, l.status),
-        raw: str(l.status) || str(l.statusIcon),
-        area: str(area?.name) || null,
+        raw: str(l.status) ?? str(l.statusIcon) ?? '',
+        area: str(area?.name),
         opensAt: clock(l.openTime),
         closesAt: clock(l.closeTime),
         note: text(l.comment, 200),
@@ -113,7 +105,7 @@ export function lifts(feed: BrightonFeed): LiftStatus[] {
 /** Access gates: winterActivities '... Access' rows (Catherine's Pass, Twin Lake Pass) plus any areas[].gates.gate[]. */
 export function gates(feed: BrightonFeed): Gate[] {
   const fromAreas = list(feed.facilities?.areas?.area).flatMap((a) => list(a?.gates?.gate));
-  const acts = list(feed.facilities?.winterActivities?.activity).filter((a) => /access|gate/i.test(str(a?.name)));
+  const acts = list(feed.facilities?.winterActivities?.activity).filter((a) => /access|gate/i.test(str(a?.name) ?? ''));
   const out: Gate[] = [];
   for (const g of [...acts, ...fromAreas]) {
     const name = text(g?.name, 120);
@@ -127,7 +119,7 @@ export function gates(feed: BrightonFeed): Gate[] {
 export function parking(feed: BrightonFeed): ParkingNow {
   const lot = list(feed.facilities?.parkingLots?.parking)[0];
   if (!lot) return { state: 'unknown', raw: null };
-  const status = str(lot.status);
+  const status = str(lot.status) ?? '';
   const pct = range(num(lot.percentFull), 0, 100);
   let state: ParkingNow['state'] = 'unknown';
   if (/full/i.test(status) || (pct !== null && pct >= 100)) state = 'full';
@@ -151,7 +143,7 @@ export function comments(feed: BrightonFeed): { report: string | null; alerts: s
   let road: string | null = null;
   const alerts: string[] = [];
   for (const c of list(feed.comments?.comment)) {
-    const name = str(c?.name);
+    const name = str(c?.name) ?? '';
     const body = text(c?.text);
     if (!body) continue;
     if (name === 'Comment') report = body;
@@ -161,17 +153,4 @@ export function comments(feed: BrightonFeed): { report: string | null; alerts: s
   const lotAlert = text(list(feed.facilities?.parkingLots?.parking)[0]?.alert, 300);
   if (lotAlert) alerts.push(lotAlert);
   return { report, alerts, road };
-}
-
-/** Hint only: the roads job owns the BCC state (§5.6). Conservative, and 'unknown' when unsure. */
-export function roadState(s: string): RoadState {
-  if (/interlodge/i.test(s)) return 'interlodge';
-  if (/\b(?:closed|closure)\b/i.test(s)) return 'closed';
-  if (
-    /\bno (?:traction|chain)|traction (?:law |restrictions? )?(?:is |are |has been |have been )?(?:lifted|not)/i.test(s)
-  ) {
-    return 'open';
-  }
-  if (/traction|chains?\b|4x4|4wd|awd/i.test(s)) return 'traction';
-  return /\bopen\b/i.test(s) ? 'open' : 'unknown';
 }

@@ -8,15 +8,17 @@
 ## Repo map
 - `config/`: typed registries, data only (ikon, resorts, cams/, youtube, roads, bases, parking, strategy, schedule, site).
 - `migrations/`: D1 SQL, `0001_init.sql` (state, histories, frames index, counters) and `0002_tracker.sql`.
-- `src/shared/`: pure, runtime-agnostic logic with colocated tests: `types.ts` (+ `types/`), time, units, num, caps, freshness.
-  `config.test.ts` checks registry integrity. Planned: `pick/`, geo, cam-url, mtnpowder.
+- `src/shared/`: pure, runtime-agnostic logic with colocated tests: `types.ts` (+ `types/`), time (+ `time/`), units, num,
+  caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page. `config.test.ts` checks the
+  registries. Planned: `pick/`, geo, cam-url.
 - `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
 - `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, debug/probe), JSON/ETag/cache/header helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
-- `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES registry, empty so far), `probe-seed.ts`.
-  Adapters go here as `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/`.
-- `src/worker/cron/dispatcher.ts`: `runTick` admits jobs against the subrequest budget. D1 prune comes later.
-- `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, counters; `test-db.ts` for tests).
+- `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
+  `probe-seed.ts` (hosts no adapter probes). Adapters: `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/` (+ `<id>/` helpers).
+- `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs against the budget), `job.ts` (one job's writes). D1 prune later.
+- `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, tick-state, row-meta, history, frames, counters;
+  `test-db.ts` for tests).
 - `src/worker/api/`: one file per route, each with a contract test.
 - `src/web/`: Preact SPA: `main.tsx`, `app.tsx`, `router.ts`, `data/` (snapshot, health), `lib/format.ts`, `ui/`,
   `features/briefing/`, `styles/` (tokens.css, base.css).
@@ -24,11 +26,11 @@
 - `scripts/`: plain-node tools; `check-repo.ts` (+ `check-repo/`) enforces the rules below.
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`.
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
-- Status now: skeleton. Config registries, migrations, worker shell (router, cron dispatcher, store, health/snapshot/probe)
-  and the web shell (header, briefing status rows) work. No source adapters yet: `SOURCES` is empty.
-- Not yet built: adapters, `src/worker/frames/`, D1 prune, `/api/cams|stake|tracker`, web features other than briefing.
-- Phase 2 adds `scripts/{refresh-fixtures,drift-check,bench-parsers}.ts` with their `pnpm fixtures|drift|bench` scripts.
-- `.github/workflows/` (ci, drift, health) comes later; not yet built.
+- `.github/workflows/`: ci (check, e2e, deploy on main) and health (twice daily `/api/health?strict=1`).
+- Status now: all source adapters registered and writing D1 (resorts, roads, NWS, avy, snotel, YouTube, stakes + KV
+  frames, cam status, maintenance). The web shell shows the header and briefing status rows.
+- Not yet built: the 08Z D1 prune, `/api/cams|stake|tracker`, web features other than briefing, the drift workflow and
+  Phase 2 `scripts/{refresh-fixtures,drift-check,bench-parsers}.ts` (`pnpm fixtures|drift|bench`).
 
 ## Commands
 - `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm deploy` runs from CI on main.
@@ -54,7 +56,8 @@
   - Features import each other only through `features/<f>/index.ts`.
   - Only `src/worker/store/` touches D1/KV.
 - Adapters do all I/O through `ctx.fetch` (fetchx); `parse()` is pure and throws `ValidationError` to keep last-good rows.
-- All Date/Intl/time logic lives in `src/shared/time.ts` (America/Denver). No local Date getters, `Intl`, `toLocale*` elsewhere.
+- All Date/Intl/time logic lives in `src/shared/time.ts` (body in `time/`; America/Denver). No local Date getters, `Intl`,
+  `toLocale*` or `new Date(ms).toISOString()` elsewhere: use `isoUtc`/`isoLocal`, `httpDateToMs`, `HOUR`/`DAY`.
 - Stored and API values stay imperial; units convert in the client (`src/shared/units.ts`).
 - Colors only through `src/web/styles/tokens.css` variables; no raw hex elsewhere in `src/web/`.
 - No secrets in git (`.dev.vars` is local only; `.dev.vars.example` lists names). KV/D1 ids are not secrets.
@@ -105,6 +108,9 @@
 - CPU is 10 ms: no DOM parsing, no un-memoized Intl.
 - Snowbird's API returns 500 for any foreign Origin. NWS returns 403 without a UA.
 - MtnPowder sits behind Imperva; the browser fallback uses the same pure parser (`src/shared/mtnpowder.ts`).
+- fetchx sends `cache: 'no-store'`, which workerd turns into `Cache-Control: no-cache`: conditional GETs
+  (If-None-Match / If-Modified-Since) must also send `Cache-Control: max-age=0` or they never get a 304.
+- Ski Utah blob URLs (`skiutah.com/files/blob/...`) 404 on any `_=` query: never `bust: true` there.
 - Deployed Workers freeze `Date.now()` during CPU work, so per-job timings show wall time only.
 - D1 allows <= 50 queries per invocation.
 - Vitest 5's fs module cache breaks the workerd pool; the `worker` project sets `fsModuleCache: false`.

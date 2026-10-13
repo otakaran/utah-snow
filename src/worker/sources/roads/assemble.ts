@@ -1,9 +1,9 @@
 // Per-corridor assembly (spec §5.6): base state from the newest state-bearing post, overlays, escalation,
 // tractionLaw, advisories and the display blocks. Pure; inputs are already normalized by roads/parse.ts.
-import { isBetweenLocal, isoToMs, localDate } from '../../../shared/time.ts';
+import { HOUR, isBetweenLocal, isoToMs, localDate, MIN } from '../../../shared/time.ts';
 import type { Corridor, ResortId, RoadState, RoadStatus } from '../../../shared/types.ts';
 import { type PostFacts, parkingIn } from './classify.ts';
-import { HOUR, type Signal, worse } from './raw.ts';
+import { type Signal, worse } from './raw.ts';
 import type { SignView } from './signs.ts';
 import type { Advisory } from './traffic.ts';
 
@@ -34,7 +34,7 @@ const TRACTION_FROM = (s: Signal): boolean =>
   s.state === 'traction' && s.source !== 'Brighton comments' && s.source !== 'Snowbird alert';
 
 function ago(ms: number): string {
-  const m = Math.max(0, Math.round(ms / 60_000));
+  const m = Math.max(0, Math.round(ms / MIN));
   return m < 60 ? `${m}m` : `${Math.round(m / 60)}h`;
 }
 const firstLine = (p: PostFacts): string => p.headline ?? p.text.split('\n')[0] ?? '';

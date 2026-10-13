@@ -3,7 +3,7 @@
 // Stored imperial: °C -> °F, km/h -> mph (rounded to 0.1). Values flagged X/B/Q by NWS QC are dropped.
 import { RESORTS, type ResortDef } from '../../../config/resorts.ts';
 import { num, range } from '../../shared/num.ts';
-import { isoToMs } from '../../shared/time.ts';
+import { HOUR, isoToMs, isoUtc } from '../../shared/time.ts';
 import type { ObsNow } from '../../shared/types.ts';
 import { cToF, kmhToMph } from '../../shared/units.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
@@ -12,7 +12,6 @@ const ROW = 'obs';
 const BASE_URL = 'https://api.weather.gov/stations/';
 const HEADERS = { Accept: 'application/geo+json' }; // fetchx adds the UA (NWS answers 403 without one)
 const ROLES = ['base', 'baseWind', 'mid', 'summit', 'summitGust'] as const; // `alternates` are never fetched
-const HOUR = 3_600_000;
 const FRESH_MS = 3 * HOUR; // gate: at least one station must report an observation this recent
 const KEEP_PREV_MS = 6 * HOUR; // a failed station's last-good entry survives this long
 const REJECTED_QC = /^[XBQ]$/; // MADIS QC: X rejected, B subjective bad, Q questioned
@@ -69,7 +68,7 @@ export function readObs(station: string, body: unknown): ObsNow | null {
     windMph: quantity(props.windSpeed, 'speed'),
     gustMph: quantity(props.windGust, 'speed'),
     dirDeg: quantity(props.windDirection, 'deg'),
-    at: new Date(ms).toISOString(),
+    at: isoUtc(ms),
   };
 }
 

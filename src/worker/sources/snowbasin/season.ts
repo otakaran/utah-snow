@@ -1,23 +1,12 @@
-// Snowbasin report time, season state and the 48/72 h sums (spec §5.5). All clock math goes through shared/time.ts.
-import { addDays, denverOffsetMin, hm24, localDate, localParts, zonedToUtc } from '../../../shared/time.ts';
-import type { LiftStatus, ResortSnapshot } from '../../../shared/types.ts';
+// Snowbasin report time and the 48/72 h sums (spec §5.5). All clock math goes through shared/time.ts; season state
+// and reportIsToday are the shared src/shared/season.ts rules.
+import { addDays, DAY, hm24, localDate, zonedToUtc } from '../../../shared/time.ts';
+import type { ResortSnapshot } from '../../../shared/types.ts';
 import type { Stamp } from './scan.ts';
 
-// seasonOpenedAt is set only on or after this local date, after all summer lift operations have ended (§5.5).
-export const SEASON_FLOOR = '2026-11-01';
 // ctx.prev key for this resort's resort_history rows ({ hour, payload }[]), supplied by the dispatcher (§5.5).
 export const HISTORY_KEY = 'resort_history:snowbasin';
-const DAY_MS = 86_400_000;
 const pad = (n: number) => String(n).padStart(2, '0');
-
-/** Denver wall time with its offset, e.g. '2026-02-09T04:19:00-07:00'; '' when invalid. */
-export function isoLocal(ms: number): string {
-  const p = localParts(ms);
-  if (!p) return '';
-  const off = denverOffsetMin(ms);
-  const a = Math.abs(off);
-  return `${p.date}T${p.hm}:00${off < 0 ? '-' : '+'}${pad(Math.floor(a / 60))}:${pad(a % 60)}`;
-}
 
 /** 'Feb 09, 4:19 AM' carries no year: the current Denver year, minus 1 when that lands > 1 day in the future. */
 export function stampMs(stamp: Stamp | null, now: number): number | null {
@@ -27,29 +16,7 @@ export function stampMs(stamp: Stamp | null, now: number): number | null {
   const year = Number(localDate(now).slice(0, 4));
   const ms = at(year);
   if (ms === null || !Number.isFinite(year)) return null;
-  return ms > now + DAY_MS ? at(year - 1) : ms;
-}
-
-/** Report is today's when its local date is today and it was stamped at 03:00 or later. */
-export function isToday(reportMs: number | null, now: number): boolean {
-  if (reportMs === null) return false;
-  const p = localParts(reportMs);
-  return !!p && p.date === localDate(now) && p.hour >= 3;
-}
-
-export function seasonOf(
-  pageSeason: 'winter' | 'summer',
-  lifts: LiftStatus[],
-  prev: Partial<ResortSnapshot> | undefined,
-  now: number,
-): Pick<ResortSnapshot, 'season' | 'seasonOpenedAt' | 'operatingToday'> {
-  const turning = lifts.some((l) => l.state === 'open' || l.state === 'hold');
-  let seasonOpenedAt = typeof prev?.seasonOpenedAt === 'string' ? prev.seasonOpenedAt : null;
-  if (seasonOpenedAt === null && turning && localDate(now) >= SEASON_FLOOR) seasonOpenedAt = isoLocal(now);
-  let season: ResortSnapshot['season'] = 'closed-for-day';
-  if (seasonOpenedAt === null || pageSeason === 'summer') season = 'preseason';
-  else if (turning || lifts.some((l) => l.state === 'scheduled')) season = 'open';
-  return { season, seasonOpenedAt, operatingToday: season !== 'preseason' };
+  return ms > now + DAY ? at(year - 1) : ms;
 }
 
 type HistRow = { hour?: unknown; payload?: unknown };

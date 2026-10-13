@@ -1,11 +1,11 @@
 // Alta lift, gate and terrain-area states (spec §5.5 "Lift-state normalizers", Alta row). Alta exposes only a boolean
 // `open` plus free-text notes, and `open: true` stays set overnight, so the state depends on local time vs the
 // lift's opening_at/closing_at.
+import { stampIso } from '../../../shared/alta-page.ts';
+import { arr, type Obj, obj, str } from '../../../shared/json.ts';
 import { text } from '../../../shared/num.ts';
 import { addDays } from '../../../shared/time.ts';
 import type { Gate, LiftState, LiftStatus } from '../../../shared/types.ts';
-import { arr, type Obj, obj, str } from './extract.ts';
-import { stampIso } from './stamp.ts';
 
 /** Local context: now as 'HH:MM', today as 'YYYY-MM-DD', and seasonal.is_winter. */
 export interface Clock {

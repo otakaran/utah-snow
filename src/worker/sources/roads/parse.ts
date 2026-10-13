@@ -1,13 +1,15 @@
 // Roads parse (spec §5.6): normalize the WP feeds and the UDOT lists once, then assemble the four corridor rows.
 // Gates (§5.2): a WP body must be a JSON array, a List page needs recordsTotal > 0, a keyed body a non-empty array.
 // A failed piece falls back to the previous row's piece; the job fails only when no WP feed and no UDOT list passed.
+// Keyless without any List page (UDOT answers 403 to Worker egress) the rows come from the WP feeds and say so.
 import { CORRIDORS } from '../../../../config/roads.ts';
+import { obj } from '../../../shared/json.ts';
 import type { Corridor, RoadStatus } from '../../../shared/types.ts';
 import { type Output, type ParseCtx, ValidationError } from '../types.ts';
 import { assembleCorridor } from './assemble.ts';
 import { classifyFeed, type PostFacts } from './classify.ts';
 import { resortSignals } from './cross.ts';
-import { obj, type RoadsRaw, type Signal } from './raw.ts';
+import type { RoadsRaw, Signal } from './raw.ts';
 import { type SignRow, signSignal, signView } from './signs.ts';
 import { trafficCarry, trafficFor } from './traffic.ts';
 import { eventKeyed, keyedRows, passKeyed, segmentKeyed, signKeyed } from './udot-keyed.ts';
@@ -58,6 +60,14 @@ function readUdot(raw: RoadsRaw): Udot {
   };
 }
 
+/** Keyless and no List page passed (refused or down): one crossChecks note per row; it never changes state. */
+function listAbsence(raw: RoadsRaw, u: Udot): Signal[] {
+  if (raw.keyed || u.segments !== null || u.passes !== null) return [];
+  const err = raw.errors?.['list:MountainPasses'] ?? '';
+  const why = /HTTP \d{3}|BlockedError/.exec(err)?.[0] ?? 'no page passed the gate';
+  return [{ source: 'UDOT list', raw: `unavailable (${why}); WP posts only`, state: 'unknown' }];
+}
+
 function prevRow(ctx: ParseCtx, c: Corridor): RoadStatus | null {
   const p = obj(ctx.prev[rowId(c)]);
   return p && typeof p.state === 'string' && Array.isArray(p.signs) ? (p as unknown as RoadStatus) : null;
@@ -97,6 +107,7 @@ export function parseRoads(raw: RoadsRaw, ctx: ParseCtx): Output {
     );
   }
   const rows: Record<string, RoadStatus> = {};
+  const absent = listAbsence(raw, u);
   for (const c of CORRIDOR_IDS) {
     const def = CORRIDORS[c];
     const prev = prevRow(ctx, c);
@@ -104,6 +115,7 @@ export function parseRoads(raw: RoadsRaw, ctx: ParseCtx): Output {
     const signs = corridorSigns(c, raw, u, prev);
     const traffic = u.events ? trafficFor(c, u.events, ctx.now) : trafficCarry(prev, ctx.now);
     const signals: Signal[] = [
+      ...absent,
       ...traffic.signals,
       ...signs.map((s) => signSignal(s, c)).filter((s): s is Signal => s !== null),
       ...resortSignals(c, raw, ctx.prev),

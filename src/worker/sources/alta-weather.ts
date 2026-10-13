@@ -3,9 +3,10 @@
 // from this row for its 48h/72h/7d fallback (§5.5).
 // History rows for day D appear at 00:10 on D+1 and are edited later; off-season seasons[0] still names the last
 // season, so rows are filtered by season AND by recency (the last HISTORY_DAYS local days), which empties them.
+import { altaJson, stampIso } from '../../shared/alta-page.ts';
+import { arr, obj, str } from '../../shared/json.ts';
 import { num, range } from '../../shared/num.ts';
 import { addDays, localDate } from '../../shared/time.ts';
-import { altaJson, arr, obj, stampIso, str } from './alta-weather/page.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const ALTA_WEATHER_URL = 'https://www.alta.com/weather';
@@ -72,6 +73,7 @@ function readings(rows: unknown[]): AltaObs[] {
 
 export function parseAltaWeather(html: string, ctx: ParseCtx): Output {
   const root = altaJson(String(html ?? ''));
+  if (!root) throw new ValidationError('alta-weather: window.Alta missing or not a JSON object');
   const w = obj(root.weather);
   const sf = obj(w?.snowfall);
   const season = num(obj(arr(sf?.seasons)[0])?.value);

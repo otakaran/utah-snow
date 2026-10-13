@@ -5,8 +5,8 @@ import sol20230119 from './fixtures/mtnpowder/20230119-inseason-solitude.json?ra
 import liveDv from './fixtures/mtnpowder/20261012-live-deer-valley.json?raw';
 import liveSol from './fixtures/mtnpowder/20261012-live-solitude.json?raw';
 import dvSynthetic from './fixtures/mtnpowder/mtnpowder-synthetic.json?raw';
-import { deerValley, MTNPOWDER_SOURCES, MtnPowderBlockedError, solitude } from './mtnpowder.ts';
-import { type FetchCtx, type FetchOpts, type FetchX, ValidationError } from './types.ts';
+import { deerValley, MTNPOWDER_SOURCES, type MtnPowderRow, solitude } from './mtnpowder.ts';
+import { BlockedError, type FetchCtx, type FetchOpts, type FetchX, ValidationError } from './types.ts';
 
 const LIVE_NOW = Date.parse('2026-10-13T01:55:55Z'); // Mon 2026-10-12 19:55 MDT, when the live files were fetched
 const opened = (id: string, at: string) => ({ [id]: { seasonOpenedAt: at } });
@@ -124,6 +124,16 @@ describe('mtnpowder in-season samples', () => {
       'Deer Valley parking is at capacity today, 12/28. Please park at the Richardson Flat Park & Ride.',
     ]);
     expect(d.roadHint?.state).toBe('traction');
+    expect(d).not.toHaveProperty('unmapped');
+  });
+
+  it('returns unmapped lift statuses in the row (parse stays pure, nothing is logged)', () => {
+    const feed = JSON.parse(dvSynthetic);
+    const area = feed.MountainAreas.find((a: { Lifts?: unknown[] }) => (a.Lifts?.length ?? 0) > 0);
+    area.Lifts[0].Status = 'Bogus Status';
+    const ctx = { now: Date.parse('2025-12-28T16:30:00Z'), prev: {} };
+    const d = deerValley.parse(JSON.stringify(feed), ctx).rows['resort:deer-valley'] as MtnPowderRow;
+    expect(d.unmapped).toEqual(['Bogus Status']);
   });
 });
 
@@ -151,7 +161,7 @@ describe('mtnpowder validation and fetch', () => {
 
   it('fetch flags an HTML body (Imperva) as blocked and other failures as errors', async () => {
     const block = '<html><head><META NAME="ROBOTS"></head><iframe src="/_Incapsula_Resource?x=1"></iframe></html>';
-    await expect(deerValley.fetch(ctxWith(200, block))).rejects.toBeInstanceOf(MtnPowderBlockedError);
+    await expect(deerValley.fetch(ctxWith(200, block))).rejects.toBeInstanceOf(BlockedError);
     await expect(deerValley.fetch(ctxWith(403, 'Request unsuccessful. Incapsula incident ID: 1'))).rejects.toThrow(
       /^blocked: HTTP 403/,
     );

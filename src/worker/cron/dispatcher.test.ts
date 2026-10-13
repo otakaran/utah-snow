@@ -1,10 +1,12 @@
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { BUDGET, SLOTS } from '../../../config/schedule.ts';
+import { BUDGET, INTERNAL_BUDGET, SLOTS } from '../../../config/schedule.ts';
+import { isoUtc } from '../../shared/time.ts';
 import { SOURCES } from '../sources/index.ts';
 import { type FetchCtx, type Source, ValidationError } from '../sources/types.ts';
+import { MAX_FRAMES_PER_JOB } from '../store/frames.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
-import { isMaintenance, isMorning, planTick, runTick, slotJobIds, slotOf } from './dispatcher.ts';
+import { isMaintenance, isMorning, planTick, runTick, slotOf } from './dispatcher.ts';
 
 const at = (iso: string) => Date.parse(iso);
 // 2026-12-28 is a Monday; Denver is UTC-7 in winter.
@@ -58,31 +60,46 @@ describe('admission', () => {
   });
 });
 
-/** Worst case over every slot x keyed/keyless x morning x maintenance: sum of the scheduled jobs' maxSubrequests. */
-function worstSlotLoad(sources: readonly Source[]): { load: number; at: string } {
-  let worst = { load: 0, at: '' };
-  for (let slot = 0; slot < SLOTS.length; slot++)
-    for (const keyed of [true, false])
-      for (const morning of [true, false])
-        for (const maintenance of [true, false]) {
-          const c = { ...ctx, slot, morning, keyed: { yt: keyed, udot: keyed } } as FetchCtx;
-          const load = slotJobIds(slot, morning, maintenance)
-            .map((id) => sources.find((s) => s.id === id)?.maxSubrequests(c) ?? 0)
-            .reduce((a, b) => a + b, 0);
-          if (load > worst.load)
-            worst = { load, at: `slot ${slot} keyed=${keyed} morning=${morning} maint=${maintenance}` };
-        }
+// Maintenance runs one sub-job per hour (08Z HDRelay, 09-11Z UDOT, Monday 12Z NWS points, 2026-12-28 is a Monday);
+// 15Z is a Denver morning hour, 20Z is not. Each hour is shifted into every slot.
+const HOURS = ['08', '09', '10', '11', '12', '15', '20'].map((h) => at(`2026-12-28T${h}:00:00Z`));
+
+/** Internal calls (D1 + KV) a tick spends: tick-start read + cron:last write, one batch per job, frame puts. */
+const internalOf = (jobs: readonly Source[]) =>
+  2 + jobs.length + jobs.filter((s) => s.id.startsWith('stake-')).length * MAX_FRAMES_PER_JOB;
+
+/** Worst case over every slot x keyed/keyless x morning x maintenance hour: subrequests, internal calls, deferrals. */
+function worstSlotLoad(sources: readonly Source[]) {
+  const worst = { load: 0, internal: 0, deferred: [] as string[], at: '' };
+  for (const hour of HOURS)
+    for (let slot = 0; slot < SLOTS.length; slot++)
+      for (const keyed of [true, false]) {
+        const now = hour + slot * 5 * 60_000;
+        const keys = { yt: keyed, udot: keyed };
+        const c = { ...ctx, now, slot, morning: isMorning(now), keyed: keys, secrets: { yt: 'k', udot: 'k' } };
+        const plan = planTick(now, sources, c as FetchCtx);
+        const jobs = [...plan.admitted, ...plan.deferred];
+        const load = jobs.reduce((n, s) => n + s.maxSubrequests(c as FetchCtx), 0);
+        const label = `${isoUtc(now)} keyed=${keyed}`;
+        if (load > worst.load) Object.assign(worst, { load, at: label });
+        worst.internal = Math.max(worst.internal, internalOf(jobs));
+        worst.deferred.push(...plan.deferred.map((s) => `${s.id} @ ${label}`));
+      }
   return worst;
 }
 
-describe('budget matrix', () => {
-  it(`no slot schedules more than ${BUDGET} subrequests for the registered sources`, () => {
+describe('budget matrix (real registry)', () => {
+  it(`no slot schedules more than ${BUDGET} subrequests or ${INTERNAL_BUDGET} internal calls, nothing deferred`, () => {
     const worst = worstSlotLoad(SOURCES);
     expect(worst.load, worst.at).toBeLessThanOrEqual(BUDGET);
+    expect(worst.internal).toBeLessThanOrEqual(INTERNAL_BUDGET);
+    expect(worst.deferred).toEqual([]);
   });
 
   it('the matrix sees scheduled jobs (guard against a vacuous pass)', () => {
-    expect(worstSlotLoad([fake('roads', BUDGET + 1)]).load).toBe(BUDGET + 1);
+    const over = worstSlotLoad([fake('roads', BUDGET + 1)]);
+    expect(over.load).toBe(BUDGET + 1);
+    expect(over.deferred.length).toBeGreaterThan(0);
   });
 });
 

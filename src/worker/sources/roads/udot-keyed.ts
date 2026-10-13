@@ -2,8 +2,10 @@
 // Field names follow the documented schema (research 2026-10-12); no keyed payload has been captured yet, so the
 // readers accept number-or-string values. Sign Ids ('ADX--…') map to keyless DT_RowIds via SIGN_KEYED_IDS.
 import { SIGN_KEYED_IDS } from '../../../../config/roads.ts';
+import { obj } from '../../../shared/json.ts';
 import { num, range, text } from '../../../shared/num.ts';
-import { iso, obj, str } from './raw.ts';
+import { isoUtc } from '../../../shared/time.ts';
+import { str } from './raw.ts';
 import { keyedPages, type SignRow } from './signs.ts';
 import { normRoute, type PassRow, type Segment, type TrafficEvent } from './udot-list.ts';
 
@@ -25,7 +27,7 @@ export function keyedRows(body: unknown): Record<string, unknown>[] | null {
 function unixIso(v: unknown): string | null {
   const n = num(v);
   if (n === null || n <= 0) return null;
-  return iso(n > 1e12 ? n : n * 1000);
+  return isoUtc(n > 1e12 ? n : n * 1000);
 }
 const unixMs = (v: unknown): number | null => {
   const n = num(v);

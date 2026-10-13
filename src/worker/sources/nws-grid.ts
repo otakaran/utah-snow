@@ -3,8 +3,9 @@
 // (fetchx always sends one). Values are converted to imperial here; trueElevFt rides along so the client compares
 // snow level against the true elevation, not the grid cell's (§5.7 step 6).
 import { RESORT_IDS, RESORTS } from '../../../config/resorts.ts';
-import { addDays, isoToMs, localDate } from '../../shared/time.ts';
+import { addDays, HOUR, isoToMs, localDate } from '../../shared/time.ts';
 import type { PointForecast, ResortId } from '../../shared/types.ts';
+import { mToFt } from '../../shared/units.ts';
 import {
   bucketDays,
   expand,
@@ -21,9 +22,7 @@ import { type FetchCtx, type ParseCtx, type Source, ValidationError } from './ty
 export type GridPointId = 'base' | 'summit';
 export const NWS_API = 'https://api.weather.gov';
 const STALE_AFTER_MIN = 180;
-const MAX_AGE_MS = 48 * 3_600_000; // an updateTime older than this means NWS stopped refreshing the grid
-const HOUR = 3_600_000;
-const FT_PER_M = 3.28084;
+const MAX_AGE_MS = 48 * HOUR; // an updateTime older than this means NWS stopped refreshing the grid
 
 // [our field, NWS property, required uom, plausible value range per interval in that uom]
 const FIELDS: readonly [Field, string, string, number, number][] = [
@@ -89,7 +88,7 @@ export function parseGrid(raw: unknown, ctx: ParseCtx, m: GridMeta): PointForeca
     resortId: m.resortId,
     point: m.point,
     grid: m.grid,
-    gridElevFt: elevM === null ? m.cellFt : Math.round(elevM * FT_PER_M),
+    gridElevFt: elevM === null ? m.cellFt : Math.round(mToFt(elevM)),
     trueElevFt: m.trueElevFt,
     days: bucketDays(g),
     updateTime,

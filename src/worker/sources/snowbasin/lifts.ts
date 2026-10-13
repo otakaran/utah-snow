@@ -1,8 +1,8 @@
 // Snowbasin lift table, access gates and groomed count (spec §5.5). Status classes are read through the page's own
 // Lift Key / Trail Key legends (O10: hold, scheduled, delayed and expected were never observed live), then the
 // fixed class names, then the sr-only text. Anything still unrecognised maps to closed with a note.
+import { liftHours, liftId } from '../../../shared/lifts.ts';
 import { decodeEntities, text } from '../../../shared/num.ts';
-import { hm24 } from '../../../shared/time.ts';
 import type { Gate, LiftState, LiftStatus } from '../../../shared/types.ts';
 
 export type Legend = Map<string, string>; // icon class suffix -> legend label ('hold' -> 'On Hold')
@@ -26,7 +26,6 @@ const ROW_RE = /<tr>([\s\S]*?)<\/tr>/g;
 const TD_RE = /<td[^>]*>([\s\S]*?)<\/td>/g;
 const ICON_RE = /mc__icon-([a-z-]+)/;
 const SR_RE = /<span class="sr-only">([^<]*)<\/span>/;
-const HOURS_RE = /(\d{1,2}:\d{2}\s*(?:AM|PM))\s*[–-]\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/;
 const GATES_AREA = 'Access Gates';
 // Ordered: 'Opening Delayed' is scheduled, 'Lift Closed' is closed.
 const BY_TEXT: [RegExp, LiftState][] = [
@@ -70,12 +69,6 @@ function cells(row: string): string[] {
   return [...row.matchAll(TD_RE)].map((m) => m[1] ?? '');
 }
 
-const slug = (name: string) =>
-  name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-
 /** Lift rows (null when the table is absent, e.g. off-season). td: name, type, status, hours. */
 export function readLifts(main: string): LiftStatus[] | null {
   const at = main.indexOf(LIFT_TABLE);
@@ -88,14 +81,13 @@ export function readLifts(main: string): LiftStatus[] | null {
     const name = text(td[0], 80);
     if (td.length < 3 || !name) continue; // thead row
     const c = classify(td[2] ?? '', legend);
-    const hours = HOURS_RE.exec(decodeEntities(td[3] ?? ''));
+    const hours = liftHours(decodeEntities(td[3] ?? '')); // '9:00 AM – 4:00 PM'
     out.push({
-      id: slug(name),
+      id: liftId(name),
       name,
       state: c.state,
       raw: c.raw,
-      opensAt: hours?.[1] ? hm24(hours[1]) : null,
-      closesAt: hours?.[2] ? hm24(hours[2]) : null,
+      ...hours,
       note: c.known ? null : `unmapped status '${c.raw}'`,
     });
   }

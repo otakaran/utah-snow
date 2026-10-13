@@ -7,13 +7,18 @@ import {
   formatClockRel,
   formatLocalDate,
   hm24,
+  httpDateToMs,
   isBetweenLocal,
+  isoLocal,
+  isoUtc,
   isTripDay,
   localDate,
   localHM,
   localSlots,
+  monthNum,
   pickMode,
   pstToUtc,
+  ptDate,
   tripDayNumber,
   zonedToUtc,
 } from './time.ts';
@@ -129,5 +134,38 @@ describe('display helpers', () => {
     expect(isBetweenLocal('2027-01-05T13:30:00Z', '06:30', '18:30')).toBe(true);
     expect(isBetweenLocal('2027-01-06T01:30:00Z', '06:30', '18:30')).toBe(false);
     expect(isBetweenLocal('2027-01-06T05:00:00Z', '18:30', '06:30')).toBe(true);
+  });
+});
+
+describe('wire formats', () => {
+  it('writes instants as UTC ISO and as Denver wall time with its offset', () => {
+    expect(isoUtc(at('2026-12-27T13:05:07Z'))).toBe('2026-12-27T13:05:07.000Z');
+    expect(isoLocal(at('2026-12-27T13:05:07Z'))).toBe('2026-12-27T06:05:07-07:00');
+    expect(isoLocal(at('2026-10-12T14:00:00Z'))).toBe('2026-10-12T08:00:00-06:00');
+    expect(isoLocal(at('2026-11-01T08:30:00Z'))).toBe('2026-11-01T01:30:00-07:00'); // just after the fall-back
+    expect(isoLocal(at('2026-12-27T13:05:07Z'), -360)).toBe('2026-12-27T07:05:07-06:00'); // pinned offset
+    expect([isoUtc(Number.NaN), isoLocal(Number.POSITIVE_INFINITY), isoUtc(9e15)]).toEqual(['', '', '']);
+  });
+
+  it('reads only IMF-fixdate HTTP dates', () => {
+    expect(httpDateToMs('Tue, 13 Oct 2026 01:48:10 GMT')).toBe(at('2026-10-13T01:48:10Z'));
+    expect(httpDateToMs(' Thu, 01 Jan 2026 19:20:23 GMT\n')).toBe(at('2026-01-01T19:20:23Z'));
+    expect(httpDateToMs('Tuesday, 13-Oct-26 01:48:10 GMT')).toBeNull(); // obsolete RFC 850
+    expect(httpDateToMs('Tue Oct 13 01:48:10 2026')).toBeNull(); // asctime
+    expect(httpDateToMs('Tue, 31 Feb 2026 01:48:10 GMT')).toBeNull();
+    expect(httpDateToMs('Tue, 13 Oct 2026 24:00:00 GMT')).toBeNull();
+    expect(httpDateToMs(null)).toBeNull();
+  });
+
+  it('keys the YouTube quota day on Pacific midnight (PST and PDT)', () => {
+    expect(ptDate(at('2026-12-28T07:59:00Z'))).toBe('2026-12-27');
+    expect(ptDate(at('2026-12-28T08:00:00Z'))).toBe('2026-12-28');
+    expect(ptDate(at('2026-07-01T06:59:00Z'))).toBe('2026-06-30');
+    expect(ptDate(at('2026-07-01T07:00:00Z'))).toBe('2026-07-01');
+    expect(ptDate(Number.NaN)).toBe('');
+  });
+
+  it('reads English month names', () => {
+    expect(['Jan', 'SEP', 'december', 'Sept', 'Ma'].map(monthNum)).toEqual([1, 9, 12, 0, 0]);
   });
 });

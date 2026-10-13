@@ -9,7 +9,7 @@ import liveJson from './fixtures/roads/20261012-live.json?raw';
 import syntheticJson from './fixtures/roads/roads-synthetic.json?raw';
 import type { RoadsRaw } from './roads/raw.ts';
 import { roads } from './roads.ts';
-import { type FetchCtx, ValidationError } from './types.ts';
+import { ValidationError } from './types.ts';
 
 const CC = 'https://cottonwoodcanyons.udot.utah.gov';
 const WB = 'https://wasatchback.udot.utah.gov';
@@ -204,41 +204,12 @@ describe('roads: synthetic keyed storm morning (2026-02-19)', () => {
   });
 });
 
-describe('roads: validation gate and budget', () => {
+describe('roads: validation gate', () => {
   it('throws ValidationError when no WP feed and no UDOT list passes', () => {
     const raw = wpOnly({});
     raw.wp = { [CC]: '<html>Just a moment</html>', [WB]: null, [OV]: { code: 'rest_forbidden' } };
     raw.conditions = [{ recordsTotal: 0, recordsFiltered: 0, data: [] }];
     expect(() => run(raw, '2026-10-12T17:00:00Z')).toThrow(ValidationError);
     expect(() => roads.parse('garbage' as unknown as RoadsRaw, { now: 0, prev: {} })).toThrow(ValidationError);
-  });
-
-  it('maxSubrequests equals the documented worst case and the calls fetch() makes', async () => {
-    const budget = (slot: number, keyed: boolean) =>
-      roads.maxSubrequests({
-        slot,
-        keyed: { yt: false, udot: keyed },
-        secrets: keyed ? { udot: 'k' } : {},
-      } as FetchCtx);
-    expect([0, 1, 2, 4, 6, 8, 10].map((s) => budget(s, false))).toEqual([16, 13, 20, 16, 20, 16, 20]);
-    expect([0, 2].map((s) => budget(s, true))).toEqual([10, 18]);
-    for (const [slot, keyed] of [
-      [0, false],
-      [2, false],
-      [2, true],
-    ] as const) {
-      let calls = 0;
-      const fetch = (async (url: string) => {
-        calls++;
-        if (keyed && url.includes('/traffic?')) throw new Error('HTTP 503'); // forces the keyed `event` fallback
-        const data = url.includes('/List/') ? { recordsTotal: 500, recordsFiltered: 500, data: [] } : [];
-        return { status: 200, url, headers: new Headers(), data, bytes: 0, blocked: false, wallMs: 0 };
-      }) as unknown as FetchCtx['fetch'];
-      const ctx = { fetch, now: 0, slot, morning: false, keyed: { yt: false, udot: keyed }, prev: {} } as FetchCtx;
-      ctx.secrets = keyed ? { udot: 'k' } : {};
-      const raw = await roads.fetch(ctx);
-      expect([slot, keyed, calls]).toEqual([slot, keyed, budget(slot, keyed)]);
-      expect(JSON.stringify(raw.errors)).not.toMatch(/key=k/);
-    }
   });
 });

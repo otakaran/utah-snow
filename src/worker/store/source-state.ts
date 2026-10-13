@@ -2,7 +2,7 @@
 // One row per source row id; a failure keeps the payload, a deferral only touches fetched_at and error.
 // 'cron:last' is a row too: payload = CronLast JSON, fetched_at = tick start.
 import type { SourceStatus } from '../../shared/types.ts';
-import type { PrevRows } from '../sources/types.ts';
+import { asOfOf, okStatusOf } from './row-meta.ts';
 
 export const CRON_LAST = 'cron:last';
 
@@ -16,7 +16,7 @@ export interface CronLast {
 
 export interface MetaRow {
   source_id: string;
-  payload: string | null; // only for cron:last and yt:state in readMetaRows()
+  payload: string | null; // only for the PAYLOAD_ROWS in readMetaRows()
   source_as_of: string | null;
   fetched_at: number;
   ok_at: number | null;
@@ -26,8 +26,9 @@ export interface MetaRow {
 }
 
 const COLS = 'source_id, source_as_of, fetched_at, ok_at, status, error, fail_count';
+const PAYLOAD_ROWS = [CRON_LAST, 'yt:state', 'cams:status', 'nws:points'].map((id) => `'${id}'`).join(', '); // /api/health reads them
 
-function parseCronLast(payload: string | null | undefined): CronLast | null {
+export function parseCronLast(payload: string | null | undefined): CronLast | null {
   if (!payload) return null;
   try {
     return JSON.parse(payload) as CronLast;
@@ -36,48 +37,14 @@ function parseCronLast(payload: string | null | undefined): CronLast | null {
   }
 }
 
-/** Every row's meta (payloads only for cron:last and yt:state). One query. */
+/** Every row's meta (payloads only for PAYLOAD_ROWS). One query. */
 export async function readMetaRows(db: D1Database): Promise<MetaRow[]> {
-  const sql = `SELECT ${COLS}, CASE WHEN source_id IN ('${CRON_LAST}', 'yt:state') THEN payload END AS payload FROM source_state`;
+  const sql = `SELECT ${COLS}, CASE WHEN source_id IN (${PAYLOAD_ROWS}) THEN payload END AS payload FROM source_state`;
   return (await db.prepare(sql).all<MetaRow>()).results;
 }
 
 export function cronLastOf(rows: readonly MetaRow[]): CronLast | null {
   return parseCronLast(rows.find((r) => r.source_id === CRON_LAST)?.payload);
-}
-
-/**
- * Dispatcher read (D1 call 1): previous cron:last, every row's fetched_at, and last-good payloads for `needIds`.
- */
-export async function readTickState(
-  db: D1Database,
-  needIds: readonly string[],
-): Promise<{ cronLast: CronLast | null; fetchedAt: Map<string, number>; prev: PrevRows }> {
-  const sql =
-    `SELECT source_id, fetched_at, CASE WHEN source_id = '${CRON_LAST}' OR ` +
-    '(ok_at IS NOT NULL AND source_id IN (SELECT value FROM json_each(?1))) THEN payload END AS payload FROM source_state';
-  const { results } = await db
-    .prepare(sql)
-    .bind(JSON.stringify(needIds))
-    .all<{ source_id: string; fetched_at: number; payload: string | null }>();
-  const fetchedAt = new Map<string, number>();
-  const prev: PrevRows = {};
-  let cronLast: CronLast | null = null;
-  for (const r of results) {
-    if (r.source_id === CRON_LAST) {
-      cronLast = parseCronLast(r.payload);
-      continue;
-    }
-    fetchedAt.set(r.source_id, r.fetched_at);
-    if (r.payload !== null) {
-      try {
-        prev[r.source_id] = JSON.parse(r.payload);
-      } catch {
-        // a corrupt payload is simply not carried forward
-      }
-    }
-  }
-  return { cronLast, fetchedAt, prev };
 }
 
 export function cronLastStmt(db: D1Database, c: CronLast): D1PreparedStatement {
@@ -114,25 +81,29 @@ export async function writeTickStart(
   await db.batch(stmts);
 }
 
-function asOfOf(v: unknown): string | null {
-  const a = v && typeof v === 'object' ? (v as { asOf?: unknown }).asOf : null;
-  return typeof a === 'string' ? a : null;
-}
-
-/** Success: payload plus meta for every row. Returns the payload bytes written. */
-export async function writeJobOk(db: D1Database, rows: Record<string, unknown>, now: number): Promise<number> {
+/**
+ * Success: payload plus meta for every row ('offseason' instead of 'ok' for closed-season payloads), then `after`
+ * (history, counters, frame index rows) in the same batch. Returns the payload bytes written.
+ */
+export async function writeJobOk(
+  db: D1Database,
+  rows: Record<string, unknown>,
+  now: number,
+  after: readonly D1PreparedStatement[] = [],
+): Promise<number> {
   const stmt = db.prepare(
     `INSERT INTO source_state (source_id, payload, source_as_of, fetched_at, ok_at, status, error, fail_count)
-     VALUES (?1, ?2, ?3, ?4, ?4, 'ok', NULL, 0)
+     VALUES (?1, ?2, ?3, ?4, ?4, ?5, NULL, 0)
      ON CONFLICT(source_id) DO UPDATE SET payload = excluded.payload, source_as_of = excluded.source_as_of,
-       fetched_at = excluded.fetched_at, ok_at = excluded.ok_at, status = 'ok', error = NULL, fail_count = 0`,
+       fetched_at = excluded.fetched_at, ok_at = excluded.ok_at, status = excluded.status, error = NULL, fail_count = 0`,
   );
   let bytes = 0;
   const stmts = Object.entries(rows).map(([id, value]) => {
     const payload = JSON.stringify(value ?? null);
     bytes += payload.length;
-    return stmt.bind(id, payload, asOfOf(value), now);
+    return stmt.bind(id, payload, asOfOf(value), now, okStatusOf(id, value));
   });
+  stmts.push(...after);
   if (stmts.length) await db.batch(stmts);
   return bytes;
 }

@@ -1,21 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { CAMS } from '../../../config/cams/index.ts';
 import { isoToMs } from '../../shared/time.ts';
+import type { StakeRow } from '../../shared/types.ts';
 import jan1Json from './fixtures/stake-skiutah/20260101-inseason.json?raw';
 import jan2Json from './fixtures/stake-skiutah/20260102-inseason.json?raw';
 import liveJson from './fixtures/stake-skiutah/20261012-live.json?raw';
-import * as alta from './stake-alta.ts';
+import { SKIUTAH_BLOB_URL, SKIUTAH_STAKES, stakeSkiutah } from './stake-skiutah.ts';
 import {
-  readCam,
-  SKIUTAH_BLOB_URL,
-  SKIUTAH_STAKES,
-  type StakeCam,
-  type StakeRow,
-  type StakeShot,
-  settle,
-  stakeSkiutah,
-} from './stake-skiutah.ts';
-import { type FetchCtx, type FetchOpts, type FetchResult, type PrevRows, ValidationError } from './types.ts';
+  BudgetError,
+  type FetchCtx,
+  type FetchOpts,
+  type FetchResult,
+  type PrevRows,
+  ValidationError,
+} from './types.ts';
 
 interface Resp {
   url: string;
@@ -39,6 +37,8 @@ function result(r: Resp, body?: ArrayBuffer): FetchResult<ArrayBuffer> {
   return { status: r.status, url: r.url, headers: new Headers(r.headers), data, bytes: 0, blocked: false, wallMs: 1 };
 }
 const named = (name: string, msg: string) => Object.assign(new Error(msg), { name });
+/** Recorded request headers plus the max-age=0 that keeps conditional GETs working on workerd. */
+const cond = (h: Record<string, string>) => ({ ...h, 'Cache-Control': 'max-age=0' });
 /** Responses by blob id; an Error value makes that request reject. */
 type Route = Record<string, Resp | Error>;
 function pick(f: Fixture, i: number): Resp {
@@ -74,7 +74,7 @@ describe('stake-skiutah', () => {
     );
     expect(calls.every((c) => c.opts?.follow === false && c.opts.body === 'bytes')).toBe(true);
     expect(calls.map((c) => c.opts?.headers)).toEqual([{}, {}]);
-    expect(row.asOf).toBe('2026-10-13T01:53:26Z'); // the newer of the two
+    expect(row.asOf).toBe('2026-10-13T01:53:26.000Z'); // the newer of the two
     expect(row.cams[DV]).toMatchObject({ t: ms('2026-10-13T01:53:26Z'), archived: true, bytes: 2048 });
     expect(row.cams[DV]?.hash).toBe('f39c8dbc756e95d609f84cc6c6929f7a7e0a473c');
     expect(row.cams[SOL]).toMatchObject({ t: ms('2026-10-13T01:07:52Z'), archived: true });
@@ -91,8 +91,8 @@ describe('stake-skiutah', () => {
     const { out, row, calls } = await run({ ZFfEsBSprV7GfFinXUifK3: dv304, 525820161: pick(live, 2) }, NOW + 9000, {
       [ROW]: first.row,
     });
-    expect(calls[1]?.opts?.headers).toEqual(pick(live, 2).request);
-    expect(calls[0]?.opts?.headers).toEqual({ 'If-None-Match': '"f39c8dbc756e95d609f84cc6c6929f7a7e0a473c"' });
+    expect(calls[1]?.opts?.headers).toEqual(cond(pick(live, 2).request));
+    expect(calls[0]?.opts?.headers).toEqual(cond({ 'If-None-Match': '"f39c8dbc756e95d609f84cc6c6929f7a7e0a473c"' }));
     expect(row).toEqual(first.row);
     expect(out.frames).toEqual([]);
   });
@@ -110,12 +110,12 @@ describe('stake-skiutah', () => {
     expect(a.out.frames?.map((f) => f.t)).toEqual([ms('2026-01-01T19:20:23Z')]);
     const route = { ZFfEsBSprV7GfFinXUifK3: pick(jan2, 0), 525820161: pick(jan2, 1) };
     const b = await run(route, ms(jan2.fetchedAt), { [ROW]: a.row });
-    expect(b.calls[1]?.opts?.headers).toEqual({ 'If-None-Match': '"7bf0a72da237acf9055ccd87e0ab90eac3a8159d"' });
+    expect(b.calls[1]?.opts?.headers).toEqual(cond({ 'If-None-Match': '"7bf0a72da237acf9055ccd87e0ab90eac3a8159d"' }));
     expect(b.out.frames?.map((f) => f.key)).toEqual([
       `cam:${DV}:${ms('2026-01-02T01:05:53Z')}`,
       `cam:${SOL}:${ms('2026-01-02T00:20:24Z')}`,
     ]);
-    expect(b.row.asOf).toBe('2026-01-02T01:05:53Z');
+    expect(b.row.asOf).toBe('2026-01-02T01:05:53.000Z');
     expect(b.row.cams[SOL]?.hash).toBe('6a048e6a12e15ff55abc79710742a935ebc0162d');
   });
 
@@ -134,7 +134,7 @@ describe('stake-skiutah', () => {
   it('every cam failing fails the job; a deferral error always propagates', async () => {
     const e1 = named('HttpError', 'HTTP 500 a');
     await expect(run({ ZFfEsBSprV7GfFinXUifK3: e1, 525820161: named('HttpError', 'b') }, NOW)).rejects.toBe(e1);
-    const budget = named('BudgetError', 'external budget 45 spent');
+    const budget = new BudgetError('external budget 45 spent');
     await expect(run({ ZFfEsBSprV7GfFinXUifK3: pick(live, 0), 525820161: budget }, NOW)).rejects.toBe(budget);
   });
 
@@ -156,40 +156,4 @@ describe('stake-skiutah', () => {
       expect(cam?.still.card.startsWith(`${SKIUTAH_BLOB_URL}${blob}?`)).toBe(true);
     }
   });
-
-  it('its archive core behaves exactly like stake-alta.ts (the two copies must not drift)', () => {
-    const body = bytesOf(pick(live, 0).bodyHeadBase64 ?? '');
-    const lm = 'Tue, 13 Oct 2026 01:53:26 GMT';
-    const shot: StakeShot = { status: 200, lm, etag: '"e"', type: 'image/jpeg', body, hash: 'h1' };
-    const prev: StakeCam = { t: 1, asOf: 'a', hash: 'h0', bytes: 9, archived: true, lm: 'l', etag: null };
-    const cases: [StakeShot, StakeCam | null, number][] = [
-      [shot, null, NOW],
-      [shot, prev, NOW],
-      [{ ...shot, hash: 'h0' }, prev, NOW],
-      [shot, prev, NOW + 3 * 86_400_000],
-      [{ ...shot, status: 304, body: null }, prev, NOW],
-    ];
-    for (const [s, p, now] of cases) expect(settle('c', s, p, now)).toEqual(alta.settle('c', s, p, now));
-    const bad: StakeShot[] = [
-      { ...shot, lm: null },
-      { ...shot, type: 'text/html' },
-      { ...shot, status: 304 },
-    ];
-    for (const s of bad) {
-      const msg = catchMsg(() => settle('c', s, null, NOW));
-      expect(msg).not.toBe('did not throw');
-      expect(msg).toBe(catchMsg(() => alta.settle('c', s, null, NOW)));
-    }
-    const row = { cams: { c: { ...prev, junk: 1 }, d: { t: 'x' } } };
-    for (const id of ['c', 'd', 'e']) expect(readCam(row, id)).toEqual(alta.readCam(row, id));
-  });
 });
-
-function catchMsg(fn: () => unknown): string {
-  try {
-    fn();
-  } catch (e) {
-    return e instanceof Error ? e.message : String(e);
-  }
-  return 'did not throw';
-}

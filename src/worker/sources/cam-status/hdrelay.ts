@@ -4,11 +4,11 @@
 // `online` for all 12 HDRelay cams comes from the daily hdrelay:config row (maintenance, 08Z).
 import { CAMS, type CamId } from '../../../../config/cams/index.ts';
 import { num } from '../../../shared/num.ts';
+import { HOUR, isoUtc, MIN } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
-import { iso } from './probe.ts';
 import type { CamStatusRow, KindCheck } from './types.ts';
 
-const GATE_MS = 30 * 60_000;
+const GATE_MS = 30 * MIN;
 const MIN_MS = 1_500_000_000_000; // 2017: anything older is junk
 const INFO = 'https://img.hdrelay.com/api/frames/info';
 
@@ -41,7 +41,7 @@ export const frameInfoUrl = (cameraId: string, position: string): string =>
 
 function ms(v: unknown, now: number): number | null {
   const n = num(v);
-  return n !== null && n >= MIN_MS && n <= now + 3_600_000 ? n : null;
+  return n !== null && n >= MIN_MS && n <= now + HOUR ? n : null;
 }
 
 export const hdrelay: KindCheck = {
@@ -62,8 +62,8 @@ export const hdrelay: KindCheck = {
     const enabled = last !== null && (!gated || now - last < GATE_MS);
     const archive = {
       position,
-      first: first === null ? null : iso(first),
-      last: last === null ? null : iso(last),
+      first: first === null ? null : isoUtc(first),
+      last: last === null ? null : isoUtc(last),
       enabled,
     };
     return { [id]: gated ? { archive, asOf: null } : { archive, asOf: archive.last } };

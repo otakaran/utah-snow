@@ -8,7 +8,12 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['src/shared/**/*.test.ts', 'src/worker/sources/**/*.test.ts', 'config/**/*.test.ts'],
+          include: [
+            'src/shared/**/*.test.ts',
+            'src/worker/sources/**/*.test.ts',
+            'src/worker/lib/**/*.test.ts',
+            'config/**/*.test.ts',
+          ],
         },
       },
       {

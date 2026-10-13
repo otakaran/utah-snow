@@ -54,4 +54,15 @@ describe('/api/snapshot', () => {
     expect(second.headers.get('X-Build')).toBe('dev');
     expect(await second.text()).toBe('');
   });
+
+  it("drops snowbird's private trailsEtag from the public block", async () => {
+    const payload = JSON.stringify({ id: 'snowbird', trails: { open: 1 }, trailsEtag: 'W/"1a-x"', gates: [] });
+    await env.DB.prepare(
+      "INSERT INTO source_state (source_id, payload, fetched_at, ok_at, status, fail_count) VALUES ('resort:snowbird', ?1, 1, 1, 'ok', 0)",
+    )
+      .bind(payload)
+      .run();
+    const snap = (await (await get()).json()) as Snapshot;
+    expect(snap.resorts.snowbird.data).toEqual({ id: 'snowbird', trails: { open: 1 }, gates: [] });
+  });
 });

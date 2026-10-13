@@ -1,33 +1,26 @@
 // Cron dispatcher (spec §5.3): one */5 trigger. Per tick:
 //   1. admit the slot's registered jobs in PRIORITY order while sum(maxSubrequests) <= BUDGET; the rest are deferred;
-//   2. D1 call 1: previous cron:last, every row's fetched_at, last-good payloads for the admitted jobs;
-//   3. D1 call 2: cron:last, deferrals, cpu-suspect counters (previous jobs whose rows were never written);
-//   4. run admitted jobs under Promise.allSettled; each writes its own rows as soon as it settles;
+//   2. D1 call 1: previous cron:last, every row's fetched_at, last-good payloads and other prev inputs (`reads`,
+//      counters, resort_history) for the admitted jobs;
+//   3. D1 call 2: cron:last, deferrals, cpu-suspect counters (previous jobs that wrote none of their due rows);
+//   4. run admitted jobs under Promise.allSettled; each writes its own rows as soon as it settles (cron/job.ts);
 //   5. one log line per job.
 import { BUDGET, MAINT, MORNING_HOURS, PRIORITY, SLOTS, TICK_DEADLINE_MS } from '../../../config/schedule.ts';
-import { localHour } from '../../shared/time.ts';
-import { BlockedError, BudgetError, createFetchx, DeadlineError, type FetchOpts, type FetchX } from '../lib/fetchx.ts';
+import { DAY, HOUR, localHour, MIN } from '../../shared/time.ts';
+import { createFetchx } from '../lib/fetchx.ts';
 import { errorText, logLine } from '../lib/log.ts';
 import { SOURCES } from '../sources/index.ts';
 import type { FetchCtx, Source } from '../sources/types.ts';
 import { cpuSuspectStmt } from '../store/counters.ts';
-import {
-  type CronLast,
-  readTickState,
-  writeJobDeferred,
-  writeJobFail,
-  writeJobOk,
-  writeTickStart,
-} from '../store/source-state.ts';
+import { type CronLast, writeTickStart } from '../store/source-state.ts';
+import { readTickState } from '../store/tick-state.ts';
+import { type JobEnv, type JobLog, readsOf, rowsAt, runJob } from './job.ts';
 
-const MIN5 = 300_000;
-const HOUR = 3_600_000;
-const DAY = 86_400_000;
-
-export type CronEnv = Pick<Env, 'DB'> & { YT_API_KEY?: string; UDOT_API_KEY?: string };
+export type { JobLog } from './job.ts';
+export type CronEnv = JobEnv & { YT_API_KEY?: string; UDOT_API_KEY?: string };
 
 /** 0-11 = UTC minute / 5. */
-export const slotOf = (ms: number): number => Math.floor((ms % HOUR) / MIN5);
+export const slotOf = (ms: number): number => Math.floor((ms % HOUR) / (5 * MIN));
 export const isMorning = (ms: number): boolean => {
   const h = localHour(ms);
   return h >= MORNING_HOURS.from && h <= MORNING_HOURS.to;
@@ -84,54 +77,16 @@ export function planTick(ms: number, sources: readonly Source[], ctx: FetchCtx):
   return { slot, morning, maintenance, admitted, deferred };
 }
 
-/** Jobs of the previous tick with any row still older than that tick's start: the runtime killed them. */
+/**
+ * Jobs of the previous tick that wrote none of the rows they were due to write since it started: the runtime killed
+ * them. A job writes all of its rows in one batch, so one fresh row clears it (maintenance writes only its due sub).
+ */
 export function findSuspects(prev: CronLast, fetchedAt: Map<string, number>, sources: readonly Source[]): string[] {
   return prev.jobs.filter((job) => {
     const src = sources.find((s) => s.id === job);
-    return src ? src.rows.some((r) => (fetchedAt.get(r) ?? 0) < prev.startedAt) : false;
+    const rows = src ? rowsAt(src, prev.startedAt) : [];
+    return rows.length > 0 && rows.every((r) => (fetchedAt.get(r) ?? 0) < prev.startedAt);
   });
-}
-
-export interface JobLog {
-  job: string;
-  slot: number;
-  wallMs: number;
-  ok: boolean;
-  bytes: number;
-  ext: number;
-  status: 'ok' | 'error' | 'blocked' | 'deferred';
-  err?: string;
-}
-
-async function runJob(db: D1Database, src: Source, base: FetchCtx, slot: number): Promise<JobLog> {
-  let ext = 0;
-  const counted = <T = unknown>(url: string, opts?: FetchOpts) => {
-    ext++;
-    return base.fetch<T>(url, opts);
-  };
-  const jobFetch: FetchX = Object.assign(counted, { remaining: base.fetch.remaining, used: base.fetch.used });
-  const t0 = Date.now();
-  const log: JobLog = { job: src.id, slot, wallMs: 0, ok: false, bytes: 0, ext: 0, status: 'ok' };
-  try {
-    const raw = await src.fetch({ ...base, fetch: jobFetch });
-    const out = src.parse(raw, { now: base.now, prev: base.prev });
-    log.bytes = await writeJobOk(db, out.rows, Date.now());
-    // out.frames (stake archive) gets its KV + stake_frames writer with the stake adapters.
-    log.ok = true;
-  } catch (err) {
-    if (err instanceof BudgetError || err instanceof DeadlineError) {
-      log.status = 'deferred';
-      await writeJobDeferred(db, src.rows, Date.now());
-    } else {
-      log.status = err instanceof BlockedError ? 'blocked' : 'error';
-      log.err = errorText(err);
-      await writeJobFail(db, src.rows, log.status, log.err, Date.now());
-    }
-  }
-  log.wallMs = Date.now() - t0;
-  log.ext = ext;
-  logLine({ ...log });
-  return log;
 }
 
 export interface TickResult {
@@ -139,7 +94,7 @@ export interface TickResult {
   morning: boolean;
   maintenance: boolean;
   ext: number;
-  internal: number; // D1 calls (INTERNAL_BUDGET = 25)
+  internal: number; // D1 + KV calls (INTERNAL_BUDGET = 25)
   logs: JobLog[];
 }
 
@@ -162,10 +117,7 @@ export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpt
     prev: {},
   };
   const plan = planTick(scheduledTime, sources, ctx);
-  const state = await readTickState(
-    env.DB,
-    plan.admitted.flatMap((s) => s.rows),
-  );
+  const state = await readTickState(env.DB, plan.admitted.flatMap(readsOf), startedAt);
   ctx.prev = state.prev;
   const suspects = state.cronLast ? findSuspects(state.cronLast, state.fetchedAt, sources) : [];
   const cron: CronLast = {
@@ -178,10 +130,10 @@ export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpt
   await writeTickStart(
     env.DB,
     cron,
-    plan.deferred.flatMap((s) => s.rows),
+    plan.deferred.flatMap((s) => rowsAt(s, startedAt)),
     suspects.map((job) => cpuSuspectStmt(env.DB, job, startedAt)),
   );
-  const settled = await Promise.allSettled(plan.admitted.map((src) => runJob(env.DB, src, ctx, plan.slot)));
+  const settled = await Promise.allSettled(plan.admitted.map((src) => runJob(env, src, ctx, plan.slot)));
   const logs = settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
   for (const r of settled)
     if (r.status === 'rejected') logLine({ slot: plan.slot, ok: false, err: errorText(r.reason) });
@@ -190,7 +142,7 @@ export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpt
     morning: plan.morning,
     maintenance: plan.maintenance,
     ext: fx.used(),
-    internal: 2 + plan.admitted.length,
+    internal: 2 + plan.admitted.length + logs.reduce((n, l) => n + l.frames, 0),
     logs,
   };
   logLine({ tick: plan.slot, jobs: cron.jobs.length, deferred: cron.deferred, suspects, ext: result.ext });

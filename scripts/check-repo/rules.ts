@@ -43,13 +43,16 @@ export function checkSizes(files: RepoFile[]): Finding[] {
   return found;
 }
 
-// Rule 4: all Date/Intl/time logic lives in src/shared/time.ts.
+// Rule 4: all Date/Intl/time logic lives in src/shared/time.ts (and its body folder src/shared/time/).
+const TIME_HOME = (p: string) =>
+  p === 'src/shared/time.ts' || p === 'src/shared/time.test.ts' || under(p, 'src/shared/time');
+
 export function checkTime(files: RepoFile[]): Finding[] {
   const found: Finding[] = [];
   for (const f of files) {
     if (f.text === null || !isCode(f.path) || f.path.endsWith('.d.ts')) continue;
     if (!(under(f.path, 'src') || under(f.path, 'config'))) continue;
-    if (f.path === 'src/shared/time.ts' || f.path === 'src/shared/time.test.ts') continue;
+    if (TIME_HOME(f.path)) continue;
     found.push(
       ...findAll(f.path, stripComments(f.text), TIME_RE, (m) => `time API '${m[0]}' outside src/shared/time.ts`),
     );

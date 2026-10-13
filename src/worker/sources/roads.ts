@@ -1,7 +1,8 @@
 // roads -> roads:{lcc,bcc,parleys,snowbasin} (spec §5.4, §5.6, Appendix B udot-wp / udot-list / udot-api).
-// Keyless by default: the three UDOT WordPress feeds plus /List/GetData. With UDOT_API_KEY (ctx.keyed.udot) the
-// RoadConditions/MountainPasses/MessageSigns lists come from api/v2 instead; traffic stays on the keyless searches
-// with api `event` as their fallback. Resort cross-checks: Snowbird roads/parking/alerts and Brighton
+// Keyless by default: the three UDOT WordPress feeds plus /List/GetData, which answers 403 to Worker egress (then the
+// rows come from WP alone; see roads/fetch.ts). With UDOT_API_KEY (ctx.keyed.udot) the RoadConditions/MountainPasses/
+// MessageSigns lists come from api/v2 instead; traffic stays on the keyless searches with api `event` as their
+// fallback. Resort cross-checks: Snowbird roads/parking/alerts and Brighton
 // reportpal-roads are fetched here; Alta, Brighton comments and Deer Valley come from their last-good rows (`reads`).
 import { CORRIDORS } from '../../../config/roads.ts';
 import type { Corridor } from '../../shared/types.ts';
@@ -16,11 +17,11 @@ export type { RoadsRaw } from './roads/raw.ts';
 
 const wpProbe = (c: Corridor): string => wpUrl(CORRIDORS[c].wpSite).replace('per_page=50', 'per_page=1');
 
-export const roads: Source<RoadsRaw> & { reads: readonly string[] } = {
+export const roads: Source<RoadsRaw> = {
   id: 'roads',
   staleAfterMin: 25,
   rows: (Object.keys(CORRIDORS) as Corridor[]).map(rowId),
-  reads: RESORT_ROWS, // the dispatcher must load these last-good rows into ctx.prev (see the integration notes)
+  reads: RESORT_ROWS, // last-good resort rows for the Alta, Brighton and Deer Valley cross-checks
   maxSubrequests: roadsBudget,
   probes: [
     { hostId: 'udot-wp-cc', url: wpProbe('lcc') },

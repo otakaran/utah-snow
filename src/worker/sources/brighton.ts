@@ -3,11 +3,12 @@
 // (headers or first 2 KB match fetchx BLOCKED_RE) makes fetchx throw BlockedError, so the row turns 'blocked' (O2).
 // The feed has no temperature or wind: the client resolves Brighton weather from obs UTBTN/BRW (§5.5).
 import { num, range } from '../../shared/num.ts';
-import { isoToMs, localDate, localParts } from '../../shared/time.ts';
+import { roadHintState } from '../../shared/road-hint.ts';
+import { prevOpenedAt, reportIsToday, seasonState } from '../../shared/season.ts';
+import { isoToMs } from '../../shared/time.ts';
 import type { ResortSnapshot, SnowNumbers } from '../../shared/types.ts';
-import { type BrightonFeed, comments, type FeedLocation, gates, lifts, parking, roadState } from './brighton/feed.ts';
-import { prevOpenedAt, seasonState } from './brighton/season.ts';
-import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
+import { type BrightonFeed, comments, type FeedLocation, gates, lifts, parking } from './brighton/feed.ts';
+import { BlockedError, type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const BRIGHTON_URL = 'https://apim-marketing-001.azure-api.net/FeedService/v1/Feed?resortName=br';
 const ROW = 'resort:brighton';
@@ -15,11 +16,12 @@ const ROW = 'resort:brighton';
 /** The row is a ResortSnapshot plus the raw `operations.resortStatus` (O21: watch it at 05:00-08:00, Nov 20-22). */
 export type BrightonRow = ResortSnapshot & { resortStatus: string | null };
 
-/** JSON body -> feed, or ValidationError (gate §5.2: `name === 'Brighton'`, plus the two trees parse reads). */
+/** JSON body -> feed; BlockedError for HTML, else ValidationError (gate §5.2: name 'Brighton' plus the two trees). */
 function feedOf(raw: unknown): BrightonFeed {
   let d: unknown = raw;
   if (typeof raw === 'string') {
-    if (/^\s*</.test(raw)) throw new ValidationError('brighton: HTML body instead of feed JSON');
+    // An HTML body is a front-end page (challenge, WAF or error) even when fetchx's markers miss it (§5.2).
+    if (/^\s*</.test(raw)) throw new BlockedError('brighton: HTML body instead of feed JSON');
     try {
       d = JSON.parse(raw);
     } catch {
@@ -41,7 +43,6 @@ const inches = (loc: FeedLocation, key: string, max: number): number | null => {
 
 function snow(loc: FeedLocation, updated: string | null, report: string | null, live: boolean, now: number) {
   const n = (key: string, max: number) => (live ? inches(loc, key, max) : null); // preseason: last season's numbers
-  const at = updated ? localParts(updated) : null;
   const surface = [loc.primarySurface, loc.secondarySurface]
     .map((s) => (typeof s === 'string' ? s.trim() : ''))
     .filter(Boolean);
@@ -56,7 +57,7 @@ function snow(loc: FeedLocation, updated: string | null, report: string | null, 
     seasonTotalIn: n('snowSeasonTotal', 1000),
     baseDepthIn: n('base', 400),
     reportAt: updated,
-    reportIsToday: !!at && at.date === localDate(now) && at.hour >= 3,
+    reportIsToday: reportIsToday(updated, now),
     area: 'primary',
     surface: surface.length ? surface.join(' / ') : null,
     text: report,
@@ -108,7 +109,7 @@ export function parseBrighton(raw: unknown, ctx: ParseCtx): Output {
     alerts: c.alerts,
     resortStatus: status,
   };
-  if (c.road) row.roadHint = { raw: c.road, state: roadState(c.road) };
+  if (c.road) row.roadHint = { raw: c.road, state: roadHintState(c.road) }; // a hint: the roads job owns BCC
   return { rows: { [ROW]: row } };
 }
 

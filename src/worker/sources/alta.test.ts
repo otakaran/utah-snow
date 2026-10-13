@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { toMs } from '../../shared/time.ts';
 import type { ResortSnapshot } from '../../shared/types.ts';
 import { createFetchx } from '../lib/fetchx.ts';
-import { parkingState, roadState } from './alta/alerts.ts';
+import { parkingState } from './alta/alerts.ts';
 import { liftState } from './alta/lifts.ts';
 import { ALTA_URL, alta } from './alta.ts';
 import { parseAltaWeather } from './alta-weather.ts';
@@ -111,7 +111,7 @@ describe('alta parse: 2025-12-26 10:00 MST (4 of 5 lifts running)', () => {
   it('opens the season only on or after 2026-11-01 with a lift running', () => {
     expect(run(dec, '2025-12-26T17:00:32Z').season).toBe('preseason');
     const next = run(dec, '2026-12-26T17:00:32Z');
-    expect(next).toMatchObject({ season: 'open', seasonOpenedAt: '2026-12-26T10:00:00-07:00' });
+    expect(next).toMatchObject({ season: 'open', seasonOpenedAt: '2026-12-26T10:00:32-07:00' });
     expect(next.snow.reportIsToday).toBe(false);
   });
 });
@@ -185,12 +185,7 @@ describe('alta normalizers', () => {
     expect(liftState(lift(false, null), { ...clock, hm: '08:00', winter: false }, true)).toBe('closed');
   });
 
-  it('classifies road and parking text', () => {
-    expect(roadState('4x4 or Chains Req')).toBe('traction');
-    expect(roadState('Closed: avalanche control')).toBe('closed');
-    expect(roadState('Interlodge in effect')).toBe('interlodge');
-    expect(roadState('Open')).toBe('open');
-    expect(roadState('See UDOT')).toBe('unknown');
+  it('classifies parking text (road text: src/shared/road-hint.test.ts)', () => {
     expect(parkingState('Reservation Req')).toBe('reservation-required');
     expect(parkingState('Available')).toBe('available');
   });

@@ -3,9 +3,11 @@
 // (videos.list, playlistItems.list); search.list is never used. The key only ever appears in request URLs,
 // and fetchx redacts `key=` in its errors; nothing here stores or rethrows a URL.
 import { CHANNELS } from '../../../../config/youtube.ts';
+import { isObj } from '../../../shared/json.ts';
+import { HOUR } from '../../../shared/time.ts';
 import type { FetchX } from '../types.ts';
 import { type CsHit, csCandidate } from './camstreamer.ts';
-import { CHANNEL_IDS, DEF_BY_CAM, HOUR, ID_RE, SLOT_DEFS, type YtChannel, type YtState } from './state.ts';
+import { CHANNEL_IDS, DEF_BY_CAM, ID_RE, SLOT_DEFS, type YtChannel, type YtState } from './state.ts';
 
 export interface VideoItem {
   id: string;
@@ -41,8 +43,6 @@ export const videosUrl = (ids: readonly string[], key: string) =>
 export const playlistUrl = (playlistId: string, key: string) =>
   `${API}playlistItems?part=contentDetails&playlistId=${playlistId}&maxResults=50` +
   `&fields=items(contentDetails(videoId,videoPublishedAt))&key=${encodeURIComponent(key)}`;
-
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 async function getJson(fx: FetchX, url: string): Promise<{ status: number | null; json: unknown }> {
   try {

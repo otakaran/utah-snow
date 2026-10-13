@@ -1,6 +1,8 @@
 // Snowbasin resort report: one server-rendered HTML page, regex-scraped (spec §5.4 'resort:snowbasin', §5.5).
 // Job and row id 'resort:snowbasin'. 397 KB off-season, ~700 KB in season; every regex runs on a pre-sliced scope.
 import { range } from '../../shared/num.ts';
+import { prevOpenedAt, reportIsToday, seasonState } from '../../shared/season.ts';
+import { isoLocal } from '../../shared/time.ts';
 import type { LiftStatus, ParkingNow, ResortSnapshot, SnowNumbers, WeatherNow } from '../../shared/types.ts';
 import { readLifts, readTrails } from './snowbasin/lifts.ts';
 import {
@@ -15,7 +17,7 @@ import {
   type SnowRead,
   scope,
 } from './snowbasin/scan.ts';
-import { HISTORY_KEY, isoLocal, isToday, multiDay, seasonOf, stampMs } from './snowbasin/season.ts';
+import { HISTORY_KEY, multiDay, stampMs } from './snowbasin/season.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const SNOWBASIN_URL = 'https://www.snowbasin.com/the-mountain/mountain-report/'; // keep the trailing slash
@@ -58,7 +60,7 @@ function snowNumbers(
     seasonTotalIn: v('Season', SEASON_MAX),
     baseDepthIn: v('Base', DEPTH_MAX),
     reportAt: reportMs === null ? null : isoLocal(reportMs),
-    reportIsToday: isToday(reportMs, ctx.now),
+    reportIsToday: reportIsToday(reportMs, ctx.now),
     area: 'primary',
     surface: null,
     text: textLine,
@@ -99,8 +101,13 @@ export function parseSnowbasin(raw: unknown, ctx: ParseCtx): Output {
   const list = readLifts(page.main) ?? [];
   validate(page, snow, list);
 
-  const prev = ctx.prev[ID] as Partial<ResortSnapshot> | undefined;
-  const state = seasonOf(page.season, list, prev, ctx.now);
+  // The summer page is always preseason, and a summer lift never opens the season.
+  const state = seasonState(
+    list.map((l) => l.state),
+    prevOpenedAt(ctx.prev[ID]),
+    ctx.now,
+    { winter: page.season === 'winter' },
+  );
   const preseason = state.season === 'preseason';
   const reportMs = stampMs(snow.stamp, ctx.now);
   const trails = readTrails(page.main);

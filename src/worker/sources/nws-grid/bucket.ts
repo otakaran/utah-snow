@@ -1,14 +1,11 @@
 // NWS gridpoint bucketing (spec §5.7): expand `validTime` intervals to hourly UTC slots, then sum or reduce them per
 // Denver day and per briefing window. Pure; every local date/hour comes from one localSlots() call per grid.
 
-import { addDays, isoToMs, localSlots, zonedToUtc } from '../../../shared/time.ts';
+import { addDays, HOUR, isoToMs, localSlots, zonedToUtc } from '../../../shared/time.ts';
 import type { NwsDay } from '../../../shared/types.ts';
+import { kmhToMph, mmToIn, mToFt } from '../../../shared/units.ts';
 
-const HOUR = 3_600_000;
 const MAX_HOURS = 16 * 24; // a grid spans ~7.5 days; anything longer is rejected by the caller
-const MM_PER_IN = 25.4;
-const FT_PER_M = 3.28084;
-const KMH_PER_MPH = 1.609344;
 
 export interface GridValue {
   validTime: string;
@@ -86,10 +83,8 @@ export function expand(fields: Partial<Record<Field, Interval[]>>): Hourly | nul
 
 const r1 = (x: number) => Math.round(x * 10) / 10;
 const r2 = (x: number) => Math.round(x * 100) / 100;
-const in1 = (mm: number) => r1(mm / MM_PER_IN);
+const in1 = (mm: number) => r1(mmToIn(mm));
 const orNull = (x: number, conv: (v: number) => number) => (Number.isFinite(x) ? Math.round(conv(x)) : null);
-const ft = (m: number) => m * FT_PER_M;
-const mph = (kmh: number) => kmh / KMH_PER_MPH;
 const degF = (c: number) => (c * 9) / 5 + 32;
 
 interface Acc {
@@ -150,11 +145,11 @@ export function bucketDays(g: Hourly): NwsDay[] {
     snowIn: in1(a.snow),
     snowDayIn: in1(a.day),
     snowNightIn: in1(a.night),
-    qpfIn: r2(a.qpf / MM_PER_IN),
-    snowLevelMinFt: orNull(a.slMin, ft),
-    snowLevelMaxFt: orNull(a.slMax, ft),
-    gustMaxMph: orNull(a.gust, mph),
-    windMaxMph: orNull(a.wind, mph),
+    qpfIn: r2(mmToIn(a.qpf)),
+    snowLevelMinFt: orNull(a.slMin, mToFt),
+    snowLevelMaxFt: orNull(a.slMax, mToFt),
+    gustMaxMph: orNull(a.gust, kmhToMph),
+    windMaxMph: orNull(a.wind, kmhToMph),
     tMinF: orNull(a.tMin, degF),
     tMaxF: orNull(a.tMax, degF),
     popMax: orNull(a.pop, (x) => x),
@@ -173,7 +168,7 @@ export function snowHours(g: Hourly, w: { from: number; to: number }): number[] 
   const out: number[] = [];
   for (let h = w.from; h < w.to; h++) {
     const v = g.f.snow[h - g.h0];
-    out.push(v === undefined ? Number.NaN : v / MM_PER_IN);
+    out.push(v === undefined ? Number.NaN : mmToIn(v));
   }
   return out;
 }

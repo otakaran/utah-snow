@@ -1,9 +1,9 @@
 // UDOT traffic events -> corridor signals and advisories (spec §5.6 escalation). Pure.
 // Active full closures outside the Construction layer close the corridor; Construction full closures become
 // advisories. Interstates are scoped to the corridor by location words, since I-80/I-84 events are statewide.
-import { isoToMs } from '../../../shared/time.ts';
+import { HOUR, isoToMs, isoUtc } from '../../../shared/time.ts';
 import type { Corridor, RoadStatus } from '../../../shared/types.ts';
-import { HOUR, iso, type Signal } from './raw.ts';
+import type { Signal } from './raw.ts';
 import type { TrafficEvent } from './udot-list.ts';
 
 export type Advisory = RoadStatus['advisories'][number];
@@ -43,7 +43,7 @@ export function trafficFor(
     if (ended) continue;
     if (e.layer === 'Construction') {
       if (e.full && (started || (e.startMs ?? 0) - now <= UPCOMING_MS)) {
-        advisories.push({ id: e.id, text: e.text, link: null, until: iso(e.endMs ?? now + 24 * HOUR) });
+        advisories.push({ id: e.id, text: e.text, link: null, until: isoUtc(e.endMs ?? now + 24 * HOUR) });
       }
     } else if (started) {
       signals.push({ source: EVENT_SOURCE, raw: e.text || `${e.route}`, state: e.full ? 'closed' : 'delays' });

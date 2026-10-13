@@ -216,6 +216,10 @@ export const RESORTS = {
 // Canonical order (= Open-Meteo response index); config.test.ts asserts it equals the RESORTS key order.
 export const RESORT_IDS = ['alta', 'snowbird', 'brighton', 'solitude', 'deer-valley', 'snowbasin'] as const;
 
+// §5.5 season state: a lift open or on hold on or after this Denver date opens the season (summer lift operations
+// have ended by then). Before it, a running lift never sets seasonOpenedAt. Roll it forward each autumn.
+export const SEASON_FLOOR = '2026-11-01';
+
 // Appendix C.3. Timestamps are PST (UTC-8): parse with pstToUtc.
 export const SNOTEL = {
   '1308:UT:SNTL': { name: 'Atwater', elevFt: 8750, median: false },

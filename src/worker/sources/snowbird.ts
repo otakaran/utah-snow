@@ -2,8 +2,10 @@
 // api.snowbird.com answers 500 to any foreign Origin; fetchx never sends one. No auth, no gzip, weak ETags.
 // Required: snow report + lifts (a failure fails the job). Optional: sensors, terrains, and trails (slot 1 only,
 // If-None-Match); when one of those fails, is skipped or answers 304, the last-good block is copied forward.
+import { obj, str } from '../../shared/json.ts';
+import { prevOpenedAt, seasonState } from '../../shared/season.ts';
 import type { ResortSnapshot } from '../../shared/types.ts';
-import { asObj, asStr, gateList, liftList, liftSummary, seasonState, trailCounts } from './snowbird/lifts.ts';
+import { gateList, liftList, liftSummary, trailCounts } from './snowbird/lifts.ts';
 import { readReport, snowNumbers } from './snowbird/report.ts';
 import { emptyWeather, weatherNow } from './snowbird/weather.ts';
 import { type FetchCtx, type FetchOpts, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
@@ -37,14 +39,14 @@ export type SnowbirdRow = ResortSnapshot & { trailsEtag: string | null };
 type Prev = Partial<Pick<SnowbirdRow, 'seasonOpenedAt' | 'weather' | 'trails' | 'gates' | 'trailsEtag'>>;
 
 function prevRow(prev: ParseCtx['prev']): Prev {
-  const p = asObj(prev[ROW]);
+  const p = obj(prev[ROW]);
   if (!p) return {};
   return {
-    seasonOpenedAt: asStr(p.seasonOpenedAt),
-    weather: asObj(p.weather) ? (p.weather as Prev['weather']) : undefined,
-    trails: asObj(p.trails) ? (p.trails as Prev['trails']) : undefined,
+    seasonOpenedAt: prevOpenedAt(p),
+    weather: obj(p.weather) ? (p.weather as Prev['weather']) : undefined,
+    trails: obj(p.trails) ? (p.trails as Prev['trails']) : undefined,
     gates: Array.isArray(p.gates) ? (p.gates as Prev['gates']) : undefined,
-    trailsEtag: asStr(p.trailsEtag),
+    trailsEtag: str(p.trailsEtag),
   };
 }
 
@@ -82,14 +84,16 @@ export function parseSnowbird(raw: SnowbirdRaw, ctx: ParseCtx): SnowbirdRow {
   const r0 = readReport(raw.report);
   const lifts = readLifts(raw.lifts);
   const prev = prevRow(ctx.prev);
-  const { season, seasonOpenedAt } = seasonState(lifts, prev.seasonOpenedAt ?? null, ctx.now);
+  const st = seasonState(
+    lifts.map((l) => l.state),
+    prev.seasonOpenedAt ?? null,
+    ctx.now,
+  );
   const trails = raw.trails == null ? null : trailCounts(raw.trails);
   return {
     id: 'snowbird',
-    season,
-    seasonOpenedAt,
-    operatingToday: season !== 'preseason',
-    snow: snowNumbers(r0, ctx.now, season === 'preseason'),
+    ...st,
+    snow: snowNumbers(r0, ctx.now, st.season === 'preseason'),
     weather: weatherNow(raw.sensors, ctx.now) ?? prev.weather ?? emptyWeather(),
     lifts: liftSummary(lifts),
     trails: trails ?? prev.trails ?? { open: null, total: null, groomed: null },

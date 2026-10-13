@@ -4,7 +4,7 @@ import dec25 from './fixtures/snowbird/20251225-inseason.json?raw';
 import mar17 from './fixtures/snowbird/20260317-inseason.json?raw';
 import apr15 from './fixtures/snowbird/20260415-inseason.json?raw';
 import live from './fixtures/snowbird/20261012-live.json?raw';
-import { liftState, parseHours } from './snowbird/lifts.ts';
+import { liftState } from './snowbird/lifts.ts';
 import { parseSnowbird, SNOWBIRD_URLS, type SnowbirdRaw, type SnowbirdRow, snowbird } from './snowbird.ts';
 import { type FetchCtx, ValidationError } from './types.ts';
 
@@ -64,7 +64,7 @@ describe('snowbird live 2026-10-12 (off-season)', () => {
     const raw = fx(mar17); // all 14 lifts open
     expect(parse(raw, at('2026-10-20T18:00:00Z')).season).toBe('preseason');
     const first = parse(raw, at('2026-12-27T16:00:00Z'));
-    expect(first.seasonOpenedAt).toBe('2026-12-27T16:00:00.000Z');
+    expect(first.seasonOpenedAt).toBe('2026-12-27T09:00:00-07:00');
     expect(first.season).toBe('open');
     expect(first.snow.reportIsToday).toBe(false);
   });
@@ -150,7 +150,7 @@ describe('snowbird in-season (Wayback)', () => {
 });
 
 describe('snowbird validation and budget', () => {
-  it('normalizes statuses and hours (§5.5)', () => {
+  it('normalizes statuses (§5.5; hours: src/shared/lifts.test.ts)', () => {
     expect(['open', 'Opening', 'on-hold', 'Expected Opening', 'delayed'].map(liftState)).toEqual([
       'open',
       'open',
@@ -159,9 +159,6 @@ describe('snowbird validation and budget', () => {
       'scheduled',
     ]);
     expect(['Closed For The Season', 'close', 'groomed', null].map(liftState)).toEqual(Array(4).fill('closed'));
-    expect(parseHours('9 am - 4 pm ')).toEqual({ opensAt: '09:00', closesAt: '16:00' });
-    expect(parseHours('8:30 AM – 3:30 PM')).toEqual({ opensAt: '08:30', closesAt: '15:30' });
-    expect(parseHours('TBD')).toEqual({ opensAt: null, closesAt: null });
   });
 
   it('throws ValidationError on garbage payloads', () => {

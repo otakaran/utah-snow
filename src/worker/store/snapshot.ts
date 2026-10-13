@@ -2,6 +2,7 @@
 // builds each Meta from columns. Every block is always present; a row that does not exist yet gets
 // data: null and a never-ok meta (okAt null -> red badge). ETag = W/"s-{max fetched_at}-{row count}".
 import { TRIP } from '../../../config/ikon.ts';
+import { isoUtc } from '../../shared/time.ts';
 import type { Corridor, Meta, ResortId, SourceStatus } from '../../shared/types.ts';
 import { redact } from '../lib/log.ts';
 
@@ -9,6 +10,9 @@ const RESORTS: readonly ResortId[] = ['alta', 'snowbird', 'brighton', 'solitude'
 const CORRIDORS: readonly Corridor[] = ['lcc', 'bcc', 'parleys', 'snowbasin'];
 const POINTS = ['base', 'summit'] as const;
 const INTERNAL = new Set(['cron:last']); // never part of the snapshot
+// snowbird's trails ETag only feeds its next run (If-None-Match) and is never sent; its value is null or a string.
+const PRIVATE = '"trailsEtag":(?:null|"(?:[^"\\\\]|\\\\.)*")';
+const PRIVATE_RES = [new RegExp(`${PRIVATE},`), new RegExp(`,${PRIVATE}(?=})`)]; // first/middle key, last key
 
 export interface SnapshotRow {
   source_id: string;
@@ -26,7 +30,12 @@ export interface BuiltSnapshot {
   etag: string;
 }
 
-const iso = (ms: number | null): string | null => (ms === null ? null : new Date(ms).toISOString());
+const iso = (ms: number | null): string | null => (ms === null ? null : isoUtc(ms));
+
+/** Drops the private key from a payload string without parsing it. */
+export function stripPrivate(payload: string): string {
+  return payload.includes('"trailsEtag":') ? PRIVATE_RES.reduce((s, re) => s.replace(re, ''), payload) : payload;
+}
 
 export async function readSnapshotRows(db: D1Database): Promise<SnapshotRow[]> {
   const sql =
@@ -65,7 +74,8 @@ export function buildSnapshot(rows: readonly SnapshotRow[], staleAfterMin: (id: 
   const byId = new Map(rows.map((r) => [r.source_id, r]));
   const block = (id: string) => {
     const r = byId.get(id);
-    return `{"data":${r?.payload || 'null'},"meta":${JSON.stringify(metaOf(id, r, staleAfterMin))}}`;
+    const data = r?.payload ? stripPrivate(r.payload) : 'null';
+    return `{"data":${data},"meta":${JSON.stringify(metaOf(id, r, staleAfterMin))}}`;
   };
   const record = (pairs: [key: string, id: string][]) =>
     `{${pairs.map(([k, id]) => `${JSON.stringify(k)}:${block(id)}`).join(',')}}`;
@@ -73,7 +83,7 @@ export function buildSnapshot(rows: readonly SnapshotRow[], staleAfterMin: (id: 
   const maxFetched = rows.reduce((m, r) => Math.max(m, r.fetched_at), 0);
   const sources = rows.map((r) => JSON.stringify(metaOf(r.source_id, r, staleAfterMin))).join(',');
   const body =
-    `{"v":1,"generatedAt":${JSON.stringify(new Date(maxFetched).toISOString())}` +
+    `{"v":1,"generatedAt":${JSON.stringify(isoUtc(maxFetched))}` +
     `,"trip":${JSON.stringify({ start: TRIP.start, end: TRIP.end })}` +
     `,"resorts":${record(RESORTS.map((r) => [r, `resort:${r}`]))}` +
     `,"forecast":${record(RESORTS.flatMap((r) => POINTS.map((p): [string, string] => [`${r}:${p}`, `nws:${r}:${p}`])))}` +

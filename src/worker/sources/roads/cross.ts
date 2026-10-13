@@ -1,15 +1,16 @@
 // Resort feeds that hint at road state (spec §4.5 crossChecks, §5.6 escalation and tractionLaw). Pure.
 // Fetched by this job: Snowbird roads/parking/alerts, Brighton reportpal-roads. Read from last-good resort rows
 // (ctx.prev, ResortSnapshot.roadHint/alerts): Alta, Brighton comments, Deer Valley Roads[].
+import { arr, obj } from '../../../shared/json.ts';
+import { roadHintState } from '../../../shared/road-hint.ts';
 import type { Corridor, RoadState } from '../../../shared/types.ts';
 import type { PrevRows } from '../types.ts';
-import { obj, type RoadsRaw, type Signal, str } from './raw.ts';
+import { type RoadsRaw, type Signal, str } from './raw.ts';
 
 export const RESORT_ROWS = ['resort:alta', 'resort:brighton', 'resort:deer-valley'] as const;
 const ROAD_WORDS = /\b(road|canyon|sr-?210|highway|hwy)\b/i;
 const MAX_ALERTS = 3;
 
-const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
 const clip = (s: string): string => s.replace(/\s+/g, ' ').trim().slice(0, 200);
 
 /** Text of an alert item of unknown schema (the Snowbird winter schema is unverified). */
@@ -54,7 +55,7 @@ function snowbird(raw: RoadsRaw): Signal[] {
     .map(alertText)
     .filter((t) => /interlodge/i.test(t) || ROAD_WORDS.test(t));
   for (const t of alerts.slice(0, MAX_ALERTS)) {
-    out.push({ source: 'Snowbird alert', raw: t, state: /interlodge/i.test(t) ? 'interlodge' : 'unknown' });
+    out.push({ source: 'Snowbird alert', raw: t, state: roadHintState(t) === 'interlodge' ? 'interlodge' : 'unknown' });
   }
   const p = obj(raw.snowbird.parking);
   const inv = obj(p?.free_parking_inventory);
@@ -75,8 +76,8 @@ function alta(prev: PrevRows): Signal[] {
   if (hint) out.push(hint);
   const alerts = arr(obj(prev['resort:alta'])?.alerts).map(alertText);
   for (const t of alerts.filter((a) => /interlodge/i.test(a) || ROAD_WORDS.test(a)).slice(0, MAX_ALERTS)) {
-    const state: RoadState = /interlodge/i.test(t) ? 'interlodge' : /\bclosed\b/i.test(t) ? 'closed' : 'unknown';
-    out.push({ source: 'Alta alert', raw: t, state });
+    const hint = roadHintState(t); // the shared resort-text reading; an alert only ever escalates
+    out.push({ source: 'Alta alert', raw: t, state: hint === 'interlodge' || hint === 'closed' ? hint : 'unknown' });
   }
   return out;
 }

@@ -1,10 +1,11 @@
 // Keyless UDOT Traffic lists (spec §5.4, Appendix B udot-list): DataTables JSON from /List/GetData/{Layer}.
 // Undocumented front-end endpoints; a start past the end silently returns page 0, so paging follows
 // recordsFiltered. Validation gate: recordsTotal > 0 (recordsFiltered may be 0).
+import { obj } from '../../../shared/json.ts';
 import { num, range, text } from '../../../shared/num.ts';
-import { hm24, isoToMs, zonedToUtc } from '../../../shared/time.ts';
+import { hm24, isoToMs, isoUtc, zonedToUtc } from '../../../shared/time.ts';
 import type { RoadStatus } from '../../../shared/types.ts';
-import { iso, obj, str } from './raw.ts';
+import { str } from './raw.ts';
 import type { SignRow } from './signs.ts';
 
 const LIST = 'https://www.udottraffic.utah.gov/List/GetData';
@@ -87,7 +88,7 @@ export function udotLocalMs(s: string): number | null {
 }
 const localIso = (s: unknown): string | null => {
   const ms = udotLocalMs(str(s));
-  return ms === null ? null : iso(ms);
+  return ms === null ? null : isoUtc(ms);
 };
 
 export function normRoute(name: string): string | null {
@@ -103,7 +104,7 @@ export function segmentRow(o: Record<string, unknown>): Segment {
     roadCondition: str(o.roadCondition),
     weatherCondition: str(o.weatherCondition),
     restriction: str(o.restriction),
-    at: ms === null ? localIso(o.lastUpdated) : iso(ms),
+    at: ms === null ? localIso(o.lastUpdated) : isoUtc(ms),
   };
 }
 

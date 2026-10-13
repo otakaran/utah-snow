@@ -1,5 +1,6 @@
 // What youtube.fetch() hands to parse(): every upstream answer of the tick, in the order it was used.
 // parse() replays the same pure steps on the last-good state, so fetch-time decisions are reproducible.
+import { isObj } from '../../../shared/json.ts';
 import type { CsHit } from './camstreamer.ts';
 import type { ApiCall, DiscoveryRun } from './data-api.ts';
 import type { ThumbHit } from './keyless.ts';
@@ -17,7 +18,6 @@ export interface YtRaw {
   etagCursor: number; // round-robin position after this tick's ETag HEADs
 }
 
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 const isStatus = (v: unknown) => v === null || (typeof v === 'number' && Number.isInteger(v));
 const isStrArr = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string');
 const isItems = (v: unknown) =>

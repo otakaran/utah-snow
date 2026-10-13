@@ -2,8 +2,9 @@
 // (constant-time); otherwise, or when the secret is unset, the same 404 as an unknown route.
 // One cheap real GET per allowlisted host through fetchx (redirects not followed, short timeout, MAX_CONN at a time).
 import { PROBE_TIMEOUT_MS } from '../../../config/schedule.ts';
+import { isoUtc } from '../../shared/time.ts';
 import { apiError, json, notFound } from '../http.ts';
-import { BLOCKED_RE, createFetchx, type FetchX } from '../lib/fetchx.ts';
+import { createFetchx, type FetchX, looksBlocked } from '../lib/fetchx.ts';
 import { safeEqual } from '../lib/hash.ts';
 import { errorText, redact } from '../lib/log.ts';
 import { probeList } from '../sources/index.ts';
@@ -25,12 +26,6 @@ export interface ProbeRow {
 }
 
 const TEXTUAL = /^(text\/|application\/(?:json|geo\+json|ld\+json|xml|javascript))/i;
-
-function headerText(h: Headers): string {
-  let s = '';
-  for (const [k, v] of h) s += `${k}: ${v}\n`;
-  return s;
-}
 
 async function probeOne(fx: FetchX, hostId: string, url: string): Promise<ProbeRow> {
   const row: ProbeRow = {
@@ -67,7 +62,7 @@ async function probeOne(fx: FetchX, hostId: string, url: string): Promise<ProbeR
       location: res.headers.get('location') ? redact(res.headers.get('location') ?? '') : null,
       bytes: res.bytes,
       first200: ct && TEXTUAL.test(ct) ? redact(sniff.slice(0, 200)) : '',
-      blockedHint: BLOCKED_RE.test(headerText(res.headers) + sniff),
+      blockedHint: looksBlocked(res.headers, sniff),
     });
   } catch (err) {
     row.wallMs = Date.now() - t0;
@@ -90,7 +85,7 @@ export async function probe(req: Request, env: Env, _ctx: ExecutionContext, url:
   const fx = createFetchx();
   const rows = await Promise.all(targets.map((t) => probeOne(fx, t.hostId, t.url)));
   return json({
-    generatedAt: new Date().toISOString(),
+    generatedAt: isoUtc(Date.now()),
     count: rows.length,
     blocked: rows.filter((r) => r.blockedHint).length,
     rows,

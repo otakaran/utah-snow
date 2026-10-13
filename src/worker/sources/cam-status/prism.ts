@@ -4,8 +4,8 @@
 import { CAMS } from '../../../../config/cams/index.ts';
 import { SITE } from '../../../../config/site.ts';
 import { num } from '../../../shared/num.ts';
+import { isoUtc } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
-import { iso } from './probe.ts';
 import type { EntryPatch, KindCheck } from './types.ts';
 
 const PATH_RE = /^\d{4}\/\d{2}\/\d{2}\/\d{2}-\d{2}$/;
@@ -49,12 +49,12 @@ function entry(c: PrismCam, now: number): EntryPatch {
   const out: EntryPatch = {
     online: status === undefined || status === null ? null : String(status) === '1',
     archive: {
-      first: times.length ? iso(Math.min(...times) * 1000) : null,
-      last: times.length ? iso(Math.max(...times) * 1000) : null,
+      first: times.length ? isoUtc(Math.min(...times) * 1000) : null,
+      last: times.length ? isoUtc(Math.max(...times) * 1000) : null,
       enabled: times.length > 0,
     },
   };
-  if (t !== null) out.asOf = iso(t * 1000);
+  if (t !== null) out.asOf = isoUtc(t * 1000);
   const path = pathOf(c, images);
   if (path) out.path = path;
   return out;

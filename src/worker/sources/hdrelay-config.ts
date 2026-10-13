@@ -6,6 +6,7 @@
 import { CAMS } from '../../../config/cams/index.ts';
 import { MAINT } from '../../../config/schedule.ts';
 import { num } from '../../shared/num.ts';
+import { HOUR, isoUtc } from '../../shared/time.ts';
 import type { CamDef } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
@@ -15,7 +16,6 @@ export const PLAYER_URL = 'https://manage.hdrelay.com/player/';
 export const DEFAULT_HOST = '//b15.hdrelay.com';
 const HOST_RE = /^(?:https?:)?(\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.hdrelay\.com)\/?$/i;
 const CAMERA_ID_RE = /^[0-9a-f-]{20,40}$/i;
-const HOUR = 3_600_000;
 
 export interface HdrelayCamConfig {
   guid: string;
@@ -100,7 +100,7 @@ export function parseHdrelayConfig(raw: unknown, ctx: ParseCtx): HdrelayConfigRo
   const probes = raw as Partial<HdrelayConfigRaw>;
   const prevRow = ctx.prev[HDRELAY_CONFIG_ROW];
   const prev = (prevRow && typeof prevRow === 'object' ? prevRow : {}) as Partial<HdrelayConfigRow>;
-  const checkedAt = new Date(ctx.now).toISOString();
+  const checkedAt = isoUtc(ctx.now);
   const row: HdrelayConfigRow = {};
   let read = 0;
   for (const p of PLAYERS) {

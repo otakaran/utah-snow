@@ -5,12 +5,12 @@
 // also what an unknown id returns. Live cams are image/jpeg or image/gif (RWIS). The 3 VMS GIFs are not checked.
 import { UDOT_CAMS } from '../../../config/cams/index.ts';
 import { MAINT } from '../../../config/schedule.ts';
+import { HOUR, isoUtc } from '../../shared/time.ts';
 import type { CamDef } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const UDOT_CAMS_ROW = 'udot:cams';
 export const CCTV_URL = 'https://www.udottraffic.utah.gov/map/Cctv/';
-const HOUR = 3_600_000;
 /** 09, 10 and 11Z: MAINT.utcHours without its first hour (08Z = hdrelay-config and the prune). */
 const UDOT_HOURS: readonly number[] = MAINT.utcHours.slice(1);
 const BATCHES = UDOT_HOURS.length;
@@ -71,7 +71,7 @@ export function parseUdotCams(raw: unknown, ctx: ParseCtx): UdotCamsRow {
     const e = prev && typeof prev === 'object' ? (prev as Record<string, UdotCamState | undefined>)[id] : undefined;
     if (e && typeof e.online === 'boolean') row[id] = e;
   }
-  const checkedAt = new Date(ctx.now).toISOString();
+  const checkedAt = isoUtc(ctx.now);
   let images = 0;
   for (const { id } of CCTV) {
     const p = checks[id];

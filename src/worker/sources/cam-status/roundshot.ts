@@ -2,13 +2,13 @@
 // off and read the Location, whose `/{YYYY-MM-DD}/{HH-MM}-00/` is America/Denver wall time (spec §6.4).
 // Captures run 07:10 to about dusk, so a night-time asOf is old by design: /api/cams exempts these kinds at night.
 import { CAMS } from '../../../../config/cams/index.ts';
-import { zonedToUtc } from '../../../shared/time.ts';
+import { DAY, HOUR, isoUtc, zonedToUtc } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
-import { iso, stillBase } from './probe.ts';
+import { stillBase } from './probe.ts';
 import type { KindCheck } from './types.ts';
 
 const SLOT_RE = /\/(\d{4}-\d{2}-\d{2})\/(\d{2})-(\d{2})-\d{2}\//;
-const MAX_AGE_MS = 30 * 86_400_000;
+const MAX_AGE_MS = 30 * DAY;
 
 const CAMS_RS = (CAMS as readonly CamDef[]).filter((c) => c.kind === 'roundshot' || c.kind === 'roundshot360');
 
@@ -26,8 +26,8 @@ export const roundshot: KindCheck = {
   read(id, probe, { now }) {
     if (probe.status >= 300 && probe.status < 400) {
       const t = slotMs(probe.location);
-      return t !== null && t <= now + 3_600_000 && t >= now - MAX_AGE_MS
-        ? { [id]: { online: true, asOf: iso(t) } }
+      return t !== null && t <= now + HOUR && t >= now - MAX_AGE_MS
+        ? { [id]: { online: true, asOf: isoUtc(t) } }
         : null;
     }
     if (probe.status === 404) return { [id]: { online: false } };

@@ -1,10 +1,11 @@
 // Alta SnowNumbers (spec §5.5 snow table, Alta row). Every field is gated on its seasonal.show_* flag; preseason
 // nulls every number because the off-season page keeps last season's values (year_to_date 322-323).
+import { stampIso } from '../../../shared/alta-page.ts';
+import { arr, type Obj, obj } from '../../../shared/json.ts';
 import { num, range, text } from '../../../shared/num.ts';
+import { reportIsToday } from '../../../shared/season.ts';
 import { addDays, type LocalParts, localParts } from '../../../shared/time.ts';
 import type { SnowNumbers } from '../../../shared/types.ts';
-import { arr, type Obj, obj } from './extract.ts';
-import { stampIso } from './stamp.ts';
 
 const MORNING = { from: 4, to: 10 } as const; // overnight = last12 read in [04:00, 10:00) local
 const MAX_24H = 120; // plausibility caps, inches
@@ -74,7 +75,7 @@ export function snowNumbers(
     seasonTotalIn: null,
     baseDepthIn: null,
     reportAt,
-    reportIsToday: !!rep && !!local && rep.date === local.date && rep.hour >= 3,
+    reportIsToday: reportIsToday(reportAt, now),
     area: 'primary',
     morningOvernightIn: null,
     surface: null,

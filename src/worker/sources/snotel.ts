@@ -3,7 +3,7 @@
 // and a whole element can be absent (off-season WTEQ at 628 and 1300 is filtered as suspect).
 import { SNOTEL } from '../../../config/resorts.ts';
 import { num, range } from '../../shared/num.ts';
-import { pstToUtc } from '../../shared/time.ts';
+import { DAY, HOUR, isoUtc, pstToUtc } from '../../shared/time.ts';
 import type { SnotelSeries } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type Source, ValidationError } from './types.ts';
 
@@ -13,8 +13,6 @@ const BASE = 'https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data';
 export const SNOTEL_URL = `${BASE}?stationTriplets=${TRIPLETS.join(',')}&elements=SNWD,WTEQ,TOBS&duration=HOURLY&beginDate=-72&endDate=0`;
 const PROBE_URL = `${BASE}?stationTriplets=1308:UT:SNTL&elements=SNWD&duration=HOURLY&beginDate=-72&endDate=0`;
 
-const HOUR = 3_600_000;
-const DAY = 24 * HOUR;
 const ANCHOR_UTC_H = 23; // 16:00 MST = 15:00 PST = 23:00 UTC; the window is 15:00-17:00 MST (§5.7)
 
 /** Plausibility gates per element (imperial, as stored upstream). */
@@ -116,7 +114,7 @@ function series(triplet: Triplet, data: unknown, stamp: Stamp): SnotelSeries {
     tempF: latest('TOBS')?.v ?? null,
     snwdChange24In: depth.change24,
     snwdSince16In: depth.since16,
-    at: atMs === null ? null : new Date(atMs).toISOString(),
+    at: atMs === null ? null : isoUtc(atMs),
   };
 }
 
