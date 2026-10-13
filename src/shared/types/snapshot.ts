@@ -16,6 +16,7 @@ export interface Meta {
   error?: string; // 'deferred' or message, key= redacted
   failCount: number;
   staleAfterMin: number;
+  via?: 'browser'; // client-only: the browser fetched this row itself (MtnPowder fallback); never on the wire
 }
 
 // Every source block.

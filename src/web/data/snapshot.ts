@@ -1,17 +1,21 @@
 // Snapshot store (spec §8.8): polls /api/snapshot with cache:'no-cache' so the browser revalidates via
 // If-None-Match; an unchanged ETag skips parsing. Polls only while visible, plus once on focus.
 // X-Build feeds the redeploy guard. Also owns the server clock: skew = response Date header - local time, and
-// serverNow = Date.now() + skew.
-import { signal } from '@preact/signals';
+// serverNow = Date.now() + skew. `snapshot` is the Worker's body with the browser's MtnPowder rows laid over it
+// (data/mtnpowder.ts), so every view sees a browser-fetched Solitude / Deer Valley block without knowing about it.
+import { computed, signal } from '@preact/signals';
 import { isoToMs } from '../../shared/time.ts';
 import type { Snapshot } from '../../shared/types.ts';
 import { noteBuildHeader } from '../lib/build-guard.ts';
+import { browserRows, overlayBrowser, startMtnPowder } from './mtnpowder.ts';
 
 const CACHE_KEY = 'utahsnow.snap';
 const TICK_MS = 15_000;
 const FOCUS_GAP_MS = 10_000;
 
-export const snapshot = signal<Snapshot | null>(readCache());
+const server = signal<Snapshot | null>(readCache()); // the Worker's /api/snapshot body (cached, then polled)
+/** What every view reads: the Worker's snapshot plus newer browser-fetched MtnPowder rows (meta.via 'browser'). */
+export const snapshot = computed(() => overlayBrowser(server.value, browserRows.value));
 export const snapshotError = signal<string | null>(null); // HTTP or payload problem; data may still be cached
 export const offline = signal(false); // last fetch failed at the network level
 export const skewMs = signal(0);
@@ -41,8 +45,8 @@ function writeCache(snap: Snapshot): void {
 
 /** Updates the server clock from a response's Date header. Every API store calls this. */
 export function noteServerDate(res: Response): void {
-  const server = isoToMs(res.headers.get('Date'));
-  if (server !== null) skewMs.value = server - Date.now();
+  const serverMs = isoToMs(res.headers.get('Date'));
+  if (serverMs !== null) skewMs.value = serverMs - Date.now();
   tickNow();
 }
 
@@ -71,7 +75,7 @@ async function refresh(): Promise<void> {
       return;
     }
     const tag = res.headers.get('ETag');
-    if (tag && tag === etag && snapshot.value) {
+    if (tag && tag === etag && server.value) {
       void res.body?.cancel();
       snapshotError.value = null;
       return;
@@ -79,7 +83,7 @@ async function refresh(): Promise<void> {
     const body = (await res.json()) as Snapshot;
     if (body?.v !== 1) throw new Error('unexpected payload');
     etag = tag;
-    snapshot.value = body;
+    server.value = body;
     snapshotError.value = null;
     writeCache(body);
   } catch (err) {
@@ -103,4 +107,5 @@ export function startSnapshot(periodMs: () => number): void {
   document.addEventListener('visibilitychange', soon);
   addEventListener('focus', soon);
   void refresh();
+  startMtnPowder(server, () => Date.now() + skewMs.peek());
 }
