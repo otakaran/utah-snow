@@ -5,6 +5,7 @@ import type { ResortId } from '../src/shared/types.ts';
 
 export const STRATEGY = {
   skiDayFraction: 0.85, // share of remaining trip days actually skied (utahsnow.skiFraction overrides)
+  skiDayFractionRange: [0.3, 1], // what Settings accepts and a stored utahsnow.skiFraction must fall in
   forecastDiscount: 0.8, // weight on forecast-only overnight snow
   daytimeWeight: 0.5, // NWS snow 08-16 on the target day
   extra24Weight: 0.5, // 24 h snow beyond overnight

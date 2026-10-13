@@ -6,7 +6,6 @@ import {
   advisoryViews,
   guardsmanText,
   postSnippet,
-  roadHeadline,
   roadView,
   stateChip,
   travelMin,
@@ -78,26 +77,6 @@ describe('postSnippet', () => {
     expect(postSnippet('Construction for Weber Canyon Bridge replacement in progress', 30)).toBe(
       'Construction for Weber Canyon…',
     );
-  });
-});
-
-describe('roadHeadline', () => {
-  const post = { at: '2026-12-28T12:00:00Z' } as RoadStatus['latestPost'];
-
-  it('drops the no-alert headline while a post carries the age, including the age old rows baked in', () => {
-    expect(roadHeadline({ headline: 'Last UDOT update 59m ago', latestPost: post })).toBeNull();
-    expect(roadHeadline({ headline: 'Latest UDOT update', latestPost: post })).toBeNull();
-    expect(roadHeadline({ headline: null, latestPost: post })).toBeNull();
-    expect(roadHeadline({ headline: 'Last UDOT update 2h ago (UDOT feed unavailable)', latestPost: post })).toBe(
-      'Latest UDOT update (UDOT feed unavailable)',
-    );
-  });
-
-  it('keeps real headlines', () => {
-    expect(roadHeadline({ headline: 'Road Closure Alert (stale)', latestPost: post })).toBe(
-      'Road Closure Alert (stale)',
-    );
-    expect(roadHeadline({ headline: 'No active UDOT alerts', latestPost: null })).toBe('No active UDOT alerts');
   });
 });
 

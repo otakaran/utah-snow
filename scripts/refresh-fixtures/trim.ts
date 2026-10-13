@@ -123,7 +123,9 @@ const SNOTEL: Shape = ['stationTriplet', { data: [{ stationElement: ['elementCod
 
 const defs = Object.values(CORRIDORS);
 const ROADWAYS = new Set<unknown>(defs.flatMap((d) => d.roadways));
-const PASSES = new Set<unknown>(defs.flatMap((d) => d.passes.flatMap((p) => [p.name, p.rowId, String(p.rowId)])));
+const PASSES = new Set<unknown>(
+  defs.flatMap((d) => d.passes.flatMap((p) => [p.name, p.rowId, String(p.rowId), p.apiId, String(p.apiId)])),
+);
 const SIGNS = new Set<unknown>(defs.flatMap((d) => [...d.signs.travel, ...d.signs.advisory]));
 const ROUTES = new Set<unknown>(TRAFFIC_TERMS.map(normRoute));
 
@@ -173,7 +175,7 @@ export const TRIM: Readonly<Record<string, (raw: unknown) => unknown>> = {
     return {
       ...r,
       conditions: listRows(r.conditions, (o) => ROADWAYS.has(o.roadway)),
-      passes: listRows(r.passes, (o) => PASSES.has(o.name) || PASSES.has(o.DT_RowId)),
+      passes: listRows(r.passes, (o) => PASSES.has(o.name) || PASSES.has(o.DT_RowId) || PASSES.has(o.mountainPassId)),
       signs: listRows(r.signs, (o) => SIGNS.has(o.DT_RowId)),
       traffic: listRows(r.traffic, (o) => ROUTES.has(normRoute(String(o.roadwayName ?? '')))), // corridor routes
     };

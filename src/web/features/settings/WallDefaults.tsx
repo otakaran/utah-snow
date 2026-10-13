@@ -1,13 +1,13 @@
 // Wall defaults (spec §8.5 item 6, §8.4): rotate / yt seconds, HLS cap and cam set, stored in utahsnow.wall.
 // #/wall URL params override them; "Open wall window" carries the current values as params into a new window.
 // Typed values are clamped to their range, and `onSaved` flashes what was stored in the section heading.
-import { WALL_SET_DEFS, WALL_SETS } from '../../../../config/wall.ts';
+import { WALL_LIMITS, WALL_SET_DEFS, WALL_SETS } from '../../../../config/wall.ts';
 import { setWallDefaults, wallDefaults } from '../../data/settings.ts';
 import { wallHref } from '../../router.ts';
 import { clampEntry, type Flash, savedFlash } from './clamp-entry.ts';
 
 interface NumberField {
-  key: 'rotate' | 'yt' | 'hls';
+  key: keyof typeof WALL_LIMITS;
   label: string;
   /** Its name in the one ranges note. */
   range: string;
@@ -16,10 +16,14 @@ interface NumberField {
   unit: string;
 }
 
+const field = (key: NumberField['key'], label: string, range: string, unit: string): NumberField => {
+  const [min, max] = WALL_LIMITS[key];
+  return { key, label, range, min, max, unit };
+};
 const NUMBERS: NumberField[] = [
-  { key: 'rotate', label: 'Page every (s)', range: 'page', min: 5, max: 600, unit: '\u00a0s' },
-  { key: 'yt', label: 'YouTube cam (s)', range: 'YouTube', min: 30, max: 3600, unit: '\u00a0s' },
-  { key: 'hls', label: 'Live streams', range: 'streams', min: 0, max: 4, unit: '' },
+  field('rotate', 'Page every (s)', 'page', '\u00a0s'),
+  field('yt', 'YouTube cam (s)', 'YouTube', '\u00a0s'),
+  field('hls', 'Live streams', 'streams', ''),
 ];
 // A word joiner after the dash and the no-break space in `unit` keep each range on one line.
 const RANGES = NUMBERS.map((n) => `${n.range} ${n.min}–\u2060${n.max}${n.unit}`).join(' · ');
@@ -28,7 +32,7 @@ export function WallDefaults({ onSaved }: { onSaved: (f: Flash) => void }) {
   const w = wallDefaults.value;
   return (
     <div class="wall-form">
-      <div class="field-grid wall-grid">
+      <div class="field-grid wall-fields">
         {NUMBERS.map((n) => (
           <label key={n.key} class="field">
             <span class="field-label">{n.label}</span>

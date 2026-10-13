@@ -18,9 +18,9 @@ import {
   postSnippet,
   type RoadView,
   roadData,
-  roadHeadline,
   roadView,
   showEto,
+  showTraction,
   travelMin,
 } from './road-view.ts';
 
@@ -51,11 +51,10 @@ function Facts({ r, units }: { r: RoadStatus; units: Units }) {
   const surface = pass?.surface ? `${pass.surface.toLowerCase()} road` : null;
   const air = pass?.airF !== null && pass?.airF !== undefined ? `air ${qty('temp', pass.airF, units)}` : null;
   const passLine = [surface, air].filter(Boolean).join(', ');
-  const headline = roadHeadline(r);
   const advisories = advisoryViews(r);
   return (
     <>
-      {headline ? <p class="cond-road-text">{headline}</p> : null}
+      {r.headline ? <p class="cond-road-text">{r.headline}</p> : null}
       {pass && passLine ? (
         <p class="cond-dim">
           {pass.name}: {passLine}
@@ -91,7 +90,7 @@ function Chips({ r, v }: { r: RoadStatus | null; v: RoadView }) {
           ETO <span class="cond-num">{r.eto}</span>
         </span>
       ) : null}
-      {r && !v.stale && r.tractionLaw && r.state !== 'traction' ? <StatusChip tone="warn" word="Traction law" /> : null}
+      {showTraction(r, v.stale) ? <StatusChip tone="warn" word="Traction law" /> : null}
       {r && !v.stale
         ? (r.parkingFull ?? []).map((id) => (
             <StatusChip key={id} tone="bad" word={`${RESORTS[id].name} parking full`} />

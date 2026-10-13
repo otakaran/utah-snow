@@ -1,6 +1,7 @@
 // Briefing chrome (owner decisions): the first-chair countdown under the title, the phone-only jump bar that shows
-// once the pick card has scrolled away, the Wall nav item only from 1024 px, and the avalanche stand-in zones when
-// UAC has no ratings (the seed's avalanche row is empty). Runs in every Playwright project; widths decide.
+// once the pick card has scrolled away, the Wall nav item only from WALL_MIN_WIDTH (1280 px), and the avalanche
+// stand-in zones when UAC has no ratings (the seed's avalanche row is empty). Runs in every Playwright project.
+import { WALL_MIN_WIDTH } from '../config/wall.ts';
 import { expect, pinTime, test } from './fixtures.ts';
 
 test('the briefing head counts the days to first chair before the trip', async ({ page }) => {
@@ -9,7 +10,7 @@ test('the briefing head counts the days to first chair before the trip', async (
   await expect(page.getByTestId('header').getByTestId('countdown')).toHaveText('76 days to first chair');
 });
 
-test('phones get a jump bar once the pick card has scrolled away; Wall leaves the nav below 1024 px', async ({
+test('phones get a jump bar once the pick card has scrolled away; Wall leaves the nav below 1280 px', async ({
   page,
 }) => {
   await page.goto('/');
@@ -18,7 +19,7 @@ test('phones get a jump bar once the pick card has scrolled away; Wall leaves th
   const bar = page.getByTestId('jumpbar');
   await expect(bar).toBeHidden();
   await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Wall' })).toBeVisible({
-    visible: width >= 1024,
+    visible: width >= WALL_MIN_WIDTH,
   });
   await page.evaluate('window.scrollBy(0, document.getElementById("pick").getBoundingClientRect().bottom + 10)');
   if (width >= 900) {

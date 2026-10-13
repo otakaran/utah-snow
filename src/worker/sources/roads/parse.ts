@@ -38,7 +38,10 @@ interface Udot {
 // per-row work (timestamps cost the most). Same keys as the fixture trim in scripts/refresh-fixtures/trim.ts.
 const DEFS = Object.values(CORRIDORS);
 const ROADWAYS = new Set<string>(DEFS.flatMap((d) => d.roadways));
-const PASSES = new Set<string>(DEFS.flatMap((d) => d.passes.flatMap((p) => [p.name, String(p.rowId)])));
+// Passes keep every key corridorPass() matches on: name, DT_RowId and mountainPassId (apiId).
+const PASSES = new Set<string>(
+  DEFS.flatMap((d) => d.passes.flatMap((p) => [p.name, String(p.rowId), String(p.apiId)])),
+);
 const SIGNS = new Set<string>(DEFS.flatMap((d) => [...d.signs.travel, ...d.signs.advisory]));
 
 function readUdot(raw: RoadsRaw): Udot {
@@ -51,7 +54,7 @@ function readUdot(raw: RoadsRaw): Udot {
   const passes = k
     ? keyedRows(raw.passes?.[0])?.map(passKeyed)
     : listRows(raw.passes)
-        ?.filter((o) => PASSES.has(str(o.name)) || PASSES.has(str(o.DT_RowId)))
+        ?.filter((o) => PASSES.has(str(o.name)) || PASSES.has(str(o.DT_RowId)) || PASSES.has(str(o.mountainPassId)))
         .map(passRow);
   const signs = k
     ? keyedRows(raw.signs?.[0])

@@ -18,7 +18,7 @@ describe('parseHash', () => {
   it('fills wall params from the stored defaults; valid URL params win', () => {
     const stored = { rotate: 30, yt: 120, set: 'lcc', hls: 1 } as const;
     expect(parseHash('#/wall', stored)).toEqual({ name: 'wall', params: stored });
-    expect(parseHash('#/wall?rotate=45&set=stakes&hls=0&yt=-5', stored)).toEqual({
+    expect(parseHash('#/wall?rotate=45&set=stakes&hls=0&yt=x', stored)).toEqual({
       name: 'wall',
       params: { rotate: 45, yt: 120, set: 'stakes', hls: 0 },
     });
@@ -27,6 +27,13 @@ describe('parseHash', () => {
 });
 
 describe('wall params', () => {
+  it('clamps numbers to WALL_LIMITS (the Settings ranges and the player cap)', () => {
+    expect(parseHash('#/wall?rotate=1&yt=-5&hls=9')).toEqual({
+      name: 'wall',
+      params: { ...WALL_DEFAULTS, rotate: 5, yt: 30, hls: 3 },
+    });
+  });
+
   it('round-trips through wallHref and accepts stored numbers', () => {
     const p = { rotate: 25, yt: 90, set: 'bcc', hls: 3 } as const;
     expect(parseHash(wallHref(p))).toEqual({ name: 'wall', params: p });

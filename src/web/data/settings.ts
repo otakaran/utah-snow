@@ -123,7 +123,7 @@ export const [wallDefaults, setWallDefaults] = persisted<WallParams>(
 );
 export const [skiFraction, setSkiFraction] = persisted<number>(
   'skiFraction',
-  (raw) => (inRange(raw, [0.1, 1]) ? raw : undefined),
+  (raw) => (inRange(raw, STRATEGY.skiDayFractionRange) ? raw : undefined),
   STRATEGY.skiDayFraction,
 );
 export const [admin, setAdmin] = persisted<boolean>(
@@ -148,7 +148,8 @@ export const baseInfo = computed<BaseInfo>(() => {
 
 // System light/dark preference, live (theme 'auto' maps light to 'sun').
 const lightQuery = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: light)') : null;
-const prefersLight = signal(lightQuery?.matches ?? false);
+/** The device asks for light: what theme 'auto' resolves to ('sun' when true), whatever theme is chosen. */
+export const prefersLight = signal(lightQuery?.matches ?? false);
 lightQuery?.addEventListener('change', (e) => {
   prefersLight.value = e.matches;
 });

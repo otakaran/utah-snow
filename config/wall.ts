@@ -1,6 +1,6 @@
 // TV wall (spec §8.4). Data only: the `set` -> resorts / ★ road-cam corridors / labels table (★ =
 // CORRIDORS[c].briefingCams in config/roads.ts; its keys are the #/wall `set` values), the pinned row, the featured
-// YouTube cell's first cam, the day window, the reload time, the canvas and the launcher breakpoint.
+// YouTube cell's first cam, the day window, the reload time, the canvas, the launcher breakpoint and the number limits.
 import type { Corridor, ResortId } from '../src/shared/types.ts';
 import type { CamId } from './cams/index.ts';
 import { RESORT_IDS } from './resorts.ts';
@@ -73,3 +73,9 @@ export const WALL_CANVAS = { width: 1920, height: 1080 } as const;
 
 /** Narrower screens (phones, tablets, a small window) get the #/wall launcher instead of the wall (CSS px). */
 export const WALL_MIN_WIDTH = 1280;
+
+/**
+ * [min, max] of the wall numbers (Settings inputs, #/wall params, the player cap): page and YouTube seconds, and
+ * concurrent HLS players (0 = stills only).
+ */
+export const WALL_LIMITS = { rotate: [5, 600], yt: [30, 3600], hls: [0, 3] } as const;

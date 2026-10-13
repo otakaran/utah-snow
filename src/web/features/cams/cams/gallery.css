@@ -76,7 +76,8 @@
   }
 }
 
-/* overnight-inches plate on the lead tile, OVERNIGHT right under the number */
+/* InchPlate: the overnight-inches plate on a stake still (StakeRow, gallery lead tiles), OVERNIGHT right under the
+   number */
 .cam-inches {
   position: absolute;
   bottom: var(--space-2);
@@ -108,11 +109,7 @@
   text-transform: uppercase;
 }
 
-/* #/cams section heads: clear the sticky JumpBar when jumped to; the pick's rule is solid accent */
-.cams-sec > .sec-h {
-  scroll-margin-top: calc(var(--jump-h, 48px) + var(--space-2));
-}
-
+/* #/cams section heads: the pick's rule is solid accent */
 .cams-sec-pick > .sec-h::after {
   border-top: 2px solid var(--accent);
 }

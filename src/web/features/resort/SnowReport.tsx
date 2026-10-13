@@ -2,10 +2,11 @@
 // reports two areas), surface, the resort's own report text (labelled) and the report time. Pre-season shows one
 // compact panel with the projected opening and a countdown instead of empty tiles. Captions sit under the numbers.
 import { RESORTS } from '../../../../config/resorts.ts';
-import { daysUntil, formatLocalDate } from '../../../shared/time.ts';
+import { formatLocalDate } from '../../../shared/time.ts';
 import type { ResortId, ResortSnapshot, SnowNumbers } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
 import { clockRel } from '../../lib/format.ts';
+import { Countdown } from '../../ui/Countdown.tsx';
 import { Section } from '../../ui/Section.tsx';
 import { Glyph } from '../../ui/StatusChip.tsx';
 import { Amount, Tile } from './Amount.tsx';
@@ -41,18 +42,12 @@ const AREA: Record<SnowNumbers['area'], string> = {
   summit: 'Measured at the summit.',
 };
 
-/** 'Pre-season · projected open Fri, Nov 20' with the days to go in big digits. */
+/** 'Pre-season · projected open Fri, Nov 20' under the 'N days to opening' countdown. */
 function PreSeason({ id, today }: { id: ResortId; today: string }) {
   const open = RESORTS[id].projectedOpen;
-  const left = open ? daysUntil(today, open) : 0;
   return (
     <div class="rs-card rs-pre" role="note">
-      {left > 0 ? (
-        <p class="rs-pre-count">
-          <span class="rs-num">{left}</span>
-          <span class="rs-label rs-dim">{left === 1 ? 'day to go' : 'days to go'}</span>
-        </p>
-      ) : null}
+      {open ? <Countdown today={today} to={open} word="to opening" /> : null}
       <div>
         <p class="rs-strong">
           <Glyph tone="off" /> Pre-season · projected open {open ? formatLocalDate(open, 'short') : 'TBA'}

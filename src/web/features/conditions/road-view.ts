@@ -1,6 +1,6 @@
 // Pure view logic for RoadsPanel (spec §8.2, §5.6): road state -> status word and tone (ui/status.ts vocabulary),
-// the LAST KNOWN rule for stale rows, canyon-top travel minutes, the UDOT post snippet, the headline and the
-// standing-advisory chips. No DOM, no signals.
+// the LAST KNOWN rule for stale rows, canyon-top travel minutes, the UDOT post snippet and the standing-advisory
+// chips. No DOM, no signals.
 import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
 import { ageMin, badge } from '../../../shared/freshness.ts';
 import type { Block, Corridor, RoadStatus } from '../../../shared/types.ts';
@@ -81,15 +81,6 @@ export function postSnippet(text: string, max = 200): string {
   return `${(sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s·,;:.-]+$/, '')}…`;
 }
 
-// The no-alert headline. Rows written before the age moved to render time carry it baked in ('… 59m ago').
-const GENERIC = /\b(?:Last|Latest) UDOT update(?: \S+ ago)?/;
-
-/** The row's headline, or null when it only announces the latest post (RoadRow shows that post with a live age). */
-export function roadHeadline(r: { headline?: string | null; latestPost: RoadStatus['latestPost'] }): string | null {
-  const h = (r.headline ?? '').replace(GENERIC, 'Latest UDOT update').trim();
-  return h === '' || (h === 'Latest UDOT update' && r.latestPost) ? null : h;
-}
-
 /** BCC's Guardsman note without a doubled 'Guardsman Pass: Guardsman Pass …' prefix. */
 export const guardsmanText = (g: string): string => g.replace(/^Guardsman Pass:\s*(?=Guardsman Pass\b)/i, '');
 
@@ -111,3 +102,9 @@ export function advisoryViews(r: Pick<RoadStatus, 'advisories' | 'guardsman'>): 
 
 /** ETO is shown only while the road is not plainly open. */
 export const showEto = (r: Pick<RoadStatus, 'state' | 'eto'>): boolean => Boolean(r.eto) && r.state !== 'open';
+
+/** The extra "Traction law" chip: a fresh row under traction law whose state chip says something else. */
+export const showTraction = (
+  r: Pick<RoadStatus, 'state' | 'tractionLaw'> | null | undefined,
+  stale: boolean,
+): boolean => !stale && r?.tractionLaw === true && r.state !== 'traction';

@@ -23,7 +23,8 @@ function connectionWantsSaver(): boolean {
   return Boolean(c?.saveData) || SLOW.has(c?.effectiveType ?? '');
 }
 
-const autoSaver = signal(connectionWantsSaver());
+/** What 'auto' resolves to on this connection, whatever the preference is. */
+export const autoSaver = signal(connectionWantsSaver());
 connection()?.addEventListener('change', () => {
   autoSaver.value = connectionWantsSaver();
 });

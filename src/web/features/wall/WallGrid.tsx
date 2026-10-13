@@ -7,8 +7,9 @@ import { RESORTS } from '../../../../config/resorts.ts';
 import { WALL_NIGHT_STILL, WALL_NIGHT_STILL_S, WALL_PINNED, WALL_YT_FIRST } from '../../../../config/wall.ts';
 import type { CamDef, ResortId } from '../../../shared/types.ts';
 import { camStates } from '../../data/cams.ts';
+import { serverNow } from '../../data/snapshot.ts';
 import type { WallParams } from '../../router.ts';
-import { CamTile, camHidden, liveSource, YouTubePlayer } from '../cams/index.ts';
+import { CamTile, liveSource, visibleCams, YouTubePlayer } from '../cams/index.ts';
 import { crewPick } from '../pick-card/index.ts';
 import { nightStakes, ytOrder } from './rotation.ts';
 
@@ -69,23 +70,22 @@ function Featured({ cam, turn, pick }: { cam: CamDef | null; turn: number; pick:
 export function WallGrid({ params, night, paused, stills, paging, page, ytPage }: Props) {
   const states = camStates.value;
   const pick = crewPick.value?.pick ?? null;
-  const shown = (d: CamDef) => !camHidden(d, states.get(d.id));
+  const now = serverNow.value;
+  const shown = (list: readonly CamDef[]) => visibleCams(list, states, 'wall', now);
 
   if (night) {
     return (
       <ul class="wall-grid" data-testid="wall-grid">
-        {nightStakes()
-          .filter(shown)
-          .map((d) => (
-            <li key={d.id} class="wall-cell" data-testid="wall-tile" data-slot="stake">
-              <CamTile cam={d} variant="wall" pick={pick} archive={d.id === ALTA} everyS={WALL_NIGHT_STILL_S} />
-            </li>
-          ))}
+        {shown(nightStakes()).map((d) => (
+          <li key={d.id} class="wall-cell" data-testid="wall-tile" data-slot="stake">
+            <CamTile cam={d} variant="wall" pick={pick} archive={d.id === ALTA} everyS={WALL_NIGHT_STILL_S} />
+          </li>
+        ))}
       </ul>
     );
   }
 
-  const yts = ytOrder(params.set).filter((d) => shown(d) && liveSource(d, states.get(d.id))?.type === 'youtube');
+  const yts = shown(ytOrder(params.set)).filter((d) => liveSource(d, states.get(d.id))?.type === 'youtube');
   const yt = yts.length > 0 ? (yts[ytPage % yts.length] ?? null) : null;
   // A turn key changes whenever the matching ticker restarts its period (Wall.tsx useTicker): step, set, seconds.
   const stillTurn = !paused && paging ? `${params.set}:${params.rotate}:${page}` : null;

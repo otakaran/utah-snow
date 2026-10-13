@@ -3,7 +3,7 @@
 import { STRATEGY } from '../../../../config/strategy.ts';
 import {
   dataSaver,
-  resolvedTheme,
+  prefersLight,
   setDataSaver,
   setSkiFraction,
   setTheme,
@@ -12,7 +12,7 @@ import {
   theme,
   units,
 } from '../../data/settings.ts';
-import { dataSaverOn } from '../../lib/data-saver.ts';
+import { autoSaver } from '../../lib/data-saver.ts';
 import { qty } from '../../lib/format.ts';
 import { Section } from '../../ui/Section.tsx';
 import { Toggle } from '../../ui/Toggle.tsx';
@@ -57,7 +57,7 @@ function ThemeSection() {
         options={[
           { value: 'dark', label: 'Dark' },
           { value: 'sun', label: 'Sun' },
-          { value: 'auto', label: `Auto · ${resolvedTheme.value}` },
+          { value: 'auto', label: `Auto · ${prefersLight.value ? 'sun' : 'dark'}` },
         ]}
       />
       <p class="field-note">
@@ -77,7 +77,7 @@ function DataSaverSection() {
         value={dataSaver.value}
         onChange={setDataSaver}
         options={[
-          { value: 'auto', label: `Auto · ${dataSaverOn.value ? 'on' : 'off'}` },
+          { value: 'auto', label: `Auto · ${autoSaver.value ? 'on' : 'off'}` },
           { value: 'on', label: 'On' },
           { value: 'off', label: 'Off' },
         ]}
@@ -90,11 +90,12 @@ function DataSaverSection() {
   );
 }
 
-const [MIN_PCT, MAX_PCT] = [30, 100];
-const DEFAULT_PCT = Math.round(STRATEGY.skiDayFraction * 100);
+const toPct = (f: number): number => Math.round(f * 100);
+const [MIN_PCT, MAX_PCT] = [toPct(STRATEGY.skiDayFractionRange[0]), toPct(STRATEGY.skiDayFractionRange[1])];
+const DEFAULT_PCT = toPct(STRATEGY.skiDayFraction);
 
 function SkiFraction({ onSaved }: { onSaved: (f: Flash) => void }) {
-  const pct = Math.round(skiFraction.value * 100);
+  const pct = toPct(skiFraction.value);
   return (
     <details class="advanced">
       <summary class="disclosure">

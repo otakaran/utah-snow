@@ -42,10 +42,7 @@ describe('roads: live 2026-10-12 (off-season)', () => {
     expect(Object.keys(rows)).toEqual(['roads:lcc', 'roads:bcc', 'roads:parleys', 'roads:snowbasin']);
     for (const r of Object.values(rows)) expect([r.state, r.tractionLaw]).toEqual(['open', false]);
     expect(rows['roads:lcc']?.headline).toBe('No active UDOT alerts');
-    expect(rows['roads:bcc']).toMatchObject({
-      headline: 'Latest UDOT update',
-      latestPost: { at: '2026-10-12T16:32:54Z' },
-    });
+    expect(rows['roads:bcc']).toMatchObject({ headline: '', latestPost: { at: '2026-10-12T16:32:54Z' } });
   });
 
   it('BCC keeps the Guardsman-only post as latestPost (info) and guardsman text', () => {
@@ -105,6 +102,18 @@ describe('roads: live 2026-10-12 (off-season)', () => {
     ]);
     expect(run(raw, '2026-10-13T02:20:00Z')['roads:parleys']?.signs.map((s) => s.id)).toEqual(['6014', '6032']);
   });
+
+  it('a renamed, re-keyed pass row still matches its corridor by mountainPassId', () => {
+    const raw = live();
+    const page = raw.passes?.[0] as { data: { DT_RowId: string; name: string; mountainPassId: string }[] };
+    const lcc = page.data.find((o) => o.mountainPassId === '98');
+    if (!lcc) throw new Error('no LCC pass row');
+    Object.assign(lcc, { DT_RowId: '999', name: 'SR-210 LCC (renamed)' });
+    expect(run(raw, '2026-10-13T02:10:00Z')['roads:lcc']?.pass).toMatchObject({
+      name: 'SR-210 LCC (renamed)',
+      airF: 34,
+    });
+  });
 });
 
 describe('roads: 20261012-guardsman fixture (§5.6 expectations)', () => {
@@ -142,7 +151,7 @@ describe('roads: in-season Wayback feeds', () => {
     const evening = run(wpOnly({ [WB]: upTo(list, '2026-01-05T00:30:00Z') }), '2026-01-05T00:30:00Z');
     expect([evening['roads:parleys']?.state, evening['roads:parleys']?.tractionLaw]).toEqual(['traction', true]);
     const morning = run(wpOnly({ [WB]: list }), '2026-01-05T14:40:00Z')['roads:parleys'];
-    expect([morning?.state, morning?.headline]).toEqual(['open', 'Latest UDOT update']);
+    expect([morning?.state, morning?.headline]).toEqual(['open', '']);
   });
 
   it('2026-01-09 "Traction Law LIFTED" supersedes an earlier traction post', () => {
@@ -202,6 +211,9 @@ describe('roads: synthetic keyed storm morning (2026-02-19)', () => {
     const lcc = run(raw, '2026-02-19T16:40:00Z', { 'roads:lcc': prev['roads:lcc'] })['roads:lcc'];
     expect([lcc?.state, lcc?.eto, lcc?.latestPost?.id]).toEqual(['closed', '8:30AM', 90004]);
     expect(lcc?.headline).toMatch(/\(UDOT feed unavailable\)$/);
+    const old = { ...prev['roads:lcc'], headline: 'Last UDOT update 2h ago (UDOT feed unavailable)' };
+    const carried = run(raw, '2026-02-19T16:50:00Z', { 'roads:lcc': old })['roads:lcc'];
+    expect(carried?.headline).toBe('(UDOT feed unavailable)'); // an old row's baked-in age is dropped
     expect(lcc?.crossChecks[0]).toEqual({ source: 'UDOT WP', raw: 'BlockedError: blocked', state: 'unknown' });
     const cold = run(raw, '2026-02-19T16:40:00Z'); // no prev: unknown base, escalation still applies
     expect([cold['roads:lcc']?.state, cold['roads:bcc']?.state, cold['roads:bcc']?.tractionLaw]).toEqual([

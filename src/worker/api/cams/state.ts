@@ -64,15 +64,13 @@ function youtube(def: CamDef, inp: CamInputs): Omit<CamState, 'id' | 'timelapse'
   const slot = inp.yt.slots[def.id];
   const videoId = slot?.videoId ?? null;
   const status: Status = videoId ? (slot?.status ?? 'unknown') : def.seasonal ? 'seasonal-off' : 'offline';
-  const out: Omit<CamState, 'id' | 'timelapse'> = {
+  return {
     status,
     online: status === 'live' ? true : status === 'offline' ? false : null,
     asOf: inp.status[def.id]?.asOf ?? null,
     still: ytStill(def.still, slot),
     live: videoId ? { type: 'youtube', videoId } : null,
   };
-  if (slot) out.thumbKind = slot.thumbKind;
-  return out;
 }
 
 function hdrelay(def: CamDef, inp: CamInputs, now: number): Omit<CamState, 'id' | 'timelapse'> {

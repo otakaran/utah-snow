@@ -4,7 +4,7 @@
 // Views are wired in app.tsx `Outlet` (briefing, resort, cams, tracker, settings, wall).
 import { signal } from '@preact/signals';
 import { RESORT_IDS } from '../../config/resorts.ts';
-import { WALL_SETS, type WallSet } from '../../config/wall.ts';
+import { WALL_LIMITS, WALL_SETS, type WallSet } from '../../config/wall.ts';
 import type { ResortId } from '../shared/types.ts';
 
 export { WALL_SETS, type WallSet };
@@ -32,20 +32,23 @@ const SIMPLE = ['cams', 'tracker', 'settings'] as const;
 
 export const isResortId = (id: string): id is ResortId => (RESORT_IDS as readonly string[]).includes(id);
 
-/** An integer >= min from a URL param or a stored value; otherwise the fallback. */
-function intAtLeast(raw: unknown, min: number, fallback: number): number {
+/** An integer from a URL param or a stored value, clamped to [lo, hi]; otherwise the fallback. */
+function intIn(raw: unknown, [lo, hi]: readonly [number, number], fallback: number): number {
   const n = typeof raw === 'number' ? raw : typeof raw === 'string' && raw.trim() !== '' ? Number(raw) : Number.NaN;
-  return Number.isInteger(n) && n >= min ? n : fallback;
+  return Number.isInteger(n) ? Math.min(hi, Math.max(lo, n)) : fallback;
 }
 
-/** Wall options from any key lookup (URL params or the stored object); invalid fields fall back to `defaults`. */
+/**
+ * Wall options from any key lookup (URL params or the stored object): numbers clamp to WALL_LIMITS, and invalid
+ * fields fall back to `defaults`.
+ */
 export function wallParams(get: (key: keyof WallParams) => unknown, defaults: WallParams = WALL_DEFAULTS): WallParams {
   const set = get('set');
   return {
-    rotate: intAtLeast(get('rotate'), 1, defaults.rotate),
-    yt: intAtLeast(get('yt'), 1, defaults.yt),
+    rotate: intIn(get('rotate'), WALL_LIMITS.rotate, defaults.rotate),
+    yt: intIn(get('yt'), WALL_LIMITS.yt, defaults.yt),
     set: typeof set === 'string' && (WALL_SETS as readonly string[]).includes(set) ? (set as WallSet) : defaults.set,
-    hls: intAtLeast(get('hls'), 0, defaults.hls),
+    hls: intIn(get('hls'), WALL_LIMITS.hls, defaults.hls),
   };
 }
 

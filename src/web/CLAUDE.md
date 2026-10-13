@@ -29,7 +29,7 @@ routes `#/`, `#/resort/:id`, `#/cams`, `#/settings`, `#/tracker`, `#/wall` full-
 
 ## Players and visibility (`lib/`)
 - `visibility.ts`: one 5 s scheduler + shared IntersectionObserver; work runs only on screen and while visible.
-- `player-manager.ts`: HLS 1 on phones, 2 on desktop, min(?hls, 3) on the wall; 1 YouTube per page; 10 min idle stop.
+- `player-manager.ts`: HLS 1 on phones, 2 on desktop, ?hls (<= 3) on the wall; 1 YouTube per page; 10 min idle stop.
 - `build-guard.ts`: one guarded reload on chunk errors or a new build; wall wake lock. `data-saver.ts`, `format.ts`.
   UDOT, Alta, Ski Utah and Snowbasin images are plain `<img>` (no fetch, canvas or `crossorigin`). hls.js is lazy.
 

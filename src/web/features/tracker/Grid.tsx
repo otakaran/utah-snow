@@ -59,14 +59,24 @@ export function Grid() {
   const wrap = useRef<HTMLDivElement>(null);
   const focus = focusDate(today);
 
-  // Bring the focus row (today) to the top of the scroller, under the sticky name row, once per focus date.
+  // Bring the focus row (today) to the top of the scroller, under the sticky name row, once per focus date. Mounted
+  // hidden (below 900 px), it waits for the grid to show: a tablet turned to landscape, a widened window.
   useEffect(() => {
     const box = wrap.current;
-    const row = box?.querySelector<HTMLElement>(`tr[data-date="${focus}"]`);
-    const head = box?.querySelector<HTMLElement>('thead');
-    if (!box || !row) return;
-    const offset = row.getBoundingClientRect().top - box.getBoundingClientRect().top;
-    box.scrollTop += offset - (head?.offsetHeight ?? 0);
+    if (!box) return;
+    const toFocus = (): boolean => {
+      const row = box.querySelector<HTMLElement>(`tr[data-date="${focus}"]`);
+      if (!row || box.clientHeight === 0) return false;
+      const offset = row.getBoundingClientRect().top - box.getBoundingClientRect().top;
+      box.scrollTop += offset - (box.querySelector<HTMLElement>('thead')?.offsetHeight ?? 0);
+      return true;
+    };
+    if (toFocus() || typeof ResizeObserver !== 'function') return;
+    const shown = new ResizeObserver(() => {
+      if (toFocus()) shown.disconnect();
+    });
+    shown.observe(box);
+    return () => shown.disconnect();
   }, [focus]);
 
   return (

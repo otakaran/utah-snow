@@ -1,6 +1,6 @@
 // Pure wall paging (spec §8.4): which cams cells 1–5 page through for a `set` (heroes first, then the set's other
 // cams, then its ★ road cams), one page of them, the featured YouTube cell's order (Solitude stake first) and the
-// night stake list. Cams the Worker reports hidden right now are filtered by the caller (camHidden).
+// night stake list. The caller keeps only the tiles the cams feature shows right now (visibleCams).
 import { CAM_BY_ID, CAMS, HEROES, RESORT_CAMS, STAKE_ORDER } from '../../../../config/cams/index.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
 import { WALL_NIGHT_STILL, WALL_PINNED, WALL_SET_DEFS, WALL_YT_FIRST, type WallSet } from '../../../../config/wall.ts';

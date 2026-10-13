@@ -25,7 +25,10 @@ const STALE_MS = 24 * HOUR;
 const RECENT_MS = 6 * HOUR;
 const MAX_CHECKS = 16;
 const RESTRICTION_RE = /chain|traction|4x4|4wd/i;
-const FEED_DOWN = ' (UDOT feed unavailable)';
+const FEED_DOWN = '(UDOT feed unavailable)';
+// Rows written before the latest post moved out of the headline ('Last UDOT update 59m ago', 'Latest UDOT update'):
+// a feed-down tick carries the previous headline forward, so that text is dropped there.
+const OLD_GENERIC = /\b(?:Last|Latest) UDOT update(?: \S+ ago)?/;
 const INTERLODGE_NOTE = ' – Interlodge possible – check x.com/altacentral';
 // Spec §5.6 escalation inputs; other signals (e.g. Brighton comments) are recorded in crossChecks only.
 const ESCALATES = (s: Signal): boolean =>
@@ -48,8 +51,8 @@ function baseState(posts: PostFacts[], now: number): { state: RoadState; headlin
       return { state: 'closed', headline: `${firstLine(st)} (stale)`, src: st };
     }
   }
-  // No age in the text: the client renders it from latestPost.at, so it never goes stale in a cached row.
-  return { state: 'open', headline: posts.length ? 'Latest UDOT update' : 'No active UDOT alerts', src: null };
+  // Posts but no state: no headline, the client shows the latest post with its age (from latestPost.at).
+  return { state: 'open', headline: posts.length ? '' : 'No active UDOT alerts', src: null };
 }
 
 /** Standing-advisory posts, one chip per route (the newest text, the latest end), while unexpired. */
@@ -77,12 +80,18 @@ export function assembleCorridor(inp: CorridorInput): RoadStatus {
   const { corridor: c, now, posts, prev, signals } = inp;
   const up = posts !== null;
   const list = posts ?? [];
-  const prevHeadline = (prev?.headline ?? 'No UDOT data').replace(FEED_DOWN, '').replace(INTERLODGE_NOTE, '');
+  const prevHeadline = (prev?.headline ?? 'No UDOT data')
+    .replace(INTERLODGE_NOTE, '')
+    .replace(FEED_DOWN, '')
+    .replace(OLD_GENERIC, '')
+    .trim();
   const carried: RoadState =
     prev?.state === 'closure-scheduled' && prev.closesAt && msOf(prev.closesAt) <= now
       ? 'closed'
       : (prev?.state ?? 'unknown');
-  const base = up ? baseState(list, now) : { state: carried, headline: `${prevHeadline}${FEED_DOWN}`, src: null };
+  const base = up
+    ? baseState(list, now)
+    : { state: carried, headline: `${prevHeadline} ${FEED_DOWN}`.trim(), src: null };
   let { state, headline } = base;
   const src = base.src;
 

@@ -2,28 +2,24 @@
 // then the UDOT road cams per corridor (VMS signs first; the road's status chip in the heading). Each resort opens
 // with a 2x2 stake hero tile carrying the overnight-inches plate; the pick's heading gets the ★ and a solid accent
 // rule. Tiles load lazily and refresh only while on screen, so the long page costs no more than what is in view.
-// Every section carries a data-testid: cams-<resort> and cams-road-<corridor>.
+// Every section carries a data-testid (also its id, the JumpBar target): cams-<resort> and cams-road-<corridor>.
 import { HEROES, UDOT_CAMS } from '../../../../config/cams/index.ts';
 import { RESORTS } from '../../../../config/resorts.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
 import type { CamDef, Corridor, ResortId } from '../../../shared/types.ts';
-import { fmt } from '../../../shared/units.ts';
 import { camStates } from '../../data/cams.ts';
-import { units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { JumpBar, type JumpItem } from '../../ui/JumpBar.tsx';
 import { Section } from '../../ui/Section.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
-import { roadView } from '../conditions/index.ts';
-import { crewPick, overnightFor } from '../pick-card/index.ts';
+import { roadView, showTraction } from '../conditions/index.ts';
 import { CamGallery, resortGallery } from './CamGallery.tsx';
 import { visibleCams } from './cam-view.ts';
+import { InchPlate } from './InchPlate.tsx';
 
 const RESORT_IDS = Object.keys(RESORTS) as ResortId[];
 const CORRIDOR_IDS = Object.keys(CORRIDORS) as Corridor[];
 const pad = (n: number): string => String(n).padStart(2, '0');
-/** Section's heading id (`<testid>-title`): the JumpBar's scroll target. */
-const head = (testid: string): string => `${testid}-title`;
 
 /** A corridor's cams, VMS signs first (travel times and warnings read before the scenery). */
 function roadList(c: Corridor): CamDef[] {
@@ -34,8 +30,8 @@ function roadList(c: Corridor): CamDef[] {
 function jumpItems(pick: ResortId | null): JumpItem[] {
   const order = pick ? [pick, ...RESORT_IDS.filter((id) => id !== pick)] : RESORT_IDS;
   return [
-    ...order.map((id) => ({ id: head(`cams-${id}`), label: RESORTS[id].name, accent: id === pick, star: id === pick })),
-    { id: head(`cams-road-${CORRIDOR_IDS[0]}`), label: 'Roads' },
+    ...order.map((id) => ({ id: `cams-${id}`, label: RESORTS[id].name, accent: id === pick, star: id === pick })),
+    { id: `cams-road-${CORRIDOR_IDS[0]}`, label: 'Roads' },
   ];
 }
 
@@ -48,7 +44,6 @@ export function CamsPage({ pick = null }: Props) {
   const states = camStates.value;
   const now = serverNow.value;
   const snap = snapshot.value;
-  const u = units.value;
   return (
     <>
       <JumpBar items={jumpItems(pick)} />
@@ -57,9 +52,6 @@ export function CamsPage({ pick = null }: Props) {
         const n = visibleCams(cams, states, 'detail', now).length;
         const off = cams.filter((d) => states.get(d.id)?.status === 'seasonal-off').length;
         const isPick = id === pick;
-        // The briefing stake plates' number: the resort report, else the pick's SNOTEL or forecast input (named).
-        const o = overnightFor(snap, crewPick.value, id);
-        const inches = fmt('snow', o.inches, u);
         return (
           <Section
             key={id}
@@ -80,17 +72,7 @@ export function CamsPage({ pick = null }: Props) {
               pick={pick}
               showResort={false}
               hero={HEROES[id]}
-              heroOverlay={
-                inches.value === '—' ? null : (
-                  <span class="cam-inches">
-                    <span class="cam-inches-num num">
-                      {inches.value}
-                      <small>{inches.unit}</small>
-                    </span>
-                    <span class="cam-inches-cap">{o.note ? `Overnight · ${o.note}` : 'Overnight'}</span>
-                  </span>
-                )
-              }
+              heroOverlay={<InchPlate resort={id} />}
             />
           </Section>
         );
@@ -100,7 +82,7 @@ export function CamsPage({ pick = null }: Props) {
         const n = visibleCams(cams, states, 'detail', now).length;
         const block = snap?.roads[c];
         const v = roadView(block, now);
-        const traction = !v.stale && block?.data?.tractionLaw === true && block.data.state !== 'traction';
+        const traction = showTraction(block?.data, v.stale);
         return (
           <Section
             key={c}

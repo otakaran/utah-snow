@@ -1,7 +1,7 @@
 // Tracker below 900 px (spec §9.5): the day list replaces the grid (today first, past days collapsed), a chip edit
-// confirms in the page notice with an Undo, and the days-left card follows. From 900 px the grid stays and the list
-// is hidden. The clock is pinned inside the trip so the list order is fixed. Own "E2E <project>-list" person, so it
-// never collides with smoke.spec.ts's per-project person.
+// confirms in the page notice with an Undo, and the days-left card follows. From 900 px the grid stays, the list is
+// hidden, and a grid that mounted hidden scrolls to today once it shows. The clock is pinned inside the trip so the
+// list order is fixed. Own "E2E <project>-list" person, so it never collides with smoke.spec.ts's per-project person.
 import { expect, pinTime, test } from './fixtures.ts';
 import { freshPerson, removePerson, trackerApi, useIp } from './tracker-api.ts';
 
@@ -13,11 +13,16 @@ test('tracker: below 900 px a day list replaces the grid; a chip edit says saved
   baseURL,
 }, info) => {
   await pinTime(page, '2027-01-03T17:00:00Z'); // 10:00 MST, trip day 8
-  const narrow = (page.viewportSize()?.width ?? 0) < 900;
+  const size = page.viewportSize() ?? { width: 0, height: 0 };
+  const narrow = size.width < 900;
   if (!narrow) {
+    await page.setViewportSize({ ...size, width: 820 }); // a portrait tablet: the grid mounts hidden
     await page.goto('/#/tracker');
+    await expect(page.getByTestId('tracker-daylist')).toBeVisible();
+    await page.setViewportSize(size); // turned to landscape: the grid shows, scrolled to today
     await expect(page.getByTestId('tracker-grid')).toBeVisible();
     await expect(page.getByTestId('tracker-daylist')).toBeHidden();
+    await expect.poll(() => page.locator('.trk-grid-wrap').evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
     return;
   }
   const api = trackerApi(request, baseURL ?? '');

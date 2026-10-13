@@ -1,7 +1,7 @@
 // App shell (spec §8.1): Header, route outlet, Footer; the #/wall route renders full-bleed without them (§8.4).
 // Header order: brand, Denver date + clock, global freshness badge (tap: every source with its age; a short word
 // under 600 px), base chip, "I am" chip, then units + theme (inside the ⋯ popover under 600 px), and the nav row.
-// Wall leaves the nav below 1024 px (phones open it from Settings → Wall defaults).
+// Wall leaves the nav below WALL_MIN_WIDTH, 1280 px (smaller screens open it from Settings → Wall defaults).
 
 import type { ComponentChildren } from 'preact';
 import { useErrorBoundary } from 'preact/hooks';

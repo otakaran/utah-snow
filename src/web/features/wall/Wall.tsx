@@ -9,7 +9,7 @@ import { isBetweenLocal } from '../../../shared/time.ts';
 import { camStates } from '../../data/cams.ts';
 import { serverNow } from '../../data/snapshot.ts';
 import { parseHash, type WallParams, wallHref } from '../../router.ts';
-import { camHidden } from '../cams/index.ts';
+import { visibleCams } from '../cams/index.ts';
 import { useKiosk, useWallReliability } from './reliability.ts';
 import { pageCount, pageOf, ROTATING, setCams, stepSet } from './rotation.ts';
 import { SnowDays } from './SnowDays.tsx';
@@ -61,7 +61,7 @@ function TvWall({ params, fit }: { params: WallParams; fit: number }) {
     togglePause: () => setPaused((p) => !p),
   });
   const states = camStates.value;
-  const rotating = setCams(params.set).filter((d) => !camHidden(d, states.get(d.id)));
+  const rotating = visibleCams(setCams(params.set), states, 'wall', now);
   const pages = pageCount(rotating.length, ROTATING);
 
   const cls = ['wall', night && 'wall-night', kiosk.idle && 'wall-idle'].filter(Boolean).join(' ');

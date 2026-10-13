@@ -47,6 +47,5 @@ export interface CamState {
   asOf: string | null;
   still: { card: string; detail: string; wall: string };
   live: { type: 'hls'; url: string } | { type: 'youtube'; videoId: string } | { type: 'iframe'; url: string } | null;
-  thumbKind?: 'live' | 'custom';
   timelapse: { provider: string; available: boolean };
 }

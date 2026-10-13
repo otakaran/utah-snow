@@ -1,7 +1,7 @@
 // Resort detail page (#/resort/:id, spec §8.7). A sticky jump row (the six resorts as #/resort/:id links, the
-// current one in accent, ★ on the pick; then buttons to each section heading), then the sections in spec order, each
-// root with its data-testid: head, cams, snow, lifts, weather, roads, avalanche, info. Unknown ids never get here
-// (router.ts redirects to #/).
+// current one in accent, ★ on the pick; then buttons to each section), then the sections in spec order, each root
+// with its data-testid (also its id): head, cams, snow, lifts, weather, roads, avalanche, info. Unknown ids never get
+// here (router.ts redirects to #/).
 import { useEffect } from 'preact/hooks';
 import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
 import { badge } from '../../../shared/freshness.ts';
@@ -12,7 +12,7 @@ import type { ResortId } from '../../../shared/types.ts';
 import { baseInfo, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { skiDays } from '../../data/tracker.ts';
-import { JumpBar } from '../../ui/JumpBar.tsx';
+import { JumpBar, type JumpItem } from '../../ui/JumpBar.tsx';
 import { AvalanchePanel, RoadsPanel } from '../conditions/index.ts';
 import { crewIds, crewPick, drive, me } from '../pick-card/index.ts';
 import { LiftList } from './LiftList.tsx';
@@ -24,43 +24,30 @@ import { SnowReport } from './SnowReport.tsx';
 import { WeatherPanel } from './WeatherPanel.tsx';
 import './resort.css';
 
-/** Jump targets: each section's heading id (ui/Section.tsx `<testid>-title`). */
-const SECTIONS = [
-  { id: 'cams-title', label: 'Cams' },
-  { id: 'snow-title', label: 'Snow' },
-  { id: 'lifts-title', label: 'Lifts' },
-  { id: 'weather-title', label: 'Weather' },
-  { id: 'roads-title', label: 'Roads' },
-  { id: 'avalanche-title', label: 'Avy' },
-  { id: 'info-title', label: 'Parking' },
+/** Jump targets: the section ids (ui/Section.tsx sets id = testid). */
+const SECTIONS: JumpItem[] = [
+  { id: 'cams', label: 'Cams' },
+  { id: 'snow', label: 'Snow' },
+  { id: 'lifts', label: 'Lifts' },
+  { id: 'weather', label: 'Weather' },
+  { id: 'roads', label: 'Roads' },
+  { id: 'avalanche', label: 'Avy' },
+  { id: 'info', label: 'Parking' },
 ];
 
 function ResortJump({ id, pick }: { id: ResortId; pick: ResortId | null }) {
-  return (
-    <div class="jumpbar jumpbar-sticky rs-jump">
-      <nav class="rs-jump-resorts" aria-label="Resorts">
-        {RESORT_IDS.map((r) => (
-          <a
-            key={r}
-            href={`#/resort/${r}`}
-            class={r === id ? 'jump jump-accent' : 'jump'}
-            aria-current={r === id ? 'page' : undefined}
-          >
-            {r === pick ? (
-              <>
-                <span class="jump-star" aria-hidden="true">
-                  ★
-                </span>
-                <span class="sr-only">Today's pick: </span>
-              </>
-            ) : null}
-            {RESORTS[r].name}
-          </a>
-        ))}
-      </nav>
-      <JumpBar items={SECTIONS} sticky={false} />
-    </div>
+  const resorts = RESORT_IDS.map(
+    (r, i): JumpItem => ({
+      id: `resort-${r}`,
+      label: RESORTS[r].name,
+      href: `#/resort/${r}`,
+      current: r === id,
+      accent: r === id,
+      star: r === pick,
+      rule: i === RESORT_IDS.length - 1,
+    }),
   );
+  return <JumpBar items={[...resorts, ...SECTIONS]} label="Resorts and sections" />;
 }
 
 export function Resort({ id }: { id: ResortId }) {

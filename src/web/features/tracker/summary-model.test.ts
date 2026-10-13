@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CapDay } from '../../../shared/caps.ts';
-import { capTable, capTone, capWord, pips } from './summary-model.ts';
+import { capTable, capTone, capWord, chipSave, pips } from './summary-model.ts';
 
 const d = (personId: string, date: string, resortId: CapDay['resortId'], status: CapDay['status'] = 'skied') => ({
   personId,
@@ -53,6 +53,34 @@ describe('tracker cap summary', () => {
     expect(t.crew?.[0]).toMatchObject({ group: 'alta-snowbird', remaining: 7 });
     expect(t.crew?.[4]?.remaining).toBeNull();
     expect(capTable(people.slice(0, 1), days).crew).toBeNull();
+  });
+
+  it("gates the pick's save number on the chip's own count (the pick leaves today's planned day out)", () => {
+    const days = [
+      ...Array.from({ length: 6 }, (_, i) => d('ana', `2027-01-0${i + 1}`, 'alta')),
+      d('ana', '2027-01-20', 'snowbird', 'planned'),
+    ];
+    const c = capTable(people, days).rows[0]?.cells[0];
+    if (!c) throw new Error('no cell');
+    expect(c.word).toBe('None left');
+    expect(chipSave(c, { remaining: 1, threshold: 0, expiringFrom: '2027-01-20' })).toEqual({
+      threshold: null,
+      from: null,
+    });
+    expect(chipSave(c, { remaining: 1, threshold: 9.8, expiringFrom: '2027-01-31' })).toEqual({
+      threshold: null,
+      from: null,
+    });
+    const open = capTable(people, []).rows[0]?.cells[0];
+    if (!open) throw new Error('no cell');
+    expect(chipSave(open, { remaining: 7, threshold: 4, expiringFrom: '2027-01-25' })).toEqual({
+      threshold: 4,
+      from: '2027-01-25',
+    });
+    expect(chipSave(open, { remaining: 7, threshold: 0, expiringFrom: '2027-01-25' })).toEqual({
+      threshold: 0,
+      from: null,
+    });
   });
 
   it('handles an empty crew', () => {

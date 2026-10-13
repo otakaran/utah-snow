@@ -5,14 +5,13 @@ import { HEROES } from '../../../../config/cams/index.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
 import { localDate } from '../../../shared/time.ts';
 import type { CamDef, Corridor } from '../../../shared/types.ts';
-import { fmt } from '../../../shared/units.ts';
 import { units } from '../../data/settings.ts';
-import { serverNow, snapshot } from '../../data/snapshot.ts';
+import { serverNow } from '../../data/snapshot.ts';
 import { longDate, tripLine } from '../../lib/format.ts';
 import { Countdown } from '../../ui/Countdown.tsx';
-import { CAM_BY_ID, CamGallery, CamTile, StakeRow } from '../cams/index.ts';
+import { CAM_BY_ID, CamGallery, CamTile, InchPlate, StakeRow } from '../cams/index.ts';
 import { AvalanchePanel, ForecastPanel, RoadsPanel } from '../conditions/index.ts';
-import { crewPick, overnightFor, PickCard } from '../pick-card/index.ts';
+import { crewPick, PickCard } from '../pick-card/index.ts';
 import { BriefJump } from './BriefJump.tsx';
 import { ResortCards } from './ResortCards.tsx';
 import { SystemStatus } from './SystemStatus.tsx';
@@ -41,26 +40,13 @@ function BriefingHeader({ now }: { now: number }) {
 
 export function Briefing() {
   const u = units.value;
-  const snap = snapshot.value;
   const pick = crewPick.value?.pick ?? null;
-  // The ridge's numbers: the resort report, else the pick's SNOTEL or forecast input (named on the plate).
-  const stakeInches = (cam: CamDef) => {
-    const o = overnightFor(snap, crewPick.value, cam.resort ?? null);
-    const q = fmt('snow', o.inches, u);
-    return q.value !== '—' ? (
-      <span class="brief-stake-in num">
-        {q.value}
-        <small>{q.unit}</small>
-        {o.note ? <span class="brief-stake-src">{o.note}</span> : null}
-      </span>
-    ) : null;
-  };
   return (
     <>
       <BriefingHeader now={serverNow.value} />
       <PickCard />
       <BriefJump />
-      <StakeRow pick={pick} no="02" overlay={stakeInches} />
+      <StakeRow pick={pick} no="02" overlay={(cam) => <InchPlate resort={cam.resort ?? null} />} />
       <ResortCards hero={(id, isPick) => <CamTile id={HEROES[id]} variant="card" star={isPick} />} />
       <RoadsPanel units={u} no="04" cams={(c) => <CamGallery cams={roadCams(c)} variant="card" pick={pick} />} />
       <AvalanchePanel no="05" />

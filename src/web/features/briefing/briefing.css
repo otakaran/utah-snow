@@ -47,37 +47,6 @@
   }
 }
 
-/* overnight-inches plate drawn over each stake still (StakeRow overlay); a SNOTEL / forecast value names its source */
-.brief-stake-in {
-  position: absolute;
-  bottom: var(--space-2);
-  left: var(--space-2);
-  padding: var(--space-1) var(--space-2) 2px;
-  border-radius: var(--radius-chip);
-  background: var(--scrim);
-  color: var(--snow);
-  font-family: var(--font-num);
-  font-feature-settings: var(--num-features);
-  font-size: var(--fs-1);
-  font-weight: 900;
-  line-height: 1;
-}
-
-.brief-stake-in small {
-  margin-left: 0.04em;
-  font-size: 0.5em;
-  vertical-align: 0.7em;
-}
-
-.brief-stake-src {
-  display: block;
-  padding-bottom: 2px;
-  color: var(--text-dim);
-  font: 800 var(--fs-5) / 1.2 var(--font-display);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 /* footer: compact system status (label/value pairs), sources disclosure; app.tsx's footer draws the rule */
 .brief-foot {
   display: grid;

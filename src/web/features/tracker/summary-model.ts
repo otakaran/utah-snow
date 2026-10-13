@@ -2,7 +2,7 @@
 // a crew-minimum row, each cell a tone + word (status = shape + word + color, red at 0 left) and punch-card pips.
 import { CAP_GROUPS } from '../../../../config/ikon.ts';
 import { type CapDay, GROUP_IDS, summary } from '../../../shared/caps.ts';
-import type { CapGroupId } from '../../../shared/types.ts';
+import type { CapGroupId, GroupThreshold } from '../../../shared/types.ts';
 import type { Tone } from '../../ui/status.ts';
 
 /** At or below this many days left a group turns amber. */
@@ -97,4 +97,20 @@ export function capTable(people: readonly { id: string; name: string }[], days: 
     rows,
     crew,
   };
+}
+
+/** A chip's save line: the pick's threshold in inches (0 = free), null for '—'; `from` = the use-it-or-lose-it date. */
+export interface ChipSave {
+  threshold: number | null;
+  from: string | null;
+}
+
+/**
+ * The pick's threshold counts days left without the target day, the chip with it, so a group whose last day is
+ * planned today would read "None left" beside a save number: the chip's own count gates the threshold.
+ */
+export function chipSave(c: CapCell, t: GroupThreshold | undefined): ChipSave {
+  if (c.cap === null || !t || (t.remaining ?? 0) <= 0 || (c.remaining ?? 0) <= 0)
+    return { threshold: null, from: null };
+  return { threshold: t.threshold, from: t.threshold > 0 ? t.expiringFrom : null };
 }

@@ -159,11 +159,9 @@ describe('/api/cams', () => {
     expect(cams.get('brighton-top-of-crest')).toMatchObject({
       status: 'live',
       online: true,
-      thumbKind: 'live',
       still: { wall: 'https://i.ytimg.com/vi/Zv8HYwaXjBg/maxresdefault_live.jpg?t={m5}' },
     });
     expect(cams.get('brighton-parking-lot')).toMatchObject({
-      thumbKind: 'custom',
       still: { card: '', detail: '', wall: '' },
       live: { type: 'youtube', videoId: '4a-3iEM7bHk' },
     });

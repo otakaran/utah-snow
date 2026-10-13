@@ -47,6 +47,24 @@ test('by day: 9 tiles without the app shell, cells 1-5 page after 20 s with a tu
   await expect(page.getByTestId('wall-tile')).toHaveCount(9);
 });
 
+test('a live stake slot with no stream never doubles its -still twin (set=stakes)', async ({ page }) => {
+  await wallAt(page, DAY);
+  await page.route(
+    (url) => url.pathname === '/api/cams', // as cams.spec.ts: the DV live slot has no stream
+    async (route) => {
+      const res = await route.fetch();
+      const body = (await res.json()) as { cams: { id: string }[] };
+      const down = { status: 'offline', online: false, live: null };
+      body.cams = body.cams.map((c) => (c.id === 'deer-valley-ontario-snowstake-live' ? { ...c, ...down } : c));
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+    },
+  );
+  await page.goto('/#/wall?set=stakes');
+  await expect(page.getByTestId('wall')).toHaveAttribute('data-set', 'stakes');
+  await expect.poll(() => camsOf(page, 'rotating')).toContain('deer-valley-ontario-snowstake-still');
+  expect(await camsOf(page, 'rotating')).not.toContain('deer-valley-ontario-snowstake-live');
+});
+
 test('at 19:00 local: night mode, stake stills only and no video', async ({ page }) => {
   await wallAt(page, NIGHT);
   await page.goto('/#/wall');

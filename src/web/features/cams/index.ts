@@ -4,7 +4,14 @@
 export { CamGallery, resortGallery } from './CamGallery.tsx';
 export { CamsPage } from './CamsPage.tsx';
 export { CamTile, type CamTileProps } from './CamTile.tsx';
-export { CAM_BY_ID, camHidden, type LiveSource, liveSource, type Variant as CamVariant } from './cam-view.ts';
+export {
+  CAM_BY_ID,
+  type LiveSource,
+  liveSource,
+  type Variant as CamVariant,
+  visibleCams,
+} from './cam-view.ts';
+export { InchPlate } from './InchPlate.tsx';
 export { StakeRow } from './StakeRow.tsx';
 export { YouTubePlayer } from './YouTubePlayer.tsx';
 

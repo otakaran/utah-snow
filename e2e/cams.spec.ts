@@ -37,12 +37,12 @@ test('cams: every resort section leads with a stake hero tile twice the width of
 test('jump bars scroll to their section; resort chips link to the other resorts', async ({ page }) => {
   await page.goto('/#/cams');
   await page.getByTestId('jumpbar').getByRole('button', { name: 'Roads' }).click();
-  await expect(page.locator('#cams-road-lcc-title')).toBeInViewport();
+  await expect(page.getByTestId('cams-road-lcc').locator('.sec-h')).toBeInViewport();
 
   await page.goto('/#/resort/alta');
   await page.getByTestId('jumpbar').getByRole('button', { name: 'Parking' }).click();
-  await expect(page.locator('#info-title')).toBeInViewport();
-  await page.getByRole('navigation', { name: 'Resorts' }).getByRole('link', { name: 'Snowbird' }).click();
+  await expect(page.getByTestId('info').locator('.sec-h')).toBeInViewport();
+  await page.getByTestId('jumpbar').getByRole('link', { name: 'Snowbird' }).click();
   await expect(page).toHaveURL(/#\/resort\/snowbird$/);
   await expect(page.getByTestId('head')).toContainText('Snowbird');
 });

@@ -1,9 +1,10 @@
 // Player manager (spec §8.3): caps concurrent live players and stops idle ones.
-// - HLS: 1 on phones (max-width 600px), 2 on desktop, min(?hls, 3) on the wall.
+// - HLS: 1 on phones (max-width 600px), 2 on desktop, ?hls on the wall (at most WALL_LIMITS.hls, 3).
 // - YouTube: at most one per page; starting a new one stops the previous one.
 // - A claim over the cap stops the oldest player of that kind (the newest tap wins).
 // - Outside the wall, every player stops after 10 min without user interaction ("Paused to save data").
 // Pausing on hidden/offscreen is each player's own job (lib/visibility.ts), since it resumes in place.
+import { WALL_LIMITS } from '../../../config/wall.ts';
 import { route } from '../router.ts';
 
 export type PlayerKind = 'hls' | 'youtube';
@@ -20,7 +21,7 @@ interface Entry {
 
 const IDLE_MS = 10 * 60_000;
 const IDLE_CHECK_MS = 30_000;
-const WALL_HLS_MAX = 3;
+const WALL_HLS_MAX = WALL_LIMITS.hls[1];
 const PHONE_QUERY = '(max-width: 600px)';
 
 const active: Entry[] = []; // oldest first
