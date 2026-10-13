@@ -1,7 +1,9 @@
-// Resort detail page (#/resort/:id, spec §8.7). Sections in spec order, each root with its data-testid:
-// head, cams, snow, lifts, weather, roads, avalanche, info. Unknown ids never get here (router.ts redirects to #/).
+// Resort detail page (#/resort/:id, spec §8.7). A sticky jump row (the six resorts as #/resort/:id links, the
+// current one in accent, ★ on the pick; then buttons to each section heading), then the sections in spec order, each
+// root with its data-testid: head, cams, snow, lifts, weather, roads, avalanche, info. Unknown ids never get here
+// (router.ts redirects to #/).
 import { useEffect } from 'preact/hooks';
-import { RESORTS } from '../../../../config/resorts.ts';
+import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
 import { badge } from '../../../shared/freshness.ts';
 import { routeCorridors } from '../../../shared/geo.ts';
 import { liftsRunning } from '../../../shared/lifts.ts';
@@ -10,6 +12,7 @@ import type { ResortId } from '../../../shared/types.ts';
 import { baseInfo, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { skiDays } from '../../data/tracker.ts';
+import { JumpBar } from '../../ui/JumpBar.tsx';
 import { AvalanchePanel, RoadsPanel } from '../conditions/index.ts';
 import { crewIds, crewPick, drive, me } from '../pick-card/index.ts';
 import { LiftList } from './LiftList.tsx';
@@ -20,6 +23,45 @@ import { daysLeft, driveInfo, isStale, resortData } from './resort-model.ts';
 import { SnowReport } from './SnowReport.tsx';
 import { WeatherPanel } from './WeatherPanel.tsx';
 import './resort.css';
+
+/** Jump targets: each section's heading id (ui/Section.tsx `<testid>-title`). */
+const SECTIONS = [
+  { id: 'cams-title', label: 'Cams' },
+  { id: 'snow-title', label: 'Snow' },
+  { id: 'lifts-title', label: 'Lifts' },
+  { id: 'weather-title', label: 'Weather' },
+  { id: 'roads-title', label: 'Roads' },
+  { id: 'avalanche-title', label: 'Avy' },
+  { id: 'info-title', label: 'Parking' },
+];
+
+function ResortJump({ id, pick }: { id: ResortId; pick: ResortId | null }) {
+  return (
+    <div class="jumpbar jumpbar-sticky rs-jump">
+      <nav class="rs-jump-resorts" aria-label="Resorts">
+        {RESORT_IDS.map((r) => (
+          <a
+            key={r}
+            href={`#/resort/${r}`}
+            class={r === id ? 'jump jump-accent' : 'jump'}
+            aria-current={r === id ? 'page' : undefined}
+          >
+            {r === pick ? (
+              <>
+                <span class="jump-star" aria-hidden="true">
+                  ★
+                </span>
+                <span class="sr-only">Today's pick: </span>
+              </>
+            ) : null}
+            {RESORTS[r].name}
+          </a>
+        ))}
+      </nav>
+      <JumpBar items={SECTIONS} sticky={false} />
+    </div>
+  );
+}
 
 export function Resort({ id }: { id: ResortId }) {
   const now = serverNow.value;
@@ -40,6 +82,7 @@ export function Resort({ id }: { id: ResortId }) {
 
   return (
     <article class="rs" data-resort={id} aria-label={RESORTS[id].name}>
+      <ResortJump id={id} pick={pick} />
       <ResortHead
         id={id}
         block={block}

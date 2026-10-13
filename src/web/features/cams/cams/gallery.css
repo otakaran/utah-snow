@@ -1,0 +1,127 @@
+/* Imported by ../cams.css: cam galleries (CamGallery.tsx) and the #/cams section heads (CamsPage.tsx). Tokens only.
+   Tiles in a row end level. Detail galleries: two columns with stacked captions below 600 px (the lead tile spans
+   the row), the #/cams hero lead 2x2 from 600 px, the Roundshot 360 strip across the row from 900 px. */
+.cam-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cam-gallery > li {
+  display: flex;
+  min-width: 0;
+}
+
+.cam-gallery .cam-tile,
+.cam-gallery .cam-tile > .cam-cap {
+  flex: 1;
+}
+
+/* a tile on its Offline plate goes last (the lead tile keeps its place) */
+.cam-gallery > li:not(.cam-lead):has(> [data-status="offline"]) {
+  order: 1;
+}
+
+.cam-gallery-detail {
+  grid-auto-flow: row dense;
+}
+
+@media (max-width: 599px) {
+  .cam-gallery-detail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .cam-gallery-detail > .cam-lead {
+    grid-column: 1 / -1;
+  }
+
+  .cam-gallery-detail > li:not(.cam-lead) .cam-cap {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 2px;
+  }
+}
+
+/* from 600 px at least two columns, so the 2x2 lead tile always fits */
+@media (min-width: 600px) {
+  .cam-gallery-detail {
+    grid-template-columns: repeat(auto-fill, minmax(min(calc((100% - var(--space-3)) / 2), 280px), 1fr));
+  }
+
+  .cam-gallery-detail > .cam-hero {
+    grid-row: span 2;
+    grid-column: span 2;
+  }
+
+  .cam-hero .cam-media {
+    flex: 1 0 auto;
+  }
+
+  .cam-hero .cam-tile > .cam-cap {
+    flex: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .cam-gallery > li:has(> [data-kind="roundshot360"]) {
+    grid-column: 1 / -1;
+  }
+
+  .cam-gallery [data-kind="roundshot360"] .cam-media:not(:has(.cam-player)) {
+    aspect-ratio: 2324 / 450;
+  }
+}
+
+/* overnight-inches plate on the lead tile, OVERNIGHT right under the number */
+.cam-inches {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-2);
+  display: grid;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-chip);
+  background: var(--scrim);
+  pointer-events: none;
+}
+
+.cam-inches-num {
+  color: var(--snow);
+  font-size: var(--fs-1);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 14px var(--snow-glow);
+}
+
+.cam-inches-num small {
+  margin-left: 0.06em;
+  font-size: 0.5em;
+}
+
+.cam-inches-cap {
+  color: var(--text);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* #/cams section heads: clear the sticky JumpBar when jumped to; the pick's rule is solid accent */
+.cams-sec > .sec-h {
+  scroll-margin-top: calc(var(--jump-h, 48px) + var(--space-2));
+}
+
+.cams-sec-pick > .sec-h::after {
+  border-top: 2px solid var(--accent);
+}
+
+.cams-sec .sec-sub {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1) var(--space-2);
+  line-height: 1.3;
+}

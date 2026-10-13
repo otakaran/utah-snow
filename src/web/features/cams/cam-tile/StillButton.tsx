@@ -1,5 +1,5 @@
 // The tile's tap target (split from ../CamTile.tsx): the still as a plain <img> (no crossorigin; UDOT, Alta, Ski Utah
-// and Snowbasin hosts send no ACAO), an empty plate while nothing loaded, and the "▶ Live" hint when a tap plays.
+// and Snowbasin hosts send no ACAO), an empty plate while nothing loaded, and the "▶ Watch live" hint when a tap plays.
 import { Icon } from '../../../ui/Icon.tsx';
 import { NOTE } from '../notes.ts';
 import type { Still } from '../use-still.ts';

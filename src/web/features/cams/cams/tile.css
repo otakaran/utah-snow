@@ -12,8 +12,10 @@
   background: var(--surface);
 }
 
+/* the accent ring sits outside the 1 px border, so a pick tile's image lines up with its neighbours' */
 .cam-tile.cam-pick {
-  border: 2px solid var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .cam-media {
@@ -67,14 +69,25 @@
   opacity: 0.8;
 }
 
-/* Small uppercase labels: empty plate, "▶ Live" hint, live plate, player state */
+/* UDOT sign GIFs: the whole sign, LED dots kept crisp (smooth downscaling turns them into moiré) */
+.cam-tile[data-kind="udot_vms"] .cam-img {
+  background: var(--bg);
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* Small uppercase labels: empty plate, live plate, player state */
 .cam-empty,
-.cam-play,
 .cam-live,
 .cam-player-state {
   font: 800 var(--fs-caption) / 1.25 var(--font-display);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+/* The "▶ Watch live" hint is a call to action in sentence case, so it never reads as a status plate */
+.cam-play {
+  font: 600 var(--fs-caption) / 1.25 var(--font-body);
 }
 
 .cam-empty {
@@ -127,4 +140,17 @@
   border-radius: var(--radius-chip);
   background: var(--live);
   color: var(--on-live);
+}
+
+/* A slow pulse on the LIVE glyph; none under reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .cam-live .glyph {
+    animation: cam-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes cam-pulse {
+  50% {
+    opacity: 0.35;
+  }
 }
