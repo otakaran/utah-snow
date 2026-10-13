@@ -1,0 +1,68 @@
+/* ModelTable (resort page weather section): one card, a day per row, a model per column. Tokens only; digits use
+   .cond-num (Barlow Condensed, tabular) from conditions/rows.css. */
+.cond-mt {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  container-type: inline-size;
+}
+.cond-mt-h {
+  margin: 0 0 var(--space-2);
+  font: 800 var(--fs-3) / 1.15 var(--font-display);
+  text-transform: uppercase;
+}
+.cond-mt-h .cond-dim {
+  font: 500 var(--fs-caption) var(--font-body);
+  text-transform: none;
+}
+/* a wider fallback font (before the woff2 swaps in) scrolls the table inside its card, never the page */
+.cond-mt-wrap {
+  overflow-x: auto;
+}
+.cond-mt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-caption);
+}
+.cond-mt-table th,
+.cond-mt-table td {
+  padding: var(--space-2) 0 var(--space-2) var(--space-2);
+  border-bottom: 1px dotted var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+.cond-mt-table th {
+  font: 800 var(--fs-caption) / 1.25 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cond-mt-table thead th {
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--text-dim);
+}
+.cond-mt-table th:first-child {
+  padding-left: 0;
+  text-align: left;
+}
+.cond-mt-snow,
+.cond-mt-t {
+  display: block;
+}
+.cond-mt-snow {
+  color: var(--snow);
+  font-weight: 800;
+  text-shadow: 0 0 12px var(--snow-glow);
+}
+.cond-mt-snow.is-dry {
+  color: var(--text-dim);
+  font-weight: 700;
+  text-shadow: none;
+}
+.cond-mt-t {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+@container (min-width: 30em) {
+  .cond-mt-snow {
+    font-size: var(--fs-body);
+  }
+}

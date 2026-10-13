@@ -1,9 +1,10 @@
 // Resort page `weather` section (spec §8.7.5): now (ResortSnapshot.weather), the NWS 3-day forecast for base and
-// summit, and the NWS text forecast for the summit grid. ModelTable (HRRR/NBM/ECMWF/GFS) is Phase 2 in conditions/.
+// summit, the NWS text forecast for the summit grid, then the Open-Meteo ModelTable (HRRR/NBM/ECMWF/GFS).
 import type { ResortId, ResortSnapshot, Snapshot, WeatherNow } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
 import { clockRel, qty } from '../../lib/format.ts';
 import { Section } from '../../ui/Section.tsx';
+import { ModelTable } from '../conditions/index.ts';
 import { Amount, Tile } from './Amount.tsx';
 import { NwsDays } from './NwsDays.tsx';
 import { NwsText } from './NwsText.tsx';
@@ -56,6 +57,7 @@ export function WeatherPanel({ id, r, forecast, today, now, units }: Props) {
       <NwsDays label="summit" block={summit} today={today} now={now} units={units} />
       <NwsDays label="base" block={base} today={today} now={now} units={units} />
       <NwsText id={id} now={now} />
+      <ModelTable id={id} today={today} now={now} units={units} />
     </Section>
   );
 }
