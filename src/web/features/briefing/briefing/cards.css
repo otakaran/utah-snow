@@ -1,0 +1,215 @@
+/* Imported first by ../briefing.css: resort cards. A flex column per card, so every foot (freshness + Details →)
+   sits on the card's bottom edge and a row of cards lines up. */
+.rc-list {
+  display: grid;
+  gap: var(--space-5) var(--space-4);
+  padding-top: var(--space-2); /* room for the pick's flag in the first row */
+}
+
+@media (min-width: 720px) {
+  .rc-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .rc-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rc {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.rc.is-pick {
+  border: 2px solid var(--accent);
+  box-shadow:
+    0 0 0 4px var(--bg),
+    0 0 0 5px var(--accent);
+}
+
+.rc-flag {
+  position: absolute;
+  top: -12px;
+  left: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-chip);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 900 var(--fs-5) / 1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rc-top,
+.rc-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rc-name {
+  margin: 0;
+  font: 900 var(--fs-2) / 1 var(--font-display);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.rc-mid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.rc-hero {
+  min-width: 0;
+}
+
+.rc-snow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.rc-snow div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+}
+
+.rc-snow-main,
+.rc-snow .rc-old {
+  grid-column: 1 / -1;
+}
+
+.rc-snow dt,
+.rc-facts dt {
+  color: var(--text-dim);
+  font: 700 var(--fs-5) / 1.2 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rc-snow dd {
+  margin: 0;
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-size: var(--fs-3);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.rc-snow .rc-big {
+  color: var(--snow);
+  font-size: var(--fs-resort-num);
+  font-weight: 900;
+  text-shadow: 0 0 14px var(--snow-glow);
+}
+
+.rc-unit {
+  margin-left: 0.04em;
+  font-size: 0.5em;
+  vertical-align: 0.7em;
+}
+
+/* pre-season: days to the projected opening (Countdown digits stay at the name's --fs-2), then the date line */
+.rc-pre p:not(.countdown) {
+  margin: var(--space-1) 0 0;
+  color: var(--text-dim);
+  font-size: var(--fs-4);
+}
+
+.rc-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.rc-facts div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: var(--space-1);
+  border-bottom: 1px dotted var(--line);
+}
+
+.rc-facts .rc-wide {
+  grid-column: span 2;
+}
+
+.rc-facts dd {
+  margin: auto 0 0; /* values share a baseline when a label wraps */
+  font-size: var(--fs-4);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.rc-facts .num {
+  font-family: var(--font-num);
+  font-feature-settings: var(--num-features);
+  font-weight: 900;
+}
+
+/* phones: four short facts per row, so a card stays about one screen tall */
+@media (max-width: 599px) {
+  .rc-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .rc-facts dd {
+    font-size: var(--fs-5);
+    font-weight: 700;
+  }
+}
+
+.rc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.rc-tag {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-chip);
+  color: var(--text-dim);
+  font-size: var(--fs-5);
+  white-space: nowrap;
+}
+
+.rc-foot {
+  margin-top: auto;
+}
+
+.rc-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  margin-left: auto;
+  font: 700 var(--fs-5) / 1 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* yesterday's report: its time in place of this morning's numbers */
+.rc-snow .rc-old dd {
+  color: var(--warn-text);
+  font: 700 var(--fs-5) / 1.2 var(--font-body);
+}

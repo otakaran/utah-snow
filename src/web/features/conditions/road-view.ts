@@ -1,5 +1,6 @@
 // Pure view logic for RoadsPanel (spec §8.2, §5.6): road state -> status word and tone (ui/status.ts vocabulary),
-// the LAST KNOWN rule for stale rows, canyon-top travel minutes and the UDOT post snippet. No DOM, no signals.
+// the LAST KNOWN rule for stale rows, canyon-top travel minutes, the UDOT post snippet, the headline and the
+// standing-advisory chips. No DOM, no signals.
 import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
 import { ageMin, badge } from '../../../shared/freshness.ts';
 import type { Block, Corridor, RoadStatus } from '../../../shared/types.ts';
@@ -78,6 +79,34 @@ export function postSnippet(text: string, max = 200): string {
   const cut = one.slice(0, max);
   const sp = cut.lastIndexOf(' ');
   return `${(sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s·,;:.-]+$/, '')}…`;
+}
+
+// The no-alert headline. Rows written before the age moved to render time carry it baked in ('… 59m ago').
+const GENERIC = /\b(?:Last|Latest) UDOT update(?: \S+ ago)?/;
+
+/** The row's headline, or null when it only announces the latest post (RoadRow shows that post with a live age). */
+export function roadHeadline(r: { headline?: string | null; latestPost: RoadStatus['latestPost'] }): string | null {
+  const h = (r.headline ?? '').replace(GENERIC, 'Latest UDOT update').trim();
+  return h === '' || (h === 'Latest UDOT update' && r.latestPost) ? null : h;
+}
+
+/** BCC's Guardsman note without a doubled 'Guardsman Pass: Guardsman Pass …' prefix. */
+export const guardsmanText = (g: string): string => g.replace(/^Guardsman Pass:\s*(?=Guardsman Pass\b)/i, '');
+
+/** A UDOT event ('{location}: {type}, {details}') as '{type} · {location}'; other texts as a snippet. */
+export function advisoryText(text: string, max = 90): string {
+  const i = text.indexOf(': ');
+  const type = i > 0 ? /^([^,.;:!?\n]{3,40})[,.;\n]/.exec(text.slice(i + 2).trim())?.[1]?.trim() : undefined;
+  return postSnippet(type ? `${type} · ${text.slice(0, i).trim()}` : text, max);
+}
+
+export type AdvisoryView = RoadStatus['advisories'][number];
+
+/** Standing advisories as chips, minus any that repeat BCC's Guardsman note (it has its own line). */
+export function advisoryViews(r: Pick<RoadStatus, 'advisories' | 'guardsman'>): AdvisoryView[] {
+  return (r.advisories ?? [])
+    .filter((a) => !(r.guardsman && /guardsman/i.test(a.text)))
+    .map((a) => ({ ...a, text: advisoryText(a.text) }));
 }
 
 /** ETO is shown only while the road is not plainly open. */

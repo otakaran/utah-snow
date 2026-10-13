@@ -165,6 +165,15 @@
   order: 3;
 }
 
+/* the collapsed block sits in .pick-main (by the crew line) from 900 px, but stays after the actions on phones */
+.pick-main > .pick-more {
+  order: 4;
+}
+
+.pick-aside > .pick-tomorrow {
+  order: 5;
+}
+
 @media (min-width: 900px) {
   .pick-body {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

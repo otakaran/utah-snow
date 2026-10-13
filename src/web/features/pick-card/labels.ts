@@ -59,11 +59,11 @@ export function memberCosts(
   return out;
 }
 
-/** 'Otakar, Ana, Kuba (board)' for the crew line; unknown modes get '(ski/board?)'. */
+/** 'Otakar, Ana, Kuba (board)' for the crew line; unknown modes get '(ski/board?)'. A no-break space keeps the
+ * mode on its name's line. */
 export function crewNames(members: readonly PickMember[]): string {
-  return members
-    .map((m) => (m.mode === 'board' ? `${m.name} (board)` : m.mode === 'unknown' ? `${m.name} (ski/board?)` : m.name))
-    .join(', ');
+  const mode = { board: '\u00a0(board)', unknown: '\u00a0(ski/board?)', ski: '' } as const;
+  return members.map((m) => `${m.name}${mode[m.mode]}`).join(', ');
 }
 
 /** Peak heights as 0..1 fractions of the tallest plausible night (a 6″ floor keeps a 1″ night from looking deep). */

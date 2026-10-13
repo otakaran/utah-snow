@@ -114,10 +114,12 @@
 .cond-fc-table th,
 .cond-fc-table td {
   padding: var(--space-2) 0 var(--space-2) var(--space-2);
-  border-bottom: 1px dotted var(--line);
   font-weight: 700;
   text-align: right;
   white-space: nowrap;
+}
+.cond-fc-table tr + tr {
+  border-top: 1px solid var(--line);
 }
 .cond-fc-table thead th {
   border-bottom: 1px solid var(--line-strong);
@@ -143,6 +145,21 @@
 .cond-afd {
   padding-left: 1.2em;
   list-style: disc;
+}
+/* from 900 px: a compact table (resort column 30 %, numbers 10ch) beside its notes and the key messages */
+@media (min-width: 900px) {
+  .cond-fc-card {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) minmax(0, 1fr);
+    gap: 0 var(--space-6);
+    align-items: start;
+  }
+  .cond-fc-table th:first-child {
+    width: 30%;
+  }
+  .cond-fc-table :is(td, thead th:not(:first-child)) {
+    width: 10ch;
+  }
 }
 /* wall variant: one line per corridor or zone, read from 3 m */
 .cond-wall-row {

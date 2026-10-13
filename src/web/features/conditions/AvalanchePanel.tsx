@@ -1,11 +1,12 @@
 // AvalanchePanel (spec §8.2 `avalanche`, C.4): Salt Lake (1738) and Ogden (1737) with the NAC level in a diamond,
 // the level word, the labelled 5-segment scale, travel advice and the UAC link. Off-season: a grey
-// "No rating (off-season)". Shared by the briefing, a resort page (its zone) and the wall (variant 'wall').
+// "No rating (off-season)"; with no zones at all, unrated stand-in zones say why (off-season or feed down).
+// Shared by the briefing, a resort page (its zone) and the wall (variant 'wall').
 import type { AvalancheZone } from '../../../shared/types.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
 import { clockRel } from '../../lib/format.ts';
 import { Section } from '../../ui/Section.tsx';
-import { orderZones, zoneResorts, zoneView } from './avy-view.ts';
+import { noRatingTitle, orderZones, placeholderZones, zoneResorts, zoneView } from './avy-view.ts';
 import { DangerScale } from './DangerScale.tsx';
 import { worstMeta } from './panel-meta.ts';
 import { SourceLine } from './SourceLine.tsx';
@@ -30,8 +31,8 @@ function Diamond({ level, k }: { level: number | null; k: string }) {
   );
 }
 
-function Zone({ z, now, wall }: { z: AvalancheZone; now: number; wall: boolean }) {
-  const v = zoneView(z);
+function Zone({ z, now, wall, title }: { z: AvalancheZone; now: number; wall: boolean; title?: string | undefined }) {
+  const v = { ...zoneView(z), ...(title ? { title } : {}) };
   const attrs = { 'data-testid': 'avy-zone', 'data-zone': String(z.zoneId), 'data-level': String(v.level ?? -1) };
   if (wall) {
     return (
@@ -68,9 +69,11 @@ export function AvalanchePanel({ zones, variant = 'full', no, testId = 'avalanch
   const snap = snapshot.value;
   const now = serverNow.value;
   const block = snap?.avalanche;
-  const list = orderZones(Array.isArray(block?.data) ? block.data : [], zones);
+  const rated = orderZones(Array.isArray(block?.data) ? block.data : [], zones);
   const wall = variant === 'wall';
   const fresh = worstMeta([block?.meta], now);
+  const list = rated.length > 0 ? rated : placeholderZones(zones);
+  const title = rated.length > 0 ? undefined : noRatingTitle(fresh?.badge);
   return (
     <Section
       testid={testId}
@@ -79,14 +82,14 @@ export function AvalanchePanel({ zones, variant = 'full', no, testId = 'avalanch
       class={wall ? 'cond-wall' : 'cond-avy'}
       sub={<SourceLine source="UAC" fresh={fresh} />}
     >
-      {list.length > 0 ? (
+      {snap ? (
         <ul class={wall ? 'cond-wall-list' : 'cond-list'}>
           {list.map((z) => (
-            <Zone key={z.zoneId} z={z} now={now} wall={wall} />
+            <Zone key={z.zoneId} z={z} now={now} wall={wall} title={title} />
           ))}
         </ul>
       ) : (
-        <p class="cond-empty">{snap ? 'No avalanche rating available.' : 'Loading avalanche danger…'}</p>
+        <p class="cond-empty">Loading avalanche danger…</p>
       )}
     </Section>
   );

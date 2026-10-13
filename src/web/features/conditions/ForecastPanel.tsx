@@ -1,6 +1,7 @@
 // ForecastPanel (spec §8.2 `forecast`): per resort, NWS snow for today (08-16), tonight (16-08) and tomorrow
 // (08-16) as base–summit ranges, the Open-Meteo model spread for today + tomorrow, summit wind, then snow level and
 // summit temperatures as notes, and the AFD KEY MESSAGES in a collapsible block. Units follow the settings toggle.
+// From 900 px the notes sit beside the table (conditions.css).
 import { useEffect } from 'preact/hooks';
 import { RESORT_IDS } from '../../../../config/resorts.ts';
 import { addDays, formatLocalDate, localDate } from '../../../shared/time.ts';
@@ -30,6 +31,7 @@ export interface ForecastPanelProps {
 const external = { target: '_blank', rel: 'noreferrer' } as const;
 const rangesNote = (units: Units, wd: string): string =>
   `Snow in ${units === 'metric' ? 'cm' : 'inches'}, base to summit: today 8 AM–4 PM, tonight 4 PM–8 AM, ${wd} 8 AM–4 PM.`;
+const BLANK_NOTE = '— = NWS grid not reported.';
 
 function ModelsNote({ now, wd }: { now: number; wd: string }) {
   const om = openMeteo.value;
@@ -52,7 +54,7 @@ function Afd({ now }: { now: number }) {
   if (!afd || bullets.length === 0) return null;
   return (
     <details class="cond-more">
-      <summary>NWS key messages · {clockRel(afd.issuedAt, now)}</summary>
+      <summary class="disclosure">NWS key messages · {clockRel(afd.issuedAt, now)}</summary>
       <ul class="cond-afd">
         {bullets.map((b) => (
           <li key={b}>{b}</li>
@@ -93,7 +95,13 @@ export function ForecastPanel({
     now,
   );
   const wd = dates.tomorrow ? formatLocalDate(dates.tomorrow, 'weekday') : 'tomorrow';
-  const notes = [rangesNote(units, wd), snowLevelNote(rows, units), tempNote(rows, units)].filter(Boolean);
+  const blank = rows.some((r) => [r.today, r.tonight, r.tomorrow].every((v) => v === '—'));
+  const notes = [
+    rangesNote(units, wd),
+    blank ? BLANK_NOTE : '',
+    snowLevelNote(rows, units),
+    tempNote(rows, units),
+  ].filter(Boolean);
   const snowUnit = unitOf('snow', units);
   return (
     <Section
@@ -110,7 +118,7 @@ export function ForecastPanel({
               <tr>
                 <th scope="col">Resort</th>
                 <th scope="col">Today</th>
-                <th scope="col">Night</th>
+                <th scope="col">Tonight</th>
                 <th scope="col">{wd}</th>
                 <th scope="col">Models</th>
                 <th scope="col">Wind {unitOf('wind', units)}</th>
@@ -129,13 +137,15 @@ export function ForecastPanel({
               ))}
             </tbody>
           </table>
-          {notes.map((n) => (
-            <p key={n} class="cond-note">
-              {n}
-            </p>
-          ))}
-          <ModelsNote now={now} wd={wd} />
-          {afd ? <Afd now={now} /> : null}
+          <div class="cond-fc-notes">
+            {notes.map((n) => (
+              <p key={n} class="cond-note">
+                {n}
+              </p>
+            ))}
+            <ModelsNote now={now} wd={wd} />
+            {afd ? <Afd now={now} /> : null}
+          </div>
         </div>
       ) : (
         <p class="cond-empty">Loading forecast…</p>

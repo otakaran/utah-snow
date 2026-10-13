@@ -1,7 +1,9 @@
 // PickCard (spec §8.2 `pick`, §10.3): the crew pick by default, [Crew | As me] when "I am" is set. Phone order: mode
-// band, who, resort name (outranks the number), overnight number + OVERNIGHT caption, tier/score/drive, the six-peak
-// ridge (CSS `order` lifts it above the fold), reasons, divergences, alternatives, action links, the collapsed
-// crew/excluded/inputs block. From 900 px, .pick-main and .pick-aside become two columns.
+// band (section 01), who, resort name (outranks the number), overnight number + OVERNIGHT caption, tier/score/drive,
+// the six-peak ridge (CSS `order` lifts it above the fold), reasons, divergences, alternatives, action links, the
+// collapsed crew/excluded/inputs block, the tomorrow outlook. From 900 px, .pick-main (who, hero, reasons,
+// divergences, the crew chips' block beside the crew line) and .pick-aside (ridge, alternatives, actions, tomorrow)
+// become two columns of about equal height. The root's id is a JumpBar target.
 import { RESORTS } from '../../../../config/resorts.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { PickResult, PickScope } from '../../../shared/types.ts';
@@ -84,9 +86,14 @@ export function PickCard() {
   const u = units.value;
   const live = r !== null && r.mode !== 'post';
   return (
-    <section data-testid="pick" class="pick" aria-live="polite" aria-labelledby="pick-title">
+    <section id="pick" data-testid="pick" class="pick" aria-live="polite" aria-labelledby="pick-title">
       <div class="pick-band">
-        <p class="pick-mode">{modeLabel(r, serverNow.value)}</p>
+        <p class="pick-mode">
+          <span class="pick-no num" aria-hidden="true">
+            01
+          </span>
+          {modeLabel(r, serverNow.value)}
+        </p>
         {me.value ? (
           <Toggle
             label="Pick for"
@@ -111,6 +118,7 @@ export function PickCard() {
           {live && r.lowValue ? <p class="pick-low">Low-value day: consider a rest day.</p> : null}
           {live ? <Reasons r={r} /> : null}
           {live && r.scope === 'crew' ? <Divergences r={r} /> : null}
+          {live ? <PickMore r={r} /> : null}
         </div>
         <div class="pick-aside">
           <Ridge values={overnightAll(snapshot.value, r)} pick={live ? r.pick : null} units={u} />
@@ -118,7 +126,6 @@ export function PickCard() {
             <>
               <Alternatives r={r} units={u} />
               <Actions r={r} />
-              <PickMore r={r} />
             </>
           ) : null}
           <TomorrowOutlook />

@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { isoUtc } from '../../../shared/time.ts';
 import type { Block, Meta, RoadStatus } from '../../../shared/types.ts';
-import { postSnippet, roadView, stateChip, travelMin } from './road-view.ts';
+import {
+  advisoryText,
+  advisoryViews,
+  guardsmanText,
+  postSnippet,
+  roadHeadline,
+  roadView,
+  stateChip,
+  travelMin,
+} from './road-view.ts';
 
 const NOW = Date.parse('2026-12-28T13:00:00Z'); // 6:00 AM Denver
 
@@ -69,5 +78,48 @@ describe('postSnippet', () => {
     expect(postSnippet('Construction for Weber Canyon Bridge replacement in progress', 30)).toBe(
       'Construction for Weber Canyon…',
     );
+  });
+});
+
+describe('roadHeadline', () => {
+  const post = { at: '2026-12-28T12:00:00Z' } as RoadStatus['latestPost'];
+
+  it('drops the no-alert headline while a post carries the age, including the age old rows baked in', () => {
+    expect(roadHeadline({ headline: 'Last UDOT update 59m ago', latestPost: post })).toBeNull();
+    expect(roadHeadline({ headline: 'Latest UDOT update', latestPost: post })).toBeNull();
+    expect(roadHeadline({ headline: null, latestPost: post })).toBeNull();
+    expect(roadHeadline({ headline: 'Last UDOT update 2h ago (UDOT feed unavailable)', latestPost: post })).toBe(
+      'Latest UDOT update (UDOT feed unavailable)',
+    );
+  });
+
+  it('keeps real headlines', () => {
+    expect(roadHeadline({ headline: 'Road Closure Alert (stale)', latestPost: post })).toBe(
+      'Road Closure Alert (stale)',
+    );
+    expect(roadHeadline({ headline: 'No active UDOT alerts', latestPost: null })).toBe('No active UDOT alerts');
+  });
+});
+
+describe('advisories', () => {
+  const event = 'EB SR-190 at MP 20 (Guardsman Pass Rd): Road Closure, EB SR-190 at MP 20 (Guardsman Pass Rd) closed';
+
+  it('reads a UDOT event as type · location, other texts as a snippet', () => {
+    expect(advisoryText(event)).toBe('Road Closure · EB SR-190 at MP 20 (Guardsman Pass Rd)');
+    expect(advisoryText('Bridge work: crews are repairing the joints over West Temple St. nightly')).toBe(
+      'Bridge work: crews are repairing the joints over West Temple St. nightly',
+    );
+  });
+
+  it('skips an advisory that repeats the Guardsman note and keeps one prefix on the note', () => {
+    const a = { id: 'e1', text: event, link: null, until: '2026-10-14T06:00:00Z' };
+    expect(advisoryViews({ advisories: [a], guardsman: 'Guardsman Pass: closed' })).toEqual([]);
+    expect(advisoryViews({ advisories: [a], guardsman: null })[0]?.text).toBe(
+      'Road Closure · EB SR-190 at MP 20 (Guardsman Pass Rd)',
+    );
+    expect(guardsmanText('Guardsman Pass: Guardsman Pass will be closed at 9:30pm')).toBe(
+      'Guardsman Pass will be closed at 9:30pm',
+    );
+    expect(guardsmanText('Guardsman Pass: gate closed')).toBe('Guardsman Pass: gate closed');
   });
 });
