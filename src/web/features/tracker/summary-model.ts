@@ -1,5 +1,5 @@
 // Pure mapping of src/shared/caps.ts `summary` to the "Days left" table (spec §9.2, §9.5): one row per person and
-// a crew-minimum row, each cell a tone + word + number (status = shape + word + color). Red at 0 left.
+// a crew-minimum row, each cell a tone + word (status = shape + word + color, red at 0 left) and punch-card pips.
 import { CAP_GROUPS } from '../../../../config/ikon.ts';
 import { type CapDay, GROUP_IDS, summary } from '../../../shared/caps.ts';
 import type { CapGroupId } from '../../../shared/types.ts';
@@ -7,6 +7,9 @@ import type { Tone } from '../../ui/status.ts';
 
 /** At or below this many days left a group turns amber. */
 export const LOW_LEFT = 2;
+
+/** One punch-card pip per day of the cap: skied and planned days are used, the rest are left. */
+export type Pip = 'skied' | 'planned' | 'left';
 
 export interface CapCell {
   group: CapGroupId;
@@ -17,6 +20,7 @@ export interface CapCell {
   remaining: number | null; // null = unlimited; negative = over the cap
   tone: Tone;
   word: string;
+  pips: Pip[]; // [] when unlimited; longer than the cap when over it
 }
 
 export interface CapRow {
@@ -28,7 +32,7 @@ export interface CapRow {
 export interface CapTable {
   groups: { id: CapGroupId; label: string; cap: number | null }[];
   rows: CapRow[];
-  /** Fewest days left per group across the crew; null with fewer than two people. */
+  /** Fewest days left per group across the crew (that person's skied/planned split); null under two people. */
   crew: CapCell[] | null;
 }
 
@@ -44,6 +48,13 @@ export function capWord(left: number | null): string {
   return left === 0 ? 'None left' : `${left} left`;
 }
 
+/** Skied pips first, then planned, then the days left; none for an unlimited group. */
+export function pips(cap: number | null, skied: number, planned: number): Pip[] {
+  if (cap === null) return [];
+  const used = skied + planned;
+  return Array.from({ length: Math.max(cap, used) }, (_, i) => (i < skied ? 'skied' : i < used ? 'planned' : 'left'));
+}
+
 const cell = (g: CapGroupId, skied: number, planned: number, left: number | null): CapCell => ({
   group: g,
   label: CAP_GROUPS[g].label,
@@ -53,6 +64,7 @@ const cell = (g: CapGroupId, skied: number, planned: number, left: number | null
   remaining: left,
   tone: capTone(left),
   word: capWord(left),
+  pips: pips(CAP_GROUPS[g].cap, skied, planned),
 });
 
 /** The table for the active crew (in crew order); days of anyone not listed are ignored. */
@@ -73,11 +85,12 @@ export function capTable(people: readonly { id: string; name: string }[], days: 
     rows.length < 2
       ? null
       : GROUP_IDS.map((g, i) => {
-          const lefts = rows.map((r) => r.cells[i]?.remaining ?? null);
-          const capped = lefts.filter((n): n is number => n !== null);
-          const skied = rows.reduce((n, r) => n + (r.cells[i]?.skied ?? 0), 0);
-          const planned = rows.reduce((n, r) => n + (r.cells[i]?.planned ?? 0), 0);
-          return cell(g, skied, planned, capped.length > 0 ? Math.min(...capped) : null);
+          let low: CapCell | undefined;
+          for (const r of rows) {
+            const c = r.cells[i];
+            if (c && c.remaining !== null && c.remaining < (low?.remaining ?? Number.POSITIVE_INFINITY)) low = c;
+          }
+          return cell(g, low?.skied ?? 0, low?.planned ?? 0, low?.remaining ?? null);
         });
   return {
     groups: GROUP_IDS.map((id) => ({ id, label: CAP_GROUPS[id].label, cap: CAP_GROUPS[id].cap })),

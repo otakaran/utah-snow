@@ -3,11 +3,12 @@
 // Polls while the page is visible: every 30 s while the tracker page watches, otherwise every 10 min (the pick
 // reads it), plus on focus. A 404 (route not deployed) keeps the empty crew and retries every 10 min.
 // 409: apply the fresh state, then finish, retry once or show "Changed on another phone – updated"
-// (optimistic.ts `conflictPlan`). 422 / 429 / 403 / offline: revert and show an inline notice.
+// (optimistic.ts `conflictPlan`). 422 / 429 / 403 / offline: revert and show an inline notice. A 200 for an op sent
+// with `saved` text shows it as a brief "saved" notice whose Undo reverts that op's audit row.
 import { batch, computed, signal } from '@preact/signals';
 import type { PickTracker } from '../../shared/types.ts';
 import { clientId, notify } from './tracker/notice.ts';
-import { applyOp, conflictPlan, prevOf } from './tracker/optimistic.ts';
+import { applyOp, auditIdFor, conflictPlan, prevOf } from './tracker/optimistic.ts';
 import {
   type AuditEntry,
   type BookingRow,
@@ -46,6 +47,7 @@ const FOCUS_GAP_MS = 10_000;
 
 interface Item {
   op: TrackerOp;
+  saved?: string | undefined;
   settle: (ok: boolean) => void;
 }
 
@@ -125,7 +127,7 @@ async function refresh(): Promise<void> {
   }
 }
 
-async function send(op: TrackerOp, attempt: number): Promise<boolean> {
+async function send(op: TrackerOp, attempt: number, saved?: string): Promise<boolean> {
   const prev = prevOf(confirmed.peek(), op);
   const body = { ...op, ...(prev === undefined ? {} : { prevUpdatedAt: prev }), clientId: clientId() };
   mutSeq += 1;
@@ -149,6 +151,7 @@ async function send(op: TrackerOp, attempt: number): Promise<boolean> {
     else await reload();
     const warnings = warningsOf(json);
     if (warnings.length > 0) notify('warn', warnings.join(' · '));
+    else if (saved) notify('ok', saved, auditIdFor(confirmed.peek().audit, op));
     return true;
   }
   if (res.status === 409 && op.op !== 'undo') {
@@ -157,7 +160,7 @@ async function send(op: TrackerOp, attempt: number): Promise<boolean> {
     else await reload();
     const plan = conflictPlan(confirmed.peek(), op);
     if (plan === 'done') return true;
-    if (plan === 'retry' && attempt === 0) return send(op, 1);
+    if (plan === 'retry' && attempt === 0) return send(op, 1, saved);
     notify('warn', 'Changed on another phone – updated');
     return false;
   }
@@ -183,7 +186,7 @@ async function drain(): Promise<void> {
   for (let item = queue.peek()[0]; item; item = queue.peek()[0]) {
     let ok = false;
     try {
-      ok = await send(item.op, 0);
+      ok = await send(item.op, 0, item.saved);
     } catch {
       notify('bad', 'Not saved – try again');
     }
@@ -194,13 +197,19 @@ async function drain(): Promise<void> {
   draining = false;
 }
 
-/** Queues one op (shown at once, sent in order). Resolves true when the server accepted it. */
-export function mutate(op: TrackerOp): Promise<boolean> {
+/**
+ * Queues one op (shown at once, sent in order). Resolves true when the server accepted it. `saved` is the brief
+ * confirmation shown on success ('Ana → Alta, Jan 3 saved'), with an Undo when the op wrote an audit row.
+ */
+export function mutate(op: TrackerOp, saved?: string): Promise<boolean> {
   return new Promise((settle) => {
-    queue.value = [...queue.peek(), { op, settle }];
+    queue.value = [...queue.peek(), { op, saved, settle }];
     void drain();
   });
 }
+
+/** Reverts one audit row (the saved notice's Undo and Recent changes). */
+export const undoChange = (auditId: number): Promise<boolean> => mutate({ op: 'undo', auditId }, 'Undone');
 
 const visible = (): boolean => document.visibilityState === 'visible';
 function period(): number {

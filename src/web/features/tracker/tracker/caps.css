@@ -1,0 +1,200 @@
+/* Days left + save thresholds (Summary.tsx). Only tokens.css variables. A table from 900 px; below it every row is a
+   card (crew stripe on the left) with one line per cap group: label, punch-card pips, snow number, then the note.
+   Pips: skied = solid, planned = half, left = empty ring. The status word shows only when low (shape + word + color). */
+.trk-caps-wrap {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.trk-caps {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.trk-caps th,
+.trk-caps td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.trk-caps thead th {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trk-cap {
+  display: block;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.trk-caps tbody th {
+  font: 800 var(--fs-body) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trk-cc-label {
+  display: none;
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trk-pips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  min-height: 12px;
+}
+
+.trk-pip {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--text);
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+
+.trk-pip-skied {
+  background: var(--text);
+}
+
+.trk-pip-planned {
+  background: linear-gradient(90deg, var(--text) 50%, transparent 50%);
+}
+
+.trk-pip-left {
+  border-color: var(--line-strong);
+}
+
+.trk-pips-inf,
+.trk-cc-save {
+  color: var(--text);
+  font: 900 var(--fs-3) / 1.1 var(--font-num);
+  font-feature-settings: var(--num-features);
+  white-space: nowrap;
+}
+
+.trk-cc-save {
+  display: block;
+  margin-top: 2px;
+}
+
+.trk-cc-save:empty {
+  display: none;
+}
+
+.trk-cc-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+
+.trk-cc-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-weight: 700;
+}
+
+.trk-tone-warn .trk-cc-word {
+  color: var(--warn-text);
+}
+
+.trk-tone-bad .trk-cc-word {
+  color: var(--bad);
+}
+
+@media (min-width: 900px) {
+  .trk-caps .trk-caps-crew > * {
+    border-bottom: 2px solid var(--line-strong);
+  }
+}
+
+.trk-caps-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+
+@media (max-width: 899.98px) {
+  .trk-caps,
+  .trk-caps tbody,
+  .trk-caps tr,
+  .trk-caps th,
+  .trk-caps td {
+    display: block;
+  }
+
+  .trk-caps thead {
+    display: none;
+  }
+
+  .trk-caps tbody {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .trk-caps tr {
+    padding: var(--space-2) var(--space-3) var(--space-1) calc(var(--space-3) + 4px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: inset 4px 0 0 var(--crew, var(--line-strong));
+  }
+
+  .trk-caps tbody .trk-caps-crew {
+    border: 2px solid var(--line-strong);
+  }
+
+  .trk-caps th,
+  .trk-caps td {
+    padding: 0;
+    border: 0;
+  }
+
+  .trk-caps tbody th {
+    padding-bottom: var(--space-1);
+  }
+
+  .trk-caps tbody th .trk-mark {
+    display: none; /* the card's stripe already carries the color */
+  }
+
+  .trk-caps td {
+    display: grid;
+    grid-template-columns: 7.5rem auto 1fr;
+    align-items: center;
+    column-gap: var(--space-2);
+    padding-block: var(--space-1);
+    border-top: 1px dotted var(--line);
+  }
+
+  .trk-cc-label {
+    display: block;
+  }
+
+  .trk-cc-save {
+    justify-self: end;
+    margin: 0;
+  }
+
+  .trk-cc-note {
+    grid-column: 2 / -1;
+  }
+}

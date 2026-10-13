@@ -8,6 +8,7 @@ export {
   addDays,
   daysBetween,
   daysRemaining,
+  daysUntil,
   isBetweenLocal,
   isTripDay,
   pickMode,

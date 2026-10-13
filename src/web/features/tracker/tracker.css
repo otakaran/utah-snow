@@ -1,8 +1,47 @@
 /* Tracker feature (#/tracker, spec §9.5). Only tokens.css variables. Leading sections live in tracker/:
-   grid (day grid), sheet (picker), page (head, notice, tables); then lists and crew here, in cascade order. */
+   grid (day grid), daylist (phone list), sheet (picker), page (head, notice), caps (days left + thresholds);
+   then crew colors, lists and crew here, in cascade order. */
 @import "./tracker/grid.css";
+@import "./tracker/daylist.css";
 @import "./tracker/sheet.css";
 @import "./tracker/page.css";
+@import "./tracker/caps.css";
+
+/* Crew colors (crew-color.ts): the class sets --crew; marks and stripes paint it. Accent only, never the only cue. */
+.trk-crew-1 {
+  --crew: var(--crew-1);
+}
+
+.trk-crew-2 {
+  --crew: var(--crew-2);
+}
+
+.trk-crew-3 {
+  --crew: var(--crew-3);
+}
+
+.trk-crew-4 {
+  --crew: var(--crew-4);
+}
+
+.trk-crew-5 {
+  --crew: var(--crew-5);
+}
+
+.trk-crew-6 {
+  --crew: var(--crew-6);
+}
+
+.trk-mark {
+  display: inline-block;
+  flex: none;
+  width: 4px;
+  height: 1em;
+  margin-right: 0.4em;
+  border-radius: 2px;
+  background: var(--crew, var(--line-strong));
+  vertical-align: -0.12em;
+}
 
 /* Lists: bookings and recent changes */
 .trk-h3 {
@@ -81,10 +120,11 @@
 .trk-person-item {
   display: grid;
   gap: var(--space-2);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 4px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
+  box-shadow: inset 4px 0 0 var(--crew, var(--line-strong));
 }
 
 .trk-person-top,

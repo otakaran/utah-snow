@@ -1,23 +1,24 @@
-// Day grid (spec §9.5): one row per trip date, one column per person; the date column and the name row stay put
-// while the grid scrolls, and it opens scrolled to today. A cell shows the resort and Planned (dashed ring) or
-// Skied (solid dot); tapping it opens the bottom-sheet picker.
+// Day grid (spec §9.5, from 900 px; DayList below): one row per trip date, one column per person; the date column
+// and the name row stay put while the grid scrolls, and it opens scrolled to today. A cell shows the resort and
+// Planned (dashed ring) or Skied (solid dot); tapping it opens the bottom-sheet picker.
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import { formatLocalDate, localDate } from '../../../shared/time.ts';
 import { serverNow } from '../../data/snapshot.ts';
 import { type DayRow, type PersonRow, people, skiDays } from '../../data/tracker.ts';
 import { Glyph } from '../../ui/StatusChip.tsx';
-import { cellText, focusDate, type GridCell, gridRows } from './grid-model.ts';
+import { CrewMark } from './CrewMark.tsx';
+import { crewClasses } from './crew-color.ts';
+import { cellLabel, cellText, focusDate, type GridCell, gridRows } from './grid-model.ts';
 import { openPicker } from './picker-state.ts';
 
 function Cell({ cell, person, dateText }: { cell: GridCell<DayRow>; person: PersonRow; dateText: string }) {
   const t = cellText(cell.day);
   const status = cell.day?.status;
-  const label = `${person.name}, ${dateText}: ${t ? `${t.resort}, ${t.status}` : 'no day recorded'}. Change`;
   return (
     <button
       type="button"
       class={`trk-cell${status ? ` trk-cell-${status}` : ' trk-cell-empty'}`}
-      aria-label={label}
+      aria-label={cellLabel(person.name, dateText, cell.day)}
       data-testid="tracker-cell"
       onClick={() => openPicker(cell.personId, cell.date)}
     >
@@ -54,6 +55,7 @@ export function Grid() {
   const today = localDate(serverNow.value);
   const rows = useMemo(() => gridRows(list, days, today), [list, days, today]);
   const byId = useMemo(() => new Map(list.map((p) => [p.id, p])), [list]);
+  const crewOf = useMemo(() => crewClasses(list), [list]);
   const wrap = useRef<HTMLDivElement>(null);
   const focus = focusDate(today);
 
@@ -77,7 +79,10 @@ export function Grid() {
             </th>
             {list.map((p) => (
               <th scope="col" key={p.id} class="trk-person">
-                <span class="trk-person-name">{p.name}</span>
+                <span class="trk-person-name">
+                  <CrewMark crew={crewOf.get(p.id)} />
+                  {p.name}
+                </span>
                 <ModeMark mode={p.mode} />
               </th>
             ))}

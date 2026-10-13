@@ -66,6 +66,14 @@
   --shadow: rgba(0, 0, 0, 0.45);
   --wall-dim: rgba(2, 6, 14, 0.55); /* night dimming veil over the wall (dark only: the wall is always dark) */
   --focus: #ffd23f;
+
+  /* crew (people order mod 6, accent only; hues clear of accent/status): >= 6.3:1 on --surface, --surface-2 */
+  --crew-1: #5cb8ff; /* azure 206 deg */
+  --crew-2: #e08cff; /* orchid 284 */
+  --crew-3: #b8e05a; /* lime 78 */
+  --crew-4: #b49bff; /* violet 255 */
+  --crew-5: #3fd0e6; /* cyan 188 */
+  --crew-6: #8fa3ff; /* periwinkle 229 */
 }
 
 /* Sun: USGS paper quad for direct sunlight; hard ink rules, no subtle tints. Worst case over
@@ -113,6 +121,14 @@
   --img-empty: #e4dccb;
   --shadow: rgba(10, 18, 32, 0.18);
   --focus: #0057b8;
+
+  /* crew (the dark set's hues, deepened for paper): >= 5.1:1 on --surface and --surface-2 */
+  --crew-1: #0b5fa8;
+  --crew-2: #8a2aa8;
+  --crew-3: #4f6a00;
+  --crew-4: #6a3fc8;
+  --crew-5: #006b80;
+  --crew-6: #3348b0;
 }
 
 /* Theme-independent */

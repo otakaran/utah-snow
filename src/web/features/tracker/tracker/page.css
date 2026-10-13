@@ -1,4 +1,4 @@
-/* Tracker page head, tone helpers, inline notice and the days-left / thresholds tables. Only tokens.css variables.
+/* Tracker page head, tone helpers and the inline notice (saved + Undo, warnings, errors). Only tokens.css variables.
    Status = shape + word + color: tone classes color the glyph; the word is always printed beside it. */
 .tracker {
   display: grid;
@@ -90,84 +90,4 @@
 
 .trk-notice-bad .glyph {
   color: var(--bad);
-}
-
-/* Days left and thresholds tables */
-.trk-table-wrap {
-  overflow-x: auto;
-}
-
-.trk-table {
-  min-width: 100%;
-  border-collapse: collapse;
-}
-
-.trk-table th,
-.trk-table td {
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-
-.trk-table thead th {
-  color: var(--text-dim);
-  font: 800 var(--fs-caption) / 1.2 var(--font-display);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.trk-table tbody th {
-  font: 800 var(--fs-body) / 1.2 var(--font-display);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.trk-cap {
-  display: block;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.trk-left-main {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  font: 800 var(--fs-body) / 1.2 var(--font-display);
-  font-feature-settings: var(--num-features);
-  white-space: nowrap;
-}
-
-.trk-left.trk-tone-warn .trk-left-main {
-  color: var(--warn-text);
-}
-
-.trk-left.trk-tone-bad .trk-left-main {
-  color: var(--bad);
-}
-
-.trk-left-split,
-.trk-th-exp {
-  display: block;
-  color: var(--text-dim);
-  font-size: var(--fs-caption);
-  white-space: nowrap;
-}
-
-.trk-table .trk-crew-row th,
-.trk-table .trk-crew-row td {
-  border-top: 2px solid var(--line-strong);
-}
-
-.trk-th-left,
-.trk-th-snow {
-  display: block;
-  white-space: nowrap;
-}
-
-.trk-th-left {
-  font-weight: 800;
 }

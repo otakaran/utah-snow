@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { TRIP } from '../../../../config/ikon.ts';
 import type { CapDay } from '../../../shared/caps.ts';
-import { cellText, defaultStatus, focusDate, gridRows, resortChoices, tripDates } from './grid-model.ts';
+import { cellText, dayListGroups, defaultStatus, focusDate, gridRows, resortChoices, tripDates } from './grid-model.ts';
 
 const day = (personId: string, date: string, resortId: CapDay['resortId'], status: CapDay['status'] = 'skied') => ({
   personId,
@@ -38,6 +38,14 @@ describe('tracker grid model', () => {
     expect(second?.cells.map((c) => c.personId)).toEqual(['eva', 'ana']);
     expect(second?.cells[0]?.day).toBeNull();
     expect(second?.cells[1]?.day?.resortId).toBe('brighton');
+  });
+
+  it('orders the phone list today, upcoming, then past days most recent first', () => {
+    const { head, past } = dayListGroups(gridRows([], [], '2026-12-29'));
+    expect(head.map((r) => r.date).slice(0, 2)).toEqual(['2026-12-29', '2026-12-30']);
+    expect(head).toHaveLength(TRIP.days - 2);
+    expect(past.map((r) => r.date)).toEqual(['2026-12-28', '2026-12-27']);
+    expect(dayListGroups(gridRows([], [], '2027-03-01')).head).toEqual([]);
   });
 
   it('defaults past dates to skied and today/future to planned', () => {

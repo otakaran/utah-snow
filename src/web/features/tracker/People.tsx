@@ -1,10 +1,12 @@
 // Crew management (spec §9.5): add, rename, ski/board, remove. A person with mode 'unknown' shows a "?" chip
 // reading "Confirm ski/board". Removing is a two-tap action and keeps the person's days (undo in Recent changes).
+// Each card carries the person's crew-color stripe, the legend for the marks on the rest of the page.
 import { useState } from 'preact/hooks';
 import type { SkiMode } from '../../../shared/types.ts';
 import { mutate, type PersonRow, people } from '../../data/tracker.ts';
 import { StatusChip } from '../../ui/StatusChip.tsx';
 import { Toggle } from '../../ui/Toggle.tsx';
+import { crewClass } from './crew-color.ts';
 
 const MAX_PEOPLE = 12;
 const MAX_NAME = 40;
@@ -23,7 +25,7 @@ export function nameProblem(name: string, list: readonly { id: string; name: str
   return list.some((p) => p.id !== selfId && p.name.toLowerCase() === lower) ? 'Someone already has that name' : null;
 }
 
-function PersonItem({ p, list }: { p: PersonRow; list: readonly PersonRow[] }) {
+function PersonItem({ p, list, crew }: { p: PersonRow; list: readonly PersonRow[]; crew: string }) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(p.name);
   const [arming, setArming] = useState(false);
@@ -35,7 +37,7 @@ function PersonItem({ p, list }: { p: PersonRow; list: readonly PersonRow[] }) {
     setEditing(false);
   };
   return (
-    <li class="trk-person-item" data-testid="tracker-person">
+    <li class={`trk-person-item ${crew}`} data-testid="tracker-person">
       <div class="trk-person-top">
         {editing ? (
           <form class="trk-inline-form" onSubmit={save}>
@@ -145,8 +147,8 @@ export function People() {
     <div class="stack trk-people">
       {list.length > 0 ? (
         <ul class="trk-person-list">
-          {list.map((p) => (
-            <PersonItem key={p.id} p={p} list={list} />
+          {list.map((p, i) => (
+            <PersonItem key={p.id} p={p} list={list} crew={crewClass(i)} />
           ))}
         </ul>
       ) : null}

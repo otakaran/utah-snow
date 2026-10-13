@@ -1,13 +1,22 @@
-/* Tracker day grid (Grid.tsx). Only tokens.css variables.
-   Cells: Skied = solid plate + ● dot, Planned = dashed outline + ◌ ring, empty = dotted "+". */
+/* Tracker day grid (Grid.tsx), from 900 px only (DayList below). Only tokens.css variables.
+   Cells: Skied = solid plate + ● dot, Planned = dashed outline + ◌ ring, empty = dotted "+".
+   The scroller fades out at the bottom as a "more rows" cue; its bottom padding lets the last row clear the fade. */
 
 .trk-grid-wrap {
-  max-height: min(70vh, 640px);
-  overflow: auto;
-  overscroll-behavior: contain;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .trk-grid-wrap {
+    display: block;
+    max-height: min(60vh, 560px);
+    overflow: auto;
+    padding-bottom: var(--space-6);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    mask-image: linear-gradient(to bottom, var(--text) calc(100% - var(--space-6)), transparent);
+  }
 }
 
 .trk-grid-wrap:focus-visible {
@@ -58,7 +67,7 @@
 
 .trk-person-name {
   display: block;
-  max-width: 8rem;
+  max-width: 9rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
