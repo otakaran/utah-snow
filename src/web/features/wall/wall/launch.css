@@ -1,0 +1,59 @@
+/* Imported by ../wall.css: the #/wall launcher under 1280 px (WallLaunch.tsx). main.tsx keeps [data-scale="wall"]
+   (about twice the phone ladder) on every #/wall view, so zoom: 0.5 brings the launcher back to phone size; px values
+   here are halved too, and buttons double --tap to stay 44 px. */
+.wall-launch {
+  zoom: 0.5;
+  box-sizing: border-box;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 32px;
+}
+
+.wall-launch-kicker,
+.wall-launch-title {
+  margin: 0;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.wall-launch-kicker {
+  color: var(--accent);
+  font-size: var(--fs-caption);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.wall-launch-title {
+  color: var(--text);
+  font-size: var(--fs-1);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.wall-launch .countdown {
+  margin-top: var(--space-3);
+}
+
+.wall-launch-text,
+.wall-launch-note {
+  max-width: 34em;
+  margin: var(--space-4) 0 0;
+  font-size: var(--fs-4);
+  line-height: 1.4;
+}
+
+.wall-launch-note {
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+}
+
+.wall-launch-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+}
+
+.wall-launch .btn {
+  min-height: calc(2 * var(--tap));
+}

@@ -1,6 +1,6 @@
 // TV wall (spec §8.4). Data only: the `set` -> resorts / ★ road-cam corridors / labels table (★ =
 // CORRIDORS[c].briefingCams in config/roads.ts; its keys are the #/wall `set` values), the pinned row, the featured
-// YouTube cell's first cam, the day window and the reload time.
+// YouTube cell's first cam, the day window, the reload time, the canvas and the launcher breakpoint.
 import type { Corridor, ResortId } from '../src/shared/types.ts';
 import type { CamId } from './cams/index.ts';
 import { RESORT_IDS } from './resorts.ts';
@@ -67,3 +67,9 @@ export const WALL_NIGHT_STILL_S = 120;
 
 /** The daily reload happens on the first tick at or after this local time on a new day. */
 export const WALL_RELOAD_HM = '03:30';
+
+/** The wall's design canvas (CSS px): other screens show it zoomed to fit, letterboxed. */
+export const WALL_CANVAS = { width: 1920, height: 1080 } as const;
+
+/** Narrower screens (phones, tablets, a small window) get the #/wall launcher instead of the wall (CSS px). */
+export const WALL_MIN_WIDTH = 1280;

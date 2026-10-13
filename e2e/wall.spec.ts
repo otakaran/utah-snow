@@ -1,8 +1,11 @@
-// TV wall (spec §8.4, §8.10): run in the `wall` project (1920x1080). Every test also fails on any console error
-// (fixtures.ts). The page clock is installed (not fixed) so rotation can be fast-forwarded, and every /api Date
-// header is pinned to the same instant, because the app's clock is the server's (serverNow = Date.now() + skew).
+// TV wall (spec §8.4, §8.10) at 1920x1080 in every project (narrower screens get the launcher). Every test also
+// fails on any console error (fixtures.ts). The page clock is installed (not fixed) so rotation can be fast-forwarded,
+// and every /api Date header is pinned to the same instant, because the app's clock is the server's
+// (serverNow = Date.now() + skew).
 import type { Page } from '@playwright/test';
 import { expect, test } from './fixtures.ts';
+
+test.use({ viewport: { width: 1920, height: 1080 } });
 
 const DAY = '2027-01-05T19:00:00Z'; // 12:00 MST
 const NIGHT = '2027-01-06T02:00:00Z'; // 19:00 MST
@@ -25,7 +28,7 @@ const camsOf = (page: Page, slot: string) =>
     .locator(`[data-testid="wall-tile"][data-slot="${slot}"] [data-cam]`)
     .evaluateAll((els) => els.map((el) => el.getAttribute('data-cam')));
 
-test('by day: 9 tiles without the app shell, cells 1-5 page after 20 s', async ({ page }) => {
+test('by day: 9 tiles without the app shell, cells 1-5 page after 20 s with a turn bar', async ({ page }) => {
   await wallAt(page, DAY);
   await page.goto('/#/wall?rotate=20&yt=180&set=all&hls=2');
   const wall = page.getByTestId('wall');
@@ -38,6 +41,7 @@ test('by day: 9 tiles without the app shell, cells 1-5 page after 20 s', async (
 
   const before = await camsOf(page, 'rotating');
   expect(before).toHaveLength(5);
+  await expect(page.locator('[data-slot="rotating"] [data-testid="wall-turn"]')).toHaveCount(5);
   await page.clock.fastForward(20_000);
   await expect.poll(() => camsOf(page, 'rotating')).not.toEqual(before);
   await expect(page.getByTestId('wall-tile')).toHaveCount(9);
