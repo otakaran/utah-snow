@@ -4,7 +4,7 @@
 // Keyless: UDOT's /List/GetData answers 403 to Worker egress (seen live), so one MountainPasses call goes first and
 // a 403 or block skips every other List call (traffic searches included): the rows then come from the WP feeds.
 import { CORRIDORS, SIGN_SEARCH } from '../../../../config/roads.ts';
-import { BlockedError, BudgetError, DeadlineError, type FetchCtx, type FetchOpts } from '../types.ts';
+import { BlockedError, BudgetError, DeadlineError, type FetchCtx, type FetchOpts, JSON_GET } from '../types.ts';
 import { type RoadsRaw, redactKey } from './raw.ts';
 import { keyedUrl } from './udot-keyed.ts';
 import { asPage, fetchPages, listUrl } from './udot-list.ts';
@@ -19,7 +19,6 @@ const WP_FIELDS = 'id,date_gmt,modified_gmt,link,title,content,categories,tags';
 export const wpUrl = (site: string): string =>
   `${site}/wp-json/wp/v2/posts?per_page=50&orderby=date&order=desc&_fields=${WP_FIELDS}`; // fetchx bust adds &_=
 type Lists = Pick<RoadsRaw, 'conditions' | 'passes' | 'signs'>;
-const JSON_GET: FetchOpts = { headers: { Accept: 'application/json' }, body: 'json', follow: false };
 
 export const isKeyed = (ctx: Pick<FetchCtx, 'keyed' | 'secrets'>): boolean => ctx.keyed.udot && !!ctx.secrets.udot;
 

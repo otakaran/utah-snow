@@ -5,6 +5,7 @@ import { BASES } from '../../../config/bases.ts';
 import { RESORT_IDS, RESORTS } from '../../../config/resorts.ts';
 import { MAINT } from '../../../config/schedule.ts';
 import { DAY, HOUR, isoUtc } from '../../shared/time.ts';
+import type { NwsPointChange, NwsPointResolved, NwsPointsRow } from '../../shared/types.ts';
 import { type FetchCtx, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 const API = 'https://api.weather.gov';
@@ -25,25 +26,6 @@ export interface NwsPointsRawItem {
   body: unknown;
   error?: string;
 }
-export interface NwsPointResolved {
-  id: string;
-  grid: string | null; // null = lookup failed
-  zone: string | null;
-  county: string | null;
-}
-export interface NwsPointChange {
-  id: string;
-  field: 'grid' | 'zone' | 'county';
-  expected: string;
-  actual: string;
-}
-export interface NwsPointsRow {
-  checkedAt: string;
-  points: NwsPointResolved[];
-  changes: NwsPointChange[];
-  failed: string[];
-}
-
 export const NWS_POINTS: readonly NwsPointDef[] = [
   ...RESORT_IDS.flatMap((r) =>
     (['base', 'summit'] as const).map((p) => {

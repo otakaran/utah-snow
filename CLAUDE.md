@@ -16,9 +16,9 @@
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
 - `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
   `probe-seed.ts` (hosts no adapter probes). Adapters: `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/` (+ `<id>/` helpers).
-- `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs against the budget), `job.ts` (one job's writes). D1 prune later.
-- `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, tick-state, row-meta, history, frames, counters;
-  `test-db.ts` for tests).
+- `src/worker/cron/`: `dispatcher.ts` (`runTick` admits jobs against the budget; 08Z D1 prune), `job.ts` (one job's writes).
+- `src/worker/store/`: the ONLY code touching D1/KV (snapshot, source-state, tick-state, row-meta, history, frames, counters,
+  prune; `test-db.ts` for tests).
 - `src/worker/api/`: one file per route, each with a contract test.
 - `src/web/`: Preact SPA: `main.tsx`, `app.tsx`, `router.ts`, `data/` (snapshot, health), `lib/format.ts`, `ui/`,
   `features/briefing/`, `styles/` (tokens.css, base.css).
@@ -29,11 +29,11 @@
 - `.github/workflows/`: ci (check, e2e, deploy on main) and health (twice daily `/api/health?strict=1`).
 - Status now: all source adapters registered and writing D1 (resorts, roads, NWS, avy, snotel, YouTube, stakes + KV
   frames, cam status, maintenance). The web shell shows the header and briefing status rows.
-- Not yet built: the 08Z D1 prune, `/api/cams|stake|tracker`, web features other than briefing, the drift workflow and
+- Not yet built: the MtnPowder browser fallback UI, `/api/cams|stake|tracker`, web features other than briefing, the drift workflow and
   Phase 2 `scripts/{refresh-fixtures,drift-check,bench-parsers}.ts` (`pnpm fixtures|drift|bench`).
 
 ## Commands
-- `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm deploy` runs from CI on main.
+- `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm deploy` runs from CI on main. Logs: `pnpm wrangler tail`.
 - `pnpm check` = `node scripts/check-repo.ts && biome check . && tsc -b && vitest run`. Must pass before commit.
 - `pnpm test` (vitest projects `unit` = node, `worker` = workerd). `pnpm e2e` (Playwright on `vite preview :4173`;
   `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused).
@@ -41,7 +41,6 @@
 - `pnpm cf-typegen` after any `wrangler.jsonc` change; commit `worker-configuration.d.ts`.
 - `pnpm db:local`: local D1 migrations + `e2e/seed.sql`.
 - Local cron tick: `curl "http://localhost:5173/cdn-cgi/local/scheduled?cron=*/5+*+*+*+*&time=<ms>&format=json"`.
-- Live logs: `pnpm wrangler tail`.
 - Every wrangler command except `deploy` passes `-c wrangler.jsonc` (after a build wrangler otherwise follows the generated config).
 - Never run interactive commands (`pnpm approve-builds`); add packages to `allowBuilds` in `pnpm-workspace.yaml` instead.
 
@@ -58,6 +57,7 @@
 - Adapters do all I/O through `ctx.fetch` (fetchx); `parse()` is pure and throws `ValidationError` to keep last-good rows.
 - All Date/Intl/time logic lives in `src/shared/time.ts` (body in `time/`; America/Denver). No local Date getters, `Intl`,
   `toLocale*` or `new Date(ms).toISOString()` elsewhere: use `isoUtc`/`isoLocal`, `httpDateToMs`, `HOUR`/`DAY`.
+  Tests may only spy on it (`vi.spyOn(Intl.…)`).
 - Stored and API values stay imperial; units convert in the client (`src/shared/units.ts`).
 - Colors only through `src/web/styles/tokens.css` variables; no raw hex elsewhere in `src/web/`.
 - No secrets in git (`.dev.vars` is local only; `.dev.vars.example` lists names). KV/D1 ids are not secrets.
@@ -107,7 +107,8 @@
   stays free for KV).
 - CPU is 10 ms: no DOM parsing, no un-memoized Intl.
 - Snowbird's API returns 500 for any foreign Origin. NWS returns 403 without a UA.
-- MtnPowder sits behind Imperva; the browser fallback uses the same pure parser (`src/shared/mtnpowder.ts`).
+- MtnPowder sits behind Imperva; the browser fallback uses the same pure parser (`src/shared/mtnpowder.ts`). Its
+  `blocked` rows are not critical (`isCritical` in `freshness.ts`), so they never fail `/api/health?strict=1`.
 - fetchx sends `cache: 'no-store'`, which workerd turns into `Cache-Control: no-cache`: conditional GETs
   (If-None-Match / If-Modified-Since) must also send `Cache-Control: max-age=0` or they never get a 304.
 - Ski Utah blob URLs (`skiutah.com/files/blob/...`) 404 on any `_=` query: never `bust: true` there.

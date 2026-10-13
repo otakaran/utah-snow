@@ -1,6 +1,7 @@
 // NWS gridpoint bucketing (spec §5.7): expand `validTime` intervals to hourly UTC slots, then sum or reduce them per
 // Denver day and per briefing window. Pure; every local date/hour comes from one localSlots() call per grid.
 
+import { round1 } from '../../../shared/num.ts';
 import { addDays, HOUR, isoToMs, localSlots, zonedToUtc } from '../../../shared/time.ts';
 import type { NwsDay } from '../../../shared/types.ts';
 import { kmhToMph, mmToIn, mToFt } from '../../../shared/units.ts';
@@ -81,9 +82,8 @@ export function expand(fields: Partial<Record<Field, Interval[]>>): Hourly | nul
   return { h0: lo, n, slots: localSlots(lo * HOUR, n), f };
 }
 
-const r1 = (x: number) => Math.round(x * 10) / 10;
 const r2 = (x: number) => Math.round(x * 100) / 100;
-const in1 = (mm: number) => r1(mmToIn(mm));
+const in1 = (mm: number) => round1(mmToIn(mm));
 const orNull = (x: number, conv: (v: number) => number) => (Number.isFinite(x) ? Math.round(conv(x)) : null);
 const degF = (c: number) => (c * 9) / 5 + 32;
 
@@ -175,7 +175,7 @@ export function snowHours(g: Hourly, w: { from: number; to: number }): number[] 
 
 /** Sum of the grid's snow (inches, 0.1) in a window; missing hours count as zero. */
 export function windowSnowIn(g: Hourly, w: { from: number; to: number }): number {
-  return r1(snowHours(g, w).reduce(add, 0));
+  return round1(snowHours(g, w).reduce(add, 0));
 }
 
 /** Overnight window for briefing day D: [D-1 16:00, D 08:00) local. */

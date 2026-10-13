@@ -5,3 +5,4 @@ export type * from './types/forecast.ts';
 export type * from './types/resort.ts';
 export type * from './types/roads.ts';
 export type * from './types/snapshot.ts';
+export type * from './types/youtube.ts';

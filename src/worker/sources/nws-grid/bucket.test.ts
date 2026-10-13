@@ -101,9 +101,8 @@ describe('bucketDays on live Alta base (SLC/108,167, updateTime 2026-10-12T19:56
 
 describe('Intl budget', () => {
   it('bucketing two grids, one across the DST change, makes <= 400 formatToParts calls', () => {
-    // Test-only instrumentation (spec §5.7 step 8 asks for a formatToParts spy); time logic stays in time.ts.
-    const { Intl: intl } = globalThis;
-    const spy = vi.spyOn(intl.DateTimeFormat.prototype, 'formatToParts');
+    // Test-only instrumentation (spec §5.7 step 8); check-repo allows `vi.spyOn(Intl.` in tests, nothing else.
+    const spy = vi.spyOn(Intl.DateTimeFormat.prototype, 'formatToParts');
     const shift = 20 * 24; // 2026-11-01 08Z falls inside the shifted grid
     const shifted = Object.fromEntries(
       Object.entries(liveFields()).map(([k, list]) => [k, list.map((iv) => ({ ...iv, h0: iv.h0 + shift }))]),

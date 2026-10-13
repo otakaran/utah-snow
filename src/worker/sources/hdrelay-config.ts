@@ -3,33 +3,18 @@
 // fetchx sends its explicit UA and never a Referer: manage.hdrelay.com answers 403 to any foreign Referer, and
 // browsers never fetch these configs. Never use server.jpg (b15b answers 404) and never run the config's
 // prepareFunction/_script. A GUID answering 404 ('player not found') marks the cam offline and `gone`.
-import { CAMS } from '../../../config/cams/index.ts';
+import { CAMS, HDRELAY_CONFIG_ROW } from '../../../config/cams/index.ts';
 import { MAINT } from '../../../config/schedule.ts';
 import { num } from '../../shared/num.ts';
 import { HOUR, isoUtc } from '../../shared/time.ts';
-import type { CamDef } from '../../shared/types.ts';
+import type { CamDef, HdrelayCamConfig, HdrelayConfigRow } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
-export const HDRELAY_CONFIG_ROW = 'hdrelay:config';
 export const PLAYER_URL = 'https://manage.hdrelay.com/player/';
 /** Hard fallback host (spec §8.3): live = 'https:' + host + '/camera/' + cameraId + '/relay/playlist.m3u8'. */
 export const DEFAULT_HOST = '//b15.hdrelay.com';
 const HOST_RE = /^(?:https?:)?(\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.hdrelay\.com)\/?$/i;
 const CAMERA_ID_RE = /^[0-9a-f-]{20,40}$/i;
-
-export interface HdrelayCamConfig {
-  guid: string;
-  cameraId: string; // camera.id; the registry's value until a config has been read
-  host: string; // server.hls, '//b15.hdrelay.com' today; only *.hdrelay.com is accepted
-  online: boolean | null; // camera.status.online; null = never read
-  gone?: true; // the GUID answered 404
-  timeoutInactive: number | null; // video.timeout.inactive, seconds
-  recordEnabled: boolean | null; // video.record.enabled
-  hotlink: { enabled: boolean; time: number | null } | null; // image.overlays.hotlink ('Last Snow'), time = epoch ms
-  position?: 'default' | 'panorama'; // image.position (timelapse players only)
-  checkedAt: string | null; // ISO of the last answer (200 or 404)
-}
-export type HdrelayConfigRow = Record<string, HdrelayCamConfig>;
 
 export interface PlayerProbe {
   status: number; // 0 = the request threw

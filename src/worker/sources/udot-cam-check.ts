@@ -6,7 +6,7 @@
 import { UDOT_CAMS } from '../../../config/cams/index.ts';
 import { MAINT } from '../../../config/schedule.ts';
 import { HOUR, isoUtc } from '../../shared/time.ts';
-import type { CamDef } from '../../shared/types.ts';
+import type { CamDef, UdotCamState, UdotCamsRow } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const UDOT_CAMS_ROW = 'udot:cams';
@@ -14,13 +14,6 @@ export const CCTV_URL = 'https://www.udottraffic.utah.gov/map/Cctv/';
 /** 09, 10 and 11Z: MAINT.utcHours without its first hour (08Z = hdrelay-config and the prune). */
 const UDOT_HOURS: readonly number[] = MAINT.utcHours.slice(1);
 const BATCHES = UDOT_HOURS.length;
-
-export interface UdotCamState {
-  online: boolean; // false = the PNG placeholder (or 404): hide the tile
-  checkedAt: string; // ISO
-}
-/** Row `udot:cams`: Cctv cam id -> state. Built up over the three daily batches. */
-export type UdotCamsRow = Record<string, UdotCamState>;
 
 export interface CctvProbe {
   status: number; // 0 = the request threw

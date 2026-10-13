@@ -5,9 +5,10 @@
 import { CHANNELS } from '../../../../config/youtube.ts';
 import { isObj } from '../../../shared/json.ts';
 import { HOUR } from '../../../shared/time.ts';
+import type { YtChannel, YtState } from '../../../shared/types.ts';
 import type { FetchX } from '../types.ts';
 import { type CsHit, csCandidate } from './camstreamer.ts';
-import { CHANNEL_IDS, DEF_BY_CAM, ID_RE, SLOT_DEFS, type YtChannel, type YtState } from './state.ts';
+import { CHANNEL_IDS, DEF_BY_CAM, ID_RE, SLOT_DEFS } from './state.ts';
 
 export interface VideoItem {
   id: string;

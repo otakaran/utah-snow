@@ -6,7 +6,7 @@ import { SOURCES } from '../sources/index.ts';
 import { type FetchCtx, type Source, ValidationError } from '../sources/types.ts';
 import { MAX_FRAMES_PER_JOB } from '../store/frames.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
-import { isMaintenance, isMorning, planTick, runTick, slotOf } from './dispatcher.ts';
+import { isMaintenance, isMorning, isPruneTick, planTick, runTick, slotOf } from './dispatcher.ts';
 
 const at = (iso: string) => Date.parse(iso);
 // 2026-12-28 is a Monday; Denver is UTC-7 in winter.
@@ -129,5 +129,35 @@ describe('runTick', () => {
       value: number;
     }>();
     expect(c?.value).toBe(1);
+  });
+});
+
+describe('08Z prune', () => {
+  it('runs only at slot 10 of 08Z and deletes expired frames, counters and old histories', async () => {
+    const t = at('2026-12-29T08:50:00Z');
+    expect([t, t - 5 * 60_000, t + 3_600_000].map(isPruneTick)).toEqual([true, false, false]);
+    const now = Date.now(); // the prune cuts relative to the tick's start, not its scheduled time
+    const day = 86_400_000;
+    const hour = (ms: number) => isoUtc(ms).slice(0, 13);
+    await env.DB.batch([
+      env.DB.prepare('INSERT INTO stake_frames VALUES (?1, ?2, 1), (?1, ?3, 1)').bind('c', now - 27 * 3_600_000, now),
+      env.DB.prepare("INSERT INTO counters VALUES ('old', 1, ?1), ('live', 1, ?2)").bind(now - 60_000, now + day),
+      env.DB.prepare("INSERT INTO drive_cache VALUES ('old', '{}', ?1), ('new', '{}', ?2)").bind(now - 31 * day, now),
+      env.DB.prepare("INSERT INTO resort_history VALUES ('alta', ?1, '{}'), ('alta', ?2, '{}')").bind(
+        hour(now - 31 * day),
+        hour(now),
+      ),
+      env.DB.prepare("INSERT INTO road_history (corridor, at) VALUES ('lcc', ?1), ('lcc', ?2)").bind(
+        now - 31 * day,
+        now,
+      ),
+    ]);
+    const count = async (table: string) =>
+      (await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first<{ n: number }>())?.n;
+    expect((await runTick(env, t - 5 * 60_000, { sources: [] })).pruned).toBe(false);
+    expect(await count('stake_frames')).toBe(2);
+    expect((await runTick(env, t, { sources: [] })).pruned).toBe(true);
+    for (const table of ['stake_frames', 'counters', 'drive_cache', 'resort_history', 'road_history'])
+      expect(await count(table), table).toBe(1);
   });
 });

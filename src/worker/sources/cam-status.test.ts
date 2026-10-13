@@ -1,7 +1,8 @@
 // Fixtures: live 2026-10-12 20:09 MDT (after dusk, pre-season); the in-season file is SYNTHETIC (Wayback has no
 // captures of these HEAD/redirect/JSON endpoints; see its _note).
 import { describe, expect, it } from 'vitest';
-import { allRequests, CAP, type CamStatusRow, camStatus, parseCamStatus, pickRequests } from './cam-status.ts';
+import type { CamStatusRow } from '../../shared/types.ts';
+import { allRequests, CAP, camStatus, parseCamStatus, pickRequests } from './cam-status.ts';
 import live from './fixtures/cam-status/20261012-live.json?raw';
 import synthetic from './fixtures/cam-status/cam-status-synthetic.json?raw';
 import { type FetchCtx, type FetchOpts, type FetchX, type PrevRows, ValidationError } from './types.ts';

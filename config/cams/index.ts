@@ -11,6 +11,9 @@ import { UDOT_CAMS } from './udot.ts';
 
 export { UDOT_CAMS };
 
+/** Row the maintenance job's hdrelay-config writes (08Z) and cam-status reads for the HDRelay cams' `online`. */
+export const HDRELAY_CONFIG_ROW = 'hdrelay:config';
+
 export const RESORT_CAMS = {
   alta: ALTA_CAMS,
   snowbird: SNOWBIRD_CAMS,

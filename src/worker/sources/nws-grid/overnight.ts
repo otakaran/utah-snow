@@ -2,6 +2,7 @@
 // [D-1 16:00, D 08:00) can lie before the grid's first hour. Every fetch that still covers the whole window stores
 // its hourly snow as frozen[D]; later fetches fill the hours they lack from it.
 
+import { round1 } from '../../../shared/num.ts';
 import { addDays, HOUR, isoUtc } from '../../../shared/time.ts';
 import type { PointForecast } from '../../../shared/types.ts';
 import { type Hourly, overnightWindow, snowHours } from './bucket.ts';
@@ -10,7 +11,6 @@ type Frozen = PointForecast['frozen'];
 type Overnight = PointForecast['overnight'];
 const KEEP = 3; // newest dates kept
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const r1 = (x: number) => Math.round(x * 10) / 10;
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
 
 /** The previous row's `frozen`, keeping only well-formed entries. */
@@ -63,5 +63,5 @@ export function overnightFor(g: Hourly, d: string, frozen: Frozen, updateTime: s
   });
   const coverage = missing ? 'partial' : usedFrozen ? 'frozen' : 'full';
   const issuedAt = usedFrozen && fz ? fz.updateTime : updateTime;
-  return { from: isoUtc(w.from * HOUR), to: isoUtc(w.to * HOUR), snowIn: r1(sum), coverage, issuedAt };
+  return { from: isoUtc(w.from * HOUR), to: isoUtc(w.to * HOUR), snowIn: round1(sum), coverage, issuedAt };
 }

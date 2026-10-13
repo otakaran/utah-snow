@@ -2,7 +2,7 @@
 // Stamps 'yyyy-MM-dd HH:mm' are PST all year; missing hours are omitted (index by time, never by position),
 // and a whole element can be absent (off-season WTEQ at 628 and 1300 is filtered as suspect).
 import { SNOTEL } from '../../../config/resorts.ts';
-import { num, range } from '../../shared/num.ts';
+import { num, range, round1 } from '../../shared/num.ts';
 import { DAY, HOUR, isoUtc, pstToUtc } from '../../shared/time.ts';
 import type { SnotelSeries } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type Source, ValidationError } from './types.ts';
@@ -38,8 +38,6 @@ function json(raw: unknown): unknown {
     throw new ValidationError('snotel: body is not JSON');
   }
 }
-
-const round1 = (x: number) => Math.round(x * 10) / 10;
 
 export function median(xs: readonly number[]): number {
   const s = [...xs].sort((a, b) => a - b);

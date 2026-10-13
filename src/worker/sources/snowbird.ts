@@ -8,7 +8,7 @@ import type { ResortSnapshot } from '../../shared/types.ts';
 import { gateList, liftList, liftSummary, trailCounts } from './snowbird/lifts.ts';
 import { readReport, snowNumbers } from './snowbird/report.ts';
 import { emptyWeather, weatherNow } from './snowbird/weather.ts';
-import { type FetchCtx, type FetchOpts, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
+import { type FetchCtx, JSON_GET, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 const ROW = 'resort:snowbird';
 const BASE = 'https://api.snowbird.com/api/v1/dor';
@@ -21,8 +21,6 @@ export const SNOWBIRD_URLS = {
 } as const;
 export const TRAILS_SLOT = 1; // §5.3: "+1 for trails in slot 1"
 const MIN_LIFTS = 5; // the API lists 14; fewer means a broken payload
-// follow:false keeps the worst case exact (no redirect hops); a 3xx body then fails JSON.parse and the job errors.
-const JSON_GET: FetchOpts = { headers: { Accept: 'application/json' }, body: 'json', follow: false };
 
 export interface SnowbirdRaw {
   report: unknown; // snow-reports array (limit=1)

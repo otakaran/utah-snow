@@ -5,8 +5,8 @@
 import { CAMS, type CamId } from '../../../../config/cams/index.ts';
 import { num } from '../../../shared/num.ts';
 import { HOUR, isoUtc, MIN } from '../../../shared/time.ts';
-import type { CamDef } from '../../../shared/types.ts';
-import type { CamStatusRow, KindCheck } from './types.ts';
+import type { CamDef, CamStatusRow } from '../../../shared/types.ts';
+import type { KindCheck } from './types.ts';
 
 const GATE_MS = 30 * MIN;
 const MIN_MS = 1_500_000_000_000; // 2017: anything older is junk

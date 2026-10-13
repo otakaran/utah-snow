@@ -7,6 +7,7 @@
 //            (in slots 7/11 the 6 cover death/pending discovery; after an API failure they cover ETag HEADs).
 // Inputs the dispatcher may provide in ctx.prev besides the row: 'yt:pending' (cam ids reported broken) and
 // 'yt:units' (units spent today, America/Los_Angeles). The row's `unitsTick` is what this run spent.
+import type { YtState } from '../../shared/types.ts';
 import { type FetchCtx, type Output, type PrevRows, type Source, ValidationError } from './types.ts';
 import { applyCamstreamer, fetchCamstreamer } from './youtube/camstreamer.ts';
 import {
@@ -20,10 +21,9 @@ import {
 import { applyThumbs, etagTargets, fetchThumbs, maxresTargets, THUMB_MAX } from './youtube/keyless.ts';
 import { applyDiscovery, applyLiveness } from './youtube/liveness.ts';
 import { answerCount, apiOk, isYtRaw, type YtRaw } from './youtube/raw.ts';
-import { CHANNEL_IDS, CS_DEFS, DEF_BY_CAM, readState, settle, type YtState } from './youtube/state.ts';
+import { CHANNEL_IDS, CS_DEFS, DEF_BY_CAM, readState, settle } from './youtube/state.ts';
 
 export type { YtRaw } from './youtube/raw.ts';
-export type { YtSlotState, YtState } from './youtube/state.ts';
 
 const ROW = 'yt:state';
 const FULL_SLOTS: readonly number[] = [3, 7]; // CamStreamer runs here; other slots are lite

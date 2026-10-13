@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { isoToMs } from '../../shared/time.ts';
+import type { YtState } from '../../shared/types.ts';
 import liveText from './fixtures/youtube/20261012-live.json?raw';
 import synthText from './fixtures/youtube/youtube-synthetic.json?raw';
 import { type FetchCtx, type FetchOpts, type FetchX, type PrevRows, ValidationError } from './types.ts';
-import { type YtRaw, type YtState, youtube } from './youtube.ts';
+import { type YtRaw, youtube } from './youtube.ts';
 
 interface Res {
   status: number;

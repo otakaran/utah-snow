@@ -1,8 +1,10 @@
 // §6.1 A: Deer Valley CamStreamer handles (keyless). HEAD https://camstreamer.com/embed/{handle} without
 // following redirects: a 3xx Location names the current YouTube ID (not proof of liveness), a 200 is
 // "Stream isn't live now.", anything else keeps the previous value.
+
+import type { YtState } from '../../../shared/types.ts';
 import type { FetchX } from '../types.ts';
-import { API_ONLY, apiOutranks, CS_DEFS, DEF_BY_CAM, ID_RE, setVideo, type YtState } from './state.ts';
+import { API_ONLY, apiOutranks, CS_DEFS, DEF_BY_CAM, ID_RE, setVideo } from './state.ts';
 
 export interface CsHit {
   cam: string;

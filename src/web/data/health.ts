@@ -60,7 +60,7 @@ export const globalBadge = computed<Badge | null>(() => {
   const now = serverNow.value;
   let worst: Badge | null = null;
   for (const m of sources.value) {
-    if (!isCritical(m.source)) continue;
+    if (!isCritical(m.source, m.status)) continue;
     const b = badge(m, now);
     if (worst === null || RANK[b] > RANK[worst]) worst = b;
   }

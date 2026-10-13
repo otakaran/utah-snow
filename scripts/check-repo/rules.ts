@@ -46,6 +46,8 @@ export function checkSizes(files: RepoFile[]): Finding[] {
 // Rule 4: all Date/Intl/time logic lives in src/shared/time.ts (and its body folder src/shared/time/).
 const TIME_HOME = (p: string) =>
   p === 'src/shared/time.ts' || p === 'src/shared/time.test.ts' || under(p, 'src/shared/time');
+// Tests may spy on Intl (instrumentation such as the §5.7 formatToParts budget); they may not call it.
+const TEST_INTL_SPY_RE = /\bvi\.spyOn\(\s*Intl\./g;
 
 export function checkTime(files: RepoFile[]): Finding[] {
   const found: Finding[] = [];
@@ -53,9 +55,9 @@ export function checkTime(files: RepoFile[]): Finding[] {
     if (f.text === null || !isCode(f.path) || f.path.endsWith('.d.ts')) continue;
     if (!(under(f.path, 'src') || under(f.path, 'config'))) continue;
     if (TIME_HOME(f.path)) continue;
-    found.push(
-      ...findAll(f.path, stripComments(f.text), TIME_RE, (m) => `time API '${m[0]}' outside src/shared/time.ts`),
-    );
+    const src = stripComments(f.text);
+    const text = isTest(f.path) ? src.replace(TEST_INTL_SPY_RE, 'vi.spyOn(') : src;
+    found.push(...findAll(f.path, text, TIME_RE, (m) => `time API '${m[0]}' outside src/shared/time.ts`));
   }
   return found;
 }

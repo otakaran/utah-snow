@@ -1,7 +1,7 @@
 // The source adapter contract (spec §3.2, §5.2). Adapters import only this file, src/shared/, config/ and their
 // own helper folder; `import type` from src/worker/lib is allowed, value imports are not: the fetchx error classes
 // the dispatcher matches with instanceof reach adapters through the re-export below (check-repo allows only that).
-import type { FetchX } from '../lib/fetchx.ts';
+import type { FetchOpts, FetchX } from '../lib/fetchx.ts';
 
 export type { FetchOpts, FetchResult, FetchX } from '../lib/fetchx.ts';
 export { BlockedError, BudgetError, DeadlineError } from '../lib/fetchx.ts';
@@ -50,4 +50,26 @@ export interface Frame {
 /** Thrown by parse() when a validation gate fails (§5.2 table): the job counts as an error, payloads are kept. */
 export class ValidationError extends Error {
   override name = 'ValidationError';
+}
+
+// Shared request helpers. follow:false keeps each job's worst case exact (every redirect hop is a subrequest).
+/** A JSON body without redirects; a 3xx body then fails JSON.parse and the job errors. */
+export const JSON_GET: FetchOpts = { headers: { Accept: 'application/json' }, body: 'json', follow: false };
+/** api.weather.gov GeoJSON as text (getJson parses it); fetchx adds the UA, without which NWS answers 403. */
+export const GEOJSON_GET: FetchOpts = { headers: { Accept: 'application/geo+json' }, follow: false };
+
+/** GET that must answer 200 with a JSON body (a 3xx is not followed and fails); `label` prefixes the errors. */
+export async function getJson(
+  ctx: Pick<FetchCtx, 'fetch'>,
+  url: string,
+  label: string,
+  opts: FetchOpts = GEOJSON_GET,
+): Promise<unknown> {
+  const res = await ctx.fetch<string>(url, { ...opts, body: 'text' });
+  if (res.status !== 200) throw new Error(`${label}: HTTP ${res.status} (redirects are not followed)`);
+  try {
+    return JSON.parse(res.data);
+  } catch {
+    throw new ValidationError(`${label}: body is not JSON`);
+  }
 }

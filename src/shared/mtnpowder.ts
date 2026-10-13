@@ -3,7 +3,7 @@
 // ACAO *) both run it. Numbers arrive as int or string ('6.0', '0', '--'), so every field goes through num().
 import { arr, type Obj, obj } from './json.ts';
 import { liftId } from './lifts.ts';
-import { num, range, text } from './num.ts';
+import { inches, num, range, text } from './num.ts';
 import { prevOpenedAt, reportIsToday, seasonState } from './season.ts';
 import { hm24, isoToMs, localParts } from './time.ts';
 import type { Gate, LiftState, LiftStatus, ResortSnapshot, RoadState, SnowNumbers, WeatherNow } from './types.ts';
@@ -102,8 +102,6 @@ function lift(l: Obj, weekday: number, unmapped: string[]): LiftStatus | null {
     updatedAt: mtnIso(l.UpdateDate),
   };
 }
-
-const inches = (v: unknown, max: number) => range(num(v), 0, max);
 
 /** Mid-Mountain is the headline area (§5.5); another area only when Mid has no 24 h number at all. */
 function headlineArea(sr: Obj): { a: Obj; area: SnowNumbers['area'] } {

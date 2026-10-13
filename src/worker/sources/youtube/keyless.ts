@@ -3,8 +3,10 @@
 // camstreamer.ts). Channel /live, /streams, embed and watch pages are never fetched: Developer Policies III.E.6
 // forbid scraping YouTube applications. A live stream's auto-generated hqdefault_live ETag is a small counter
 // that grows about every 5 min; a 10-digit ETag is a custom thumbnail (inconclusive); a 404 is a removed video.
+
+import type { YtState, YtStatus } from '../../../shared/types.ts';
 import type { FetchX } from '../types.ts';
-import { API_ONLY, apiOutranks, SLOT_DEFS, type YtState, type YtStatus } from './state.ts';
+import { API_ONLY, apiOutranks, SLOT_DEFS } from './state.ts';
 
 export interface ThumbHit {
   cam: string;

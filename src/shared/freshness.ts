@@ -1,13 +1,21 @@
 // Source freshness (spec §5.8), shared by the client badges, /api/health and the pick.
 // The client passes nowMs = Date.now() + skew, where skew = server Date header - local time.
+import { MTNPOWDER } from './mtnpowder.ts';
 import { isoToMs } from './time.ts';
-import type { Meta } from './types.ts';
+import type { Meta, SourceStatus } from './types.ts';
 
 export type Badge = 'green' | 'amber' | 'red' | 'grey';
 
-/** Critical rows (§8.1) drive the global badge and /api/health strict: resort:*, roads:*, nws:*:summit, avy:uac. */
-export const isCritical = (id: string): boolean =>
-  id.startsWith('resort:') || id.startsWith('roads:') || /^nws:[^:]+:summit$/.test(id) || id === 'avy:uac';
+/** Rows the browser refetches itself when the Worker is refused (MtnPowder: Imperva challenges Worker egress). */
+const BROWSER_FALLBACK: ReadonlySet<string> = new Set(Object.keys(MTNPOWDER).map((r) => `resort:${r}`));
+
+/**
+ * Critical rows (§8.1) drive the global badge and /api/health strict: resort:*, roads:*, nws:*:summit, avy:uac.
+ * A 'blocked' row with a browser fallback is not critical: being blocked is its expected production state.
+ */
+export const isCritical = (id: string, status?: SourceStatus): boolean =>
+  !(status === 'blocked' && BROWSER_FALLBACK.has(id)) &&
+  (id.startsWith('resort:') || id.startsWith('roads:') || /^nws:[^:]+:summit$/.test(id) || id === 'avy:uac');
 
 /** Minutes since the last good fetch, or null when there never was one. */
 export function ageMin(meta: Pick<Meta, 'okAt'>, nowMs: number): number | null {

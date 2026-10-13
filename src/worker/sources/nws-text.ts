@@ -5,14 +5,13 @@ import { obj, str } from '../../shared/json.ts';
 import { text } from '../../shared/num.ts';
 import { isoToMs, isoUtc } from '../../shared/time.ts';
 import type { Afd, NwsAlert } from '../../shared/types.ts';
-import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
+import { type FetchCtx, getJson, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const AFD_URL = 'https://api.weather.gov/products/types/AFD/locations/SLC/latest';
 // UTZ105 Salt Lake Valley (base presets), UTZ108 Wasatch Back (DV base), UTZ110 Snowbasin, UTZ111 Cottonwoods.
 export const ALERT_ZONES = ['UTZ105', 'UTZ108', 'UTZ110', 'UTZ111'] as const;
 export const ALERTS_URL = `https://api.weather.gov/alerts/active?zone=${ALERT_ZONES.join(',')}`;
 export const AFD_LINK = 'https://forecast.weather.gov/product.php?site=SLC&issuedby=SLC&product=AFD';
-const HEADERS = { Accept: 'application/geo+json' }; // fetchx adds the UA (NWS answers 403 without one)
 const MAX_KEY_MESSAGES = 1200;
 const SECTION_RE = /^\.([A-Z /]+)\.\.\./m;
 const SPLIT_RE = /^[ \t]*&&[ \t]*$/m;
@@ -96,16 +95,6 @@ export function parseAlerts(body: unknown): NwsAlert[] {
   return out;
 }
 
-async function getJson(ctx: FetchCtx, url: string, label: string): Promise<unknown> {
-  const res = await ctx.fetch<string>(url, { headers: HEADERS, follow: false });
-  if (res.status !== 200) throw new Error(`nws-text: ${label} HTTP ${res.status} (redirects are not followed)`);
-  try {
-    return JSON.parse(res.data);
-  } catch {
-    throw new ValidationError(`nws-text: ${label} body is not JSON`);
-  }
-}
-
 export const nwsText: Source<NwsTextRaw> = {
   id: 'nws-text',
   staleAfterMin: STALE_BY_ROW['nws:alerts'], // the default; staleByRow gives nws:afd its own 720
@@ -117,7 +106,10 @@ export const nwsText: Source<NwsTextRaw> = {
     { hostId: 'nws-afd', url: AFD_URL },
   ],
   async fetch(ctx: FetchCtx): Promise<NwsTextRaw> {
-    const [afd, alerts] = await Promise.all([getJson(ctx, AFD_URL, 'AFD'), getJson(ctx, ALERTS_URL, 'alerts')]);
+    const [afd, alerts] = await Promise.all([
+      getJson(ctx, AFD_URL, 'nws-text: AFD'),
+      getJson(ctx, ALERTS_URL, 'nws-text: alerts'),
+    ]);
     return { afd, alerts };
   },
   parse(raw: NwsTextRaw, _ctx: ParseCtx): Output {

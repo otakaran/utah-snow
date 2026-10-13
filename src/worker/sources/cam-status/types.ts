@@ -1,28 +1,5 @@
-// cam-status shapes (spec §6.4). The row types belong in src/shared/types/cams.ts once /api/cams reads them.
-
-/** Archive bounds: HDRelay frames/info (one position) or the Prism cam_init 24 h image list. */
-export interface CamArchive {
-  position?: 'default' | 'panorama'; // HDRelay only
-  first: string | null; // ISO
-  last: string | null; // ISO
-  /** Scrubber on: active archives while they have a frame, gated ones only while `last` is < 30 min old. */
-  enabled: boolean;
-}
-
-/** One `cams:status` entry. A cam whose `asOf` is more than 45 min old shows as stale. */
-export interface CamStatusEntry {
-  online: boolean | null; // null = unknown
-  asOf: string | null; // ISO time of the newest image; null for live-only stills (HDRelay snapshot)
-  checkedAt: string; // ISO; when this entry was last refreshed (rotation keeps older entries)
-  archive?: CamArchive;
-  path?: string; // Prism: current object path 'YYYY/MM/DD/HH-MM' (local wall clock)
-  hidden?: boolean; // Ski Utah hiddenUntilFresh: the ETag has not changed for 3 h
-  etag?: string; // Ski Utah hiddenUntilFresh tracking
-  etagSince?: string; // ISO; first time this ETag was seen (or its Last-Modified, if older)
-}
-
-/** Row `cams:status`: cam id -> entry. Only the cams this job checks (YouTube, UDOT, archives merge in /api/cams). */
-export type CamStatusRow = Record<string, CamStatusEntry>;
+// cam-status internals (spec §6.4). The row types (CamStatusEntry, CamStatusRow) live in src/shared/types/cams.ts.
+import type { CamStatusEntry, CamStatusRow } from '../../../shared/types.ts';
 
 /** What one request saw. JSON-serialisable, so fixtures store it as is. */
 export interface Probe {

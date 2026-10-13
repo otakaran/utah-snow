@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import type { NwsPointsRow } from '../../shared/types.ts';
 import live from './fixtures/nws-points/20261012-live.json?raw';
-import {
-  NWS_POINTS,
-  type NwsPointsRawItem,
-  type NwsPointsRow,
-  nwsPoints,
-  nwsPointsDue,
-  pointUrl,
-} from './nws-points.ts';
+import { NWS_POINTS, type NwsPointsRawItem, nwsPoints, nwsPointsDue, pointUrl } from './nws-points.ts';
 import { type FetchCtx, type FetchOpts, ValidationError } from './types.ts';
 
 const NOW = Date.parse('2026-10-12T12:50:00Z');

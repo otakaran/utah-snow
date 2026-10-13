@@ -52,4 +52,11 @@ describe('isCritical', () => {
     for (const id of ['resort:alta', 'roads:lcc', 'nws:alta:summit', 'avy:uac']) expect(isCritical(id)).toBe(true);
     for (const id of ['nws:alta:base', 'nws:afd', 'snotel', 'cams:status']) expect(isCritical(id)).toBe(false);
   });
+
+  it('exempts blocked rows the browser refetches (MtnPowder), not other blocked rows', () => {
+    expect(isCritical('resort:solitude', 'blocked')).toBe(false);
+    expect(isCritical('resort:deer-valley', 'blocked')).toBe(false);
+    expect(isCritical('resort:solitude', 'error')).toBe(true);
+    expect(isCritical('resort:brighton', 'blocked')).toBe(true);
+  });
 });

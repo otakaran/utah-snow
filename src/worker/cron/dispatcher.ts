@@ -2,7 +2,8 @@
 //   1. admit the slot's registered jobs in PRIORITY order while sum(maxSubrequests) <= BUDGET; the rest are deferred;
 //   2. D1 call 1: previous cron:last, every row's fetched_at, last-good payloads and other prev inputs (`reads`,
 //      counters, resort_history) for the admitted jobs;
-//   3. D1 call 2: cron:last, deferrals, cpu-suspect counters (previous jobs that wrote none of their due rows);
+//   3. D1 call 2: cron:last, deferrals, cpu-suspect counters (previous jobs that wrote none of their due rows) and,
+//      at the 08Z maintenance tick, the D1 prune (store/prune.ts);
 //   4. run admitted jobs under Promise.allSettled; each writes its own rows as soon as it settles (cron/job.ts);
 //   5. one log line per job.
 import { BUDGET, MAINT, MORNING_HOURS, PRIORITY, SLOTS, TICK_DEADLINE_MS } from '../../../config/schedule.ts';
@@ -12,6 +13,7 @@ import { errorText, logLine } from '../lib/log.ts';
 import { SOURCES } from '../sources/index.ts';
 import type { FetchCtx, Source } from '../sources/types.ts';
 import { cpuSuspectStmt } from '../store/counters.ts';
+import { pruneStmts } from '../store/prune.ts';
 import { type CronLast, writeTickStart } from '../store/source-state.ts';
 import { readTickState } from '../store/tick-state.ts';
 import { type JobEnv, type JobLog, readsOf, rowsAt, runJob } from './job.ts';
@@ -32,6 +34,10 @@ export function isMaintenance(ms: number): boolean {
   const monday = (Math.floor(ms / DAY) + 4) % 7 === 1; // 1970-01-01 was a Thursday
   return (MAINT.utcHours as readonly number[]).includes(h) || (monday && h === MAINT.mondayUtcHour);
 }
+
+/** The daily D1 prune rides on the first maintenance hour (08Z, with hdrelay-config). */
+export const isPruneTick = (ms: number): boolean =>
+  isMaintenance(ms) && Math.floor(ms / HOUR) % 24 === MAINT.utcHours[0];
 
 function priorityOf(id: string): number {
   const key = id.startsWith('nws-grid:') ? 'nws-grid' : id;
@@ -93,6 +99,7 @@ export interface TickResult {
   cron: CronLast;
   morning: boolean;
   maintenance: boolean;
+  pruned: boolean;
   ext: number;
   internal: number; // D1 + KV calls (INTERNAL_BUDGET = 25)
   logs: JobLog[];
@@ -127,11 +134,15 @@ export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpt
     deferred: plan.deferred.map((s) => s.id),
     suspects,
   };
+  const pruned = isPruneTick(scheduledTime);
   await writeTickStart(
     env.DB,
     cron,
     plan.deferred.flatMap((s) => rowsAt(s, startedAt)),
-    suspects.map((job) => cpuSuspectStmt(env.DB, job, startedAt)),
+    [
+      ...suspects.map((job) => cpuSuspectStmt(env.DB, job, startedAt)),
+      ...(pruned ? pruneStmts(env.DB, startedAt) : []),
+    ],
   );
   const settled = await Promise.allSettled(plan.admitted.map((src) => runJob(env, src, ctx, plan.slot)));
   const logs = settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
@@ -141,10 +152,11 @@ export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpt
     cron,
     morning: plan.morning,
     maintenance: plan.maintenance,
+    pruned,
     ext: fx.used(),
     internal: 2 + plan.admitted.length + logs.reduce((n, l) => n + l.frames, 0),
     logs,
   };
-  logLine({ tick: plan.slot, jobs: cron.jobs.length, deferred: cron.deferred, suspects, ext: result.ext });
+  logLine({ tick: plan.slot, jobs: cron.jobs.length, deferred: cron.deferred, suspects, pruned, ext: result.ext });
   return result;
 }

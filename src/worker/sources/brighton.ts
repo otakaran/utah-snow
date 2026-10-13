@@ -2,7 +2,7 @@
 // Job and row 'resort:brighton'. The Azure APIM host needs no key, UA or Origin. A Cloudflare/Imperva challenge
 // (headers or first 2 KB match fetchx BLOCKED_RE) makes fetchx throw BlockedError, so the row turns 'blocked' (O2).
 // The feed has no temperature or wind: the client resolves Brighton weather from obs UTBTN/BRW (§5.5).
-import { num, range } from '../../shared/num.ts';
+import { inches, num, range } from '../../shared/num.ts';
 import { roadHintState } from '../../shared/road-hint.ts';
 import { prevOpenedAt, reportIsToday, seasonState } from '../../shared/season.ts';
 import { isoToMs } from '../../shared/time.ts';
@@ -36,13 +36,13 @@ function feedOf(raw: unknown): BrightonFeed {
   return feed;
 }
 
-const inches = (loc: FeedLocation, key: string, max: number): number | null => {
+const locInches = (loc: FeedLocation, key: string, max: number): number | null => {
   const v = loc[key];
-  return range(num(v && typeof v === 'object' ? v.inches : v), 0, max);
+  return inches(v && typeof v === 'object' ? v.inches : v, max);
 };
 
 function snow(loc: FeedLocation, updated: string | null, report: string | null, live: boolean, now: number) {
-  const n = (key: string, max: number) => (live ? inches(loc, key, max) : null); // preseason: last season's numbers
+  const n = (key: string, max: number) => (live ? locInches(loc, key, max) : null); // preseason: last season's numbers
   const surface = [loc.primarySurface, loc.secondarySurface]
     .map((s) => (typeof s === 'string' ? s.trim() : ''))
     .filter(Boolean);

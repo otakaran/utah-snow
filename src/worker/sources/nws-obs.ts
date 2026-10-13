@@ -2,15 +2,14 @@
 // One GET per station (13), all through fetchx; a failed station keeps its last-good entry for up to 6 h.
 // Stored imperial: °C -> °F, km/h -> mph (rounded to 0.1). Values flagged X/B/Q by NWS QC are dropped.
 import { RESORTS, type ResortDef } from '../../../config/resorts.ts';
-import { num, range } from '../../shared/num.ts';
+import { num, range, round1 } from '../../shared/num.ts';
 import { HOUR, isoToMs, isoUtc } from '../../shared/time.ts';
 import type { ObsNow } from '../../shared/types.ts';
 import { cToF, kmhToMph } from '../../shared/units.ts';
-import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
+import { type FetchCtx, getJson, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 const ROW = 'obs';
 const BASE_URL = 'https://api.weather.gov/stations/';
-const HEADERS = { Accept: 'application/geo+json' }; // fetchx adds the UA (NWS answers 403 without one)
 const ROLES = ['base', 'baseWind', 'mid', 'summit', 'summitGust'] as const; // `alternates` are never fetched
 const FRESH_MS = 3 * HOUR; // gate: at least one station must report an observation this recent
 const KEEP_PREV_MS = 6 * HOUR; // a failed station's last-good entry survives this long
@@ -32,8 +31,6 @@ export type ObsRaw = Record<string, unknown>;
 
 type Quantity = { unitCode?: unknown; value?: unknown; qualityControl?: unknown };
 type Kind = 'temp' | 'speed' | 'deg';
-
-const round1 = (v: number): number => Math.round(v * 10) / 10;
 
 /** One NWS quantity in imperial units, or null (missing, QC-rejected, unknown unit, implausible). */
 function quantity(q: unknown, kind: Kind): number | null {
@@ -102,12 +99,6 @@ export function parseObs(raw: ObsRaw, ctx: ParseCtx): Record<string, ObsNow> {
   return out;
 }
 
-async function getJson(ctx: FetchCtx, url: string): Promise<unknown> {
-  const res = await ctx.fetch<string>(url, { headers: HEADERS, follow: false });
-  if (res.status !== 200) throw new Error(`nws-obs: HTTP ${res.status} (redirects are not followed)`);
-  return JSON.parse(res.data);
-}
-
 export const nwsObs: Source<ObsRaw> = {
   id: 'nws-obs',
   staleAfterMin: 90,
@@ -115,7 +106,7 @@ export const nwsObs: Source<ObsRaw> = {
   maxSubrequests: () => OBS_STATIONS.length, // 13 GETs; redirects are not followed
   probes: [{ hostId: 'nws-obs', url: obsUrl('HDP') }],
   async fetch(ctx: FetchCtx): Promise<ObsRaw> {
-    const settled = await Promise.allSettled(OBS_STATIONS.map((id) => getJson(ctx, obsUrl(id))));
+    const settled = await Promise.allSettled(OBS_STATIONS.map((id) => getJson(ctx, obsUrl(id), `nws-obs ${id}`)));
     const raw: ObsRaw = {};
     settled.forEach((s, i) => {
       const id = OBS_STATIONS[i];

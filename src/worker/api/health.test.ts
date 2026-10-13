@@ -47,6 +47,20 @@ describe('/api/health', () => {
     expect(body.cron.lastTickAt).not.toBeNull();
   });
 
+  it('strict ignores blocked MtnPowder rows (browser fallback) but not other red critical rows', async () => {
+    const now = Date.now();
+    const put = env.DB.prepare(
+      'INSERT INTO source_state (source_id, fetched_at, ok_at, status, fail_count) VALUES (?1, ?2, NULL, ?3, 3)',
+    );
+    await env.DB.batch([put.bind('resort:solitude', now, 'blocked'), put.bind('resort:deer-valley', now, 'blocked')]);
+    await runTick(env, now, { sources: [] });
+    expect((await get('/api/health?strict=1')).status).toBe(200);
+    await put.bind('resort:brighton', now, 'blocked').run();
+    const res = await get('/api/health?strict=1');
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { failures: string[] }).failures).toEqual(['red:resort:brighton']);
+  });
+
   it('cams from cams:status, youtube from yt:state + units, nws:points changes fail strict', async () => {
     const now = Date.now();
     const ago = (min: number) => isoUtc(now - min * 60_000);

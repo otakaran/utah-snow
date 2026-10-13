@@ -3,18 +3,10 @@
 // are re-matched against the ordered slot regexes, so a re-pointed stream moves to its proper slot.
 import { CHANNELS } from '../../../../config/youtube.ts';
 import { isoToMs } from '../../../shared/time.ts';
+import type { YtChannel, YtSlotState, YtState } from '../../../shared/types.ts';
 import { type CsHit, csCandidate } from './camstreamer.ts';
 import type { ApiCall, DiscoveryRun, VideoItem } from './data-api.ts';
-import {
-  DEF_BY_CAM,
-  matchSlot,
-  SLOT_DEFS,
-  type SlotDef,
-  setVideo,
-  type YtChannel,
-  type YtSlotState,
-  type YtState,
-} from './state.ts';
+import { DEF_BY_CAM, matchSlot, SLOT_DEFS, type SlotDef, setVideo } from './state.ts';
 
 const DEATH_RETRIES = 3; // the immediate run plus the next 2 youtube ticks
 

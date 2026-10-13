@@ -1,18 +1,11 @@
 // Fixtures: live 2026-10-12 (all 49 Cctv ids GET at 02:00Z, split into the three daily batches). The in-season file
 // is SYNTHETIC: UDOT re-issued every Cctv id on 2026-10-08, so no Wayback capture can match these ids (see _note).
 import { describe, expect, it } from 'vitest';
+import type { UdotCamsRow } from '../../shared/types.ts';
 import live from './fixtures/udot-cam-check/20261012-live.json?raw';
 import synthetic from './fixtures/udot-cam-check/udot-cam-check-synthetic.json?raw';
 import { type FetchCtx, type FetchOpts, type FetchX, ValidationError } from './types.ts';
-import {
-  batchCams,
-  batchIndex,
-  CCTV,
-  type UdotCamCheckRaw,
-  type UdotCamsRow,
-  udotCamCheck,
-  udotCamCheckDue,
-} from './udot-cam-check.ts';
+import { batchCams, batchIndex, CCTV, type UdotCamCheckRaw, udotCamCheck, udotCamCheckDue } from './udot-cam-check.ts';
 
 const at = (h: number) => Date.UTC(2026, 9, 13, h, 50);
 const BATCHES: UdotCamCheckRaw[] = JSON.parse(live);

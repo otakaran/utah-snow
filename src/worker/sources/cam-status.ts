@@ -3,23 +3,21 @@
 // = 20 requests, each one subrequest (redirects are never followed). Should the registry outgrow CAP, a window of
 // CAP requests rotates every hour and unchecked cams keep their previous entry. One kind file per provider in
 // cam-status/. YouTube (yt:state), UDOT (udot:cams) and archived stakes (stake_frames) are merged by /api/cams.
-import { CAMS } from '../../../config/cams/index.ts';
+import { CAMS, HDRELAY_CONFIG_ROW } from '../../../config/cams/index.ts';
 import { HOUR, isoUtc } from '../../shared/time.ts';
-import type { CamDef } from '../../shared/types.ts';
+import type { CamDef, CamStatusEntry, CamStatusRow } from '../../shared/types.ts';
 import { doStill } from './cam-status/do-still.ts';
 import { ARCHIVES, applyHdrelayOnline, frameInfoUrl, HDRELAY_CAMS, hdrelay } from './cam-status/hdrelay.ts';
 import { CAM_INIT_URL, prism } from './cam-status/prism.ts';
 import { runProbe } from './cam-status/probe.ts';
 import { roundshot } from './cam-status/roundshot.ts';
 import { skiutah } from './cam-status/skiutah.ts';
-import type { CamStatusEntry, CamStatusRaw, CamStatusRow, CheckReq, KindCheck } from './cam-status/types.ts';
+import type { CamStatusRaw, CheckReq, KindCheck } from './cam-status/types.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
-export type { CamStatusEntry, CamStatusRaw, CamStatusRow } from './cam-status/types.ts';
+export type { CamStatusRaw } from './cam-status/types.ts';
 
 export const CAM_STATUS_ROW = 'cams:status';
-/** Read (not written) by this job: `online` for the 12 HDRelay cams. */
-export const HDRELAY_CONFIG_ROW = 'hdrelay:config';
 export const CAP = 20; // §6.4 / §5.3 slot 11: cam-status <= 20 subrequests
 
 const KINDS: readonly KindCheck[] = [doStill, prism, hdrelay, roundshot, skiutah];

@@ -83,3 +83,23 @@ export interface ObsNow {
   dirDeg: number | null;
   at: string | null;
 }
+
+/** Row `nws:points` (Appendix C.1, maintenance Mondays 12Z): a non-empty `changes` is the alert. */
+export interface NwsPointResolved {
+  id: string;
+  grid: string | null; // null = lookup failed
+  zone: string | null;
+  county: string | null;
+}
+export interface NwsPointChange {
+  id: string;
+  field: 'grid' | 'zone' | 'county';
+  expected: string;
+  actual: string;
+}
+export interface NwsPointsRow {
+  checkedAt: string;
+  points: NwsPointResolved[];
+  changes: NwsPointChange[];
+  failed: string[];
+}

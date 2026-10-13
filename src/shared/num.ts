@@ -22,6 +22,12 @@ export function range(v: number | null | undefined, min: number, max: number): n
   return v !== null && v !== undefined && v >= min && v <= max ? v : null;
 }
 
+/** Rounds to one decimal (0.1 in, 0.1 °F, 0.1 mph). */
+export const round1 = (x: number): number => Math.round(x * 10) / 10;
+
+/** A snow amount in inches: the first number of `v` when it lies in [0, max], else null. */
+export const inches = (v: unknown, max: number): number | null => range(num(v), 0, max);
+
 const NAMED: Record<string, string> = {
   amp: '&',
   lt: '<',

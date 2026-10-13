@@ -1,16 +1,10 @@
 // Fixtures: live 2026-10-12 (all 12 players, trimmed to the parsed paths). In season: Wayback's only capture of
 // one of our GUIDs from a ski season (Peruvian, 2024-11-23; nothing exists for Jan-Mar 2026), served from b9.
 import { describe, expect, it } from 'vitest';
+import type { HdrelayConfigRow } from '../../shared/types.ts';
 import wb20241123 from './fixtures/hdrelay-config/20241123-inseason.json?raw';
 import live from './fixtures/hdrelay-config/20261012-live.json?raw';
-import {
-  DEFAULT_HOST,
-  type HdrelayConfigRaw,
-  type HdrelayConfigRow,
-  hdrelayConfig,
-  hdrelayConfigDue,
-  PLAYERS,
-} from './hdrelay-config.ts';
+import { DEFAULT_HOST, type HdrelayConfigRaw, hdrelayConfig, hdrelayConfigDue, PLAYERS } from './hdrelay-config.ts';
 import { type FetchCtx, type FetchOpts, type FetchX, type PrevRows, ValidationError } from './types.ts';
 
 const NOW = Date.UTC(2026, 9, 13, 8, 50);
