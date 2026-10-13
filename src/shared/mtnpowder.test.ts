@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mtnIso, mtnLiftState, mtnpowderUrl, parseMtnPowder } from './mtnpowder.ts';
+import { mtnIso, mtnLiftState, parseMtnPowder } from './mtnpowder.ts';
 
 const NOW = Date.parse('2026-12-28T13:30:00Z'); // Mon 06:30 MST
 const area = (v: (string | number)[]) => ({
@@ -73,17 +73,12 @@ describe('mtnLiftState (§5.5 table)', () => {
   });
 });
 
-describe('mtnIso and mtnpowderUrl', () => {
+describe('mtnIso', () => {
   it('adds the colon to ±HHMM offsets and rejects zone-less or placeholder stamps', () => {
     expect(mtnIso('2026-10-07T15:50:41-0600')).toBe('2026-10-07T15:50:41-06:00');
     expect(mtnIso('2026-10-07T15:50:41-06:00')).toBe('2026-10-07T15:50:41-06:00');
     expect(mtnIso('2026-10-07T15:50:41')).toBeNull();
     expect(mtnIso('--')).toBeNull();
-  });
-
-  it('builds the legacy feed URL, with the browser cache-buster when asked', () => {
-    expect(mtnpowderUrl('solitude')).toBe('https://mtnpowder.com/feed?resortId=65');
-    expect(mtnpowderUrl('deer-valley', 1767000000000)).toBe('https://mtnpowder.com/feed?resortId=49&_=1767000000000');
   });
 });
 

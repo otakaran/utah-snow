@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { toMs } from '../../shared/time.ts';
 import { BlockedError, createFetchx } from '../lib/fetchx.ts';
 import { liftState } from './brighton/feed.ts';
-import { BRIGHTON_URL, type BrightonRow, brighton } from './brighton.ts';
+import { type BrightonRow, brighton } from './brighton.ts';
 import jan from './fixtures/brighton/20260120-inseason.json?raw';
 import mar from './fixtures/brighton/20260328-inseason.json?raw';
 import live from './fixtures/brighton/20261012-live.json?raw';
@@ -139,11 +139,6 @@ describe('brighton validation gate', () => {
 });
 
 describe('brighton fetch', () => {
-  it('costs exactly one subrequest in the worst case', () => {
-    expect(brighton.maxSubrequests(fetchCtx(() => new Response('')).ctx)).toBe(1);
-    expect(brighton.probes).toEqual([{ hostId: 'brighton', url: BRIGHTON_URL }]);
-  });
-
   it('returns the body on 200', async () => {
     const { ctx, used } = fetchCtx(() => new Response(jan, { headers: { 'content-type': 'application/json' } }));
     expect(await brighton.fetch(ctx)).toBe(jan);

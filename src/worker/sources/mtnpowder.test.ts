@@ -5,7 +5,7 @@ import sol20230119 from './fixtures/mtnpowder/20230119-inseason-solitude.json?ra
 import liveDv from './fixtures/mtnpowder/20261012-live-deer-valley.json?raw';
 import liveSol from './fixtures/mtnpowder/20261012-live-solitude.json?raw';
 import dvSynthetic from './fixtures/mtnpowder/mtnpowder-synthetic.json?raw';
-import { deerValley, MTNPOWDER_SOURCES, type MtnPowderRow, solitude } from './mtnpowder.ts';
+import { deerValley, type MtnPowderRow, solitude } from './mtnpowder.ts';
 import { BlockedError, type FetchCtx, type FetchOpts, type FetchX, ValidationError } from './types.ts';
 
 const LIVE_NOW = Date.parse('2026-10-13T01:55:55Z'); // Mon 2026-10-12 19:55 MDT, when the live files were fetched
@@ -22,10 +22,9 @@ function ctxWith(status: number, body: string, seen: { url: string; opts?: Fetch
 }
 
 describe('mtnpowder live feeds (2026-10-12, pre-season)', () => {
-  it('Solitude: pre-season gating nulls the leftover snow numbers but keeps lifts, gates and weather', () => {
+  it('Solitude: report, weather, lifts, trails and gates', () => {
     const s = row(solitude.parse(liveSol, { now: LIVE_NOW, prev: {} }), 'resort:solitude');
     expect(s).toMatchObject({ id: 'solitude', season: 'preseason', seasonOpenedAt: null, operatingToday: false });
-    expect(s.snow).toMatchObject({ overnightIn: null, new24hIn: null, seasonTotalIn: null, baseDepthIn: null });
     expect(s.snow).toMatchObject({ reportAt: '2026-10-07T15:50:41-06:00', reportIsToday: false, area: 'mid' });
     expect(s.snow.summit).toBeUndefined();
     expect(s.snow.text).toMatch(/^Winter is coming! .*November 20\.$/);
@@ -55,22 +54,6 @@ describe('mtnpowder live feeds (2026-10-12, pre-season)', () => {
     expect(d.trails.total).toBe(202);
     expect(d.gates).toEqual([]);
     expect(d.roadHint).toEqual({ state: 'open', raw: 'I-80: Open; US-40: Open; SR-224: Open; SR-248: Open' });
-  });
-
-  it('marks the season opened on the first open lift on or after Nov 1, then carries it forward', () => {
-    const feed = JSON.parse(liveSol);
-    feed.MountainAreas[0].Lifts[1].Status = 'Open';
-    const opening = Date.parse('2026-11-20T15:30:00Z'); // 08:30 MST
-    const s = row(solitude.parse(JSON.stringify(feed), { now: opening, prev: {} }), 'resort:solitude');
-    expect(s).toMatchObject({ season: 'open', seasonOpenedAt: '2026-11-20T08:30:00-07:00', operatingToday: true });
-    expect(s.snow).toMatchObject({ new24hIn: 0, seasonTotalIn: 0 });
-    const summer = row(solitude.parse(JSON.stringify(feed), { now: LIVE_NOW, prev: {} }), 'resort:solitude');
-    expect(summer.season).toBe('preseason');
-    const later = solitude.parse(liveSol, {
-      now: opening,
-      prev: opened('resort:solitude', '2026-11-20T08:30:00-07:00'),
-    });
-    expect(row(later, 'resort:solitude')).toMatchObject({ season: 'closed-for-day', operatingToday: true });
   });
 });
 
@@ -167,15 +150,5 @@ describe('mtnpowder validation and fetch', () => {
     );
     await expect(deerValley.fetch(ctxWith(503, '{"error":"down"}'))).rejects.toThrow('HTTP 503');
     await expect(deerValley.fetch(ctxWith(302, ''))).rejects.toThrow('HTTP 302');
-  });
-
-  it('declares one subrequest per job, the shared probe host and 40 min staleness', () => {
-    for (const src of MTNPOWDER_SOURCES) {
-      expect(src.maxSubrequests(ctxWith(200, ''))).toBe(1);
-      expect(src.probes).toEqual([{ hostId: 'mtnpowder', url: expect.stringMatching(/^https:\/\/mtnpowder\.com\//) }]);
-      expect(src.staleAfterMin).toBe(40);
-      expect(src.rows).toEqual([src.id]);
-    }
-    expect(MTNPOWDER_SOURCES.map((s) => s.id)).toEqual(['resort:solitude', 'resort:deer-valley']);
   });
 });

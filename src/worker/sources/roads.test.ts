@@ -42,7 +42,10 @@ describe('roads: live 2026-10-12 (off-season)', () => {
     expect(Object.keys(rows)).toEqual(['roads:lcc', 'roads:bcc', 'roads:parleys', 'roads:snowbasin']);
     for (const r of Object.values(rows)) expect([r.state, r.tractionLaw]).toEqual(['open', false]);
     expect(rows['roads:lcc']?.headline).toBe('No active UDOT alerts');
-    expect(rows['roads:bcc']?.headline).toBe('Last UDOT update 10h ago');
+    expect(rows['roads:bcc']).toMatchObject({
+      headline: 'Latest UDOT update',
+      latestPost: { at: '2026-10-12T16:32:54Z' },
+    });
   });
 
   it('BCC keeps the Guardsman-only post as latestPost (info) and guardsman text', () => {
@@ -139,7 +142,7 @@ describe('roads: in-season Wayback feeds', () => {
     const evening = run(wpOnly({ [WB]: upTo(list, '2026-01-05T00:30:00Z') }), '2026-01-05T00:30:00Z');
     expect([evening['roads:parleys']?.state, evening['roads:parleys']?.tractionLaw]).toEqual(['traction', true]);
     const morning = run(wpOnly({ [WB]: list }), '2026-01-05T14:40:00Z')['roads:parleys'];
-    expect([morning?.state, morning?.headline]).toEqual(['open', 'Last UDOT update 9m ago']);
+    expect([morning?.state, morning?.headline]).toEqual(['open', 'Latest UDOT update']);
   });
 
   it('2026-01-09 "Traction Law LIFTED" supersedes an earlier traction post', () => {

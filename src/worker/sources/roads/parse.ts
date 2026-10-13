@@ -9,7 +9,7 @@ import { type Output, type ParseCtx, ValidationError } from '../types.ts';
 import { assembleCorridor } from './assemble.ts';
 import { classifyFeed, type PostFacts } from './classify.ts';
 import { resortSignals } from './cross.ts';
-import type { RoadsRaw, Signal } from './raw.ts';
+import { type RoadsRaw, type Signal, str } from './raw.ts';
 import { type SignRow, signSignal, signView } from './signs.ts';
 import { trafficCarry, trafficFor } from './traffic.ts';
 import { eventKeyed, keyedRows, passKeyed, segmentKeyed, signKeyed } from './udot-keyed.ts';
@@ -34,19 +34,33 @@ interface Udot {
   events: TrafficEvent[] | null; // null = no traffic data this tick
 }
 
-const recs = (rows: unknown[] | null): Record<string, unknown>[] | null =>
-  rows ? rows.map(obj).filter((o): o is Record<string, unknown> => o !== null) : null;
+// Keyless lists are statewide (a full sign pull is ~220 rows): keep only the rows the corridors read, before any
+// per-row work (timestamps cost the most). Same keys as the fixture trim in scripts/refresh-fixtures/trim.ts.
+const DEFS = Object.values(CORRIDORS);
+const ROADWAYS = new Set<string>(DEFS.flatMap((d) => d.roadways));
+const PASSES = new Set<string>(DEFS.flatMap((d) => d.passes.flatMap((p) => [p.name, String(p.rowId)])));
+const SIGNS = new Set<string>(DEFS.flatMap((d) => [...d.signs.travel, ...d.signs.advisory]));
 
 function readUdot(raw: RoadsRaw): Udot {
   const k = raw.keyed;
-  const seg = k ? keyedRows(raw.conditions?.[0])?.map(segmentKeyed) : recs(listRows(raw.conditions))?.map(segmentRow);
-  const passes = k ? keyedRows(raw.passes?.[0])?.map(passKeyed) : recs(listRows(raw.passes))?.map(passRow);
+  const seg = k
+    ? keyedRows(raw.conditions?.[0])?.map(segmentKeyed)
+    : listRows(raw.conditions)
+        ?.filter((o) => ROADWAYS.has(str(o.roadway)))
+        .map(segmentRow);
+  const passes = k
+    ? keyedRows(raw.passes?.[0])?.map(passKeyed)
+    : listRows(raw.passes)
+        ?.filter((o) => PASSES.has(str(o.name)) || PASSES.has(str(o.DT_RowId)))
+        .map(passRow);
   const signs = k
     ? keyedRows(raw.signs?.[0])
         ?.map(signKeyed)
         .filter((s): s is SignRow => s !== null)
-    : recs(listRows(raw.signs))?.map(signRow);
-  const searched = raw.traffic === null ? null : recs(listRows(raw.traffic));
+    : listRows(raw.signs)
+        ?.filter((o) => SIGNS.has(str(o.DT_RowId)))
+        .map(signRow);
+  const searched = raw.traffic === null ? null : listRows(raw.traffic);
   const keyedEvents = keyedRows(raw.events)?.map(eventKeyed) ?? null;
   const events =
     searched === null && keyedEvents === null
