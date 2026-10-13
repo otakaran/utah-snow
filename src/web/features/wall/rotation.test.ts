@@ -4,17 +4,18 @@ import { CORRIDORS } from '../../../../config/roads.ts';
 import { WALL_PINNED } from '../../../../config/wall.ts';
 import type { CamDef } from '../../../shared/types.ts';
 import { WALL_SETS } from '../../router.ts';
-import { nightStakes, pageOf, setCams, stepSet, ytOrder } from './rotation.ts';
+import { nightStakes, pageCount, pageOf, setCams, stepSet, ytOrder } from './rotation.ts';
 
 const ids = (list: readonly { id: string }[]) => list.map((c) => c.id);
 
 describe('pageOf', () => {
   const list = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-  it('pages in cells of 5, wrapping so every cam gets a turn and none repeats on a page', () => {
+  it('cycles through pageCount pages of 5, the last one filled from the start, none repeating a cam', () => {
+    expect(pageCount(list.length, 5)).toBe(2);
     expect(pageOf(list, 0, 5)).toEqual(['a', 'b', 'c', 'd', 'e']);
     expect(pageOf(list, 1, 5)).toEqual(['f', 'g', 'a', 'b', 'c']);
-    expect(pageOf(list, 2, 5)).toEqual(['d', 'e', 'f', 'g', 'a']);
-    expect(pageOf(list, 7, 5)).toEqual(pageOf(list, 0, 5)); // 35 % 7 === 0: the cycle restarts
+    expect(pageOf(list, 2, 5)).toEqual(pageOf(list, 0, 5));
+    expect(pageCount(0, 5)).toBe(1);
   });
   it('returns a list that fits on one page whole', () => {
     expect(pageOf(['a', 'b'], 3, 5)).toEqual(['a', 'b']);

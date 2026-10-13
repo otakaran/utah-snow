@@ -1,7 +1,9 @@
 /* TV wall (spec §8.4), tokens.css variables only. 1920x1080, always dark, [data-scale="wall"] type ladder:
    3fr = 16:9 cam grid + the snow table in the band under it | 1fr = sidebar, all inside --wall-safe. The clock stays
-   at or below the pick name; night = the --wall-dim veil; kiosk = no cursor and no controls after 3 s idle. */
+   at or below the pick name; night = the --wall-dim veil; kiosk = no cursor and no controls after 3 s idle.
+   Under 1280 px: the launcher (wall/launch.css). */
 @import "./wall/grid.css";
+@import "./wall/launch.css";
 
 /* sidebar: one column, footer pinned to the bottom. The 1fr column is ~460 px wide, so the hero sizes step down
    until every resort name fits on one line; the ladder relations hold: clock <= pick name > pick number >= 64 px,
@@ -130,9 +132,25 @@
   color: var(--text-dim);
 }
 
+.wall-count {
+  font-feature-settings: var(--num-features);
+}
+
 .wall-offline,
 .wall-paused {
   color: var(--warn-text);
+}
+
+/* LIVE plates breathe: a slow pulse on the ● glyph only, the word stays solid (base.css stops it under reduced
+   motion) */
+.wall .cam-live .glyph {
+  animation: wall-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes wall-pulse {
+  to {
+    opacity: 0.35;
+  }
 }
 
 /* fullscreen button: over the top-right corner, only while the pointer moves */

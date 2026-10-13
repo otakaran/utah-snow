@@ -1,6 +1,15 @@
-/* Imported first by ../wall.css: page layout, the 3x3 cam grid, the featured YouTube cell, the snow table. */
+/* Imported first by ../wall.css: page layout, the 3x3 cam grid, the rotation bar, the featured YouTube cell, the snow
+   table. */
 .wall-main:focus {
   outline: none;
+}
+
+/* the wall: a fixed 1920x1080 canvas (size and fit zoom inline, Wall.tsx), centered in the window */
+.wall-main:has(.wall) {
+  display: grid;
+  place-content: center;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .wall {
@@ -9,7 +18,6 @@
   grid-template-columns: 3fr 1fr;
   gap: var(--space-4);
   box-sizing: border-box;
-  height: 100vh;
   padding: var(--wall-safe);
   overflow: hidden;
 }
@@ -32,6 +40,7 @@
 }
 
 .wall-cell {
+  position: relative;
   min-width: 0;
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -40,6 +49,43 @@
 
 .wall-cell > .cam-tile {
   height: 100%;
+}
+
+/* rotation bar (WallGrid Turn): a --scrim track on the bottom edge of a cell that rotates, filling over one turn
+   (--turn, inline). It is re-keyed every turn, so the animation restarts without per-frame JS. Reduced motion:
+   base.css stops the fill, so the empty track goes too (the footer's page counter stays). */
+.wall-turn {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0;
+  height: var(--space-1);
+  background: var(--scrim);
+  pointer-events: none;
+}
+
+.wall-turn::after {
+  content: "";
+  display: block;
+  height: 100%;
+  background: var(--text-dim);
+  transform-origin: left;
+  animation: wall-turn var(--turn) linear both;
+}
+
+@keyframes wall-turn {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall-turn {
+    display: none;
+  }
 }
 
 /* featured YouTube cell: the player fills the cell, its label sits under it (never over the player) */

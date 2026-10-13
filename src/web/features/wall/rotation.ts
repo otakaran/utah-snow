@@ -26,13 +26,19 @@ export function setCams(set: WallSet): CamDef[] {
   return uniq([...heroes, ...rest, ...roads]);
 }
 
+/** Cells 1–5: the rotating stills. */
+export const ROTATING = 5;
+
+/** How many pages of `size` cells `count` cams fill (at least 1): the wall footer's "page 2/3". */
+export const pageCount = (count: number, size: number): number => Math.max(1, Math.ceil(count / size));
+
 /**
- * Page `page` (0, 1, 2 ...) of `list` in `size` cells, wrapping at the end, so every cam gets its turn and no cam
- * shows twice on one page. A list that fits in one page is returned whole.
+ * Page `page` (0, 1, 2 ...) of `list` in `size` cells, cycling through pageCount pages; the last page fills up
+ * from the start, so no cam shows twice on one page. A list that fits in one page is returned whole.
  */
 export function pageOf<T>(list: readonly T[], page: number, size: number): T[] {
   if (list.length <= size) return [...list];
-  const start = (Math.max(0, Math.floor(page)) * size) % list.length;
+  const start = (Math.max(0, Math.floor(page)) % pageCount(list.length, size)) * size;
   return Array.from({ length: size }, (_, i) => list[(start + i) % list.length] as T);
 }
 
