@@ -38,7 +38,7 @@ const RANK: Record<Badge, number> = { red: 0, amber: 1, green: 2, grey: 3 };
 function GlobalFreshness({ now }: { now: number }) {
   const g = globalBadge.value;
   const rows: SourceRow[] = sources.value
-    .map((m) => ({ id: m.source, badge: badge(m, now), age: ageMin(m, now), error: m.error }))
+    .map((m) => ({ id: m.source, badge: badge(m, now), age: ageMin(m, now), error: m.error, via: m.via }))
     .sort((a, b) => RANK[a.badge] - RANK[b.badge] || (a.id < b.id ? -1 : 1));
   return (
     <>

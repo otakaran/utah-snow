@@ -26,6 +26,7 @@ export function SystemStatus() {
     badge: badge(m, now),
     age: ageMin(m, now),
     error: m.error,
+    via: m.via,
   }));
   const bad = rows.filter((r) => r.badge === 'amber' || r.badge === 'red').length;
   return (
