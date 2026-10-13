@@ -1,72 +1,219 @@
-/*
- * PLACEHOLDER TOKENS. The design sprint (spec §8.9) replaces this whole file with the locked palette.
- * Neutral greys plus four status hues, just enough for a readable page. This is the only file in
- * src/web allowed to hold raw colors; everything else uses these variables. Keep the variable names
- * (or update their users) when the sprint swaps in the real values.
- * Themes via [data-theme] on <html>: dark (default), sun (light, high contrast), auto (follows the OS).
- */
-:root {
-  color-scheme: dark;
-  --bg: #121417;
-  --surface: #1b1e23;
-  --border: #343941;
-  --text: #f2f3f5;
-  --text-muted: #b4b9c2;
-  --link: #9cc7ff;
-  --focus: #ffd166;
-  --status-green: #4cc38a;
-  --status-amber: #f0b429;
-  --status-red: #ff6b6b;
-  --status-grey: #9aa0a8;
-  --banner-bg: #3a2f12;
+/* Locked 2026-10-12 from the design sprint: B Topo Night base + D First Chair grafts (type ladder, sunrise accent,
+   wall discipline). Decisions the UI must honor:
+   - OVERNIGHT caption directly under the big number; the pick resort name outranks the number (see --fs-*).
+   - Six-peak overnight ridge chart in the pick card with full resort names (no BIRD / DV); pick peak in --accent.
+   - Labelled 5-segment avalanche scale (--nac-*, the level word on every segment).
+   - Status = shape + word + color, same on phone and wall; stale roads say LAST KNOWN: OPEN?, never a solid OPEN.
+   - Cam captions carry an age; a ★ marks every cam of the pick resort.
+   - Wall clock never larger than the pick name; wall content stays inside --wall-safe.
+   - Contour texture (--texture-topo) only as a page background, never behind text in cards. No stencil fonts.
+   Fonts (Google Fonts families, self-hosted woff2 per spec 8.9): "Barlow Condensed" 600-900 for digits and display
+   (digits 900, tabular via --num-features, --snow-glow text-shadow), "Barlow" 400-700 for text.
+   Themes: <html data-theme> dark (default, :root) | sun (USGS paper quad). Settings resolves "auto" to dark|sun with
+   matchMedia, so the sun set is not duplicated here. The wall ([data-scale="wall"]) is always dark.
+   The only file in src/web allowed to hold color literals. Contrast ratios are WCAG 2.x, measured.
+*/
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+/* Dark: backlit navy topo map. Worst case over --bg/--surface/--surface-2/--bg-glow: --text 13.3:1,
+   --text-dim 7.5, --snow 13.2, --accent 7.1 (9.5 on --bg, 7.1 on --accent-soft), --ok 8.7, --warn 9.9,
+   --bad 5.1, --off 5.8, --live 5.1. Inks: --accent-ink >= 7.7 on every gradient stop, --on-* >= 6.8. */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* surfaces + text */
+  --bg: #061020;
+  --bg-glow: #0e2a52; /* backlight radial behind hero blocks */
+  --surface: #0b1a30;
+  --surface-2: #12274a;
+  --line: #24406a;
+  --line-strong: #3d6299;
+  --text: #f2f7ff;
+  --text-dim: #a9bddb;
+
+  /* accents: sunrise orange = the pick and primary actions; ice = overnight inches, so the two never blur */
+  --accent: #ffa152;
+  --accent-ink: #1a0d03; /* text on --accent and --accent-gradient */
+  --accent-soft: rgba(255, 161, 82, 0.12); /* pick card wash */
+  --accent-gradient: linear-gradient(100deg, #ffc760 0%, #ffa152 55%, #ff7f5c 100%); /* pick header */
+  --snow: #eaf8ff;
+  --snow-glow: rgba(95, 214, 255, 0.38);
+  --live: #ff5fb0;
+  --on-live: #061020;
+
+  /* status: --ok ● OPEN, --warn ▲ CAUTION (amber, never blue), --bad ◆ CLOSED (solid plate),
+     --off ◌ STALE (dashed outline). Plates: status fill + --on-* ink. As plain text: the status
+     color itself, except warn uses --warn-text. */
+  --ok: #4fe3a1;
+  --on-ok: #061020;
+  --warn: #ffd23f;
+  --on-warn: #061020;
+  --warn-text: #ffd23f;
+  --warn-soft: #3a2f12; /* caution / offline banner fill: --text 12.2:1 */
+  --bad: #ff6a5c;
+  --on-bad: #061020;
+  --off: #93a6c2;
+  --on-off: #061020;
+  --chip-edge: rgba(0, 0, 0, 0);
+
+  /* map furniture */
+  --contour: #5a8cd2; /* painted through the --texture-topo mask */
+  --contour-alpha: 0.2;
+  --peak: #24497f; /* ridge chart mountains */
+  --peak-cap: #eaf8ff;
+  --scrim: rgba(6, 16, 32, 0.88); /* caption plate over cam images */
+  --img-empty: #0f2240;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --wall-dim: rgba(2, 6, 14, 0.55); /* night dimming veil over the wall (dark only: the wall is always dark) */
+  --focus: #ffd23f;
+}
+
+/* Sun: USGS paper quad for direct sunlight; hard ink rules, no subtle tints. Worst case over
+   --bg/--surface/--surface-2: --text 15.5:1, --text-dim 8.1, --snow 10.9, --accent 7.2 (7.3 on
+   --accent-soft), --ok 4.9, --warn-text 4.9, --bad 6.2, --off 8.1, --live 5.8. Inks: white on every
+   --accent-gradient stop >= 5.7, --on-* >= 5.9. */
+[data-theme="sun"] {
+  color-scheme: light;
+
+  --bg: #f7f3e8;
+  --bg-glow: #fffdf6;
+  --surface: #ffffff;
+  --surface-2: #efe9db;
+  --line: #1e2a3a;
+  --line-strong: #0a1220;
+  --text: #0a1220;
+  --text-dim: #384556;
+
+  --accent: #8a2b00; /* burnt sunrise: 7:1 on paper needs this depth */
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(138, 43, 0, 0.1);
+  --accent-gradient: linear-gradient(100deg, #b04500 0%, #9c3500 55%, #8a2b00 100%);
+  --snow: #062a73; /* deep survey blue */
+  --snow-glow: rgba(0, 0, 0, 0);
+  --live: #b0005a;
+  --on-live: #ffffff;
+
+  --ok: #0a7342;
+  --on-ok: #ffffff;
+  --warn: #ffc400; /* hazard-yellow plate: holds up in glare and in grayscale */
+  --on-warn: #0a1220;
+  --warn-text: #8a5a00; /* yellow as text on paper is 1.6:1 */
+  --warn-soft: #fff3cd;
+  --bad: #a8160c;
+  --on-bad: #ffffff;
+  --off: #384556;
+  --on-off: #ffffff;
+  --chip-edge: #0a1220;
+
+  --contour: #9a6b3c; /* brown survey contours, page background only */
+  --contour-alpha: 0.24;
+  --peak: #b9a888;
+  --peak-cap: #c3d0e0; /* pale ice: white vanishes on paper */
+  --scrim: rgba(255, 255, 255, 0.92);
+  --img-empty: #e4dccb;
+  --shadow: rgba(10, 18, 32, 0.18);
+  --focus: #0057b8;
+}
+
+/* Theme-independent */
+:root {
+  /* NAC North American danger scale: fixed by the standard, never themed. Ink: black on low..high
+     (8.3 / 16.1 / 9.9 / 4.8:1; the sprint's #141b21 was 4.0 on high), white on extreme (16.3:1). */
+  --nac-low: #50b848;
+  --nac-moderate: #f4e500;
+  --nac-considerable: #ff9933;
+  --nac-high: #ed1c24;
+  --nac-extreme: #231f20;
+  --nac-ink: #000000;
+  --nac-ink-extreme: #ffffff;
+
+  /* fonts: 2 self-hosted families, plus the system monospace for ids */
+  --font-display: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-num: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.5rem;
+  --num-features: "tnum" 1, "lnum" 1; /* font-feature-settings for every number */
+
+  /* phone type ladder (390 x 844): pick name > pick overnight > resort overnight > body; 12 px absolute floor */
+  --fs-pick-name: 60px;
+  --fs-pick-num: 56px; /* pick overnight inches, OVERNIGHT caption right under it */
+  --fs-resort-num: 36px; /* every other resort's overnight inches */
+  --fs-clock: 20px; /* never above --fs-pick-name */
+  --fs-1: 32px; /* secondary numbers: score, drive, countdown, ETO */
+  --fs-2: 24px; /* card titles */
+  --fs-3: 20px; /* sub-heads */
+  --fs-4: 16px; /* body (--fs-body), 14 px floor */
+  --fs-5: 13px; /* captions, ages, OVERNIGHT (--fs-caption) */
+  --lh: 1.4;
+
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
-  --space-6: 24px;
+  --space-5: 24px;
+  --space-6: 40px;
   --radius: 8px;
-  --gutter: 16px;
+  --radius-chip: 4px;
+  --tap: 44px; /* minimum touch target */
+  --gutter: 16px; /* page gutter */
   --max-width: 1200px;
-  --touch: 44px;
+  --wall-safe: 24px; /* TV overscan-safe margin: nothing on the wall sits closer to the edge */
+  --wall-scale: 1;
+
+  /* texture: seamless 640px contour tile, used as a mask over --contour (page background only) */
+  --texture-topo-size: 640px;
+  --texture-topo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640' viewBox='0 0 640 640' fill='none' stroke='black' stroke-linejoin='round'%3E%3Cpath stroke-opacity='.55' stroke-width='1' d='M55 159 55 159M167 0 175 6 185 8 195 5 201 0M55 145 55 145M201 640 203 630 201 625 195 619 185 616 175 618 166 625 165 635 167 640M133 0 139 15 149 25 165 34 180 36 195 35 210 28 222 15 227 0M0 172 10 190 30 211 50 223 60 225 70 225 80 223 95 216 124 195 134 185 140 175 142 160 137 145 127 135 110 128 90 125 58 125 29 130 10 139 0 151M640 151 638 160 640 172M227 640 228 630 227 620 219 605 205 596 185 593 165 595 153 600 145 606 135 620 133 630 133 640M122 0 124 10 128 20 140 34 150 41 160 45 180 48 200 44 216 35 229 20 235 0M0 190 20 212 40 226 55 232 75 232 90 227 104 220 140 195 153 180 156 170 157 160 154 145 144 130 130 120 115 116 85 115 45 118 20 123 0 133M640 133 630 145 627 160 631 175 640 190M235 640 236 625 234 615 230 605 225 598 210 589 185 585 170 586 155 590 137 600 130 609 125 619 122 630 122 640M112 0 114 15 118 25 130 43 140 52 150 58 160 61 170 62 195 57 210 50 220 43 228 35 235 24 242 0M0 201 20 220 40 234 59 240 75 240 90 236 102 230 155 198 167 185 170 175 171 165 168 145 159 125 145 109 130 103 105 103 50 109 20 115 0 122M640 122 630 128 623 135 618 145 616 155 617 165 621 175 640 201M242 640 243 625 241 610 237 600 230 590 220 584 210 580 185 578 155 581 145 585 135 591 126 600 119 610 114 625 112 640M104 0 106 25 122 65 122 75 118 80 110 85 90 92 20 107 0 113M248 0 242 25 230 44 210 61 177 80 168 90 167 100 180 145 184 170 183 190 177 200 170 205 135 221 95 241 80 246 70 248 55 247 40 241 20 228 0 210M640 113 626 120 615 130 609 140 606 155 608 165 615 180 626 195 640 210M248 640 249 625 248 610 243 595 237 585 230 579 220 575 190 571 155 574 140 578 130 584 120 595 111 610 106 625 104 640M88 0 83 50 77 65 65 75 54 80 0 96M259 0 255 22 248 40 235 60 211 85 204 95 200 105 198 120 203 155 214 185 225 201 254 230 264 245 266 260 262 270 258 275 245 282 230 280 215 271 185 243 175 238 160 235 135 240 85 261 70 263 60 262 50 260 35 253 0 226M640 96 620 105 601 120 591 135 588 155 590 170 598 185 611 200 640 226M259 640 260 620 259 600 256 585 252 575 245 566 235 560 210 557 150 560 135 563 125 568 112 580 102 595 94 615 88 640M80 0 73 40 69 50 63 60 55 67 40 75 0 88M264 0 261 20 255 40 245 57 216 95 209 110 208 125 212 155 223 180 235 195 270 230 279 245 283 260 282 270 278 280 270 290 260 298 250 302 240 303 230 301 215 292 180 257 168 250 155 247 135 250 85 268 70 270 55 268 45 265 30 257 0 233M640 88 614 100 595 115 587 125 582 135 579 155 582 175 591 190 606 205 640 233M210 378 210 378M264 640 266 600 263 580 260 568 255 559 250 554 240 549 230 548 145 552 130 555 120 560 110 569 100 585 89 610 80 640M73 0 63 35 58 45 51 55 35 66 0 80M269 0 265 25 259 45 250 61 223 100 219 110 217 125 220 150 230 174 243 190 284 230 293 245 297 260 295 280 289 295 275 311 253 330 247 340 249 350 265 382 271 410 271 435 268 455 263 470 256 480 250 482 245 481 225 468 191 440 180 423 177 405 180 385 190 367 214 340 217 335 216 330 212 320 199 300 185 281 175 270 160 261 145 259 130 262 90 276 75 278 60 277 45 272 35 267 0 241M640 80 609 95 595 105 585 115 574 135 570 160 574 180 582 195 593 205 640 241M269 640 272 595 269 560 265 545 260 536 255 532 250 530 195 542 135 544 125 546 115 551 105 561 95 578 84 605 73 640M65 0 55 28 45 45 26 60 0 72M274 0 270 25 264 45 255 65 230 105 227 115 225 130 228 150 237 170 250 186 283 215 297 230 306 245 312 265 312 280 309 295 302 310 285 335 281 345 279 355 281 415 277 495 281 550 274 640M640 72 605 89 590 100 580 110 573 120 566 135 562 150 561 165 563 185 570 200 580 209 615 229 640 248M65 640 92 565 100 550 108 540 115 536 125 533 175 534 204 530 216 525 225 516 228 510 229 500 224 490 217 480 178 445 170 435 166 425 164 405 166 385 171 370 184 340 187 325 183 305 170 285 155 275 140 272 90 284 75 286 60 284 35 275 0 248M50 0 40 18 30 31 15 45 0 54M283 0 279 30 273 55 244 115 242 135 246 150 253 165 265 179 312 215 323 225 335 240 357 275 365 281 375 285 390 285 410 279 425 269 460 240 525 203 532 195 537 185 549 135 555 120 562 110 575 95 590 83 640 54M640 264 620 249 600 239 585 236 570 237 555 246 536 265 520 277 475 302 464 310 453 325 440 360 430 372 420 375 410 375 360 359 345 357 330 360 317 370 310 379 305 391 297 425 295 470 303 525 303 540 289 600 283 640M50 640 60 615 70 585 76 555 77 520 80 511 84 505 90 499 100 494 120 489 135 490 156 500 165 502 175 501 177 495 174 490 150 470 144 455 143 420 149 340 147 325 143 315 135 307 125 304 75 302 50 296 27 285 0 264M41 0 23 25 0 43M288 0 283 35 279 55 271 75 257 105 252 120 251 135 255 150 264 165 279 180 331 215 370 252 385 258 400 257 415 252 495 209 515 196 524 185 530 175 542 130 550 115 556 105 570 90 585 78 640 43M640 272 620 258 605 250 590 247 575 249 565 254 532 280 490 306 475 317 463 335 447 375 436 385 425 388 415 388 370 375 350 373 335 376 322 385 315 395 310 405 303 435 303 470 312 525 313 540 310 555 295 600 288 640M41 640 57 605 65 570 65 550 57 515 57 505 64 495 70 490 115 465 125 452 130 435 134 410 137 375 136 350 130 331 120 320 105 314 65 308 45 302 25 292 0 272M580 539 580 539M30 0 15 18 0 31M293 0 288 40 284 60 261 120 260 135 264 150 275 165 290 177 343 205 380 230 395 235 415 233 440 225 480 207 505 191 515 180 520 172 535 125 543 110 551 100 580 73 640 31M640 281 620 266 605 259 590 257 575 261 499 310 485 321 472 340 457 380 450 390 445 394 435 398 420 398 375 387 355 384 340 387 325 398 317 410 314 420 310 435 308 455 311 485 322 530 322 545 318 560 300 602 293 640M0 490 20 491 35 488 80 470 105 455 115 443 122 425 126 405 128 380 127 365 124 350 119 340 110 331 95 323 40 308 20 297 0 281M640 490 625 490 610 495 580 517 560 534 546 550 537 565 535 575 538 585 542 590 555 598 570 600 585 596 593 590 600 581 625 535 640 520M30 640 44 615 52 595 56 575 55 555 50 542 45 534 30 519 25 516 15 515 5 517 0 520M17 0 0 16M297 0 290 60 270 120 270 135 275 149 285 161 305 174 355 192 390 211 410 216 430 215 455 208 480 196 497 185 506 175 512 165 528 120 540 100 570 72 640 16M640 291 620 276 608 270 595 267 580 269 565 277 515 308 493 325 485 335 479 345 463 390 455 400 450 404 440 407 425 407 380 396 360 394 345 396 332 405 325 414 320 425 316 440 315 455 318 485 331 530 332 550 328 560 307 600 301 620 297 640M0 470 30 471 50 469 70 463 90 453 104 440 113 425 118 405 120 385 118 370 114 355 108 345 100 338 85 330 35 313 20 305 0 291M640 470 625 470 615 473 605 477 590 489 550 530 533 550 524 565 521 580 524 590 527 595 535 602 545 608 565 613 585 612 595 607 605 597 627 560 640 546M17 640 30 623 40 603 45 585 45 567 38 550 25 541 10 541 0 546M308 0 303 70 295 115 295 125 300 137 309 145 320 149 330 150 345 147 361 140 375 132 410 104 420 100 425 100 428 105 426 110 415 130 411 140 410 150 411 160 416 170 425 178 435 182 445 183 465 178 475 172 483 165 492 150 500 120 508 105 523 90 563 55 580 35 585 25 585 15 580 7 567 0M640 311 620 297 605 289 590 288 575 291 530 315 516 325 505 335 493 355 479 400 470 413 461 420 450 424 435 425 420 422 385 413 365 410 350 414 340 421 334 430 330 440 328 455 328 470 335 495 357 540 359 555 354 565 330 589 320 603 312 620 308 640M0 445 25 449 45 449 60 447 75 440 88 430 96 420 101 405 103 390 101 375 97 365 85 351 70 342 25 326 0 311M640 445 625 444 614 445 600 450 590 457 575 473 545 510 500 560 492 570 488 580 487 590 489 595 504 610 530 624 567 640M314 0 311 35 314 105 315 110 320 119 330 122 340 120 355 113 410 72 430 62 440 61 450 64 475 82 485 87 500 86 520 76 535 66 550 53 561 40 564 30 563 20 560 15 550 7 538 0M640 322 615 306 602 300 585 299 570 303 535 321 522 330 510 342 500 360 487 405 480 417 470 426 455 432 440 433 425 431 385 420 370 418 355 422 345 429 338 440 335 455 335 470 340 489 355 517 395 565 394 570 355 582 335 596 321 615 314 640M0 434 25 439 40 440 55 439 66 435 80 426 88 415 92 405 94 390 93 380 89 370 81 360 75 355 60 347 20 333 0 322M640 434 615 432 600 436 590 442 572 460 530 515 490 554 475 564 460 572 423 580 431 590 455 605 538 640M320 0 318 15 318 35 324 70 332 85 340 90 345 90 355 88 370 81 425 41 440 34 450 33 455 35 481 55 495 62 510 63 525 57 535 49 542 40 544 30 543 25 535 15 527 10 515 5 496 0M640 335 610 316 595 311 580 311 560 317 530 334 514 350 505 370 496 410 490 422 480 432 465 439 445 442 425 439 385 428 365 428 355 432 348 440 343 450 342 460 345 480 351 495 365 515 380 529 395 538 420 548 440 552 460 553 475 548 485 543 500 533 514 520 536 495 566 450 585 431 600 422 610 419 625 419 640 422M0 422 35 431 50 430 60 427 71 420 80 410 84 400 84 390 80 375 75 368 65 360 55 355 15 342 0 335M496 640 460 639 450 637 440 632 400 602 385 595 370 593 355 595 339 605 327 620 320 640M327 0 325 25 330 50 335 60 340 65 350 69 360 69 375 62 390 51 402 40 410 30 415 20 416 10 414 0M640 351 606 330 594 325 575 324 555 330 535 342 526 350 520 359 514 375 509 410 506 420 500 430 489 440 470 449 450 451 430 449 390 437 370 436 361 440 355 447 351 455 350 465 353 480 360 494 370 506 385 518 405 528 430 536 450 539 465 538 475 535 490 528 511 510 527 490 553 445 566 430 580 418 595 408 610 403 625 403 640 408M0 408 30 419 40 420 50 418 58 415 65 410 71 400 72 390 70 382 66 375 55 367 40 361 0 351M414 640 404 625 392 615 380 609 365 606 350 610 340 617 334 625 327 640M359 0 353 5 349 15 353 25 360 29 370 24 375 15 372 5 366 0M380 464 380 464M366 640 359 640'/%3E%3Cpath stroke-width='2' d='M147 0 152 10 160 17 170 22 185 24 195 23 205 18 213 10 217 0M50 135 50 135M217 640 218 625 213 615 209 610 200 605 185 603 165 606 152 615 146 625 147 640M96 0 95 20 99 60 95 70 90 75 80 82 65 87 0 104M254 0 250 20 240 42 225 60 196 85 189 95 186 105 186 120 189 135 205 201 215 220 234 240 235 247 230 249 225 247 200 227 185 223 170 222 155 224 140 228 85 253 70 255 60 255 50 252 35 246 20 235 0 218M640 104 620 114 607 125 599 140 597 155 600 170 608 185 640 218M254 640 255 620 254 605 250 591 244 580 235 572 225 567 195 564 150 567 135 572 125 578 115 588 105 605 100 620 96 640M58 0 46 25 35 40 20 53 0 63M278 0 274 30 269 50 262 65 237 110 234 125 235 140 241 160 251 175 265 189 302 220 318 240 328 265 334 305 331 320 310 344 303 355 297 370 294 385 289 430 288 465 293 540 278 640M640 63 615 76 595 88 580 100 567 115 559 130 555 145 548 210 550 217 555 219 580 223 605 232 620 241 640 256M525 224 525 224M58 640 74 595 90 541 95 529 100 522 110 516 120 515 165 523 185 522 193 520 202 515 206 510 208 500 201 485 167 455 160 446 156 435 153 415 154 395 167 325 164 310 159 300 150 291 135 287 85 294 70 293 55 290 30 279 0 256M405 315 405 315M302 0 296 65 281 120 282 135 286 145 296 155 310 163 330 168 370 172 380 176 407 195 420 199 430 200 445 198 465 192 480 184 492 175 502 160 516 120 528 100 543 85 588 45 620 11 633 0M640 300 620 286 609 280 595 277 580 280 565 286 525 310 499 330 486 350 470 397 465 405 455 412 445 416 430 416 380 404 365 402 350 405 335 414 328 425 324 435 321 450 321 465 326 490 343 535 344 550 338 565 320 590 312 605 306 620 302 640M0 457 25 459 45 459 65 454 80 448 95 436 103 425 109 410 111 390 110 375 107 365 102 355 93 345 75 335 30 319 0 300M640 457 625 456 615 458 600 465 590 473 521 550 511 565 506 580 507 590 510 595 519 605 530 612 560 624 575 627 590 628 605 623 613 615 633 580 640 570M0 635 15 621 25 608 30 595 32 580 30 570 25 564 20 562 10 563 0 570M640 635 633 640M337 0 334 15 337 35 345 47 355 51 365 50 375 45 390 31 396 15 394 0M570 340 570 340M20 378 20 378M370 449 370 449M394 640 387 630 381 625 365 620 355 621 348 625 340 634 337 640'/%3E%3C/svg%3E");
 }
 
-:root[data-theme="sun"] {
-  color-scheme: light;
-  --bg: #ffffff;
-  --surface: #f4f5f7;
-  --border: #c9cdd3;
-  --text: #0b0d10;
-  --text-muted: #3d434b;
-  --link: #0645ad;
-  --focus: #0645ad;
-  --status-green: #116b3c;
-  --status-amber: #8a5a00;
-  --status-red: #b3261e;
-  --status-grey: #5c626a;
-  --banner-bg: #fff3cd;
+/* TV wall at 1080p, read from 3 m: body >= 28 px, key numbers >= 64 px, clock <= pick name. */
+[data-scale="wall"] {
+  --fs-pick-name: 112px;
+  --fs-pick-num: 104px;
+  --fs-resort-num: 96px; /* overnight strip, every number on one baseline */
+  --fs-clock: 96px; /* neutral --text, never the gradient */
+  --fs-1: 72px; /* drive, countdown, ETO */
+  --fs-2: 48px;
+  --fs-3: 36px;
+  --fs-4: 30px;
+  --fs-5: 28px; /* floor: nothing smaller on the wall */
+  --lh: 1.2;
+
+  --space-1: 6px;
+  --space-2: 12px;
+  --space-3: 18px;
+  --space-4: 24px;
+  --space-5: 36px;
+  --space-6: 56px;
+  --radius: 12px;
+  --radius-chip: 6px;
+  --gutter: var(--wall-safe);
+  --max-width: none;
+  --wall-scale: 2;
+  --texture-topo-size: 1100px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root[data-theme="auto"] {
-    color-scheme: light;
-    --bg: #ffffff;
-    --surface: #f4f5f7;
-    --border: #c9cdd3;
-    --text: #0b0d10;
-    --text-muted: #3d434b;
-    --link: #0645ad;
-    --focus: #0645ad;
-    --status-green: #116b3c;
-    --status-amber: #8a5a00;
-    --status-red: #b3261e;
-    --status-grey: #5c626a;
-    --banner-bg: #fff3cd;
-  }
+/* Aliases, re-resolved wherever a theme or scale is set. */
+:root,
+[data-theme],
+[data-scale] {
+  --fs-hero: var(--fs-pick-name);
+  --fs-body: var(--fs-4);
+  --fs-caption: var(--fs-5);
+  --on-accent: var(--accent-ink);
+
+  /* legacy names from the placeholder shell (base.css, briefing.css); new code uses the names above */
+  --border: var(--line);
+  --text-muted: var(--text-dim);
+  --link: var(--accent);
+  --banner-bg: var(--warn-soft);
+  --status-green: var(--ok);
+  --status-amber: var(--warn-text);
+  --status-red: var(--bad);
+  --status-grey: var(--off);
+  --font-sans: var(--font-body);
+  --touch: var(--tap);
+  --text-sm: var(--fs-5);
+  --text-md: var(--fs-4);
+  --text-lg: var(--fs-3);
+  --text-xl: var(--fs-2);
 }

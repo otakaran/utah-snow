@@ -17,7 +17,8 @@ wall, tracker, settings and resort routes render `Stub`. Lines below are the con
 - The pick runs client-side from `src/shared/pick/`: crew pick by default, "as me" toggle per person.
 
 ## Tokens and themes
-- Colors only via `styles/tokens.css` variables (locked by the design sprint); no raw hex anywhere else here.
+- Colors only via `styles/tokens.css` (locked 2026-10-12: B Topo Night + D First Chair); no raw hex elsewhere here.
+- Obey its header's UI rules. `<html data-theme>` dark|sun (settings resolves auto via matchMedia); wall `data-scale="wall"`.
 - Values arrive imperial; convert with `src/shared/units.ts` at render time. Time formatting only via `src/shared/time.ts`.
 
 ## Players and visibility (`lib/`)
