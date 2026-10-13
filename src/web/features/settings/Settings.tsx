@@ -1,12 +1,10 @@
-// #/settings (spec §8.5): per-device choices, in the spec's section order. Every change saves at once.
+// #/settings (spec §8.5): per-device choices, in the spec's section order, each section on a --surface panel (topo
+// shows only in the gutters). Every change saves at once; typed values flash "✓ Saved" in their section heading.
 import { STRATEGY } from '../../../../config/strategy.ts';
 import {
   dataSaver,
-  me,
-  ride,
+  resolvedTheme,
   setDataSaver,
-  setMe,
-  setRide,
   setSkiFraction,
   setTheme,
   setUnits,
@@ -14,58 +12,17 @@ import {
   theme,
   units,
 } from '../../data/settings.ts';
-import { people } from '../../data/tracker.ts';
+import { dataSaverOn } from '../../lib/data-saver.ts';
 import { qty } from '../../lib/format.ts';
 import { Section } from '../../ui/Section.tsx';
 import { Toggle } from '../../ui/Toggle.tsx';
 import { About } from './About.tsx';
 import { BaseEditor } from './BaseEditor.tsx';
+import { clampEntry, type Flash, savedFlash } from './clamp-entry.ts';
+import { FlashNote, useFlash } from './Flash.tsx';
 import { WallDefaults } from './WallDefaults.tsx';
+import { WhoAmI } from './WhoAmI.tsx';
 import './settings.css';
-
-function WhoAmI() {
-  const id = me.value;
-  const list = people.value;
-  return (
-    <div class="stack">
-      {list.length === 0 ? (
-        <p class="field-note">No crew yet. Add people on the Tracker page, then pick yourself here.</p>
-      ) : (
-        <label class="field">
-          <span class="field-label">I am</span>
-          <select
-            value={id === null ? '' : id === '' ? '-' : id}
-            onChange={(e) => {
-              const v = e.currentTarget.value;
-              setMe(v === '-' ? '' : v || null);
-            }}
-          >
-            <option value="">Not set (ask me)</option>
-            <option value="-">Skip (crew only)</option>
-            {list.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      <Toggle
-        label="I ride"
-        name="ride"
-        value={ride.value}
-        onChange={setRide}
-        options={[
-          { value: 'ski', label: 'Skier' },
-          { value: 'board', label: 'Snowboarder' },
-        ]}
-      />
-      <p class="field-note">
-        Alta and Deer Valley are skiers-only. Once you pick yourself above, your tracker ski/board setting wins.
-      </p>
-    </div>
-  );
-}
 
 function UnitsSection() {
   const u = units.value;
@@ -99,11 +56,14 @@ function ThemeSection() {
         onChange={setTheme}
         options={[
           { value: 'dark', label: 'Dark' },
-          { value: 'sun', label: 'Sun (bright light)' },
-          { value: 'auto', label: 'Auto' },
+          { value: 'sun', label: 'Sun' },
+          { value: 'auto', label: `Auto · ${resolvedTheme.value}` },
         ]}
       />
-      <p class="field-note">Auto follows the device's light or dark setting. The TV wall is always dark.</p>
+      <p class="field-note">
+        Sun is the high-contrast light theme for bright light. Auto follows the device's light or dark setting. The TV
+        wall is always dark.
+      </p>
     </div>
   );
 }
@@ -117,7 +77,7 @@ function DataSaverSection() {
         value={dataSaver.value}
         onChange={setDataSaver}
         options={[
-          { value: 'auto', label: 'Auto' },
+          { value: 'auto', label: `Auto · ${dataSaverOn.value ? 'on' : 'off'}` },
           { value: 'on', label: 'On' },
           { value: 'off', label: 'Off' },
         ]}
@@ -130,35 +90,48 @@ function DataSaverSection() {
   );
 }
 
-function SkiFraction() {
-  const f = skiFraction.value;
+const [MIN_PCT, MAX_PCT] = [30, 100];
+const DEFAULT_PCT = Math.round(STRATEGY.skiDayFraction * 100);
+
+function SkiFraction({ onSaved }: { onSaved: (f: Flash) => void }) {
+  const pct = Math.round(skiFraction.value * 100);
   return (
     <details class="advanced">
-      <summary>Ski-day fraction: {Math.round(f * 100)}%</summary>
+      <summary>
+        Ski-day fraction: <span class="num">{pct}%</span>
+      </summary>
       <label class="field">
         <span class="field-label">Share of the remaining trip days you will actually ski</span>
         <span class="field-row">
           <input
             type="number"
-            inputMode="decimal"
-            min={0.3}
-            max={1}
-            step={0.05}
-            value={f}
+            inputMode="numeric"
+            min={MIN_PCT}
+            max={MAX_PCT}
+            step={5}
+            value={pct}
             onChange={(e) => {
-              const v = Number(e.currentTarget.value);
-              setSkiFraction(Number.isFinite(v) && v >= 0.3 && v <= 1 ? v : STRATEGY.skiDayFraction);
+              const c = clampEntry(e.currentTarget.value, MIN_PCT, MAX_PCT, pct);
+              e.currentTarget.value = String(c.value);
+              setSkiFraction(c.value / 100);
+              onSaved(savedFlash(c, '%'));
             }}
           />
+          <span class="field-unit">%</span>
         </span>
       </label>
-      <p class="field-note">The pick spends capped days faster when this is high. Default {STRATEGY.skiDayFraction}.</p>
+      <p class="field-note">
+        The pick spends capped days faster when this is high. Default {DEFAULT_PCT}%, range{' '}
+        {`${MIN_PCT}–\u2060${MAX_PCT}%`}.
+      </p>
     </details>
   );
 }
 
 /** The settings page (#/settings). */
 export function Settings() {
+  const [wallFlash, flashWall] = useFlash();
+  const [skiFlash, flashSki] = useFlash();
   return (
     <div class="settings" data-testid="settings">
       <h1 class="page-title">Settings</h1>
@@ -178,11 +151,11 @@ export function Settings() {
       <Section testid="settings-data-saver" index="05" title="Data saver">
         <DataSaverSection />
       </Section>
-      <Section testid="settings-wall" index="06" title="Wall defaults">
-        <WallDefaults />
+      <Section testid="settings-wall" index="06" title="Wall defaults" sub={<FlashNote flash={wallFlash} />}>
+        <WallDefaults onSaved={flashWall} />
       </Section>
-      <Section testid="settings-advanced" index="07" title="Advanced">
-        <SkiFraction />
+      <Section testid="settings-advanced" index="07" title="Advanced" sub={<FlashNote flash={skiFlash} />}>
+        <SkiFraction onSaved={flashSki} />
       </Section>
       <Section testid="settings-about" index="08" title="About">
         <About />

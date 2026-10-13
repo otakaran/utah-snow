@@ -1,17 +1,14 @@
 // Base picker (spec §8.5, §4.6): the 5 presets with their drive minutes to each resort, then the custom base form
 // (CustomBase.tsx: location, Google Maps link or coordinates; drive times from /api/drive).
-import { BASES, type BaseId, DRIVE } from '../../../../config/bases.ts';
-import { RESORTS } from '../../../../config/resorts.ts';
-import type { ResortId } from '../../../shared/types.ts';
+import { BASES, type BaseId } from '../../../../config/bases.ts';
+import { driveMatrix } from '../../../shared/geo.ts';
 import { base, setBase } from '../../data/settings.ts';
 import { CustomBase } from './CustomBase.tsx';
+import { DriveChips } from './DriveChips.tsx';
 
 const PRESETS = Object.keys(BASES) as BaseId[];
-const RESORT_IDS = Object.keys(RESORTS) as ResortId[];
 
-function driveLine(id: BaseId): string {
-  return RESORT_IDS.map((r) => `${RESORTS[r].name} ${DRIVE[id][r].min}`).join(' · ');
-}
+const minutes = (id: BaseId) => driveMatrix({ id, ...BASES[id] }).min;
 
 export function BaseEditor() {
   const b = base.value;
@@ -30,7 +27,7 @@ export function BaseEditor() {
               onChange={() => setBase({ preset: id })}
             />
             <span class="base-name">{BASES[id].label}</span>
-            <span class="base-drive">Drive min: {driveLine(id)}</span>
+            <DriveChips min={minutes(id)} />
           </label>
         ))}
       </fieldset>
