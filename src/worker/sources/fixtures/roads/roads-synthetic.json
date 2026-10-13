@@ -1,0 +1,248 @@
+{
+ "_note": "SYNTHETIC keyed-mode, in-season composite (no UDOT_API_KEY yet; Wayback has no List/api captures). Post sentences are real winter wording quoted in the research notes (UDOT 2/18/2026 and an Alta 2/18/2026 post); api field names follow the documented schema; values are invented. Moment: 2026-02-19 09:30 MST (16:30Z).",
+ "keyed": true,
+ "wp": {
+  "https://cottonwoodcanyons.udot.utah.gov": [
+   {
+    "id": 90004,
+    "date_gmt": "2026-02-19T16:10:00",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/2-19-910am/",
+    "content": {
+     "rendered": "<p class=\"wp-block-paragraph\">Parking at Snowbird in free and paid lots is now FULL.</p>\n<p class=\"wp-block-paragraph\">SR-210 travelers: plan ahead</p>"
+    }
+   },
+   {
+    "id": 90003,
+    "date_gmt": "2026-02-19T15:30:00",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/2-19-830am/",
+    "content": {
+     "rendered": "<p class=\"wp-block-paragraph\"><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"⚠️\" class=\"wp-smiley\" /> Crash Alert <img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"⚠️\" class=\"wp-smiley\" /></p>\n<p class=\"wp-block-paragraph\">SR-190: Multiple vehicle slide offs &#8211; slick road conditions.</p>\n<p class=\"wp-block-paragraph\"><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"📍\" class=\"wp-smiley\" />: Storm Mountain (MP 4.2)</p>\n<p class=\"wp-block-paragraph\">EXPECT: Travel delays/stopped traffic in both directions</p>"
+    }
+   },
+   {
+    "id": 90002,
+    "date_gmt": "2026-02-19T13:40:00",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/2-19-640am/",
+    "content": {
+     "rendered": "<p class=\"wp-block-paragraph\"><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"👋\" class=\"wp-smiley\" />SR-190 ROAD CONDITIONS</p>\n<p class=\"wp-block-paragraph\">Lower: wet/slush</p>\n<p class=\"wp-block-paragraph\">Upper: snow covered</p>\n<p class=\"wp-block-paragraph\"><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"📍\" class=\"wp-smiley\" />Snow increases at Cardiff (MP 10.7)</p>\n<p class=\"wp-block-paragraph\"><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"🚨\" class=\"wp-smiley\" />Traction devices are REQUIRED</p>"
+    }
+   },
+   {
+    "id": 90001,
+    "date_gmt": "2026-02-19T05:05:00",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/2-18-1005pm/",
+    "content": {
+     "rendered": "<p class=\"wp-block-paragraph\"><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/x.png\" alt=\"🚨\" class=\"wp-smiley\" />Highway 210 will close at 12:30am for avalanche mitigation. Estimated opening at 8:30am.</p>"
+    }
+   }
+  ],
+  "https://wasatchback.udot.utah.gov": [],
+  "https://ogdenvalley.udot.utah.gov": []
+ },
+ "conditions": [
+  [
+   {
+    "Id": 1,
+    "RoadwayName": "SR-210 Mouth of Little Cottonwood to SR-190",
+    "RoadCondition": "Snow Covered",
+    "WeatherCondition": "Snowing",
+    "Restriction": "Chains or 4WD/AWD Required",
+    "LastUpdated": 1771516800
+   },
+   {
+    "Id": 2,
+    "RoadwayName": "SR-210 Upper Little Cottonwood Canyon",
+    "RoadCondition": "Snow Covered",
+    "WeatherCondition": "Snowing",
+    "Restriction": "Chains or 4WD/AWD Required",
+    "LastUpdated": 1771516800
+   },
+   {
+    "Id": 3,
+    "RoadwayName": "SR-190 Big Cottonwood Canyon Mouth to Spruces",
+    "RoadCondition": "Slushy",
+    "WeatherCondition": "Snowing",
+    "Restriction": "None",
+    "LastUpdated": 1771516800
+   },
+   {
+    "Id": 4,
+    "RoadwayName": "I-80 Parleys Summit",
+    "RoadCondition": "Wet",
+    "WeatherCondition": "Cloudy",
+    "Restriction": "None",
+    "LastUpdated": 1771516800
+   },
+   {
+    "Id": 5,
+    "RoadwayName": "SR-226 to Snowbasin",
+    "RoadCondition": "Dry",
+    "WeatherCondition": "Fair",
+    "Restriction": "None",
+    "LastUpdated": 1771516800
+   }
+  ]
+ ],
+ "passes": [
+  [
+   {
+    "Name": "SR-210 Little Cottonwood Canyon",
+    "MountainPassId": 98,
+    "AirTemperature": "18",
+    "WindSpeed": "12",
+    "WindGust": "31",
+    "SurfaceTemp": "21",
+    "SurfaceStatus": "Snow/Ice Warning",
+    "Visibility": "0.4"
+   },
+   {
+    "Name": "SR-190 Big Cottonwood Canyon",
+    "MountainPassId": 97,
+    "AirTemperature": 22,
+    "WindSpeed": 5,
+    "WindGust": 14,
+    "SurfaceTemp": 25,
+    "SurfaceStatus": "Wet",
+    "Visibility": 2.1
+   },
+   {
+    "Name": "SR-226 Snowbasin",
+    "MountainPassId": 93,
+    "AirTemperature": 27,
+    "WindSpeed": 3,
+    "WindGust": 9,
+    "SurfaceTemp": 30,
+    "SurfaceStatus": "Dry",
+    "Visibility": 10
+   }
+  ]
+ ],
+ "signs": [
+  [
+   {
+    "Id": "ADX--73247",
+    "Name": "6200 S / SR-190 @ 3200 E, HDY",
+    "Messages": [
+     "<MSG>BIG  COTTONWOOD<BR/>CANYON  TOP<BR/>41MIN</MSG>",
+     "<MSG>LITTLE  COTTONWOOD<BR/>CANYON  TOP<BR/>55MIN</MSG>"
+    ],
+    "LastUpdated": 1771518600
+   },
+   {
+    "Id": "ADX--71972",
+    "Name": "Little Cottonwood Canyon Rd / SR-210 EB @ Little Cottonwood Rd / SR-209, SL",
+    "Messages": [
+     "<MSG>SR-210<BR/>CANYON ROAD CLOSED<BR/>AVALANCHE CONTROL</MSG>"
+    ],
+    "LastUpdated": 1771518600
+   },
+   {
+    "Id": "ADX--71712",
+    "Name": "Big Cottonwood Canyon Rd / SR-190 EB @ Mouth of Big Cottonwood Canyon, CWH",
+    "Messages": [
+     "<MSG>TRACTION LAW<BR/>IN EFFECT<BR/>4WD/AWD OR CHAINS</MSG>",
+     "<MSG>SOLITUDE LOTS<BR/>FULL</MSG>"
+    ],
+    "LastUpdated": 1771518600
+   },
+   {
+    "Id": "ADX--71918",
+    "Name": "I-80 EB @ Mouth of Parley's Canyon",
+    "Messages": [
+     "<MSG>TIME TO<BR/>PARK CITY 22MIN<BR/>I-84 48MIN</MSG>"
+    ],
+    "LastUpdated": 1771518600
+   },
+   {
+    "Id": "ADX--99999",
+    "Name": "I-15 NB @ 600 N",
+    "Messages": [
+     "<MSG>DRIVE SAFE</MSG>"
+    ],
+    "LastUpdated": 1771518600
+   }
+  ]
+ ],
+ "traffic": [
+  {
+   "recordsTotal": 270,
+   "recordsFiltered": 0,
+   "data": []
+  },
+  {
+   "recordsTotal": 270,
+   "recordsFiltered": 1,
+   "data": [
+    {
+     "DT_RowId": "40001",
+     "id": 40001,
+     "layerName": "Incidents",
+     "roadwayName": "SR 210",
+     "description": "Avalanche control. Road closed in both directions from the mouth to Alta.",
+     "locationDescription": "SR-210 Little Cottonwood Canyon",
+     "startDate": "2/19/26, 12:30 AM",
+     "endDate": "2/19/26, 11:00 AM",
+     "isFullClosure": true
+    }
+   ]
+  },
+  null,
+  null,
+  null,
+  null,
+  null
+ ],
+ "events": [
+  {
+   "ID": 40001,
+   "RoadwayName": "SR-210",
+   "EventType": "closures",
+   "IsFullClosure": true,
+   "StartDate": 1771486200,
+   "PlannedEndDate": 1771524000,
+   "Description": "Avalanche control.",
+   "Location": "SR-210 Little Cottonwood Canyon"
+  },
+  {
+   "ID": 40002,
+   "RoadwayName": "SR-167",
+   "EventType": "roadwork",
+   "IsFullClosure": true,
+   "StartDate": 1771488000,
+   "PlannedEndDate": 1771610400,
+   "Description": "Trappers Loop closed nightly 10pm-6am for rockfall mitigation.",
+   "Location": "SR-167 Trappers Loop MP 3-6"
+  }
+ ],
+ "snowbird": {
+  "roads": [
+   {
+    "name": "Highway SR-210",
+    "status": "closed"
+   }
+  ],
+  "parking": {
+   "free_parking_inventory": {
+    "value": 18,
+    "max": 18,
+    "percentage": 100
+   },
+   "highway_parking": "closed"
+  },
+  "alerts": []
+ },
+ "brighton": [
+  {
+   "updated": "2026-02-19T16:20:00Z",
+   "mountainPassName": "SR-190 Big Cottonwood Canyon Mouth to Spruces",
+   "restrictionOne": {
+    "restrictionText": "4WD/AWD or chains required",
+    "travelDirection": "Uphill"
+   },
+   "roadCondition": "Slushy"
+  }
+ ],
+ "errors": {
+  "list:traffic:I-80": "HttpError: HTTP 503 https://www.udottraffic.utah.gov/List/GetData/traffic?query=..."
+ }
+}

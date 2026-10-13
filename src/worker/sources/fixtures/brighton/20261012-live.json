@@ -1,0 +1,270 @@
+{
+ "name": "Brighton",
+ "updated": "2026-10-12T14:21:14Z",
+ "operations": {
+  "resortStatus": "Closed"
+ },
+ "currentConditions": {
+  "resortwide": {
+   "numTrailsTotal": 76,
+   "numTrailsOpen": 23,
+   "numTrailsGroomed": 25,
+   "numLiftsTotal": 8,
+   "numLiftsOpen": 0,
+   "numLiftsOnHold": 0,
+   "numLiftsClosed": 8
+  },
+  "resortLocations": {
+   "location": [
+    {
+     "name": "Brighton",
+     "primarySurface": "",
+     "secondarySurface": "",
+     "snowOverNight": {
+      "inches": "0"
+     },
+     "snow12Hours": {
+      "inches": "0"
+     },
+     "snow24Hours": {
+      "inches": "0"
+     },
+     "snow48Hours": {
+      "inches": "0"
+     },
+     "snow72Hours": {
+      "inches": "0"
+     },
+     "snow7Days": {
+      "inches": "0"
+     },
+     "snowSeasonTotal": {
+      "inches": "284"
+     },
+     "base": {
+      "inches": "67"
+     }
+    }
+   ]
+  }
+ },
+ "comments": {
+  "comment": [
+   {
+    "name": "Comment",
+    "title": "Conditions Report",
+    "text": ""
+   },
+   {
+    "name": "Uphill",
+    "title": "Uphill Travel Status",
+    "text": ""
+   },
+   {
+    "name": "Weather",
+    "title": "Overcast, snowing",
+    "text": "Light is red, no uphill on any route "
+   },
+   {
+    "name": "Events",
+    "title": "Events",
+    "text": "Events"
+   },
+   {
+    "name": "Road",
+    "title": "",
+    "text": ""
+   },
+   {
+    "name": "commentAlert",
+    "title": "",
+    "text": ""
+   },
+   {
+    "name": "trailsAlert",
+    "title": "",
+    "text": ""
+   },
+   {
+    "name": "liftsAlert",
+    "title": "",
+    "text": ""
+   }
+  ]
+ },
+ "facilities": {
+  "areas": {
+   "area": [
+    {
+     "name": "Caterpillar",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Caterpillar",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Crest 6",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Crest 6",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": "10:00",
+        "closeTime": "15:00"
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Explorer",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Explorer",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Great Western Express",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Great Western Express",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Majestic",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Majestic",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Milly Express",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Milly Express",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Porcupine",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Porcupine",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Snake Creek Express",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Snake Creek",
+        "status": "Closed",
+        "statusIcon": "closed",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Terrain Park",
+     "lifts": {
+      "lift": null
+     },
+     "gates": null
+    }
+   ]
+  },
+  "parkingLots": {
+   "parking": [
+    {
+     "name": "Main Lot",
+     "status": "Closed",
+     "percentFull": null,
+     "openTime": "07:00",
+     "closeTime": null,
+     "price": "",
+     "totalCapacity": null,
+     "comment": "The Brighton parking lot opens Daily at 7:00AM. Reservations are no longer required. ",
+     "alert": "",
+     "reservationsRequired": false
+    }
+   ]
+  },
+  "winterActivities": {
+   "activity": [
+    {
+     "name": "Lost Maid / Catherine's Pass Access",
+     "status": "Closed",
+     "openTime": null,
+     "closeTime": null,
+     "statusIcon": "closed"
+    },
+    {
+     "name": "Easy Out / Twin Lake Pass Access",
+     "status": "Closed",
+     "openTime": null,
+     "closeTime": null,
+     "statusIcon": "closed"
+    }
+   ]
+  }
+ }
+}

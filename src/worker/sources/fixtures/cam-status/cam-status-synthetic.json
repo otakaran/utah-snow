@@ -1,0 +1,229 @@
+{
+ "_note": "SYNTHETIC in-season sample (Wayback has no captures of these HEAD/redirect/JSON endpoints). Hand-built from the 2026-10-12 live shapes for 2026-01-15 16:55Z (09:55 MST): Greeley DO 404, Prism 88 stale 130 min and 115 camStatus 0, gated Peruvian/Strawberry archives fresh (< 30 min), Little Cloud stale, Mineral {} (no archive), Snowbasin stake frames/info 500 and Wildcat timed out (both keep prev), 360 404, Brighton stake ETag as in prev.",
+ "capturedAt": 1768496100000,
+ "probes": {
+  "do:alta-mount-superior": {
+   "status": 200,
+   "lastModified": "Thu, 15 Jan 2026 16:51:00 GMT",
+   "contentType": "image/jpeg"
+  },
+  "do:alta-high-rustler": {
+   "status": 200,
+   "lastModified": "Thu, 15 Jan 2026 16:46:00 GMT",
+   "contentType": "image/jpeg"
+  },
+  "do:alta-sugarloaf-peak": {
+   "status": 200,
+   "lastModified": "Thu, 15 Jan 2026 16:51:00 GMT",
+   "contentType": "image/jpeg"
+  },
+  "do:alta-east-greeley": {
+   "status": 404,
+   "contentType": "application/xml"
+  },
+  "do:alta-salt-lake-valley": {
+   "status": 200,
+   "lastModified": "Thu, 15 Jan 2026 16:41:00 GMT",
+   "contentType": "image/jpeg"
+  },
+  "prism": {
+   "status": 200,
+   "contentType": "application/x-javascript",
+   "body": {
+    "cams": [
+     {
+      "id": "65",
+      "cam": {
+       "camTitle": "Devil's Castle",
+       "camStatus": "1"
+      },
+      "current": {
+       "imagePath": "00065/2026/01/15/09-52",
+       "time": 1768495920,
+       "hourMin": "09-52",
+       "mysqlTime": "2026-01-15 09:52:00"
+      },
+      "images": [
+       {
+        "hm": "09-57",
+        "time": "1768409820",
+        "path": "2026/01/14/09-57"
+       },
+       {
+        "hm": "09-52",
+        "time": "1768495938",
+        "path": "2026/01/15/09-52"
+       }
+      ],
+      "imageCount": 212
+     },
+     {
+      "id": "88",
+      "cam": {
+       "camTitle": "Mount Baldy",
+       "camStatus": "1"
+      },
+      "current": {
+       "imagePath": "00088/2026/01/15/07-45",
+       "time": 1768488300,
+       "hourMin": "07-45",
+       "mysqlTime": "2026-01-15 07:45:00"
+      },
+      "images": [
+       {
+        "hm": "07-50",
+        "time": "1768402200",
+        "path": "2026/01/14/07-50"
+       },
+       {
+        "hm": "07-45",
+        "time": "1768488318",
+        "path": "2026/01/15/07-45"
+       }
+      ],
+      "imageCount": 96
+     },
+     {
+      "id": "54",
+      "cam": {
+       "camTitle": "Snowbasin",
+       "camStatus": "1"
+      },
+      "current": {
+       "imagePath": "00054/2026/01/15/09-53",
+       "time": 1768495980,
+       "hourMin": "09-53",
+       "mysqlTime": "2026-01-15 09:53:00"
+      },
+      "images": [
+       {
+        "hm": "09-58",
+        "time": "1768409880",
+        "path": "2026/01/14/09-58"
+       },
+       {
+        "hm": "09-53",
+        "time": "1768495998",
+        "path": "2026/01/15/09-53"
+       }
+      ],
+      "imageCount": 230
+     },
+     {
+      "id": "115",
+      "cam": {
+       "camTitle": "John Paul",
+       "camStatus": "0"
+      },
+      "current": {
+       "imagePath": "00115/2026/01/15/09-49",
+       "time": 1768495740,
+       "hourMin": "09-49",
+       "mysqlTime": "2026-01-15 09:49:00"
+      },
+      "images": [
+       {
+        "hm": "09-54",
+        "time": "1768409640",
+        "path": "2026/01/14/09-54"
+       },
+       {
+        "hm": "09-49",
+        "time": "1768495758",
+        "path": "2026/01/15/09-49"
+       }
+      ],
+      "imageCount": 140
+     }
+    ]
+   }
+  },
+  "hdrelay:snowbird-snowstake": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {
+    "first": 1750737300577,
+    "last": 1768495980000
+   }
+  },
+  "hdrelay:snowbird-peruvian-gulch": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {
+    "first": 1766000000000,
+    "last": 1768495500000
+   }
+  },
+  "hdrelay:snowbird-mineral-basin": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {}
+  },
+  "hdrelay:snowbird-little-cloud": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {
+    "first": 1766000007662,
+    "last": 1768488900000
+   }
+  },
+  "hdrelay:snowbird-tram-bullpen": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {
+    "first": 1752541200328,
+    "last": 1768495920000
+   }
+  },
+  "hdrelay:snowbasin-snowstake": {
+   "status": 500,
+   "contentType": "text/html"
+  },
+  "hdrelay:snowbasin-strawberry-patio": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {
+    "first": 1766029080024,
+    "last": 1768495800000
+   }
+  },
+  "hdrelay:snowbasin-middle-bowl-base": {
+   "status": 200,
+   "contentType": "application/json",
+   "body": {
+    "first": 1738944301883,
+    "last": 1768495860000
+   }
+  },
+  "hdrelay:snowbasin-base-of-wildcat": {
+   "status": 0,
+   "err": "DeadlineError"
+  },
+  "roundshot:snowbird-hidden-peak": {
+   "status": 302,
+   "contentType": "text/html; charset=UTF-8",
+   "location": "https://storage4.roundshot.com/5da7581da7f568.58906703/2026-01-15/09-40-00/2026-01-15-09-40-00_optional.jpg"
+  },
+  "roundshot:snowbird-powder-paradise": {
+   "status": 302,
+   "contentType": "text/html; charset=UTF-8",
+   "location": "https://storage4.roundshot.com/5da7589a5cfa88.31667145/2026-01-15/09-40-00/2026-01-15-09-40-00_optional.jpg"
+  },
+  "roundshot:snowbird-hidden-peak-360": {
+   "status": 404,
+   "contentType": "text/html; charset=UTF-8"
+  },
+  "skiutah:brighton-snowstake-skiutah": {
+   "status": 200,
+   "contentType": "image/jpeg",
+   "lastModified": "Thu, 15 Jan 2026 16:53:00 GMT",
+   "etag": "\"835874fa51dcf1c5d2d957de6b08e7b8ae2b36c0\""
+  },
+  "skiutah:solitude-apex-sunrise": {
+   "status": 200,
+   "contentType": "image/jpeg",
+   "lastModified": "Thu, 15 Jan 2026 16:48:00 GMT",
+   "etag": "\"dcb491fc83d15d7e0c7deb9e7622f458266491c5\""
+  }
+ }
+}

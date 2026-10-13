@@ -1,0 +1,277 @@
+{
+ "_note": "SYNTHETIC in-season grid (Wayback has no api.weather.gov/gridpoints/SLC/{x},{y} captures). Shape and units copy the live SLC/108,167 payload trimmed to the fields parse() reads; values are a realistic Jan 6-7 2027 storm. Fetched 06:35 MST Jan 6, so the grid starts at 13:00Z and most of the Jan 5-6 overnight lies before it (frozen-overnight case, spec 5.7).",
+ "properties": {
+  "updateTime": "2027-01-06T12:35:12+00:00",
+  "validTimes": "2027-01-06T13:00:00+00:00/P2DT23H",
+  "elevation": {
+   "unitCode": "wmoUnit:m",
+   "value": 2987.04
+  },
+  "gridId": "SLC",
+  "gridX": 108,
+  "gridY": 167,
+  "snowfallAmount": {
+   "uom": "wmoUnit:mm",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT5H",
+     "value": 38.1
+    },
+    {
+     "validTime": "2027-01-06T18:00:00+00:00/PT6H",
+     "value": 12.7
+    },
+    {
+     "validTime": "2027-01-07T00:00:00+00:00/PT6H",
+     "value": 25.4
+    },
+    {
+     "validTime": "2027-01-07T06:00:00+00:00/PT6H",
+     "value": 50.8
+    },
+    {
+     "validTime": "2027-01-07T12:00:00+00:00/PT6H",
+     "value": 20.32
+    },
+    {
+     "validTime": "2027-01-07T18:00:00+00:00/PT6H",
+     "value": 5.08
+    },
+    {
+     "validTime": "2027-01-08T00:00:00+00:00/PT6H",
+     "value": 0
+    },
+    {
+     "validTime": "2027-01-08T06:00:00+00:00/PT6H",
+     "value": 0
+    },
+    {
+     "validTime": "2027-01-08T12:00:00+00:00/PT6H",
+     "value": 0
+    },
+    {
+     "validTime": "2027-01-08T18:00:00+00:00/PT6H",
+     "value": 0
+    },
+    {
+     "validTime": "2027-01-09T00:00:00+00:00/PT6H",
+     "value": 0
+    },
+    {
+     "validTime": "2027-01-09T06:00:00+00:00/PT6H",
+     "value": 0
+    }
+   ]
+  },
+  "quantitativePrecipitation": {
+   "uom": "wmoUnit:mm",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT5H",
+     "value": 3.175
+    },
+    {
+     "validTime": "2027-01-06T18:00:00+00:00/PT6H",
+     "value": 1.058
+    },
+    {
+     "validTime": "2027-01-07T00:00:00+00:00/PT6H",
+     "value": 2.117
+    },
+    {
+     "validTime": "2027-01-07T06:00:00+00:00/PT6H",
+     "value": 4.233
+    },
+    {
+     "validTime": "2027-01-07T12:00:00+00:00/PT6H",
+     "value": 1.693
+    },
+    {
+     "validTime": "2027-01-07T18:00:00+00:00/PT6H",
+     "value": 0.423
+    },
+    {
+     "validTime": "2027-01-08T00:00:00+00:00/PT6H",
+     "value": 0.0
+    },
+    {
+     "validTime": "2027-01-08T06:00:00+00:00/PT6H",
+     "value": 0.0
+    },
+    {
+     "validTime": "2027-01-08T12:00:00+00:00/PT6H",
+     "value": 0.0
+    },
+    {
+     "validTime": "2027-01-08T18:00:00+00:00/PT6H",
+     "value": 0.0
+    },
+    {
+     "validTime": "2027-01-09T00:00:00+00:00/PT6H",
+     "value": 0.0
+    },
+    {
+     "validTime": "2027-01-09T06:00:00+00:00/PT6H",
+     "value": 0.0
+    }
+   ]
+  },
+  "snowLevel": {
+   "uom": "wmoUnit:m",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT5H",
+     "value": 1524.0
+    },
+    {
+     "validTime": "2027-01-06T18:00:00+00:00/PT9H",
+     "value": 1463.04
+    },
+    {
+     "validTime": "2027-01-07T03:00:00+00:00/PT12H",
+     "value": 1402.08
+    },
+    {
+     "validTime": "2027-01-07T15:00:00+00:00/PT15H",
+     "value": 1645.92
+    },
+    {
+     "validTime": "2027-01-08T06:00:00+00:00/PT12H",
+     "value": 1889.76
+    },
+    {
+     "validTime": "2027-01-08T18:00:00+00:00/PT18H",
+     "value": 2133.6
+    }
+   ]
+  },
+  "windGust": {
+   "uom": "wmoUnit:km_h-1",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT3H",
+     "value": 64.82
+    },
+    {
+     "validTime": "2027-01-06T16:00:00+00:00/PT6H",
+     "value": 74.08
+    },
+    {
+     "validTime": "2027-01-06T22:00:00+00:00/PT11H",
+     "value": 83.34
+    },
+    {
+     "validTime": "2027-01-07T09:00:00+00:00/PT9H",
+     "value": 55.56
+    },
+    {
+     "validTime": "2027-01-07T18:00:00+00:00/PT12H",
+     "value": 40.74
+    },
+    {
+     "validTime": "2027-01-08T06:00:00+00:00/P1DT6H",
+     "value": 29.63
+    }
+   ]
+  },
+  "windSpeed": {
+   "uom": "wmoUnit:km_h-1",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT3H",
+     "value": 33.34
+    },
+    {
+     "validTime": "2027-01-06T16:00:00+00:00/PT6H",
+     "value": 38.89
+    },
+    {
+     "validTime": "2027-01-06T22:00:00+00:00/PT11H",
+     "value": 44.45
+    },
+    {
+     "validTime": "2027-01-07T09:00:00+00:00/PT9H",
+     "value": 27.78
+    },
+    {
+     "validTime": "2027-01-07T18:00:00+00:00/PT12H",
+     "value": 20.37
+    },
+    {
+     "validTime": "2027-01-08T06:00:00+00:00/P1DT6H",
+     "value": 14.82
+    }
+   ]
+  },
+  "temperature": {
+   "uom": "wmoUnit:degC",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT2H",
+     "value": -8.333
+    },
+    {
+     "validTime": "2027-01-06T15:00:00+00:00/PT4H",
+     "value": -7.222
+    },
+    {
+     "validTime": "2027-01-06T19:00:00+00:00/PT4H",
+     "value": -6.667
+    },
+    {
+     "validTime": "2027-01-06T23:00:00+00:00/PT7H",
+     "value": -9.444
+    },
+    {
+     "validTime": "2027-01-07T06:00:00+00:00/PT7H",
+     "value": -12.222
+    },
+    {
+     "validTime": "2027-01-07T13:00:00+00:00/PT6H",
+     "value": -13.889
+    },
+    {
+     "validTime": "2027-01-07T19:00:00+00:00/PT5H",
+     "value": -10.0
+    },
+    {
+     "validTime": "2027-01-08T00:00:00+00:00/PT12H",
+     "value": -15.0
+    },
+    {
+     "validTime": "2027-01-08T12:00:00+00:00/PT9H",
+     "value": -12.778
+    },
+    {
+     "validTime": "2027-01-08T21:00:00+00:00/PT15H",
+     "value": -11.111
+    }
+   ]
+  },
+  "probabilityOfPrecipitation": {
+   "uom": "wmoUnit:percent",
+   "values": [
+    {
+     "validTime": "2027-01-06T13:00:00+00:00/PT5H",
+     "value": 96
+    },
+    {
+     "validTime": "2027-01-06T18:00:00+00:00/PT12H",
+     "value": 100
+    },
+    {
+     "validTime": "2027-01-07T06:00:00+00:00/PT12H",
+     "value": 90
+    },
+    {
+     "validTime": "2027-01-07T18:00:00+00:00/PT6H",
+     "value": 45
+    },
+    {
+     "validTime": "2027-01-08T00:00:00+00:00/P1DT6H",
+     "value": 8
+    }
+   ]
+  }
+ }
+}

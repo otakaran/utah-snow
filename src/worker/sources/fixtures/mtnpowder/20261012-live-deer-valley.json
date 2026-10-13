@@ -1,0 +1,445 @@
+{
+ "Name": "Deer Valley",
+ "LastUpdate": "2026-10-12T19:52:52-0600",
+ "SnowReport": {
+  "LastUpdate": "2026-09-21T09:42:57-0600",
+  "BaseConditions": "Spring conditions",
+  "Report": "--",
+  "AdditionalText": "--",
+  "Alert": "--",
+  "LiftNotification": "--",
+  "StormTotalIn": "0",
+  "SeasonTotalIn": "0",
+  "TotalOpenTrails": 0,
+  "TotalTrails": 202,
+  "GroomedTrails": 0,
+  "TotalOpenLifts": 0,
+  "TotalLifts": 31,
+  "BaseArea": {
+   "Name": "Base",
+   "SinceLiftsClosedIn": "0",
+   "BaseIn": "0",
+   "Last24HoursIn": "0",
+   "Last48HoursIn": "0",
+   "Last72HoursIn": "0",
+   "Last7DaysIn": "0"
+  },
+  "MidMountainArea": {
+   "Name": "Mid-Mountain",
+   "SinceLiftsClosedIn": "0",
+   "BaseIn": "0",
+   "Last24HoursIn": "0",
+   "Last48HoursIn": "0",
+   "Last72HoursIn": "0",
+   "Last7DaysIn": "0"
+  },
+  "SummitArea": {
+   "Name": "Summit",
+   "SinceLiftsClosedIn": "0",
+   "BaseIn": "0",
+   "Last24HoursIn": "0",
+   "Last48HoursIn": "0",
+   "Last72HoursIn": "0",
+   "Last7DaysIn": "0"
+  }
+ },
+ "CurrentConditions": {
+  "Base": {
+   "Name": "Base",
+   "FeedSavedTime": "2026-10-12T19:52:47-0600",
+   "TemperatureF": "40",
+   "WindDirection": "SE",
+   "WindStrengthMph": 3,
+   "WindGustsMph": 4,
+   "Skies": "Rain"
+  },
+  "MidMountain": {
+   "Name": "Mid-Mountain",
+   "FeedSavedTime": "2026-10-12T19:52:47-0600",
+   "TemperatureF": "37",
+   "WindDirection": "S",
+   "WindStrengthMph": 13,
+   "WindGustsMph": 13,
+   "Skies": "Rain"
+  },
+  "Summit": {
+   "Name": "Summit",
+   "FeedSavedTime": "2026-10-12T19:52:47-0600",
+   "TemperatureF": "33",
+   "WindDirection": "S",
+   "WindStrengthMph": 27,
+   "WindGustsMph": 31,
+   "Skies": "Rain"
+  }
+ },
+ "MountainAreas": [
+  {
+   "Name": "Bald Mountain",
+   "Lifts": [
+    {
+     "Id": 139,
+     "Name": "Mayflower",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:58:44-0600",
+     "Hours": {"Sunday":{"Open":"9:15 AM","Close":"3:00 PM"},"Monday":{"Open":"9:15 AM","Close":"3:00 PM"},"Tuesday":{"Open":"9:15 AM","Close":"3:00 PM"},"Wednesday":{"Open":"9:15 AM","Close":"3:00 PM"},"Thursday":{"Open":"9:15 AM","Close":"3:00 PM"},"Friday":{"Open":"9:15 AM","Close":"3:00 PM"},"Saturday":{"Open":"9:15 AM","Close":"3:00 PM"}}
+    },
+    {
+     "Id": 140,
+     "Name": "Sterling Express",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-09-20T22:52:58-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 142,
+     "Name": "Sultan Express",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:58:51-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 141,
+     "Name": "Wasatch Express",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:58:54-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Keetley Point",
+   "Lifts": [
+    {
+     "Id": 937,
+     "Name": "Aurora",
+     "MountainAreaName": "Keetley Point",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:00-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 1001,
+     "Name": "Galena Express",
+     "MountainAreaName": "Keetley Point",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:02-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 936,
+     "Name": "Hoodoo Express",
+     "MountainAreaName": "Keetley Point",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:07-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 938,
+     "Name": "Keetley Express",
+     "MountainAreaName": "Keetley Point",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:10-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Lady Morgan",
+   "Lifts": [
+    {
+     "Id": 151,
+     "Name": "Lady Morgan Express",
+     "MountainAreaName": "Lady Morgan",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:14-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:00 PM"},"Monday":{"Open":"9:00 AM","Close":"3:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:00 PM"},"Friday":{"Open":"9:00 AM","Close":"3:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Flagstaff Mountain",
+   "Lifts": [
+    {
+     "Id": 143,
+     "Name": "Judge",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:18-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"Closed","Close":"Closed"},"Tuesday":{"Open":"Closed","Close":"Closed"},"Wednesday":{"Open":"Closed","Close":"Closed"},"Thursday":{"Open":"Closed","Close":"Closed"},"Friday":{"Open":"Closed","Close":"Closed"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 144,
+     "Name": "Northside Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:43-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 145,
+     "Name": "Quincy Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:47-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 146,
+     "Name": "Red Cloud",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:49-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 147,
+     "Name": "Ruby Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:51-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 148,
+     "Name": "Silver Strike Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:54-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 149,
+     "Name": "Viking",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T17:59:59-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Park Peak",
+   "Lifts": [
+    {
+     "Id": 980,
+     "Name": "East Village Gondola",
+     "MountainAreaName": "Park Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:07-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 979,
+     "Name": "East Village Gondola Mid Station",
+     "MountainAreaName": "Park Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:09-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 983,
+     "Name": "Pinyon Express",
+     "MountainAreaName": "Park Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:12-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 982,
+     "Name": "Revelator Express",
+     "MountainAreaName": "Park Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:15-0600",
+     "Hours": {"Sunday":{"Open":"9:15 AM","Close":"3:45 PM"},"Monday":{"Open":"9:15 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:15 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:15 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:15 AM","Close":"3:45 PM"},"Friday":{"Open":"9:15 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:15 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 981,
+     "Name": "Vulcan Express",
+     "MountainAreaName": "Park Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:17-0600",
+     "Hours": {"Sunday":{"Open":"9:15 AM","Close":"3:45 PM"},"Monday":{"Open":"9:15 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:15 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:15 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:15 AM","Close":"3:45 PM"},"Friday":{"Open":"9:15 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:15 AM","Close":"3:45 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Pioche Point",
+   "Lifts": [
+    {
+     "Id": 985,
+     "Name": "Neptune Express",
+     "MountainAreaName": "Pioche Point",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:21-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 984,
+     "Name": "Pioche Express",
+     "MountainAreaName": "Pioche Point",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:23-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Empire",
+   "Lifts": [
+    {
+     "Id": 150,
+     "Name": "Empire Express",
+     "MountainAreaName": "Empire",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:32-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:00 PM"},"Monday":{"Open":"9:00 AM","Close":"3:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:00 PM"},"Friday":{"Open":"9:00 AM","Close":"3:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Little Baldy Peak",
+   "Lifts": [
+    {
+     "Id": 135,
+     "Name": "Jordanelle Express Gondola",
+     "MountainAreaName": "Little Baldy Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:35-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 134,
+     "Name": "Mountaineer Express",
+     "MountainAreaName": "Little Baldy Peak",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:37-0600",
+     "Hours": {"Sunday":{"Open":"Closed","Close":"Closed"},"Monday":{"Open":"Closed","Close":"Closed"},"Tuesday":{"Open":"Closed","Close":"Closed"},"Wednesday":{"Open":"Closed","Close":"Closed"},"Thursday":{"Open":"Closed","Close":"Closed"},"Friday":{"Open":"Closed","Close":"Closed"},"Saturday":{"Open":"Closed","Close":"Closed"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Bald Eagle Mountain",
+   "Lifts": [
+    {
+     "Id": 131,
+     "Name": "Burns Express",
+     "MountainAreaName": "Bald Eagle Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:40-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 132,
+     "Name": "Carpenter Express",
+     "MountainAreaName": "Bald Eagle Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:43-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 133,
+     "Name": "Crown Point",
+     "MountainAreaName": "Bald Eagle Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:48-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 136,
+     "Name": "Homestake Express",
+     "MountainAreaName": "Bald Eagle Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-09-20T22:53:05-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 137,
+     "Name": "Silver Lake Express",
+     "MountainAreaName": "Bald Eagle Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-09-20T22:53:07-0600",
+     "Hours": {"Sunday":{"Open":"8:45 AM","Close":"4:30 PM"},"Monday":{"Open":"8:45 AM","Close":"4:30 PM"},"Tuesday":{"Open":"8:45 AM","Close":"4:30 PM"},"Wednesday":{"Open":"8:45 AM","Close":"4:30 PM"},"Thursday":{"Open":"8:45 AM","Close":"4:30 PM"},"Friday":{"Open":"8:45 AM","Close":"4:30 PM"},"Saturday":{"Open":"8:45 AM","Close":"4:30 PM"}}
+    },
+    {
+     "Id": 138,
+     "Name": "Snowflake",
+     "MountainAreaName": "Bald Eagle Mountain",
+     "Status": "Closed for Season",
+     "StatusEnglish": "closed_for_season",
+     "UpdateDate": "2026-03-29T18:00:55-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  }
+ ],
+ "Roads": [
+  {
+   "Name": "I-80",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  },
+  {
+   "Name": "US-40",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  },
+  {
+   "Name": "SR-224",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  },
+  {
+   "Name": "SR-248",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  }
+ ]
+}

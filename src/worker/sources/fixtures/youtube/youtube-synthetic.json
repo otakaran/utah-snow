@@ -1,0 +1,585 @@
+{
+ "_note": "SYNTHETIC in-season sample (no live or Wayback source: the Data API needs a key and Wayback has no CamStreamer captures for Dec 2025-Mar 2026). Hand-built from the documented videos.list / playlistItems.list field paths (spec 6.1) and the stream titles verified live on 2026-10-12. Scenario, 2026-01-17: `videos` is the API truth at 15:15Z; `earlier` overrides it for the 14:55Z tick (the Solitude stake and Sterling were still live; the Sterling handle still pointed at the old ID). Galena is not embeddable, Eagle is upcoming, Majestic ended, Hail Peak matches no slot, the DV stake handle points at an unavailable video and the Hoodoo handle answers 200 (offline page). `camstreamer` maps handle -> redirect target (null = 200). `maxres404`: maxresdefault_live 404s; `customEtag`: 10-digit ETags of channel-uploaded thumbnails.",
+ "videos": [
+  {
+   "id": "4a-3iEM7bHk",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Parking Lot - Brighton Ski Resort",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-07-16T15:02:11Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "uZ24vqOWEkQ",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Molly Greens View - Brighton Ski Resort",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-18T14:31:07Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "Zv8HYwaXjBg",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Top of Crest Lift - Brighton Ski Resort",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-10-10T19:12:40Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "vMwQRjlfqtA",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Explorer Lift - Brighton Ski Resort",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-01T16:00:03Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "N-d3MuOagLg",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Milly Express - Brighton Ski Resort",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-01T16:05:51Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "RPIfUKjRQgI",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Great Western - Brighton Ski Resort",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-27T14:02:19Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "XLzKPufaAts",
+   "snippet": {
+    "channelId": "UC3NvXJeIa_dBZ2ygCKrfCCQ",
+    "title": "Majestic - Brighton Ski Resort",
+    "liveBroadcastContent": "none"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-20T15:00:00Z",
+    "actualEndTime": "2026-01-10T01:12:44Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "lkEM6EC8NVA",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Solitude Snowstake",
+    "liveBroadcastContent": "none"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-11-20T18:40:02Z",
+    "actualEndTime": "2026-01-17T15:04:51Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "Q7nS3wStk26",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Solitude Snowstake",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2026-01-17T15:08:30Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "yeoBog_kSzc",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Powderhorn II Lift Line",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2023-07-25T20:11:09Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "xNER0JHrqLg",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Powderhorn",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-05T17:20:00Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "ta-4QZbfMXc",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Moonbeam Parking Lot",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2023-10-27T16:44:31Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "NSiItCGabfo",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Moonbeam Lift Line",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-05-23T15:30:18Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "Lnznapxh2xM",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Sunshine Bowl",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2023-07-25T20:15:42Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "l2X9DlRzX54",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Apex Express and Sunrise Lift Lines",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2022-10-21T17:58:10Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "Yx3QmuKfwjY",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Link Lift Line",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-12T16:01:27Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "rUXoOLxKKX4",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Summit Express Lift Line",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-14T15:47:02Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "My1P9laoUeg",
+   "snippet": {
+    "channelId": "UCsG59EVXq_OZatwq299yThg",
+    "title": "Eagle Express Lift Line",
+    "liveBroadcastContent": "upcoming"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "QozKoFs-hL0",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Snow Park Lodge Livestream",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-02T21:00:13Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "uE_ent5rC3Y",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Silver Lake Lodge Livestream",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-02-25T18:33:20Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "r8qiPv9XCOM",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Empire Express Chairlift Livestream",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-02-25T18:35:55Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "iNdfTLilLlU",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Sterling Express Chairlift Webcam",
+    "liveBroadcastContent": "none"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-02-25T18:38:12Z",
+    "actualEndTime": "2026-01-17T15:01:09Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "S7erlingCam",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Sterling Express Chairlift Webcam",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2026-01-17T15:03:40Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "0shWeR7Fvpg",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Galena Express Chairlift Livestream",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-06T15:10:00Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": false
+   }
+  },
+  {
+   "id": "XZjubaPbamE",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Revelator Express Chairlift Livestream",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-06T15:12:31Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "sAjdqw-lzgI",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Sultan Express Live",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-06T15:15:02Z"
+   },
+   "status": {
+    "privacyStatus": "unlisted",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "RaX_MhXETq4",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Hoodoo Express Chairlift",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2025-12-06T15:18:44Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  },
+  {
+   "id": "HailPeakCam",
+   "snippet": {
+    "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+    "title": "Hail Peak Express Livestream",
+    "liveBroadcastContent": "live"
+   },
+   "liveStreamingDetails": {
+    "actualStartTime": "2026-01-16T15:00:00Z"
+   },
+   "status": {
+    "privacyStatus": "public",
+    "embeddable": true
+   }
+  }
+ ],
+ "earlier": {
+  "videos": [
+   {
+    "id": "lkEM6EC8NVA",
+    "snippet": {
+     "channelId": "UCsG59EVXq_OZatwq299yThg",
+     "title": "Solitude Snowstake",
+     "liveBroadcastContent": "live"
+    },
+    "liveStreamingDetails": {
+     "actualStartTime": "2025-11-20T18:40:02Z"
+    },
+    "status": {
+     "privacyStatus": "public",
+     "embeddable": true
+    }
+   },
+   {
+    "id": "iNdfTLilLlU",
+    "snippet": {
+     "channelId": "UCTqz2P_u5ewpc7ICo9p-TMg",
+     "title": "Sterling Express Chairlift Webcam",
+     "liveBroadcastContent": "live"
+    },
+    "liveStreamingDetails": {
+     "actualStartTime": "2025-02-25T18:38:12Z"
+    },
+    "status": {
+     "privacyStatus": "public",
+     "embeddable": true
+    }
+   }
+  ],
+  "camstreamer": {
+   "85gYTybAhS5pjj2NpJ6n93R4VQwgn6aLdHWhpFDx": "https://www.youtube.com/embed/iNdfTLilLlU?autoplay=1&mute=1"
+  }
+ },
+ "playlists": {
+  "UU3NvXJeIa_dBZ2ygCKrfCCQ": [
+   {
+    "contentDetails": {
+     "videoId": "RPIfUKjRQgI",
+     "videoPublishedAt": "2025-12-27T14:02:19Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "XLzKPufaAts",
+     "videoPublishedAt": "2025-12-20T15:00:00Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "uZ24vqOWEkQ",
+     "videoPublishedAt": "2025-12-18T14:31:07Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "N-d3MuOagLg",
+     "videoPublishedAt": "2025-12-01T16:05:51Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "vMwQRjlfqtA",
+     "videoPublishedAt": "2025-12-01T16:00:03Z"
+    }
+   }
+  ],
+  "UUsG59EVXq_OZatwq299yThg": [
+   {
+    "contentDetails": {
+     "videoId": "Q7nS3wStk26",
+     "videoPublishedAt": "2026-01-17T15:08:30Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "My1P9laoUeg",
+     "videoPublishedAt": "2026-01-16T22:00:00Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "rUXoOLxKKX4",
+     "videoPublishedAt": "2025-12-14T15:47:02Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "Yx3QmuKfwjY",
+     "videoPublishedAt": "2025-12-12T16:01:27Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "xNER0JHrqLg",
+     "videoPublishedAt": "2025-12-05T17:20:00Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "lkEM6EC8NVA",
+     "videoPublishedAt": "2025-11-20T18:40:02Z"
+    }
+   }
+  ],
+  "UUTqz2P_u5ewpc7ICo9p-TMg": [
+   {
+    "contentDetails": {
+     "videoId": "S7erlingCam",
+     "videoPublishedAt": "2026-01-17T15:03:40Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "HailPeakCam",
+     "videoPublishedAt": "2026-01-16T15:00:00Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "XZjubaPbamE",
+     "videoPublishedAt": "2025-12-06T15:12:31Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "RaX_MhXETq4",
+     "videoPublishedAt": "2025-12-06T15:18:44Z"
+    }
+   },
+   {
+    "contentDetails": {
+     "videoId": "QozKoFs-hL0",
+     "videoPublishedAt": "2025-12-02T21:00:13Z"
+    }
+   }
+  ]
+ },
+ "camstreamer": {
+  "7v1terTMcMZfFAMOp8Gauh1H4PYtk6sP3FDMQuzI": "https://www.youtube.com/embed/_-jBmcnsK6s?autoplay=1&mute=1",
+  "M5ToybhwNTDP6Y5Yt6lIr9hylOONXTv892poZIyH": "https://www.youtube.com/embed/QozKoFs-hL0?autoplay=1&mute=1",
+  "oCzfMDDSJHRGJXfQug4D8FhLpuU7GwaphZjuO00Z": "https://www.youtube.com/embed/uE_ent5rC3Y?autoplay=1&mute=1",
+  "5JJMkCuxzOl52j8pMT9Fc6wNrJkeVLlPl75l2nPD": "https://www.youtube.com/embed/r8qiPv9XCOM?autoplay=1&mute=1",
+  "85gYTybAhS5pjj2NpJ6n93R4VQwgn6aLdHWhpFDx": "https://www.youtube.com/embed/S7erlingCam?autoplay=1&mute=1",
+  "lgOzg0AxWR6BOLOBlZnaN7hhB6RnEOUaaWErbdxH": "https://www.youtube.com/embed/0shWeR7Fvpg?autoplay=1&mute=1",
+  "cgVMhgI2Dht1tLyFW28p4r4uoCgka4wGNgL3npJ0": "https://www.youtube.com/embed/XZjubaPbamE?autoplay=1&mute=1",
+  "WHHs0IGromJCpEcQUtsBvCiYCOQfueb4CM5nq6XC": "https://www.youtube.com/embed/sAjdqw-lzgI?autoplay=1&mute=1",
+  "r5HqNCcbTMOt3gyc1tFVYWWxhLSdTikzwsOxVrRY": null
+ },
+ "maxres404": [
+  "vMwQRjlfqtA",
+  "N-d3MuOagLg"
+ ],
+ "customEtag": {
+  "4a-3iEM7bHk": "\"1775247294\"",
+  "l2X9DlRzX54": "\"1671131678\""
+ }
+}

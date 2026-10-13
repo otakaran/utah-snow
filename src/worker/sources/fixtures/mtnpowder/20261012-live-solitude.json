@@ -1,0 +1,240 @@
+{
+ "Name": "Solitude",
+ "LastUpdate": "2026-10-12T19:52:52-0600",
+ "SnowReport": {
+  "LastUpdate": "2026-10-07T15:50:41-0600",
+  "BaseConditions": "--",
+  "Report": "<div>Winter is coming! Join us for skiing, riding, and the <a href=\"https://www.solitudemountain.com/things-to-do/events-and-activities/opening-day-dj-and-donuts\">DJ + Donuts Opening Party</a> on November 20.</div>",
+  "AdditionalText": "Winter is coming! Join us for skiing, riding, and the DJ + Donuts Opening Party on November 20.",
+  "Alert": "--",
+  "LiftNotification": "--",
+  "StormTotalIn": "0",
+  "SeasonTotalIn": "0",
+  "TotalOpenTrails": 0,
+  "TotalTrails": 82,
+  "GroomedTrails": 0,
+  "TotalOpenLifts": 0,
+  "TotalLifts": 9,
+  "BaseArea": {
+   "Name": "--",
+   "SinceLiftsClosedIn": "--",
+   "BaseIn": "--",
+   "Last24HoursIn": "--",
+   "Last48HoursIn": "--",
+   "Last72HoursIn": "--",
+   "Last7DaysIn": "--"
+  },
+  "MidMountainArea": {
+   "Name": "Mid-Mountain",
+   "SinceLiftsClosedIn": "0",
+   "BaseIn": "0",
+   "Last24HoursIn": "0",
+   "Last48HoursIn": "0",
+   "Last72HoursIn": "0",
+   "Last7DaysIn": "0"
+  },
+  "SummitArea": {
+   "Name": "--",
+   "SinceLiftsClosedIn": "--",
+   "BaseIn": "--",
+   "Last24HoursIn": "--",
+   "Last48HoursIn": "--",
+   "Last72HoursIn": "--",
+   "Last7DaysIn": "--"
+  }
+ },
+ "CurrentConditions": {
+  "Base": {
+   "Name": "--",
+   "FeedSavedTime": "--",
+   "TemperatureF": "--",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "--"
+  },
+  "MidMountain": {
+   "Name": "Mid-Mountain",
+   "FeedSavedTime": "2026-10-12T19:52:48-0600",
+   "TemperatureF": "32",
+   "WindDirection": "N",
+   "WindStrengthMph": 0,
+   "WindGustsMph": "--",
+   "Skies": "Snow"
+  },
+  "Summit": {
+   "Name": "--",
+   "FeedSavedTime": "--",
+   "TemperatureF": "--",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "--"
+  }
+ },
+ "MountainAreas": [
+  {
+   "Name": "Moonbeam Area",
+   "Lifts": [
+    {
+     "Id": 535,
+     "Name": "Link",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:45-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"5:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"5:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"5:00 PM"}}
+    },
+    {
+     "Id": 536,
+     "Name": "Moonbeam Express",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:46-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"5:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"5:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"5:00 PM"}}
+    },
+    {
+     "Id": 856,
+     "Name": "Magic Carpet",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:47-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"5:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"5:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"5:00 PM"}}
+    },
+    {
+     "Id": 1003,
+     "Name": "Soli Parks Tow",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:48-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"5:00 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"5:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"5:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Eagle Ridge",
+   "Lifts": [
+    {
+     "Id": 538,
+     "Name": "Eagle Express",
+     "MountainAreaName": "Eagle Ridge",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:50-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 539,
+     "Name": "Powderhorn II",
+     "MountainAreaName": "Eagle Ridge",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:51-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Solitude Canyon",
+   "Lifts": [
+    {
+     "Id": 537,
+     "Name": "Apex Express",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:53-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"5:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"5:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"5:00 PM"}}
+    },
+    {
+     "Id": 540,
+     "Name": "Sunrise",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:55-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 541,
+     "Name": "Summit Express",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:05:58-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:30 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"3:30 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:30 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Honeycomb Canyon",
+   "Lifts": [
+    {
+     "Id": 542,
+     "Name": "Honeycomb Return",
+     "MountainAreaName": "Honeycomb Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2026-10-07T14:06:00-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:30 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"3:30 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:30 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Terrain Areas",
+   "Lifts": [],
+   "Activities": [
+    {
+     "Id": 240,
+     "Name": "Eagle Ridge",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    },
+    {
+     "Id": 237,
+     "Name": "Evergreen Peak",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    },
+    {
+     "Id": 235,
+     "Name": "Fantasy Ridge",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    },
+    {
+     "Id": 236,
+     "Name": "Highway to Heaven",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    },
+    {
+     "Id": 234,
+     "Name": "Honeycomb Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    },
+    {
+     "Id": 239,
+     "Name": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    },
+    {
+     "Id": 238,
+     "Name": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed"
+    }
+   ]
+  }
+ ],
+ "Roads": []
+}

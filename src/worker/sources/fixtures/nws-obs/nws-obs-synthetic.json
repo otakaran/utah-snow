@@ -1,0 +1,159 @@
+{
+ "_note": "Synthetic in-season sample: Wayback has no captures of api.weather.gov/stations/{ID}/observations/latest for these stations, and the NWS API keeps only about a week of history. Shape copied from the 2026-10-12 live fixture; values are plausible for the 2026-02-16/17 Wasatch storm. DVP carries a QC-rejected (X) gust, and the other stations are absent (failed fetches).",
+ "AGD": {
+  "properties": {
+   "stationId": "AGD",
+   "timestamp": "2026-02-17T06:00:00+00:00",
+   "temperature": {
+    "unitCode": "wmoUnit:degC",
+    "value": -5.0,
+    "qualityControl": "V"
+   },
+   "windSpeed": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 12.96,
+    "qualityControl": "V"
+   },
+   "windGust": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 33.336,
+    "qualityControl": "S"
+   },
+   "windDirection": {
+    "unitCode": "wmoUnit:degree_(angle)",
+    "value": 205,
+    "qualityControl": "V"
+   }
+  }
+ },
+ "HDP": {
+  "properties": {
+   "stationId": "HDP",
+   "timestamp": "2026-02-17T06:00:00+00:00",
+   "temperature": {
+    "unitCode": "wmoUnit:degC",
+    "value": -11.67,
+    "qualityControl": "V"
+   },
+   "windSpeed": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 51.48,
+    "qualityControl": "V"
+   },
+   "windGust": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 96.48,
+    "qualityControl": "S"
+   },
+   "windDirection": {
+    "unitCode": "wmoUnit:degree_(angle)",
+    "value": 228,
+    "qualityControl": "V"
+   }
+  }
+ },
+ "SBDU1": {
+  "properties": {
+   "stationId": "SBDU1",
+   "timestamp": "2026-02-17T05:45:00+00:00",
+   "temperature": {
+    "unitCode": "wmoUnit:degC",
+    "value": -6.1,
+    "qualityControl": "V"
+   },
+   "windSpeed": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": null,
+    "qualityControl": "Z"
+   },
+   "windGust": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": null,
+    "qualityControl": "Z"
+   },
+   "windDirection": {
+    "unitCode": "wmoUnit:degree_(angle)",
+    "value": null,
+    "qualityControl": "Z"
+   }
+  }
+ },
+ "BRW": {
+  "properties": {
+   "stationId": "BRW",
+   "timestamp": "2026-02-17T06:00:00+00:00",
+   "temperature": {
+    "unitCode": "wmoUnit:degC",
+    "value": -9.44,
+    "qualityControl": "V"
+   },
+   "windSpeed": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 40.716,
+    "qualityControl": "V"
+   },
+   "windGust": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 79.632,
+    "qualityControl": "S"
+   },
+   "windDirection": {
+    "unitCode": "wmoUnit:degree_(angle)",
+    "value": 215.5,
+    "qualityControl": "V"
+   }
+  }
+ },
+ "DVP": {
+  "properties": {
+   "stationId": "DVP",
+   "timestamp": "2026-02-17T05:55:00+00:00",
+   "temperature": {
+    "unitCode": "wmoUnit:degC",
+    "value": -8.33,
+    "qualityControl": "V"
+   },
+   "windSpeed": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 27.36,
+    "qualityControl": "V"
+   },
+   "windGust": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 412.2,
+    "qualityControl": "X"
+   },
+   "windDirection": {
+    "unitCode": "wmoUnit:degree_(angle)",
+    "value": 240,
+    "qualityControl": "V"
+   }
+  }
+ },
+ "OGP": {
+  "properties": {
+   "stationId": "OGP",
+   "timestamp": "2026-02-17T06:00:00+00:00",
+   "temperature": {
+    "unitCode": "wmoUnit:degC",
+    "value": -10.56,
+    "qualityControl": "V"
+   },
+   "windSpeed": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": null,
+    "qualityControl": "Z"
+   },
+   "windGust": {
+    "unitCode": "wmoUnit:km_h-1",
+    "value": 104.04,
+    "qualityControl": "S"
+   },
+   "windDirection": {
+    "unitCode": "wmoUnit:degree_(angle)",
+    "value": null,
+    "qualityControl": "Z"
+   }
+  }
+ }
+}

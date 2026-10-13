@@ -1,0 +1,213 @@
+[
+ {
+  "batch": 0,
+  "checks": {
+   "udot-164559": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164806": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164767": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164768": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-166033": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-166000": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165999": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165998": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165174": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-155967": {
+    "status": 200,
+    "type": "image/png"
+   },
+   "udot-165175": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165271": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165574": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164804": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164835": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164335": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164812": {
+    "status": 200,
+    "type": "image/jpeg"
+   }
+  }
+ },
+ {
+  "batch": 1,
+  "checks": {
+   "udot-164567": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165939": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164333": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164416": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164788": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165945": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164818": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165123": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165825": {
+    "status": 200,
+    "type": "image/gif"
+   },
+   "udot-166089": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-166167": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-166150": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165548": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-166134": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-166233": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165044": {
+    "status": 200,
+    "type": "image/jpeg"
+   }
+  }
+ },
+ {
+  "batch": 2,
+  "checks": {
+   "udot-164545": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164247": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164303": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164918": {
+    "status": 200,
+    "type": "image/gif"
+   },
+   "udot-165212": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164385": {
+    "status": 200,
+    "type": "image/png"
+   },
+   "udot-141123": {
+    "status": 200,
+    "type": "image/png"
+   },
+   "udot-142189": {
+    "status": 200,
+    "type": "image/png"
+   },
+   "udot-154500": {
+    "status": 200,
+    "type": "image/png"
+   },
+   "udot-165500": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164499": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-165318": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164722": {
+    "status": 200,
+    "type": "image/jpeg"
+   },
+   "udot-164505": {
+    "status": 200,
+    "type": "image/gif"
+   },
+   "udot-165868": {
+    "status": 200,
+    "type": "image/gif"
+   },
+   "udot-166007": {
+    "status": 200,
+    "type": "image/gif"
+   }
+  }
+ }
+]

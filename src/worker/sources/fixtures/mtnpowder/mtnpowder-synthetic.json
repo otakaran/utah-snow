@@ -1,0 +1,215 @@
+{
+ "_synthetic": "Hand-built, NOT a capture: Wayback has no in-season resortId=49 feed. Shape copied from the 2026-10-12 live DV feed (trimmed); numbers modelled on the 2025-12-27 DV report (Base 5, Mid 5, Summit 10 in 24 h, storm 8) and the 2026-01-11 parking alert. Parse with now=2025-12-28T16:30:00Z.",
+ "Name": "Deer Valley",
+ "LastUpdate": "2025-12-28T09:24:51-0700",
+ "SnowReport": {
+  "LastUpdate": "2025-12-28T05:58:03-0700",
+  "BaseConditions": "Packed Powder",
+  "Report": "<p>Good morning! <strong>10&quot; at the summit</strong> since the lifts closed. Patrol is working on Lady Morgan this morning.</p>",
+  "AdditionalText": "--",
+  "Alert": "<div>Deer Valley parking is at capacity today, 12/28. Please park at the Richardson Flat Park &amp; Ride.</div>",
+  "LiftNotification": "--",
+  "StormTotalIn": "8",
+  "SeasonTotalIn": "62",
+  "TotalOpenTrails": 98,
+  "TotalTrails": 202,
+  "GroomedTrails": 55,
+  "TotalOpenLifts": 21,
+  "TotalLifts": 31,
+  "BaseArea": {
+   "SinceLiftsClosedIn": "5",
+   "BaseIn": "30",
+   "Last24HoursIn": "5",
+   "Last48HoursIn": "8",
+   "Last72HoursIn": "8",
+   "Last7DaysIn": "12"
+  },
+  "MidMountainArea": {
+   "SinceLiftsClosedIn": "5",
+   "BaseIn": "30",
+   "Last24HoursIn": "5",
+   "Last48HoursIn": "8",
+   "Last72HoursIn": "8",
+   "Last7DaysIn": "12"
+  },
+  "SummitArea": {
+   "SinceLiftsClosedIn": "9",
+   "BaseIn": "30",
+   "Last24HoursIn": "10",
+   "Last48HoursIn": "13",
+   "Last72HoursIn": "13",
+   "Last7DaysIn": "18"
+  }
+ },
+ "CurrentConditions": {
+  "Base": {
+   "Name": "Base",
+   "FeedSavedTime": "2025-12-28T09:24:47-0700",
+   "TemperatureF": "18",
+   "WindDirection": "NW",
+   "WindStrengthMph": 4,
+   "WindGustsMph": 6,
+   "Skies": "Light Snow"
+  },
+  "MidMountain": {
+   "Name": "Mid-Mountain",
+   "FeedSavedTime": "2025-12-28T09:24:47-0700",
+   "TemperatureF": "14",
+   "WindDirection": "WNW",
+   "WindStrengthMph": 9,
+   "WindGustsMph": 12,
+   "Skies": "Light Snow"
+  },
+  "Summit": {
+   "Name": "Summit",
+   "FeedSavedTime": "2025-12-28T09:24:47-0700",
+   "TemperatureF": "9",
+   "WindDirection": "WNW",
+   "WindStrengthMph": 17,
+   "WindGustsMph": 18,
+   "Skies": "Light Snow"
+  }
+ },
+ "MountainAreas": [
+  {
+   "Name": "Bald Mountain",
+   "Lifts": [
+    {
+     "Id": 139,
+     "Name": "Mayflower",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:15 AM","Close":"3:00 PM"},"Monday":{"Open":"9:15 AM","Close":"3:00 PM"},"Tuesday":{"Open":"9:15 AM","Close":"3:00 PM"},"Wednesday":{"Open":"9:15 AM","Close":"3:00 PM"},"Thursday":{"Open":"9:15 AM","Close":"3:00 PM"},"Friday":{"Open":"9:15 AM","Close":"3:00 PM"},"Saturday":{"Open":"9:15 AM","Close":"3:00 PM"}}
+    },
+    {
+     "Id": 140,
+     "Name": "Sterling Express",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 141,
+     "Name": "Wasatch Express",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 142,
+     "Name": "Sultan Express",
+     "MountainAreaName": "Bald Mountain",
+     "Status": "Wind Hold",
+     "StatusEnglish": "wind_hold",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Flagstaff Mountain",
+   "Lifts": [
+    {
+     "Id": 144,
+     "Name": "Northside Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 145,
+     "Name": "Quincy Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Mechanical Hold",
+     "StatusEnglish": "mechanical_hold",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    },
+    {
+     "Id": 147,
+     "Name": "Ruby Express",
+     "MountainAreaName": "Flagstaff Mountain",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:45 PM"},"Monday":{"Open":"9:00 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:45 PM"},"Friday":{"Open":"9:00 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:45 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Lady Morgan",
+   "Lifts": [
+    {
+     "Id": 151,
+     "Name": "Lady Morgan Express",
+     "MountainAreaName": "Lady Morgan",
+     "Status": "Pending Avalanche Mitigation",
+     "StatusEnglish": "pending_avalanche_mitigation",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:00 PM"},"Monday":{"Open":"9:00 AM","Close":"3:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:00 PM"},"Friday":{"Open":"9:00 AM","Close":"3:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Park Peak",
+   "Lifts": [
+    {
+     "Id": 980,
+     "Name": "East Village Gondola",
+     "MountainAreaName": "Park Peak",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:15 PM"},"Monday":{"Open":"9:00 AM","Close":"4:15 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:15 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:15 PM"},"Friday":{"Open":"9:00 AM","Close":"4:15 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:15 PM"}}
+    },
+    {
+     "Id": 982,
+     "Name": "Revelator Express",
+     "MountainAreaName": "Park Peak",
+     "Status": "Delayed",
+     "StatusEnglish": "delayed",
+     "UpdateDate": "2025-12-28T09:12:40-0700",
+     "Hours": {"Sunday":{"Open":"9:15 AM","Close":"3:45 PM"},"Monday":{"Open":"9:15 AM","Close":"3:45 PM"},"Tuesday":{"Open":"9:15 AM","Close":"3:45 PM"},"Wednesday":{"Open":"9:15 AM","Close":"3:45 PM"},"Thursday":{"Open":"9:15 AM","Close":"3:45 PM"},"Friday":{"Open":"9:15 AM","Close":"3:45 PM"},"Saturday":{"Open":"9:15 AM","Close":"3:45 PM"}}
+    }
+   ],
+   "Activities": []
+  }
+ ],
+ "Roads": [
+  {
+   "Name": "I-80",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  },
+  {
+   "Name": "US-40",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  },
+  {
+   "Name": "SR-224",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "Yes"
+  },
+  {
+   "Name": "SR-248",
+   "Status": "Open",
+   "StatusEnglish": "open",
+   "ChainsRequired": "No"
+  }
+ ]
+}

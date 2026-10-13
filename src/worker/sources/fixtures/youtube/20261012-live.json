@@ -1,0 +1,289 @@
+{
+ "_note": "Live capture 2026-10-13 ~02:00Z (2026-10-12 MDT) from a laptop with the fetchx UA. Two rounds of HEAD https://camstreamer.com/embed/{handle} (redirect not followed: status + Location) and HEAD https://i.ytimg.com/vi/{id}/hqdefault_live.jpg (status + ETag), about 6 min apart, so live counters moved and custom-thumbnail ETags (10 digits) did not. api403 is the real keyless answer of GET https://www.googleapis.com/youtube/v3/videos (no key). maxres is HEAD maxresdefault_live.jpg.",
+ "rounds": [
+  {
+   "at": "2026-10-13T01:59:38Z",
+   "camstreamer": {
+    "7v1terTMcMZfFAMOp8Gauh1H4PYtk6sP3FDMQuzI": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/_-jBmcnsK6s?autoplay=1&mute=1"
+    },
+    "M5ToybhwNTDP6Y5Yt6lIr9hylOONXTv892poZIyH": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/QozKoFs-hL0?autoplay=1&mute=1"
+    },
+    "oCzfMDDSJHRGJXfQug4D8FhLpuU7GwaphZjuO00Z": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/uE_ent5rC3Y?autoplay=1&mute=1"
+    },
+    "5JJMkCuxzOl52j8pMT9Fc6wNrJkeVLlPl75l2nPD": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/r8qiPv9XCOM?autoplay=1&mute=1"
+    },
+    "85gYTybAhS5pjj2NpJ6n93R4VQwgn6aLdHWhpFDx": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/iNdfTLilLlU?autoplay=1&mute=1"
+    },
+    "lgOzg0AxWR6BOLOBlZnaN7hhB6RnEOUaaWErbdxH": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/0shWeR7Fvpg?autoplay=1&mute=1"
+    },
+    "cgVMhgI2Dht1tLyFW28p4r4uoCgka4wGNgL3npJ0": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/XZjubaPbamE?autoplay=1&mute=1"
+    },
+    "WHHs0IGromJCpEcQUtsBvCiYCOQfueb4CM5nq6XC": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/sAjdqw-lzgI?autoplay=1&mute=1"
+    },
+    "r5HqNCcbTMOt3gyc1tFVYWWxhLSdTikzwsOxVrRY": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/RaX_MhXETq4?autoplay=1&mute=1"
+    }
+   },
+   "hqdefault_live": {
+    "4a-3iEM7bHk": {
+     "status": 200,
+     "etag": "\"1775247294\""
+    },
+    "uZ24vqOWEkQ": {
+     "status": 200,
+     "etag": "\"14586\""
+    },
+    "Zv8HYwaXjBg": {
+     "status": 200,
+     "etag": "\"102426\""
+    },
+    "vMwQRjlfqtA": {
+     "status": 200,
+     "etag": "\"12012\""
+    },
+    "N-d3MuOagLg": {
+     "status": 200,
+     "etag": "\"4798\""
+    },
+    "lkEM6EC8NVA": {
+     "status": 200,
+     "etag": "\"106\""
+    },
+    "yeoBog_kSzc": {
+     "status": 200,
+     "etag": "\"195679\""
+    },
+    "xNER0JHrqLg": {
+     "status": 200,
+     "etag": "\"4383\""
+    },
+    "ta-4QZbfMXc": {
+     "status": 200,
+     "etag": "\"221691\""
+    },
+    "NSiItCGabfo": {
+     "status": 200,
+     "etag": "\"132782\""
+    },
+    "Lnznapxh2xM": {
+     "status": 200,
+     "etag": "\"191076\""
+    },
+    "l2X9DlRzX54": {
+     "status": 200,
+     "etag": "\"1671131678\""
+    },
+    "Yx3QmuKfwjY": {
+     "status": 200,
+     "etag": "\"34329\""
+    },
+    "_-jBmcnsK6s": {
+     "status": 404,
+     "etag": null
+    },
+    "QozKoFs-hL0": {
+     "status": 200,
+     "etag": "\"10958\""
+    },
+    "uE_ent5rC3Y": {
+     "status": 200,
+     "etag": "\"168892\""
+    },
+    "r8qiPv9XCOM": {
+     "status": 200,
+     "etag": "\"168570\""
+    },
+    "iNdfTLilLlU": {
+     "status": 200,
+     "etag": "\"162849\""
+    },
+    "0shWeR7Fvpg": {
+     "status": 200,
+     "etag": "\"27468\""
+    },
+    "XZjubaPbamE": {
+     "status": 200,
+     "etag": "\"70594\""
+    },
+    "sAjdqw-lzgI": {
+     "status": 200,
+     "etag": "\"11529\""
+    },
+    "RaX_MhXETq4": {
+     "status": 200,
+     "etag": "\"4941\""
+    }
+   }
+  },
+  {
+   "at": "2026-10-13T02:05:50Z",
+   "camstreamer": {
+    "7v1terTMcMZfFAMOp8Gauh1H4PYtk6sP3FDMQuzI": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/_-jBmcnsK6s?autoplay=1&mute=1"
+    },
+    "M5ToybhwNTDP6Y5Yt6lIr9hylOONXTv892poZIyH": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/QozKoFs-hL0?autoplay=1&mute=1"
+    },
+    "oCzfMDDSJHRGJXfQug4D8FhLpuU7GwaphZjuO00Z": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/uE_ent5rC3Y?autoplay=1&mute=1"
+    },
+    "5JJMkCuxzOl52j8pMT9Fc6wNrJkeVLlPl75l2nPD": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/r8qiPv9XCOM?autoplay=1&mute=1"
+    },
+    "85gYTybAhS5pjj2NpJ6n93R4VQwgn6aLdHWhpFDx": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/iNdfTLilLlU?autoplay=1&mute=1"
+    },
+    "lgOzg0AxWR6BOLOBlZnaN7hhB6RnEOUaaWErbdxH": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/0shWeR7Fvpg?autoplay=1&mute=1"
+    },
+    "cgVMhgI2Dht1tLyFW28p4r4uoCgka4wGNgL3npJ0": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/XZjubaPbamE?autoplay=1&mute=1"
+    },
+    "WHHs0IGromJCpEcQUtsBvCiYCOQfueb4CM5nq6XC": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/sAjdqw-lzgI?autoplay=1&mute=1"
+    },
+    "r5HqNCcbTMOt3gyc1tFVYWWxhLSdTikzwsOxVrRY": {
+     "status": 302,
+     "location": "https://www.youtube.com/embed/RaX_MhXETq4?autoplay=1&mute=1"
+    }
+   },
+   "hqdefault_live": {
+    "4a-3iEM7bHk": {
+     "status": 200,
+     "etag": "\"1775247294\""
+    },
+    "uZ24vqOWEkQ": {
+     "status": 200,
+     "etag": "\"14587\""
+    },
+    "Zv8HYwaXjBg": {
+     "status": 200,
+     "etag": "\"102427\""
+    },
+    "vMwQRjlfqtA": {
+     "status": 200,
+     "etag": "\"12013\""
+    },
+    "N-d3MuOagLg": {
+     "status": 200,
+     "etag": "\"4799\""
+    },
+    "lkEM6EC8NVA": {
+     "status": 200,
+     "etag": "\"108\""
+    },
+    "yeoBog_kSzc": {
+     "status": 200,
+     "etag": "\"195680\""
+    },
+    "xNER0JHrqLg": {
+     "status": 200,
+     "etag": "\"4385\""
+    },
+    "ta-4QZbfMXc": {
+     "status": 200,
+     "etag": "\"221692\""
+    },
+    "NSiItCGabfo": {
+     "status": 200,
+     "etag": "\"132783\""
+    },
+    "Lnznapxh2xM": {
+     "status": 200,
+     "etag": "\"191078\""
+    },
+    "l2X9DlRzX54": {
+     "status": 200,
+     "etag": "\"1671131678\""
+    },
+    "Yx3QmuKfwjY": {
+     "status": 200,
+     "etag": "\"34330\""
+    },
+    "_-jBmcnsK6s": {
+     "status": 404,
+     "etag": null
+    },
+    "QozKoFs-hL0": {
+     "status": 200,
+     "etag": "\"10960\""
+    },
+    "uE_ent5rC3Y": {
+     "status": 200,
+     "etag": "\"168893\""
+    },
+    "r8qiPv9XCOM": {
+     "status": 200,
+     "etag": "\"168571\""
+    },
+    "iNdfTLilLlU": {
+     "status": 200,
+     "etag": "\"162851\""
+    },
+    "0shWeR7Fvpg": {
+     "status": 200,
+     "etag": "\"27469\""
+    },
+    "XZjubaPbamE": {
+     "status": 200,
+     "etag": "\"70595\""
+    },
+    "sAjdqw-lzgI": {
+     "status": 200,
+     "etag": "\"11531\""
+    },
+    "RaX_MhXETq4": {
+     "status": 200,
+     "etag": "\"4942\""
+    }
+   }
+  }
+ ],
+ "maxres": {
+  "QozKoFs-hL0": 200,
+  "vMwQRjlfqtA": 404,
+  "_-jBmcnsK6s": 404
+ },
+ "api403": {
+  "status": 403,
+  "body": {
+   "error": {
+    "code": 403,
+    "message": "Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.",
+    "errors": [
+     {
+      "message": "Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.",
+      "domain": "global",
+      "reason": "forbidden"
+     }
+    ],
+    "status": "PERMISSION_DENIED"
+   }
+  }
+ }
+}

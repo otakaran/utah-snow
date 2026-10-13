@@ -1,0 +1,61 @@
+{
+  "_note": "SYNTHETIC in-season sequence, hand-built: Wayback has no capture of Collins_Snow_Stake.jpg (CDX checked 2026-10-12). Header shapes copy the live DO Spaces response (IMF-fixdate Last-Modified, quoted MD5 ETag). Timeline: Thu 2026-01-15 MST morning after the 04:00 board clear, one upload every ~5 min. [0] first frame, [1] new frame, [2] re-upload of identical pixels (same ETag, later Last-Modified), [3] 304 to If-Modified-Since = [2]. 200 bodies are not stored: tests reuse the real 2,048-byte JPEG head of 20261012-live.json (hash comes from the ETag, so the body bytes only need to pass the JPEG gate).",
+  "fetchedAt": "2026-01-15T14:12:00Z",
+  "responses": [
+    {
+      "url": "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg?t=29474755",
+      "request": {},
+      "status": 200,
+      "headers": {
+        "content-type": "image/jpeg",
+        "last-modified": "Thu, 15 Jan 2026 13:55:07 GMT",
+        "etag": "\"27bf73c9ccfa5b540d4da18c47fb07c0\"",
+        "cache-control": "max-age=60",
+        "content-length": "512340"
+      },
+      "bodyBytes": 512340
+    },
+    {
+      "url": "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg?t=29474760",
+      "request": {
+        "If-Modified-Since": "Thu, 15 Jan 2026 13:55:07 GMT"
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "image/jpeg",
+        "last-modified": "Thu, 15 Jan 2026 14:00:09 GMT",
+        "etag": "\"010f616d2a2339f8c90f9555c1bdef75\"",
+        "cache-control": "max-age=60",
+        "content-length": "518902"
+      },
+      "bodyBytes": 518902
+    },
+    {
+      "url": "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg?t=29474765",
+      "request": {
+        "If-Modified-Since": "Thu, 15 Jan 2026 14:00:09 GMT"
+      },
+      "status": 200,
+      "headers": {
+        "content-type": "image/jpeg",
+        "last-modified": "Thu, 15 Jan 2026 14:05:11 GMT",
+        "etag": "\"010f616d2a2339f8c90f9555c1bdef75\"",
+        "cache-control": "max-age=60",
+        "content-length": "518902"
+      },
+      "bodyBytes": 518902
+    },
+    {
+      "url": "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg?t=29474770",
+      "request": {
+        "If-Modified-Since": "Thu, 15 Jan 2026 14:05:11 GMT"
+      },
+      "status": 304,
+      "headers": {
+        "last-modified": "Thu, 15 Jan 2026 14:05:11 GMT",
+        "etag": "\"010f616d2a2339f8c90f9555c1bdef75\"",
+        "cache-control": "max-age=60"
+      }
+    }
+  ]
+}

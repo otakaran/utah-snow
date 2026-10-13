@@ -1,0 +1,74 @@
+{
+ "_note": "SYNTHETIC in-season batch (UDOT re-issued all Cctv ids on 2026-10-08, so no Wayback capture can match these ids). Batch 0 at 2026-01-15 09:50Z: 155967 back online (JPEG), 164806 a 404, 164768 an HTML 403 from the edge and 166000 timed out (both keep their previous state), 165174 the PNG placeholder; the rest live.",
+ "batch": 0,
+ "checks": {
+  "udot-164559": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-164806": {
+   "status": 404,
+   "type": "text/html"
+  },
+  "udot-164767": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-164768": {
+   "status": 403,
+   "type": "text/html"
+  },
+  "udot-166033": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-166000": {
+   "status": 0,
+   "err": "DeadlineError"
+  },
+  "udot-165999": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-165998": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-165174": {
+   "status": 200,
+   "type": "image/png"
+  },
+  "udot-155967": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-165175": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-165271": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-165574": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-164804": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-164835": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-164335": {
+   "status": 200,
+   "type": "image/jpeg"
+  },
+  "udot-164812": {
+   "status": 200,
+   "type": "image/jpeg"
+  }
+ }
+}

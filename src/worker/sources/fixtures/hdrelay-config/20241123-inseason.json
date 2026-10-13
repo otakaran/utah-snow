@@ -1,0 +1,47 @@
+{
+ "snowbird-peruvian-gulch": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "544432bd-3910-4888-aa9f-14b6f51a7eb5",
+    "status": {
+     "time": 39244,
+     "http": true,
+     "rtsp": true,
+     "online": true
+    }
+   },
+   "server": {
+    "jpg": "//b9b.hdrelay.com",
+    "hls": "//b9.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 90,
+     "max": 0
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1
+     ]
+    }
+   },
+   "image": {
+    "position": "panorama",
+    "interval": 0,
+    "overlays": {
+     "hotlink": {
+      "enabled": false,
+      "label": null,
+      "speed": 1,
+      "time": null
+     }
+    }
+   }
+  }
+ }
+}

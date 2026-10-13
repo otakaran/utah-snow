@@ -1,0 +1,440 @@
+{
+ "snowbird-snowstake": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "8611e276-7ee5-42c0-b8cd-d9e1890e1cd4",
+    "status": {
+     "time": 102122,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 90,
+     "max": 90
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1,
+      1200,
+      120
+     ]
+    }
+   }
+  }
+ },
+ "snowbird-peruvian-gulch": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "544432bd-3910-4888-aa9f-14b6f51a7eb5",
+    "status": {
+     "time": 103010,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 90,
+     "max": 0
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1
+     ]
+    }
+   },
+   "image": {
+    "position": "panorama",
+    "interval": 0,
+    "overlays": {
+     "hotlink": {
+      "enabled": false,
+      "label": null,
+      "speed": 1,
+      "time": null
+     }
+    }
+   }
+  }
+ },
+ "snowbird-mineral-basin": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "5780754f-8da1-4223-ab8a-6755d84cbc10",
+    "status": {
+     "time": 102984,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 90,
+     "max": 0
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1
+     ]
+    }
+   }
+  }
+ },
+ "snowbird-little-cloud": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "db2a69c5-66e9-4c48-a713-919eaf191fc1",
+    "status": {
+     "time": 98052,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 60,
+     "max": 90
+    },
+    "record": {
+     "enabled": true,
+     "hideDatePicker": false,
+     "speeds": [
+      60
+     ]
+    }
+   }
+  }
+ },
+ "snowbird-tram-bullpen": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "61b2490be101c00b9c48374f",
+    "status": {
+     "time": 103475,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "max": 0,
+     "inactive": 120
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1
+     ]
+    }
+   }
+  }
+ },
+ "snowbasin-snowstake": {
+  "status": 200,
+  "body": {
+   "type": "timeelapsed-2021",
+   "camera": {
+    "id": "09f922af-169d-4949-9bb7-295c6a859daa",
+    "status": {
+     "time": 102408,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 90,
+     "max": 0
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1
+     ]
+    }
+   },
+   "image": {
+    "position": "default",
+    "interval": 300,
+    "overlays": {
+     "hotlink": {
+      "enabled": true,
+      "label": null,
+      "speed": 30,
+      "time": 1770192456000.0,
+      "name": "Last Snow"
+     }
+    }
+   }
+  }
+ },
+ "snowbasin-earls-plaza": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "6192dd615233cdcad76d7dba",
+    "status": {
+     "time": 105573,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "max": 0,
+     "inactive": 120
+    },
+    "record": {
+     "enabled": false
+    }
+   }
+  }
+ },
+ "snowbasin-needles": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "1b6ed87c-f919-4e59-b9cc-7480e3ca31c3",
+    "status": {
+     "time": 105368,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "inactive": 90,
+     "max": 0
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1
+     ]
+    }
+   }
+  }
+ },
+ "snowbasin-strawberry-patio": {
+  "status": 200,
+  "body": {
+   "type": "timeelapsed-2021",
+   "camera": {
+    "id": "65652b36eb0e282336694064",
+    "status": {
+     "time": 105477,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "max": 0,
+     "inactive": 120
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1,
+      30
+     ]
+    }
+   },
+   "image": {
+    "position": "panorama",
+    "interval": 0,
+    "overlays": {
+     "hotlink": {
+      "enabled": false
+     }
+    }
+   }
+  }
+ },
+ "snowbasin-base-of-wildcat": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "61e1c2e0faf0bf0b5629ac59",
+    "status": {
+     "time": 106047,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "max": 0,
+     "inactive": 120
+    },
+    "record": {
+     "enabled": true,
+     "hideDatePicker": false,
+     "speeds": [
+      1,
+      30
+     ]
+    }
+   },
+   "image": {
+    "position": "panorama",
+    "interval": 0,
+    "overlays": {
+     "hotlink": {
+      "enabled": false,
+      "name": "",
+      "speed": 30
+     }
+    }
+   }
+  }
+ },
+ "snowbasin-base-area": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "621944828db58d080b9eac8b",
+    "status": {
+     "time": 106727,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "max": 0,
+     "inactive": 120
+    },
+    "record": {
+     "enabled": false
+    }
+   }
+  }
+ },
+ "snowbasin-middle-bowl-base": {
+  "status": 200,
+  "body": {
+   "type": "hdrelay-2021",
+   "camera": {
+    "id": "62101a0b8db58d080b9eac83",
+    "status": {
+     "time": 106457,
+     "online": true,
+     "http": true,
+     "rtsp": true
+    }
+   },
+   "server": {
+    "jpg": "//b15b.hdrelay.com",
+    "hls": "//b15.hdrelay.com"
+   },
+   "video": {
+    "format": "hls",
+    "timeout": {
+     "max": 0,
+     "inactive": 120
+    },
+    "record": {
+     "enabled": false,
+     "hideDatePicker": false,
+     "speeds": [
+      1,
+      30
+     ]
+    }
+   }
+  }
+ }
+}

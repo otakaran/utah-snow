@@ -1,0 +1,32 @@
+{
+  "_note": "Live capture 2026-10-13T01:56:32Z (2026-10-12 Pacific) with the worker UA. Headers trimmed to what fetch() reads; bodyHeadBase64 = the first 2,048 bytes of the real frame (bodyBytes long; its MD5 equals the ETag). The second response is the same URL one minute later with If-Modified-Since = the first Last-Modified.",
+  "fetchedAt": "2026-10-13T01:56:32Z",
+  "responses": [
+    {
+      "url": "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg?t=29864276",
+      "request": {},
+      "status": 200,
+      "headers": {
+        "content-type": "image/jpeg",
+        "content-length": "456731",
+        "last-modified": "Tue, 13 Oct 2026 01:48:10 GMT",
+        "etag": "\"c5a2a8ebe02ec27690ed93013ef379db\"",
+        "cache-control": "max-age=60"
+      },
+      "bodyBytes": 456731,
+      "bodyHeadBase64": "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"
+    },
+    {
+      "url": "https://alta-webcams.sfo3.cdn.digitaloceanspaces.com/Collins_Snow_Stake.jpg?t=29864277",
+      "request": {
+        "If-Modified-Since": "Tue, 13 Oct 2026 01:48:10 GMT"
+      },
+      "status": 304,
+      "headers": {
+        "last-modified": "Tue, 13 Oct 2026 01:48:10 GMT",
+        "etag": "\"c5a2a8ebe02ec27690ed93013ef379db\"",
+        "cache-control": "max-age=60"
+      }
+    }
+  ]
+}

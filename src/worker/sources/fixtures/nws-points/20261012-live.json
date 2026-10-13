@@ -1,0 +1,308 @@
+[
+ {
+  "id": "alta:base",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5887,-111.6401",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 108,
+    "gridY": 167,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "alta:summit",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5672,-111.6284",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 108,
+    "gridY": 166,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "snowbird:base",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5816,-111.6586",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 107,
+    "gridY": 166,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "snowbird:summit",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5611,-111.6452",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 108,
+    "gridY": 165,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "brighton:base",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5989,-111.5846",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 110,
+    "gridY": 167,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "brighton:summit",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5926,-111.5616",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 111,
+    "gridY": 166,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "solitude:base",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.6243,-111.5987",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 110,
+    "gridY": 168,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "solitude:summit",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.5989,-111.6064",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 109,
+    "gridY": 167,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "deer-valley:base",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.6404,-111.4786",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 114,
+    "gridY": 168,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ108",
+    "county": "https://api.weather.gov/zones/county/UTC043",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "deer-valley:summit",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.6124,-111.5275",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 112,
+    "gridY": 167,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ111",
+    "county": "https://api.weather.gov/zones/county/UTC043",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "snowbasin:base",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/41.2172,-111.8571",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 104,
+    "gridY": 196,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ110",
+    "county": "https://api.weather.gov/zones/county/UTC057",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "snowbasin:summit",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/41.2048,-111.8843",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 103,
+    "gridY": 195,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ110",
+    "county": "https://api.weather.gov/zones/county/UTC057",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "base:cottonwood-heights",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.6197,-111.8105",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 102,
+    "gridY": 169,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ105",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ478",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "base:downtown-slc",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.7608,-111.891",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 100,
+    "gridY": 175,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ105",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ478",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "base:sandy",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.565,-111.8389",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 101,
+    "gridY": 166,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ105",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ478",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "base:park-city-old-town",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.6461,-111.498",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 113,
+    "gridY": 169,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ108",
+    "county": "https://api.weather.gov/zones/county/UTC043",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ479",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ },
+ {
+  "id": "base:slc-airport",
+  "status": 200,
+  "body": {
+   "properties": {
+    "@id": "https://api.weather.gov/points/40.7899,-111.9791",
+    "cwa": "SLC",
+    "gridId": "SLC",
+    "gridX": 98,
+    "gridY": 177,
+    "forecastZone": "https://api.weather.gov/zones/forecast/UTZ105",
+    "county": "https://api.weather.gov/zones/county/UTC035",
+    "fireWeatherZone": "https://api.weather.gov/zones/fire/UTZ478",
+    "timeZone": "America/Denver",
+    "radarStation": "KMTX"
+   }
+  }
+ }
+]

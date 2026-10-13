@@ -1,0 +1,55 @@
+{
+ "_note": "Synthetic in-season sample (Wayback has no api.weather.gov captures for these URLs). productText is the real AFDSLC issued 2026-02-16 23:17Z (IEM AFOS archive), with long section bodies trimmed; id is made up. Alerts rebuilt in the /alerts/active shape from the real WSWSLC 2:10 PM and NPWSLC 5:47 PM MST products of that day.",
+ "afd": {
+  "id": "synthetic-afdslc-202602162317",
+  "issuanceTime": "2026-02-16T23:17:00+00:00",
+  "productCode": "AFD",
+  "productName": "Area Forecast Discussion",
+  "productText": "FXUS65 KSLC 162317\nAFDSLC\n\nArea Forecast Discussion\nNational Weather Service Salt Lake City UT\n417 PM MST Mon Feb 16 2026\n\n.KEY MESSAGES...\n\n- Widespread south-southwest winds in excess of 45 mph and locally\n  in excess of 60 mph will continue through the night, with the\n  strongest winds expected to occur late this evening and\n  overnight behind a cold front. Elevated winds will persist \n  thereafter through Wednesday.\n\n- Expect broadly 1-2 feet of mountain snow through Wednesday, with\n  two periods of heavy snowfall: overnight tonight and on Wednesday\n  as a couple of cold front push through the area.\n\n- While most valleys will transition to snow by mid-day Tuesday,\n  precipitation will be at a relative lull by that point. As\n  precipitation ramps back up early Wednesday, valleys will likely\n  receive minor snow accumulations through the day, with\n  widespread 1-4 inches with locally higher amounts on benches and\n  in Cedar City.\n\n&&\n\n.DISCUSSION...The large-scale pattern this afternoon depicts a \nclosed low off the central California coast gradually filling and\nbeginning to eject inland as another closed low continues to \n&&\n\n.AVIATION...KSLC...Strong south winds are expected over the KSLC \nthrough the overnight period, with winds expected to peak between \naround 04Z and 15Z Tuesday. Showers are expected to develop over \n&&\n\n.SLC WATCHES/WARNINGS/ADVISORIES...\nUT...High Wind Warning until 5 AM MST Tuesday for UTZ101-102.\n\n&&\n\n$$\n\nCheng/Webber\n\nFor more information from NOAA's National Weather Service visit...\nhttp://weather.gov/saltlakecity\n\n\u0003\n"
+ },
+ "alerts": {
+  "type": "FeatureCollection",
+  "updated": "2026-02-17T00:50:00+00:00",
+  "features": [
+   {
+    "properties": {
+     "id": "urn:oid:synthetic.wsw.1",
+     "status": "Actual",
+     "messageType": "Update",
+     "event": "Winter Storm Warning",
+     "severity": "Moderate",
+     "headline": "Winter Storm Warning issued February 16 at 2:10PM MST until February 19 at 5:00AM MST by NWS Salt Lake City UT",
+     "onset": "2026-02-16T17:00:00-07:00",
+     "ends": "2026-02-19T05:00:00-07:00",
+     "affectedZones": [
+      "https://api.weather.gov/zones/forecast/UTZ108",
+      "https://api.weather.gov/zones/forecast/UTZ110",
+      "https://api.weather.gov/zones/forecast/UTZ111",
+      "https://api.weather.gov/zones/forecast/UTZ112"
+     ]
+    }
+   },
+   {
+    "properties": {
+     "id": "urn:oid:synthetic.npw.1",
+     "status": "Actual",
+     "messageType": "Update",
+     "event": "Wind Advisory",
+     "severity": "Moderate",
+     "headline": "Wind Advisory issued February 16 at 5:47PM MST until February 17 at 5:00AM MST by NWS Salt Lake City UT",
+     "onset": "2026-02-16T20:00:00-07:00",
+     "ends": "2026-02-17T05:00:00-07:00",
+     "affectedZones": [
+      "https://api.weather.gov/zones/forecast/UTZ103",
+      "https://api.weather.gov/zones/forecast/UTZ104",
+      "https://api.weather.gov/zones/forecast/UTZ105",
+      "https://api.weather.gov/zones/forecast/UTZ121",
+      "https://api.weather.gov/zones/forecast/UTZ128",
+      "https://api.weather.gov/zones/forecast/UTZ129",
+      "https://api.weather.gov/zones/forecast/UTZ130"
+     ]
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,171 @@
+{
+ "Name": "Solitude",
+ "LastUpdate": "2023-01-19T02:37:20-0700",
+ "SnowReport": {
+  "LastUpdate": "2023-01-18T09:06:33-0700",
+  "BaseConditions": "Powder",
+  "Report": "The powdery fun continues today with another six inches of new snow since yesterday morning, bringing us to 43 inches from this system! Patrol crews have been hard at work on avalanche mitigation, dropping ropes on Honeycomb Canyon's west face yesterday along with Milk Run terrain. They'll be continuing their efforts today, so keep a close eye on the Solitude app or our website for updates on lift and terrain openings. As usual, we'll be spinning the #EarliestLiftsInUtah with Apex, Moonbeam, and Link lifts running at 8:00 a.m. for our dedicated early morning skiers and riders. Weather today will be partly sunny with a high around 15 degrees – bundle up and take some laps!",
+  "AdditionalText": "The powdery fun continues today with another six inches of new snow since yesterday morning, bringing us to 43 inches from this system! Patrol crews have been hard at work on avalanche mitigation, dropping ropes on Honeycomb Canyon's west face yesterday along with Milk Run terrain. They'll be continuing their efforts today, so keep a close eye on the Solitude app or our website for updates on lift and terrain openings. As usual, we'll be spinning the #EarliestLiftsInUtah with Apex, Moonbeam, and Link lifts running at 8:00 a.m. for our dedicated early morning skiers and riders. Weather today will be partly sunny with a high around 15 degrees – bundle up and take some laps!",
+  "Alert": "--",
+  "LiftNotification": "--",
+  "StormTotalIn": "43.0",
+  "SeasonTotalIn": "375.0",
+  "TotalOpenTrails": 79,
+  "TotalTrails": 82,
+  "GroomedTrails": 23,
+  "TotalOpenLifts": 0,
+  "TotalLifts": 8,
+  "BaseArea": {
+   "SinceLiftsClosedIn": "--",
+   "BaseIn": "--",
+   "Last24HoursIn": "--",
+   "Last48HoursIn": "--",
+   "Last72HoursIn": "--",
+   "Last7DaysIn": "--"
+  },
+  "MidMountainArea": {
+   "SinceLiftsClosedIn": "3.0",
+   "BaseIn": "122.0",
+   "Last24HoursIn": "6.0",
+   "Last48HoursIn": "22.0",
+   "Last72HoursIn": "34.0",
+   "Last7DaysIn": "45.0"
+  },
+  "SummitArea": {
+   "SinceLiftsClosedIn": "--",
+   "BaseIn": "--",
+   "Last24HoursIn": "--",
+   "Last48HoursIn": "--",
+   "Last72HoursIn": "--",
+   "Last7DaysIn": "--"
+  }
+ },
+ "CurrentConditions": {
+  "Base": {
+   "Name": "--",
+   "FeedSavedTime": "--",
+   "TemperatureF": "--",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "--"
+  },
+  "MidMountain": {
+   "Name": "Summit",
+   "FeedSavedTime": "2023-01-19T02:37:19-0700",
+   "TemperatureF": "9.0",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "Clear"
+  },
+  "Summit": {
+   "Name": "--",
+   "FeedSavedTime": "--",
+   "TemperatureF": "--",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "--"
+  }
+ },
+ "MountainAreas": [
+  {
+   "Name": "Moonbeam Area",
+   "Lifts": [
+    {
+     "Id": 535,
+     "Name": "Link",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:07:35-0700",
+     "Hours": {"Sunday":{"Open":"8:00 AM","Close":"4:00 PM"},"Monday":{"Open":"8:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"8:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"8:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"8:00 AM","Close":"4:00 PM"},"Friday":{"Open":"8:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"8:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 536,
+     "Name": "Moonbeam Express",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:07:35-0700",
+     "Hours": {"Sunday":{"Open":"8:00 AM","Close":"4:00 PM"},"Monday":{"Open":"8:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"8:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"8:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"8:00 AM","Close":"4:00 PM"},"Friday":{"Open":"8:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"8:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Eagle Ridge",
+   "Lifts": [
+    {
+     "Id": 538,
+     "Name": "Eagle Express",
+     "MountainAreaName": "Eagle Ridge",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:05:39-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 539,
+     "Name": "Powderhorn II",
+     "MountainAreaName": "Eagle Ridge",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:05:39-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Solitude Canyon",
+   "Lifts": [
+    {
+     "Id": 537,
+     "Name": "Apex Express",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:05:38-0700",
+     "Hours": {"Sunday":{"Open":"8:00 AM","Close":"4:00 PM"},"Monday":{"Open":"8:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"8:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"8:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"8:00 AM","Close":"4:00 PM"},"Friday":{"Open":"8:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"8:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Id": 541,
+     "Name": "Summit Express",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:05:39-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:30 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"3:30 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:30 PM"}}
+    },
+    {
+     "Id": 540,
+     "Name": "Sunrise",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:05:38-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Honeycomb Canyon",
+   "Lifts": [
+    {
+     "Id": 542,
+     "Name": "Honeycomb Return",
+     "MountainAreaName": "Honeycomb Canyon",
+     "Status": "Closed",
+     "StatusEnglish": "closed",
+     "UpdateDate": "2023-01-18T16:05:38-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:30 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"3:30 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:30 PM"}}
+    }
+   ],
+   "Activities": []
+  }
+ ],
+ "Roads": []
+}

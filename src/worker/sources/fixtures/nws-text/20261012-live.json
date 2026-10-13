@@ -1,0 +1,30 @@
+{
+ "afd": {
+  "id": "c107fce0-47b6-406b-94a8-2d1da681ff87",
+  "issuanceTime": "2026-10-12T20:44:00+00:00",
+  "productCode": "AFD",
+  "productName": "Area Forecast Discussion",
+  "productText": "\n000\nFXUS65 KSLC 122044\nAFDSLC\n\nArea Forecast Discussion\nNational Weather Service Salt Lake City UT\n244 PM MDT Mon Oct 12 2026\n\n.KEY MESSAGES...\n\n\n- A Pacific Northwest low will be the dominant weather feature\n  over the region through the middle of the week. Pairing with an\n  abundant amount of moisture from tropical cyclone remnants,\n  widespread precipitation with an elevated potential for flash\n  flooding along with cooler temperatures and lowering snow\n  levels, bringing accumulating mountain snow is expected through\n  at least Tuesday.\n\n- Some outlying valleys, including the Cache Valley, may see\n  freezing temperatures as early as Tuesday morning, with freezing\n  temperatures becoming more widespread Wednesday and Thursday\n  mornings. \n\n- Conditions will steadily dry for the latter half of the week\n  with a gradual warming trend in temperatures through the\n  weekend.  \n\n&&\n\n.DISCUSSION...A slow moving Pacific storm system will begin to\nprogress through the region over the next 48 hours, bringing\ncontinued rainfall and even some high elevation snowfall. Moisture\n&&\n\n.AVIATION...\n\nKSLC...MVFR conditions with pockets of VFR will persist for the KSLC \n&&\n\n.FIRE WEATHER, Issued 149 AM MDT Mon Oct 12 2026...\nA slow moving low pressure system combined with ample\nmoisture across the region will continue to bring widespread wetting \nrains through Tuesday. As this low slowly makes its way through the\nregion, cooler air will lower snow levels into the 7000 to 8000 \nfoot range tonight through Tuesday. With widespread precipitation \nalong with cooler air spreading into the region, temperatures will\nremain well below normal through midweek along with high relative\nhumidity. Precipitation may linger into the day Wednesday as this\nlow pressure system begins to exit the region. High pressure will \nbring a warming and drying trend for the latter portion of the week. \n\n&&\n\n.SLC WATCHES/WARNINGS/ADVISORIES...\nUT...Flood Watch until 6 PM MDT this evening for UTZ101>131.\n\n&&\n\n$$\n\nPUBLIC...Webber\nAVIATION...Mahan\nFIRE WEATHER...Seaman\n\nFor more information from NOAA's National Weather Service visit...\nhttp://weather.gov/saltlakecity\n"
+ },
+ "alerts": {
+  "type": "FeatureCollection",
+  "updated": "2026-10-13T01:53:38+00:00",
+  "features": [
+   {
+    "properties": {
+     "id": "urn:oid:2.49.0.1.840.0.ba6f6430767f1a61105fb257d574433839be8fde.002.1",
+     "status": "Actual",
+     "messageType": "Alert",
+     "event": "Winter Weather Advisory",
+     "severity": "Moderate",
+     "headline": "Winter Weather Advisory issued October 12 at 1:51PM MDT until October 14 at 6:00AM MDT by NWS Salt Lake City UT",
+     "onset": "2026-10-13T06:00:00-06:00",
+     "ends": "2026-10-14T06:00:00-06:00",
+     "affectedZones": [
+      "https://api.weather.gov/zones/forecast/UTZ111"
+     ]
+    }
+   }
+  ]
+ }
+}

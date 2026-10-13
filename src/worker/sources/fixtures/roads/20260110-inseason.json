@@ -1,0 +1,17 @@
+{
+ "_note": "Wayback capture 20260110001234 of https://cottonwoodcanyons.udot.utah.gov/feed/ (RSS 2.0), converted to the /wp-json/wp/v2/posts shape the adapter reads: guid ?p= -> id, pubDate -> date_gmt, content:encoded -> content.rendered (RSS footer and presentational attributes removed). The wp-json URL itself has no in-season Wayback capture.",
+ "site": "https://cottonwoodcanyons.udot.utah.gov",
+ "posts": [
+  {
+   "id": 12174,
+   "date_gmt": "2026-01-09T15:17:04",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/1-9-815/",
+   "title": {
+    "rendered": "1/9 8:15"
+   },
+   "content": {
+    "rendered": "\n<figure><img fetchpriority=\"high\" src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2026/01/0038f399-fba8-4ec6-a93d-c9c9ea8df9c9-576x1024.jpg\" /></figure>\n<p><strong>1/9 8:17am</strong></p>\n<p>&nbsp;<img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" />Traction Law Update<img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" /></p>\n<p>Traction Law LIFTED for both Big &amp; Little Cottonwood Canyons (SR-190, SR-210)&nbsp;</p>\n<p>REMINDER: This is based on current road conditions, is subject to change at any time, &amp; applies to both travel directions.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/203c.png\" alt=\"‼\" />Watch for slush and ice until temps increase.</p>\n"
+   }
+  }
+ ]
+}

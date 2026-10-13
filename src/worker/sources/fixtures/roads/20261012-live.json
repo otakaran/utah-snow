@@ -1,0 +1,692 @@
+{
+ "keyed": false,
+ "wp": {
+  "https://cottonwoodcanyons.udot.utah.gov": [
+   {
+    "id": 13271,
+    "date_gmt": "2026-10-12T16:32:54",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/10-12-1030/",
+    "title": {
+     "rendered": "10/12 10:30"
+    },
+    "content": {
+     "rendered": "\n<figure><video controls src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2026/10/d1242e91-5084-4409-bf64-42a79ac2ccac.mp4\"></video></figure>\n<p>👋 SR-190 ROAD CONDITIONS</p>\n<p>Be prepared for winter conditions on Guardsman Pass</p>\n<p>‼️ Slow down, especially on uphills and corners</p>\n<p>🚨Guardsman Pass will be temporarily CLOSED tonight (10/12) at 9:30pm</p>\n"
+    }
+   },
+   {
+    "id": 13267,
+    "date_gmt": "2026-10-12T07:50:41",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/10-12/",
+    "title": {
+     "rendered": "10/12 1:50am"
+    },
+    "content": {
+     "rendered": "\n<figure><img src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2026/10/c0e543ec-1e05-469c-b5e3-aaba0b87e556-576x1024.jpeg\" alt=\"\" /></figure>\n<p>🚧 Road Closure Update 🚧</p>\n<p>SR-190 OPEN: Both directions. Flood control and debris clearing is complete.</p>\n<p>📍Uphill: Open at mouth</p>\n<p>📍Downhill: Open to the mouth</p>\n<p>➡️ Plan ahead: More rain is forecasted over the next couple days. Weather related delays are possible.</p>\n"
+    }
+   },
+   {
+    "id": 13258,
+    "date_gmt": "2026-10-12T02:49:45",
+    "link": "https://cottonwoodcanyons.udot.utah.gov/10-11-848pm/",
+    "title": {
+     "rendered": "10/11 8:48pm"
+    },
+    "content": {
+     "rendered": "\n<figure><video autoplay controls src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2026/10/a20ae2a4-fbb8-4a1f-94b9-5beaabe3b0b1.mp4\" playsinline></video></figure>\n<p><strong>10/11 8:47pm</strong></p>\n<p>🚧 Uphill Restriction Update 🚧</p>\n<p>SR-190: Utah Transportation crew is working on clearing the culvert at Storm Mountain (MP 4.25) of debris</p>\n<p>‼️No ETO to uphill traffic at this time</p>\n"
+    }
+   }
+  ],
+  "https://wasatchback.udot.utah.gov": [
+   {
+    "id": 12533,
+    "date_gmt": "2026-10-12T22:02:26",
+    "link": "https://wasatchback.udot.utah.gov/12533-2/",
+    "title": {
+     "rendered": ""
+    },
+    "content": {
+     "rendered": "\n<figure><video autoplay controls src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/10/1e07305713d24488b16d6bff02b70542.mp4\" playsinline></video></figure>\n<p>Heads up, Guardsman/Empire Pass travelers: <a href=\"https://x.com/UDOTcottonwoods/status/2109682425676865951\">https://x.com/UDOTcottonwoods/status/2109682425676865951</a></p>\n"
+    }
+   }
+  ],
+  "https://ogdenvalley.udot.utah.gov": [
+   {
+    "id": 12460,
+    "date_gmt": "2026-10-09T21:53:25",
+    "link": "https://ogdenvalley.udot.utah.gov/%f0%9f%a6%ba-i-84-construction-alert-%f0%9f%a6%ba/",
+    "title": {
+     "rendered": "🦺 I-84 Construction Alert 🦺"
+    },
+    "content": {
+     "rendered": "\n<p>Construction for Weber Canyon Bridge replacement in progress, estimated to be complete late Spring. Expect one-way traffic with travel delays in the area. EB single-lane closure: Active day and night through Oct. 10. WB Single-lane closure: Active day and night through Oct. 15.&nbsp;</p>\n<p></p>\n"
+    }
+   },
+   {
+    "id": 12458,
+    "date_gmt": "2026-10-09T21:51:41",
+    "link": "https://ogdenvalley.udot.utah.gov/i-84-construction/",
+    "title": {
+     "rendered": "I-84 construction"
+    },
+    "content": {
+     "rendered": "\n<figure><img src=\"https://ogdenvalley.udot.utah.gov/wp-content/uploads/2026/10/f1b80e0e-4881-4a63-bd43-fed3ec6b8cba-576x1024.jpeg\" /></figure>\n<p>🦺I-84 CONSTRUCTION UPDATE</p>\n<p>EB Single-lane closure: Active day and night through Oct. 10.&nbsp;</p>\n<p>WB Single-lane closure: Active day and night through Oct. 15.&nbsp;</p>\n<p>‼️ Strict 11-foot lane width restriction, no exceptions.&nbsp;</p>\n<p>Expect moderate delays and prepare to reduce speeds as you approach the lane drop.</p>\n"
+    }
+   }
+  ]
+ },
+ "conditions": [
+  {
+   "recordsTotal": 145,
+   "recordsFiltered": 145,
+   "data": [
+    {
+     "DT_RowId": 40130667,
+     "roadway": "I-80 Parleys Canyon",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:26-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130668,
+     "roadway": "I-80 Parleys Summit",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:26-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130676,
+     "roadway": "I-84 Uintah Jct to Jct SR-167 at Mountain Green",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:24-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130694,
+     "roadway": "SR-190 Big Cottonwood Canyon Mouth to Spruces",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:26-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130695,
+     "roadway": "SR-190 Spruces and above",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:26-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130696,
+     "roadway": "SR-210 Mouth of Little Cottonwood to SR-190",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:26-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130697,
+     "roadway": "SR-210 Upper Little Cottonwood Canyon",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:26-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130709,
+     "roadway": "SR-167 Trappers Loop I-84 to Huntsville",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:24-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    },
+    {
+     "DT_RowId": 40130711,
+     "roadway": "SR-226 to Snowbasin",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:24-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    }
+   ]
+  },
+  {
+   "recordsTotal": 145,
+   "recordsFiltered": 145,
+   "data": [
+    {
+     "DT_RowId": 40130735,
+     "roadway": "SR-224 Kimball Jct to Park City",
+     "description": "<b>Road Cond : </b>dry<br /><b>Weather Cond : </b>fair<br /><b>Restriction : </b>none<br /><b>Last Updated : </b>2026-10-12T19:47:25-06:00<br />",
+     "roadCondition": "Dry",
+     "weatherCondition": "Fair",
+     "restriction": "none",
+     "lastUpdated": "10/12/26, 7:47 PM"
+    }
+   ]
+  }
+ ],
+ "passes": [
+  {
+   "recordsTotal": 78,
+   "recordsFiltered": 78,
+   "data": [
+    {
+     "DT_RowId": "8",
+     "name": "SR-226 Snowbasin",
+     "mountainPassId": "93",
+     "rwisInfo": "SR-167 @ Trappers Loop;42;NW;5;7;47;Wet;10"
+    },
+    {
+     "DT_RowId": "9",
+     "name": "I-80 Parleys Summit",
+     "mountainPassId": "94",
+     "rwisInfo": "I-80 @ Parleys Summit;42;NE;0;1;;;10"
+    },
+    {
+     "DT_RowId": "12",
+     "name": "SR-190 Big Cottonwood Canyon",
+     "mountainPassId": "97",
+     "rwisInfo": "SR-190 @ MP 16 Brighton;38;S;6;16;38;Wet;3.79"
+    },
+    {
+     "DT_RowId": "13",
+     "name": "SR-210 Little Cottonwood Canyon",
+     "mountainPassId": "98",
+     "rwisInfo": "SR-210 @ Alta;34;E;0;4;37;Wet;3.51"
+    },
+    {
+     "DT_RowId": "71",
+     "name": "SR-167 Trappers Loop Summit",
+     "mountainPassId": "156",
+     "rwisInfo": "SR-167 @ Trappers Loop;42;NW;5;7;47;Wet;10"
+    }
+   ]
+  }
+ ],
+ "signs": [
+  {
+   "recordsTotal": 221,
+   "recordsFiltered": 5,
+   "data": [
+    {
+     "DT_RowId": "2440",
+     "name": "Big Cottonwood Canyon Rd / SR-190 EB @ Mouth of Big Cottonwood Canyon, CWH",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 9:31 AM"
+    },
+    {
+     "DT_RowId": "3687",
+     "name": "Little Cottonwood Canyon Rd / SR-210 EB @ Little Cottonwood Rd / SR-209, SL",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 9:31 AM"
+    },
+    {
+     "DT_RowId": "3688",
+     "name": "Little Cottonwood Rd / 3335 E / SR-209 EB @ Old Wasatch Blvd / 9710 S, SL",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/8/26, 2:28 PM"
+    },
+    {
+     "DT_RowId": "6040",
+     "name": "9400 S / SR-209 @ 1700 E, SND",
+     "message": "BIG  COTTONWOOD<br/>CANYON  TOP<br/>33min",
+     "message2": "LITTLE  COTTONWOOD<br/>CANYON  TOP<br/>23min",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:49 PM"
+    },
+    {
+     "DT_RowId": "6019",
+     "name": "6200 S / SR-190 @ 3200 E, HDY",
+     "message": "BIG  COTTONWOOD<br/>CANYON  TOP<br/>24min",
+     "message2": "LITTLE  COTTONWOOD<br/>CANYON  TOP<br/>23min",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:49 PM"
+    }
+   ]
+  },
+  {
+   "recordsTotal": 221,
+   "recordsFiltered": 2,
+   "data": [
+    {
+     "DT_RowId": "3687",
+     "name": "Little Cottonwood Canyon Rd / SR-210 EB @ Little Cottonwood Rd / SR-209, SL",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 9:31 AM"
+    },
+    {
+     "DT_RowId": "3707",
+     "name": "Wasatch Blvd / 3650 E / SR-210 @ 7700 S, CWH",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/8/26, 2:28 PM"
+    }
+   ]
+  },
+  {
+   "recordsTotal": 221,
+   "recordsFiltered": 2,
+   "data": [
+    {
+     "DT_RowId": "6014",
+     "name": "I-80 EB @ Mouth of Parley's Canyon / MP 128.87, SL",
+     "message": "TIME TO<br/>PARK CITY&nbsp;15min<br/>I-84&nbsp;37min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:49 PM"
+    },
+    {
+     "DT_RowId": "6032",
+     "name": "I-80 WB @ Mouth of Parley's Canyon / MP 129.64, SL",
+     "message": "TIME TO  I-15<br/>VIA I-80&nbsp;7min<br/>VIA I-215&nbsp;12min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:45 PM"
+    }
+   ]
+  },
+  {
+   "recordsTotal": 221,
+   "recordsFiltered": 221,
+   "data": [
+    {
+     "DT_RowId": "6125",
+     "name": "I-84 / Weber Canyon EB @ MP 86.68, SWE",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/11/26, 3:00 AM"
+    },
+    {
+     "DT_RowId": "2440",
+     "name": "Big Cottonwood Canyon Rd / SR-190 EB @ Mouth of Big Cottonwood Canyon, CWH",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 9:31 AM"
+    },
+    {
+     "DT_RowId": "3395",
+     "name": "Deer Valley Dr / SR-224 NB @ Milepost 5.38, PKC",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/8/26, 2:28 PM"
+    },
+    {
+     "DT_RowId": "3685",
+     "name": "Deer Valley Dr / SR-224 SB @ Milepost 5.27, PKC",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/8/26, 2:28 PM"
+    },
+    {
+     "DT_RowId": "6036",
+     "name": "I-215 E NB @ 3100 S / MP 1.62, MCK",
+     "message": "TIME TO<br/>PARK CITY&nbsp;17min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:45 PM"
+    }
+   ]
+  },
+  {
+   "recordsTotal": 221,
+   "recordsFiltered": 221,
+   "data": [
+    {
+     "DT_RowId": "6075",
+     "name": "I-80 EB @ 1900 E / MP 126, SLC",
+     "message": "TIME TO<br/>U OF U&nbsp;7min<br/>PARK CITY&nbsp;18min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 8:09 PM"
+    },
+    {
+     "DT_RowId": "5991",
+     "name": "I-80 EB @ Jeremy Ranch / MP 142.61, SU",
+     "message": "TO PARK CITY SR248<br/>VIA KIMBALL JCT<br/>10min",
+     "message2": "TO PARK CITY SR248<br/>VIA US-40<br/>13min",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:57 PM"
+    },
+    {
+     "DT_RowId": "6014",
+     "name": "I-80 EB @ Mouth of Parley's Canyon / MP 128.87, SL",
+     "message": "TIME TO<br/>PARK CITY&nbsp;15min<br/>I-84&nbsp;39min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 8:05 PM"
+    },
+    {
+     "DT_RowId": "6032",
+     "name": "I-80 WB @ Mouth of Parley's Canyon / MP 129.64, SL",
+     "message": "TIME TO  I-15<br/>VIA I-80&nbsp;7min<br/>VIA I-215&nbsp;12min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:45 PM"
+    },
+    {
+     "DT_RowId": "6093",
+     "name": "I-84 / Weber Canyon WB @ Milepost 91.35, MN",
+     "message": "TRUCKS / SEMIS<br/>SLOW DOWN",
+     "message2": "TRUCKS / SEMIS<br/>SHARP CURVES AHEAD",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:30 PM"
+    },
+    {
+     "DT_RowId": "6120",
+     "name": "Legacy Pkwy / SR-67 NB @ 1100 N / MP 5.36, WBN",
+     "message": "ANTELOPE DR<br/>VIA I-15&nbsp;15min<br/>VIA US89&nbsp;14min",
+     "message2": "ANTELOPE DR<br/><br/>VIA SR-177&nbsp;18min",
+     "message3": "",
+     "lastUpdated": "10/12/26, 7:28 PM"
+    },
+    {
+     "DT_RowId": "3687",
+     "name": "Little Cottonwood Canyon Rd / SR-210 EB @ Little Cottonwood Rd / SR-209, SL",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 9:31 AM"
+    },
+    {
+     "DT_RowId": "3688",
+     "name": "Little Cottonwood Rd / 3335 E / SR-209 EB @ Old Wasatch Blvd / 9710 S, SL",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/8/26, 2:28 PM"
+    }
+   ]
+  },
+  {
+   "recordsTotal": 221,
+   "recordsFiltered": 221,
+   "data": [
+    {
+     "DT_RowId": "6060",
+     "name": "US-89 NB @ 1700 N / MP 402.6, LTN",
+     "message": "RIVERDALE RD<br/>VIA US89&nbsp;12min<br/>VIA I-84&nbsp;9min",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/12/26, 8:00 PM"
+    },
+    {
+     "DT_RowId": "6040",
+     "name": "9400 S / SR-209 @ 1700 E, SND",
+     "message": "BIG  COTTONWOOD<br/>CANYON  TOP<br/>33min",
+     "message2": "LITTLE  COTTONWOOD<br/>CANYON  TOP<br/>23min",
+     "message3": "",
+     "lastUpdated": "10/12/26, 8:09 PM"
+    },
+    {
+     "DT_RowId": "6019",
+     "name": "6200 S / SR-190 @ 3200 E, HDY",
+     "message": "BIG  COTTONWOOD<br/>CANYON  TOP<br/>25min",
+     "message2": "LITTLE  COTTONWOOD<br/>CANYON  TOP<br/>25min",
+     "message3": "",
+     "lastUpdated": "10/12/26, 8:09 PM"
+    },
+    {
+     "DT_RowId": "3707",
+     "name": "Wasatch Blvd / 3650 E / SR-210 @ 7700 S, CWH",
+     "message": "",
+     "message2": "",
+     "message3": "",
+     "lastUpdated": "10/8/26, 2:28 PM"
+    }
+   ]
+  }
+ ],
+ "traffic": [
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 1,
+   "data": [
+    {
+     "DT_RowId": "36027",
+     "id": 36027,
+     "layerName": "Construction",
+     "roadwayName": "SR 190",
+     "description": "UDOT will be repairing the culvert crossing on SR-190 at the Big Cottonwood Treatment Plant to ensure the culvert continues working effectively and efficiently for years to come.<div class='cellSpacer'><i><b>Comments:</b></i> Big Cottonwood Creek Culvert Preservation|udotinput.utah.gov/bccculvert, 855-952-2801 #11874, bccculvert@utah.gov</div>",
+     "locationDescription": "Big Cottonwood Creek at the Big Cottonwood Treatment Plant",
+     "startDate": "10/4/26, 6:00 PM",
+     "endDate": "11/14/26, 5:00 PM",
+     "isFullClosure": false
+    }
+   ]
+  },
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 0,
+   "data": []
+  },
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 8,
+   "data": [
+    {
+     "DT_RowId": "15240",
+     "id": 15240,
+     "layerName": "Construction",
+     "roadwayName": "I-215 W",
+     "description": "**TRAFFIC ALERT** Starting as early as Friday, October 9, there will be a lane restriction on the California Avenue on-ramp to I-215 northbound through Spring 2027\n\n**TRAFFIC ALERT** The I-215 northbound off-ramp to California Avenue has a lane restriction in place through approximately October 20\n\n**TRAFFIC ALERT** The California Avenue on-ramp to I-215 northbound is closed and is expected to ope",
+     "locationDescription": "Northbound I-215 SR-201 to North Temple",
+     "startDate": "7/27/25, 6:00 PM",
+     "endDate": "7/29/27, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "15898",
+     "id": 15898,
+     "layerName": "Construction",
+     "roadwayName": "I-215 W",
+     "description": "**TRAFFIC ALERT** Starting as early as Friday, October 9, there will be a lane restriction on the California Avenue on-ramp to I-215 northbound through Spring 2027\n\n**TRAFFIC ALERT** The I-215 northbound off-ramp to California Avenue has a lane restriction in place through approximately October 20\n\n**TRAFFIC ALERT** The California Avenue on-ramp to I-215 northbound is closed and is expected to ope",
+     "locationDescription": "Southbound I-215 from just north of I-80 to SR-201",
+     "startDate": "8/7/25, 6:00 PM",
+     "endDate": "7/29/27, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "29299",
+     "id": 29299,
+     "layerName": "Construction",
+     "roadwayName": "I-80",
+     "description": "TRAFFIC ALERTS\nNightly lane closures are no longer expected. One more overnight double lane closure will take place in October.\nPROJECT OVERVIEW\nConstruction is ongoing on I-80 between SR-65 (East Canyon Road) to Lambs Canyon.\nThis work will provide a smoother ride for drivers and extend the life of the roadway. Construction is anticipated to be completed by fall 2026.<div class='cellSpacer'><i><b",
+     "locationDescription": "I-80 from SR-65 (East Canyon Road) to Lambs Canyon",
+     "startDate": "5/25/26, 6:00 PM",
+     "endDate": "10/29/26, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "32757",
+     "id": 32757,
+     "layerName": "Construction",
+     "roadwayName": "I-80",
+     "description": "TRAFFIC ALERT\nConstruction resumes on the I-80 Jeremy Ranch Bridges Reconstruction project on 9/8. Homestead Road will be reduced to one lane in each direction. Please use caution and plan ahead for delays.\nPROJECT OVERVIEW \nThe Utah Department of Transportation (UDOT) is replacing two bridges on Interstate 80 (I-80) at the Jeremy Ranch interchange in Summit County. This project will ensure safer,",
+     "locationDescription": "Westbound and eastbound I-80 at Jeremy Ranch.",
+     "startDate": "8/2/26, 6:00 PM",
+     "endDate": "8/30/27, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "32758",
+     "id": 32758,
+     "layerName": "Construction",
+     "roadwayName": "I-80",
+     "description": "TRAFFIC ALERTS\n10/5 and 10/8, the left lane on eastbound I-80 at milepost 174.2 east of Echo will close during the day for utility work.\nPROJECT OVERVIEW\nThe Utah Department of Transportation (UDOT) is improving drainage infrastructure on Interstate 80 (I-80) between Parleys Canyon and Emory by rehabilitating 50 miles of culverts. Drivers can expect shoulder closures. Use caution driving through t",
+     "locationDescription": "I-80 from Parleys Canyon to Emory.",
+     "startDate": "8/5/26, 6:00 PM",
+     "endDate": "11/29/26, 5:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "33901",
+     "id": 33901,
+     "layerName": "Construction",
+     "roadwayName": "I-80",
+     "description": "Crews are repairing the bridge joints on the I-80 Westbound collector lane over West Temple St. and the UTA Railroad. Work will occur nightly on weekdays and both daytime and nighttime on weekends. Motorists can expect lane closures during the work hours.<div class='cellSpacer'><i><b>Comments:</b></i> I-80 | West Temple St. | South Salt Lake | Bridgework|For public questions, contact the project h",
+     "locationDescription": "Westbound Collector Road on I-80 over West Temple St. and the UTA Railroad",
+     "startDate": "8/9/26, 6:00 PM",
+     "endDate": "10/14/26, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "34593",
+     "id": 34593,
+     "layerName": "Construction",
+     "roadwayName": "SR 201",
+     "description": "!!  Traffic Alert !!\nUPDATED 10/5:\nSR-201 WB CLOSED at I-80 Onramp | 10/7 Wed PM (10pm - 5am) | 10/8 - 10/12 ; Thu PM (10pm) - Mon AM (5am)\nPlease use SR-202 as alternate to reach SR-201 | 5-10 minute delays possible\n*Note: Additional Eastbound or Westbound SR-201 ramps closures to be updated each week through Oct 25.  Please check back often for additional updates.\n\nContact the dedicated Public I",
+     "locationDescription": "SR-201 - Tooele County (north point of Oquirrh Mountains)",
+     "startDate": "9/6/26, 6:00 PM",
+     "endDate": "10/22/26, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "36417",
+     "id": 36417,
+     "layerName": "Construction",
+     "roadwayName": "I-80",
+     "description": "Crews will be taking the right lane of WB I-80 at MP 163 (Coalville) for erosion control work near the Weber River. This closure will be in place 10/6 to 10/15 beginning each morning at 8AM until 4:30 PM.<div class='cellSpacer'><i><b>Comments:</b></i> Erosion Control Work|</div>",
+     "locationDescription": "WB I-80 in Coalville",
+     "startDate": "10/4/26, 6:00 PM",
+     "endDate": "10/15/26, 6:00 PM",
+     "isFullClosure": false
+    }
+   ]
+  },
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 2,
+   "data": [
+    {
+     "DT_RowId": "17725",
+     "id": 17725,
+     "layerName": "Construction",
+     "roadwayName": "SR 224",
+     "description": "High Valley Transit SR-224 (The Bobsled Express) is a bus rapid transit construction project that spans seven-miles from Kimball Junction to Park City Old Town. The project will include segments of dedicated bus lanes as well as new stations along the corridor. Construction got underway in 2026 and is scheduled to be complete summer 2028.  \n  \n2026 work includes utility upgrades, median removal an",
+     "locationDescription": "SR-224 Between Ute Blvd and Park Ave",
+     "startDate": "8/24/25, 6:00 PM",
+     "endDate": "7/30/28, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "30269",
+     "id": 30269,
+     "layerName": "Construction",
+     "roadwayName": "SR 224",
+     "description": "The SR-224: Marsac Roundabout to SR-248 project is a pavement preservation effort aimed at improving roadway conditions while enhancing safety and accessibility. As part of this project, sidewalk crossings will be upgraded to meet ADA standards, ensuring safer and more convenient travel for pedestrians of all abilities. Additional improvements will focus on enhancing pedestrian infrastructure and ",
+     "locationDescription": "SR-224 Marsac Roundabout to SR-248",
+     "startDate": "8/1/26, 6:00 PM",
+     "endDate": "11/5/26, 5:00 PM",
+     "isFullClosure": false
+    }
+   ]
+  },
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 2,
+   "data": [
+    {
+     "DT_RowId": "10148",
+     "id": 10148,
+     "layerName": "Construction",
+     "roadwayName": "I-84",
+     "description": "!!Lane Closure Alerts!! \nThe following lane closures will require a 11 foot lane restriction...  No exceptions will be provided.\n \nEastbound single lane closure | Sat (10/3) - Sat (10/10) | Day & Night \n\nWestbound single lane closure | Tue (10/6) - Thu (10/15) | Day & Night\n\nWestbound single lane closure | Fri (10/16) - Spring 2028 | All traffic crossover shift to new Eastbound bridge [ NOTE: This",
+     "locationDescription": "I-84 bridges crossing the UP railroad; Located just west of the eastbound I-84 rest area. Both bridges span from mileposts 90.6 - 91.2.",
+     "startDate": "3/26/25, 6:00 PM",
+     "endDate": "4/6/28, 6:00 PM",
+     "isFullClosure": false
+    },
+    {
+     "DT_RowId": "15579",
+     "id": 15579,
+     "layerName": "Construction",
+     "roadwayName": "I-84",
+     "description": "Starting 10 pm Sept 12 through 8 a.m. Sept 13, WB I-84 will be closed and & EB I-84 will remain open but reduced to a single lane. 4400 South will be closed between the roundabouts.\nNo trucks with trailers, semi-trucks or other vehicles over 40 feet in length will be allowed on 4400 South between Cozy Dale Drive and Parker Drive during construction. A heigh limit of 13'6\" is also in place.\nThere a",
+     "locationDescription": "4400 South over I-15 & I-84 Northbound in Roy and Riverdale",
+     "startDate": "8/10/25, 6:00 PM",
+     "endDate": "10/30/26, 6:00 PM",
+     "isFullClosure": false
+    }
+   ]
+  },
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 0,
+   "data": []
+  },
+  {
+   "recordsTotal": 264,
+   "recordsFiltered": 0,
+   "data": []
+  }
+ ],
+ "snowbird": {
+  "roads": [
+   {
+    "id": "4fe4f02a-ac0e-4051-87e9-e7b04550418a",
+    "name": "Highway SR-210",
+    "status": "open_wet",
+    "description": "",
+    "created": 0,
+    "updated": 0
+   },
+   {
+    "id": "a4cf632f-9217-4b72-87a9-76a4d84a293c",
+    "name": "test close",
+    "status": "closed",
+    "description": "",
+    "created": 1730397025,
+    "updated": 1730397025
+   }
+  ],
+  "parking": {
+   "free_parking_inventory": {
+    "value": 0,
+    "max": 18,
+    "percentage": 0
+   },
+   "highway_parking": "open"
+  },
+  "alerts": []
+ },
+ "brighton": [
+  {
+   "updated": "2026-10-13T01:47:26Z",
+   "mountainPassName": "SR-190 Big Cottonwood Canyon Mouth to Spruces",
+   "restrictionOne": {
+    "restrictionText": "None",
+    "travelDirection": "Restriction"
+   },
+   "restrictionTwo": null,
+   "roadCondition": "Dry",
+   "weatherCondition": "Fair"
+  }
+ ],
+ "errors": {}
+}

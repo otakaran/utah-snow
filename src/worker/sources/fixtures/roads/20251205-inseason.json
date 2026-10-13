@@ -1,0 +1,116 @@
+{
+ "_note": "Wayback capture 20251205194840 of https://cottonwoodcanyons.udot.utah.gov/feed/ (RSS 2.0), converted to the /wp-json/wp/v2/posts shape the adapter reads: guid ?p= -> id, pubDate -> date_gmt, content:encoded -> content.rendered (RSS footer and presentational attributes removed). The wp-json URL itself has no in-season Wayback capture.",
+ "site": "https://cottonwoodcanyons.udot.utah.gov",
+ "posts": [
+  {
+   "id": 11659,
+   "date_gmt": "2025-12-05T14:44:46",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-5-ig-6/",
+   "title": {
+    "rendered": "12/5 IG 6"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/e9dbe249-b0eb-4bef-9df8-cc17b0cc80ce.mp4\"></video></figure>\n<p><strong>12/5 7:40am</strong></p>\n<p>SR-190 &amp; SR-210 FORECAST</p>\n<p>6am(12/5) &#8211; 6pm(12/5): Snow through the day, heavier after 5pm. 2-4&#8243; of road snow for upper canyons, with 1&#8243; for lower canyon.<br /></p>\n<p>6pm(12/5) &#8211; 6am(12/6):&nbsp;Heavy snow all night. 9-15&#8243; road snow in upper canyons &amp; 4-8&#8243; in mid possible.</p>\n"
+   }
+  },
+  {
+   "id": 11656,
+   "date_gmt": "2025-12-05T14:27:21",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-5-ig-5/",
+   "title": {
+    "rendered": "12/5 IG 5"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/43482aec937a4112bd6eb60fd73f1f4d.mp4\"></video></figure>\n<p><strong>12/5 7:20am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f44b.png\" alt=\"👋\" /> SR-210 ROAD CONDITIONS</p>\n<p>Lower-upper: heavy slush and snow covered&nbsp;</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f4cd.png\" alt=\"📍\" />watch for slick spots, especially at Tanners Flat (MP 8.1)</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/203c.png\" alt=\"‼\" />BE ALERT: crews are out. Travel with caution to/from Snowbird, Alta Ski Area, and  Town of Alta</p>\n"
+   }
+  },
+  {
+   "id": 11653,
+   "date_gmt": "2025-12-05T13:58:51",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-5-ig-4/",
+   "title": {
+    "rendered": "12/5 IG 4"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/ef522924-24d5-4ccd-98cb-f18d40915a66.mp4\"></video></figure>\n<p><strong>12/5 6:55am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f44b.png\" alt=\"👋\" />SR-190 REMINDER: Parking reservations required for Town of Brighton</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f17f.png\" alt=\"🅿\" /> Plan ahead and check their website for details.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f17f.png\" alt=\"🅿\" /> Please obey all posted signage and park to the right of the white line.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f17f.png\" alt=\"🅿\" /> Salt Lake County parking fines range from $75-$150</p>\n"
+   }
+  },
+  {
+   "id": 11650,
+   "date_gmt": "2025-12-05T13:51:11",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-5-ig-2-2/",
+   "title": {
+    "rendered": "12/5 IG 2"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/cc6366b1-f665-4bbf-a5e3-91f3e28571b3.mp4\"></video></figure>\n<p><strong>12/5 6:50am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f44b.png\" alt=\"👋\" />SR-190 ROAD CONDITIONS</p>\n<p>Lower-Mid: slush/snow sticking&nbsp;</p>\n<p>Upper: heavy slush/snow covered</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f4cd.png\" alt=\"📍\" />Snowfall is heaviest in lower canyon, be cautious of low visibility.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/203c.png\" alt=\"‼\" />Crews are out: travel delays are possible this AM to Solitude Mountain and Brighton Resort.</p>\n"
+   }
+  },
+  {
+   "id": 11647,
+   "date_gmt": "2025-12-05T13:20:52",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-5-ig-2/",
+   "title": {
+    "rendered": "12/5 IG 2"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/c7dbaf54c9ab48248c396cc874d7148d.mp4\"></video></figure>\n<p><strong>12/5 6:14am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" /> Traction Law IN EFFECT: SR-190 &amp; SR-210&nbsp;</p>\n<p>DRIVE ACCORDING TO CONDITIONS&nbsp;</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Expect delays</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Reduce your speed&nbsp;</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Don’t drive distracted</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Maintain adequate space with vehicle in front of you</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Give plows space &amp; don’t pass them</p>\n"
+   }
+  },
+  {
+   "id": 11644,
+   "date_gmt": "2025-12-05T13:18:07",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-5-ig-1/",
+   "title": {
+    "rendered": "12/5 IG 1"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/b2b7029e-f565-43df-a2e0-10812e758ac9.mp4\"></video></figure>\n<p><strong>12/5 6:14am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" />Traction Law Alert <img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" /></p>\n<p>Traction Law IN EFFECT for both Big &amp; Little Cottonwood Canyons (SR-190, SR-210)</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/203c.png\" alt=\"‼\" /> Travel with caution and make sure your vehicles are properly equipped</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/203c.png\" alt=\"‼\" /> Applies to both travel directions (up/down)</p>\n"
+   }
+  },
+  {
+   "id": 11641,
+   "date_gmt": "2025-12-05T13:15:37",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/traction-law-alert-7/",
+   "title": {
+    "rendered": "Traction Law Alert"
+   },
+   "content": {
+    "rendered": "\n<p>The Traction Law is in effect for both Big &amp; Little Cottonwood Canyons (SR-190/SR-210) and applies to both travel directions. Traction devices are required for all vehicles, for requirements click <a href=\"https://cottonwoodcanyons.udot.utah.gov/traction-law/\">here</a>.</p>\n"
+   }
+  },
+  {
+   "id": 11638,
+   "date_gmt": "2025-12-04T23:36:59",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-4-ig-7/",
+   "title": {
+    "rendered": "12/4 IG 7"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/739d3d02c7be4c69a39d94123e5efa14.mp4\"></video></figure>\n<p><strong>12/4 4:30pm</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2744.png\" alt=\"❄\" />SR-190 &amp; SR-210</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" />Be prepared for changing conditions to/from Solitude Mountain, Brighton Resort, Alta, and Snowbird</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" />Make sure your vehicles are properly equipped before entering canyons or wait for UTA ski bus.</p>\n"
+   }
+  },
+  {
+   "id": 11635,
+   "date_gmt": "2025-12-04T23:32:45",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-4-ig-6/",
+   "title": {
+    "rendered": "12/4 IG 6"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/a814f3c0-6c9b-440b-897a-4c836c401901.mp4\"></video></figure>\n<p><strong>12/4 4:28pm</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2744.png\" alt=\"❄\" />SR-190 &amp; SR-210 FORECAST</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/203c.png\" alt=\"‼\" />Weather-related travel delays likely (12/5)</p>\n<p>1-2 feet of road snow may be possible near resorts from Friday night into Saturday.</p>\n"
+   }
+  },
+  {
+   "id": 11632,
+   "date_gmt": "2025-12-04T23:31:47",
+   "link": "https://cottonwoodcanyons.udot.utah.gov/12-4-ig-5/",
+   "title": {
+    "rendered": "12/4 IG 5"
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://cottonwoodcanyons.udot.utah.gov/wp-content/uploads/2025/12/c323bd32-0412-4d20-a08e-92c0aa73f627.mp4\"></video></figure>\n<p><strong>12/4 4:28pm</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2744.png\" alt=\"❄\" /> Road Weather Alert <img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2744.png\" alt=\"❄\" /></p>\n<p>SR-190 &amp; SR-210 PLAN AHEAD</p>\n<p>6pm(12/4) &#8211; 6am(12/5): Snow begins after 10pm becoming steadier after midnight. 2-3&#8243; road snow in upper canyons and 1&#8243; in lower canyons.</p>\n<p>6am(12/5) &#8211; 6pm(12/5): Periods of snow through the day, heavier after 5am. 3-6&#8243; of road snow in upper canyons, w/ 2-4&#8243; for lower canyons.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" />Be prepared &amp; drive to conditions.</p>\n"
+   }
+  }
+ ]
+}

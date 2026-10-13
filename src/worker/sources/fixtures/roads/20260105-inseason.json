@@ -1,0 +1,83 @@
+{
+ "_note": "Wayback capture 20260105144125 of https://wasatchback.udot.utah.gov/feed/ (RSS 2.0), converted to the /wp-json/wp/v2/posts shape the adapter reads: guid ?p= -> id, pubDate -> date_gmt, content:encoded -> content.rendered (RSS footer and presentational attributes removed). The wp-json URL itself has no in-season Wayback capture.",
+ "site": "https://wasatchback.udot.utah.gov",
+ "posts": [
+  {
+   "id": 11560,
+   "date_gmt": "2026-01-05T14:30:59",
+   "link": "https://wasatchback.udot.utah.gov/1-5-6am/",
+   "title": {
+    "rendered": "1/5 6am"
+   },
+   "content": {
+    "rendered": "\n<figure><img fetchpriority=\"high\" src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/01/img_2134-576x1024.jpg\" alt=\"\" /></figure>\n<p><strong>1/5 6am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f4cd.png\" alt=\"📍\" />PARK CITY FORECAST</p>\n<p>6am(1/5)-6pm:&nbsp;Snow showers linger through 4pm. Expect slush in lower Parleys/Park City, up to 1” of snow at Parleys/Mayflower summits, 1-3&#8243; road snow near Empire Pass.<br /></p>\n<p>6pm (1/5) &#8211; 6am (1/6):&nbsp;Likely dry. Icy spots possible as temperatures drop overnight.</p>\n"
+   }
+  },
+  {
+   "id": 11557,
+   "date_gmt": "2026-01-05T14:28:30",
+   "link": "https://wasatchback.udot.utah.gov/12-5-6am/",
+   "title": {
+    "rendered": "12/5 6am"
+   },
+   "content": {
+    "rendered": "\n<figure><img src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/01/img_2135-576x1024.jpg\" /></figure>\n<p><strong>12/5/25 6am</strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f4cd.png\" alt=\"📍\" />PARLEYS FORECAST</p>\n<p>6am(1/5)-6pm:&nbsp;Periods of rain/snow showers linger through 4pm. Expect slush in lower Parleys, 1-3&#8243; road snow over Summit and up to 1” at lower canyon.</p>\n<p>6pm (1/5) &#8211; 6am (1/6):&nbsp;Likely dry. Icy spots possible as temperatures drop overnight.</p>\n"
+   }
+  },
+  {
+   "id": 11554,
+   "date_gmt": "2026-01-04T23:57:21",
+   "link": "https://wasatchback.udot.utah.gov/11554-2/",
+   "title": {
+    "rendered": ""
+   },
+   "content": {
+    "rendered": "\n<figure><img src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/01/728ddb60-4d99-4dda-a3ad-47a86cf15b86-1-576x1024.jpg\" /></figure>\n<p><strong><em>4:55pm 1/4</em></strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" />Traction Law Alert<img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f6a8.png\" alt=\"🚨\" /></p>\n<p>The Traction Law is IN EFFECT for Empire Pass/Marsac Ave (SR-224) and applies to both travel directions.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f517.png\" alt=\"🔗\" />Traction Law requirements: <a href=\"https://wasatchback.udot.utah.gov/traction-law/\">https://wasatchback.udot.utah.gov/traction-law</a></p>\n"
+   }
+  },
+  {
+   "id": 9387,
+   "date_gmt": "2026-01-04T23:56:31",
+   "link": "https://wasatchback.udot.utah.gov/traction-law-alert/",
+   "title": {
+    "rendered": "TRACTION LAW ALERT&#160;"
+   },
+   "content": {
+    "rendered": "\n<p>The Traction Law is in effect for Empire Pass/Marsac Avenue (SR-224) and applies to both travel directions. Traction devices are required for all vehicles. For requirements, click <a href=\"https://wasatchback.udot.utah.gov/traction-law/\">here</a>.</p>\n"
+   }
+  },
+  {
+   "id": 11551,
+   "date_gmt": "2026-01-04T23:04:15",
+   "link": "https://wasatchback.udot.utah.gov/11551-2/",
+   "title": {
+    "rendered": ""
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/01/ea7a17323989453890423e568c94f973.mp4\"></video></figure>\n<p><strong><em>4:00pm 1/4</em></strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2744.png\" alt=\"❄\" />TRAVEL TIPS: Allow extra time for your morning drive and be prepared for winter conditions.</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Reduce speeds</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Don’t drive distracted</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Don’t pass our plows</p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/2705.png\" alt=\"✅\" /> Use free public transit or carpool</p>\n"
+   }
+  },
+  {
+   "id": 11548,
+   "date_gmt": "2026-01-04T23:03:44",
+   "link": "https://wasatchback.udot.utah.gov/11548-2/",
+   "title": {
+    "rendered": ""
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/01/5f93e65677744ad7b47c469d50fe20e0.mp4\"></video></figure>\n<p><strong><em>4:00pm 1/4</em></strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f4cd.png\" alt=\"📍\" />PARK CITY FORECAST</p>\n<p>6pm(1/4)-6am(1/5):&nbsp;Periods of rain/snow (all snow higher elevations). Mayflower 1-3&#8243; road snow, Ontario 2-4&#8243;, slush-ups lower.</p>\n<p>6am-6pm(1/5):&nbsp;Periods of rain/snow (all snow over Ontario) through 3pm. 2-4&#8243; road snow Ontario, 1-3&#8243; Mayflower, up to 1&#8243; elsewhere.</p>\n"
+   }
+  },
+  {
+   "id": 11545,
+   "date_gmt": "2026-01-04T23:02:31",
+   "link": "https://wasatchback.udot.utah.gov/11545-2/",
+   "title": {
+    "rendered": ""
+   },
+   "content": {
+    "rendered": "\n<figure><video src=\"https://wasatchback.udot.utah.gov/wp-content/uploads/2026/01/218e99881a604d14a15d487de91f9a64.mp4\"></video></figure>\n<p><strong><em>4:00pm 1/4</em></strong></p>\n<p><img src=\"https://s.w.org/images/core/emoji/17.0.2/72x72/1f4cd.png\" alt=\"📍\" />PARLEYS FORECAST</p>\n<p>6pm(1/4)-6am(1/5):&nbsp;Rain/snow in early evening, turning to all snow shortly after. 1/2-1&#8243; road snow at summit, slush-ups around Lambs.</p>\n<p>6am-6pm(1/5):&nbsp;Rain/snow in lower canyon, all snow at summit through 3pm. Upwards of 1-3&#8243; road snow at summit, up to 1&#8243; lower.</p>\n"
+   }
+  }
+ ]
+}

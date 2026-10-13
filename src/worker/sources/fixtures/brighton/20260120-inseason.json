@@ -1,0 +1,270 @@
+{
+ "name": "Brighton",
+ "updated": "2026-01-20T23:00:04Z",
+ "operations": {
+  "resortStatus": "Open"
+ },
+ "currentConditions": {
+  "resortwide": {
+   "numTrailsTotal": 76,
+   "numTrailsOpen": 72,
+   "numTrailsGroomed": 27,
+   "numLiftsTotal": 8,
+   "numLiftsOpen": 5,
+   "numLiftsOnHold": 0,
+   "numLiftsClosed": 3
+  },
+  "resortLocations": {
+   "location": [
+    {
+     "name": "Brighton",
+     "primarySurface": "",
+     "secondarySurface": "",
+     "snowOverNight": {
+      "inches": "0"
+     },
+     "snow12Hours": {
+      "inches": "0"
+     },
+     "snow24Hours": {
+      "inches": "0"
+     },
+     "snow48Hours": {
+      "inches": "0"
+     },
+     "snow72Hours": {
+      "inches": "0"
+     },
+     "snow7Days": {
+      "inches": "0"
+     },
+     "snowSeasonTotal": {
+      "inches": "148"
+     },
+     "base": {
+      "inches": "67"
+     }
+    }
+   ]
+  }
+ },
+ "comments": {
+  "comment": [
+   {
+    "name": "Comment",
+    "title": "Conditions Report",
+    "text": "JANUARY 9: The cold front is here and it brought 3\" last night with an additional 8\" falling during the day yesterday. The snow will be soft and a little wind blown in spots."
+   },
+   {
+    "name": "Uphill",
+    "title": "Uphill Travel Status",
+    "text": "Our uphill travel light is RED which means uphill travel is not allowed at Brighton today, restrictions apply due to heavy machinery on the mountain that can cause severe injury or even death. Thank you for your cooperation in respecting these important safety policies so we may continue uphill travel. Uphill Travel Status"
+   },
+   {
+    "name": "Weather",
+    "title": "Overcast, snowing",
+    "text": ""
+   },
+   {
+    "name": "Events",
+    "title": "Events",
+    "text": "Events"
+   },
+   {
+    "name": "Road",
+    "title": "",
+    "text": "Big Cottonwood Canyon (SR-190) is open with no traction restrictions. Check conditions before you go and drive responsibly!"
+   },
+   {
+    "name": "commentAlert",
+    "title": "",
+    "text": ""
+   },
+   {
+    "name": "trailsAlert",
+    "title": "",
+    "text": ""
+   },
+   {
+    "name": "liftsAlert",
+    "title": "",
+    "text": ""
+   }
+  ]
+ },
+ "facilities": {
+  "areas": {
+   "area": [
+    {
+     "name": "Caterpillar",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Caterpillar",
+        "status": "Scheduled",
+        "statusIcon": "scheduled",
+        "comment": null,
+        "openTime": "09:00",
+        "closeTime": "16:00"
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Crest 6",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Crest 6",
+        "status": "Open",
+        "statusIcon": "open",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Explorer",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Explorer",
+        "status": "Open",
+        "statusIcon": "open",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Great Western Express",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Great Western Express",
+        "status": "Scheduled",
+        "statusIcon": "scheduled",
+        "comment": null,
+        "openTime": "09:00",
+        "closeTime": "16:00"
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Majestic",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Majestic",
+        "status": "Open",
+        "statusIcon": "open",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Milly Express",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Milly Express",
+        "status": "Open",
+        "statusIcon": "open",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Porcupine",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Porcupine",
+        "status": "Scheduled",
+        "statusIcon": "scheduled",
+        "comment": null,
+        "openTime": "09:00",
+        "closeTime": "16:00"
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Snake Creek Express",
+     "lifts": {
+      "lift": [
+       {
+        "name": "Snake Creek",
+        "status": "Open",
+        "statusIcon": "open",
+        "comment": null,
+        "openTime": null,
+        "closeTime": null
+       }
+      ]
+     },
+     "gates": null
+    },
+    {
+     "name": "Terrain Park",
+     "lifts": {
+      "lift": null
+     },
+     "gates": null
+    }
+   ]
+  },
+  "parkingLots": {
+   "parking": [
+    {
+     "name": "Main Lot",
+     "status": "Open",
+     "percentFull": 90,
+     "openTime": "07:00",
+     "closeTime": null,
+     "price": "",
+     "totalCapacity": null,
+     "comment": "",
+     "alert": "",
+     "reservationsRequired": true
+    }
+   ]
+  },
+  "winterActivities": {
+   "activity": [
+    {
+     "name": "Lost Maid / Catherine's Pass Access",
+     "status": "Closed",
+     "openTime": null,
+     "closeTime": null,
+     "statusIcon": "closed"
+    },
+    {
+     "name": "Easy Out / Twin Lake Pass Access",
+     "status": "Closed",
+     "openTime": null,
+     "closeTime": null,
+     "statusIcon": "closed"
+    }
+   ]
+  }
+ }
+}

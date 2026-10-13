@@ -1,0 +1,163 @@
+{
+ "Name": "Solitude",
+ "LastUpdate": "2022-03-14T07:38:47-0600",
+ "SnowReport": {
+  "LastUpdate": "2022-03-14T05:23:02-0600",
+  "BaseConditions": "Powder",
+  "Report": "Solitude has 8 of 8 lifts scheduled to open, serving 77 runs.",
+  "AdditionalText": "--",
+  "Alert": "--",
+  "LiftNotification": "--",
+  "StormTotalIn": "11.0",
+  "SeasonTotalIn": "304.0",
+  "TotalOpenTrails": 77,
+  "TotalTrails": 82,
+  "GroomedTrails": 26,
+  "TotalOpenLifts": 8,
+  "TotalLifts": 8,
+  "BaseArea": {
+   "SinceLiftsClosedIn": "--",
+   "BaseIn": "--",
+   "Last24HoursIn": "--",
+   "Last48HoursIn": "--",
+   "Last72HoursIn": "--",
+   "Last7DaysIn": "--"
+  },
+  "MidMountainArea": {
+   "SinceLiftsClosedIn": "5.0",
+   "BaseIn": "88.0",
+   "Last24HoursIn": "11.0",
+   "Last48HoursIn": "11.0",
+   "Last72HoursIn": "11.0",
+   "Last7DaysIn": "0.0"
+  },
+  "SummitArea": {
+   "SinceLiftsClosedIn": "--",
+   "BaseIn": "--",
+   "Last24HoursIn": "--",
+   "Last48HoursIn": "--",
+   "Last72HoursIn": "--",
+   "Last7DaysIn": "--"
+  }
+ },
+ "CurrentConditions": {
+  "Base": {
+   "Name": "--",
+   "FeedSavedTime": "--",
+   "TemperatureF": "--",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "--"
+  },
+  "MidMountain": {
+   "Name": "Summit",
+   "FeedSavedTime": "2022-03-14T07:38:43-0600",
+   "TemperatureF": "11.0",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "Clear"
+  },
+  "Summit": {
+   "Name": "--",
+   "FeedSavedTime": "--",
+   "TemperatureF": "--",
+   "WindDirection": "--",
+   "WindStrengthMph": "--",
+   "WindGustsMph": "--",
+   "Skies": "--"
+  }
+ },
+ "MountainAreas": [
+  {
+   "Name": "Moonbeam Area",
+   "Lifts": [
+    {
+     "Name": "Link",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2021-11-22T16:04:55-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Name": "Moonbeam Express",
+     "MountainAreaName": "Moonbeam Area",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2021-11-22T16:04:55-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Eagle Ridge",
+   "Lifts": [
+    {
+     "Name": "Eagle Express",
+     "MountainAreaName": "Eagle Ridge",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2022-01-05T09:32:55-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Name": "Powderhorn II",
+     "MountainAreaName": "Eagle Ridge",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2022-01-05T09:47:30-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Solitude Canyon",
+   "Lifts": [
+    {
+     "Name": "Apex Express",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2022-01-05T11:20:43-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    },
+    {
+     "Name": "Summit Express",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2022-01-07T05:19:17-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:30 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"3:30 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:30 PM"}}
+    },
+    {
+     "Name": "Sunrise",
+     "MountainAreaName": "Solitude Canyon",
+     "Status": "Open",
+     "StatusEnglish": "open",
+     "UpdateDate": "2021-12-15T10:09:20-0700",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"4:00 PM"},"Monday":{"Open":"9:00 AM","Close":"4:00 PM"},"Tuesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Wednesday":{"Open":"9:00 AM","Close":"4:00 PM"},"Thursday":{"Open":"9:00 AM","Close":"4:00 PM"},"Friday":{"Open":"9:00 AM","Close":"4:00 PM"},"Saturday":{"Open":"9:00 AM","Close":"4:00 PM"}}
+    }
+   ],
+   "Activities": []
+  },
+  {
+   "Name": "Honeycomb Canyon",
+   "Lifts": [
+    {
+     "Name": "Honeycomb Return",
+     "MountainAreaName": "Honeycomb Canyon",
+     "Status": "Pending Mitigation",
+     "StatusEnglish": "pending_mitigation",
+     "UpdateDate": "2022-03-14T05:21:13-0600",
+     "Hours": {"Sunday":{"Open":"9:00 AM","Close":"3:30 PM"},"Monday":{"Open":"9:00 AM","Close":"3:30 PM"},"Tuesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Wednesday":{"Open":"9:00 AM","Close":"3:30 PM"},"Thursday":{"Open":"9:00 AM","Close":"3:30 PM"},"Friday":{"Open":"9:00 AM","Close":"3:30 PM"},"Saturday":{"Open":"9:00 AM","Close":"3:30 PM"}}
+    }
+   ],
+   "Activities": []
+  }
+ ],
+ "Roads": []
+}
