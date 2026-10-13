@@ -39,12 +39,12 @@ export function CamTile(props: CamTileProps) {
   return def ? <Tile key={def.id} {...props} def={def} /> : null;
 }
 
-/** The "▶" hint on a still a tap plays. */
+/** The "▶" hint on a still a tap plays: a call to action, never a status word (that is the plate's job). */
 function liveHint(live: LiveSource | null, own: CamApiState | undefined, status: TileStatus | null): string | null {
   if (!live) return null;
+  if (live.type === 'iframe') return '360° view';
   if (own?.status === 'unknown' && live.type === 'youtube') return NOTE.ytUnknown;
-  if (own?.thumbKind === 'custom') return 'Live · tap';
-  return status === 'live' ? 'Play' : 'Live'; // the plate already says LIVE
+  return status === 'live' ? 'Play' : 'Watch live'; // the plate already says LIVE
 }
 
 function Tile(p: CamTileProps & { def: CamDef }) {
@@ -138,7 +138,7 @@ function Tile(p: CamTileProps & { def: CamDef }) {
   const caption = (
     <Caption
       star={star}
-      resort={resort}
+      resort={p.showResort === false ? null : resort}
       name={name}
       age={age}
       note={note}
@@ -159,7 +159,14 @@ function Tile(p: CamTileProps & { def: CamDef }) {
     .join(' ');
   const boxed = (mode.m === 'live' && mode.inBox) || mode.m === 'zoom' || mode.m === 'scrub';
   return (
-    <figure ref={root} class={cls} data-testid="cam-tile" data-cam={def.id} data-status={status ?? 'ok'}>
+    <figure
+      ref={root}
+      class={cls}
+      data-testid="cam-tile"
+      data-cam={def.id}
+      data-kind={def.kind}
+      data-status={status ?? 'ok'}
+    >
       <div class="cam-media" ref={media}>
         {inTile ? (
           player()

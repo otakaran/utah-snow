@@ -2,11 +2,13 @@
    Captions carry name + age (+ ★ for the pick resort); status plates are shape + word + color. */
 @import "./cams/tile.css";
 @import "./cams/scrubber.css";
+@import "./cams/gallery.css";
 
 /* Caption: under the media, or a scrim plate over it (the wall) */
 .cam-cap {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   align-items: baseline;
   gap: 2px var(--space-2);
   padding: var(--space-2);
@@ -147,16 +149,6 @@
   aspect-ratio: 4 / 3;
 }
 
-/* Galleries */
-.cam-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 @media (min-width: 900px) {
   .cam-strip {
     display: grid;
@@ -176,6 +168,7 @@
   border: 0;
   outline: 5px solid var(--accent);
   outline-offset: -5px;
+  box-shadow: none;
 }
 
 .cam-wall .cam-media {

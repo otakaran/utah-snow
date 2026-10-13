@@ -163,3 +163,27 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* jump row (Resort.tsx ResortJump): one sideways-scrolling sticky row from ui/jumpbar.css; the resort links, a rule,
+   then the section JumpBar laid flat inside it. Section headings clear the row when jumped to. */
+.rs-jump > .jumpbar {
+  flex: none;
+  min-height: 0;
+  overflow: visible;
+}
+
+.rs-jump-resorts {
+  display: flex;
+  flex: none;
+  gap: var(--space-2);
+  padding-right: var(--space-2);
+  border-right: 1px solid var(--line);
+}
+
+.rs-jump a.jump {
+  text-decoration: none;
+}
+
+.rs .section > .sec-h {
+  scroll-margin-top: calc(var(--jump-h, 48px) + var(--space-2));
+}

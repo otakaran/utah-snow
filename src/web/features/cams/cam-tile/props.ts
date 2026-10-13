@@ -26,6 +26,8 @@ export interface CamTileProps {
   caption?: 'below' | 'overlay';
   /** Caption name instead of the cam's own. */
   label?: string;
+  /** Resort name before the cam name in the caption (default true); alt text and labels always carry it. */
+  showResort?: boolean;
   /** An extra caption line, e.g. Alta's "since 04:00 board clear". */
   note?: ComponentChildren;
   /** Drawn over the still, e.g. an inch plate. */

@@ -64,14 +64,38 @@ export function liveSource(def: CamDef, state: CamApiState | undefined): LiveSou
 }
 
 /**
- * Tiles hidden outright: UDOT cams on their offline placeholder, hiddenUntilFresh cams until /api/cams calls them
- * fresh, seasonal YouTube slots with no stream.
+ * Tiles hidden outright: UDOT cams on their offline placeholder, offlineGated UDOT cams until /api/cams reports them
+ * online (§8.7.6), hiddenUntilFresh cams until /api/cams calls them fresh, seasonal YouTube slots with no stream.
  */
 export function camHidden(def: CamDef, state: CamApiState | undefined): boolean {
   if (def.hiddenUntilFresh) return !(state?.status === 'ok' || state?.status === 'live');
+  if (def.offlineGated) return state?.online !== true;
   if (state?.status === 'seasonal-off') return true;
   return (def.kind === 'udot' || def.kind === 'udot_vms') && state?.online === false;
 }
+
+/**
+ * The tiles a gallery shows, in list order: no hidden cams (camHidden), no `detailOnly` cams outside the detail
+ * variant, `alternate` road cams only while another cam of their corridor in the list is hidden, and no tile whose
+ * still falls back to a cam that has its own tile (DV's live stake slot showing its -still twin).
+ */
+export function visibleCams(list: readonly CamDef[], states: States, variant: Variant, nowMs: number): CamDef[] {
+  const hidden = new Set(list.filter((d) => camHidden(d, states.get(d.id))).map((d) => d.id));
+  const kept = list.filter((d) => {
+    if (hidden.has(d.id) || (d.detailOnly && variant !== 'detail')) return false;
+    if (!d.alternate) return true;
+    return list.some((o) => o !== d && !o.alternate && o.corridor === d.corridor && hidden.has(o.id));
+  });
+  const ids = new Set(kept.map((d) => d.id));
+  return kept.filter((d) => {
+    const shown = shownCam(d, states, nowMs).id;
+    return shown === d.id || !ids.has(shown);
+  });
+}
+
+/** A gallery's lead (2x2) tile: its first shown stake, else the cam `heroId` (the resort's hero); null if neither. */
+export const leadCam = (shown: readonly CamDef[], heroId: string): CamDef | null =>
+  shown.find((d) => d.isStake) ?? shown.find((d) => d.id === heroId) ?? null;
 
 /** The status word for the chip; 'ok' shows no chip. A failed refresh turns ok into stale. */
 export function tileStatus(state: CamApiState | undefined, failed: boolean): TileStatus | null {
