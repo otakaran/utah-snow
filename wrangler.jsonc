@@ -10,12 +10,12 @@
   // no assets.directory: the Cloudflare Vite plugin writes it into the generated build config
   "assets": { "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
   "triggers": { "crons": ["*/5 * * * *"] },
-  "kv_namespaces": [{ "binding": "FRAMES", "id": "00000000-0000-0000-0000-000000000000" }],
+  "kv_namespaces": [{ "binding": "FRAMES", "id": "14f8e71c1041422d92652a35588b1578" }],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "utah-snow",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "ef0e1f48-6405-4f3c-b9e4-0b37c8780a76",
       "migrations_dir": "migrations"
     }
   ],
