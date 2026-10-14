@@ -19,5 +19,8 @@
       "migrations_dir": "migrations"
     }
   ],
+  // Scheduler: the DO alarm chain that ticks when cron triggers stall (src/worker/scheduler.ts). SQLite-backed (free plan).
+  "durable_objects": { "bindings": [{ "name": "SCHEDULER", "class_name": "Scheduler" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Scheduler"] }],
   "observability": { "enabled": true }
 }

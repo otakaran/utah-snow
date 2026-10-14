@@ -1,6 +1,6 @@
 # src/worker
 
-`index.ts` routes `/api/*` (health, snapshot, cams[/report], stake, drive, tracker, debug/{probe,tick}) and runs `runTick` on cron;
+`index.ts` routes `/api/*` (health, snapshot, cams[/report], stake, drive, tracker, debug/{probe,tick}) and runs `runTick` on cron + the `scheduler.ts` DO alarm chain;
 `frames/` lists timelapse frames (KV archive, HDRelay, Prism, Roundshot; `available.ts` gates the providers). Wire types: `shared/types/`.
 
 ## Source contract (`sources/types.ts`, which also re-exports the only fetchx values adapters may use)
@@ -35,6 +35,6 @@
 
 ## Tests
 - `unit` project (node): `sources/**` and `lib/**` tests. Adapter tests: field assertions on fixtures plus one gate failure.
-- `worker` project (workerd, `cloudflare:workers` `env`/`exports`, `fsModuleCache: false`): `api/`, `cron/`, `frames/` tests.
+- `worker` project (workerd, `cloudflare:workers` `env`/`exports`, `fsModuleCache: false`): `api/`, `cron/`, `frames/`, `scheduler` tests.
 - Fixtures: one live + <= 5 Wayback in-season files per source, <= 30 KB, from `pnpm fixtures` (new dated files; tests opt in).
 - Worker tests call `migrate(env.DB)` / `clearStore(env.DB)` (store + tracker tables) from `store/test-db.ts`.

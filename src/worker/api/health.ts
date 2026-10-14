@@ -1,6 +1,6 @@
 // GET /api/health[?strict=1] (spec §7, §11). no-store. strict=1 -> 503 when a critical source is red, the last
 // cron tick is older than 15 min (or never ran), any job was flagged cpu-suspect in the last 24 h, or the weekly
-// NWS /points check found a grid or zone change (Appendix C.1).
+// NWS /points check found a grid or zone change (Appendix C.1). Also arms the Scheduler alarm chain (waitUntil).
 import { CAMS } from '../../../config/cams/index.ts';
 import { CRON_STALE_MIN } from '../../../config/schedule.ts';
 import { ageMin, badge, isCritical } from '../../shared/freshness.ts';
@@ -8,6 +8,7 @@ import { isBetweenLocal, isoToMs, isoUtc, MIN } from '../../shared/time.ts';
 import type { CamDef, CamKind, CamStatusEntry, Meta } from '../../shared/types.ts';
 import { BUILD_ID, json } from '../http.ts';
 import { redact } from '../lib/log.ts';
+import { ensureScheduler } from '../scheduler.ts';
 import { sourceOfRow, staleAfterMin } from '../sources/index.ts';
 import { readHealthCounters } from '../store/counters.ts';
 import { CRON_LAST, cronLastOf, type MetaRow, readMetaRows } from '../store/source-state.ts';
@@ -67,7 +68,8 @@ function metaOf(r: MetaRow): Meta {
   };
 }
 
-export async function health(_req: Request, env: Env, _ctx: ExecutionContext, url: URL): Promise<Response> {
+export async function health(_req: Request, env: Env, ctx: ExecutionContext, url: URL): Promise<Response> {
+  ctx.waitUntil(ensureScheduler(env));
   const now = Date.now();
   const [rows, counters] = await Promise.all([readMetaRows(env.DB), readHealthCounters(env.DB, now)]);
   const cron = cronLastOf(rows);

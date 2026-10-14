@@ -50,7 +50,10 @@ describe('POST /api/debug/tick', () => {
     }
     expect(unknown.status).toBe(404);
     const tick = fakeTick();
-    expect((await makeDebugTick({ runTick: tick, now: () => NOW })(post('wrong-key'), testEnv)).status).toBe(404);
+    expect(
+      (await makeDebugTick({ runTick: tick, now: () => NOW })(post('wrong-key'), testEnv, createExecutionContext()))
+        .status,
+    ).toBe(404);
     expect(tick).not.toHaveBeenCalled();
   });
 
@@ -66,7 +69,7 @@ describe('POST /api/debug/tick', () => {
     for (const minAgo of [null, 10]) {
       if (minAgo !== null) await seedLast(minAgo);
       const tick = fakeTick();
-      const res = await makeDebugTick({ runTick: tick, now: () => NOW })(post(KEY), testEnv);
+      const res = await makeDebugTick({ runTick: tick, now: () => NOW })(post(KEY), testEnv, createExecutionContext());
       expect(res.status).toBe(200);
       expect(res.headers.get('Cache-Control')).toBe('no-store');
       expect(await res.json()).toEqual({ ran: true, slot: 7, jobs: ['avy', 'nws-alerts'], deferred: ['udot'] });

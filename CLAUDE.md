@@ -11,7 +11,7 @@
 - `src/shared/`: pure, runtime-agnostic logic with colocated tests: `types.ts` (+ `types/`), time (+ `time/`), units, num,
   caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page, parking (`parkingCal`), cam-url,
   geo (drive matrix, corridors, live-sign delay), `pick/` (the pick engine). `config.test.ts` checks the registries.
-- `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
+- `src/worker/index.ts`: `export default { fetch, scheduled }` + the `Scheduler` DO (`scheduler.ts`); `/api/*` -> router, else 404 text/plain no-store.
 - `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams[/report], stake, drive, tracker, debug/{probe,tick}) + helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
 - `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
@@ -89,7 +89,7 @@
 - One Worker: assets with SPA fallback, `run_worker_first: ["/api/*"]`, custom domain route creates DNS + cert.
 - Redeploys drop old chunks: the client reloads once on chunk-load error; the wall reloads when `X-Build` differs.
 - D1 holds all structured state (last-good per source, tracker, histories, counters); cron writes `cron:last` first.
-- Cron fallback: `.github/workflows/tick.yml` POSTs `/api/debug/tick` (probe key) every 5 min; it skips when `cron:last` is < 4 min old.
+- Scheduling: cron trigger + DO alarm chain (`scheduler.ts`, 5 min + 90 s, armed by `scheduled`, `/api/health`, `/api/debug/tick`) + `tick.yml`; the alarm and tick skip when `cron:last` < 4 min old.
 - `caches.default` fronts only `/api/snapshot`, `/api/cams`, `/api/stake/*`. No Workers Cache, no R2.
 - Open-Meteo is called from the browser only (30 min, 60 on the wall, visible only, shared cache, 429 backoff).
 - The pick runs in the browser (`src/shared/pick/`): crew pick by default, "as me" per person; the wall shows crew.
