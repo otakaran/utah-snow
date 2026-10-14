@@ -33,7 +33,7 @@
   custom base, MtnPowder browser fallback, model table, scripts. Next: Phase 3, checking parsers as each resort opens.
 
 ## Commands
-- `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm deploy` runs from CI on main. Logs: `pnpm wrangler tail`.
+- `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm run deploy` (pnpm's own `deploy` shadows it; CI deploys on main). Logs: `pnpm wrangler tail`.
 - `pnpm check` = `node scripts/check-repo.ts && biome check . && tsc -b && vitest run`. Must pass before commit.
 - `pnpm test` (vitest projects `unit` = node, `worker` = workerd). `pnpm e2e` (Playwright on `vite preview :4173`;
   `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused).
