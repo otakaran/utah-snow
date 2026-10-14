@@ -47,6 +47,12 @@ export function cronLastOf(rows: readonly MetaRow[]): CronLast | null {
   return parseCronLast(rows.find((r) => r.source_id === CRON_LAST)?.payload);
 }
 
+/** The last tick's start (cron:last fetched_at), or null before the first tick. One query (/api/debug/tick). */
+export async function readCronLastAt(db: D1Database): Promise<number | null> {
+  const sql = `SELECT fetched_at FROM source_state WHERE source_id = '${CRON_LAST}'`;
+  return (await db.prepare(sql).first<{ fetched_at: number }>())?.fetched_at ?? null;
+}
+
 export function cronLastStmt(db: D1Database, c: CronLast): D1PreparedStatement {
   return db
     .prepare(

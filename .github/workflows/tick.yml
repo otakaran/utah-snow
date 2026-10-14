@@ -1,0 +1,28 @@
+# Cron fallback for Cloudflare cron-trigger outages: POST /api/debug/tick (probe key) every 5 min. The route skips
+# when the real cron is fresh (cron:last < 4 min old), so both can run; otherwise it runs one tick and returns a summary.
+name: Tick
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tick
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Fallback cron tick
+        shell: bash
+        env:
+          PROBE_KEY: ${{ secrets.PROBE_KEY }}
+        run: |
+          curl -fsS --max-time 100 -X POST -H "X-Probe-Key: $PROBE_KEY" 'https://utah.otakar.dev/api/debug/tick'
+          echo

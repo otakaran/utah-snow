@@ -1,6 +1,6 @@
 # src/worker
 
-`index.ts` routes `/api/*` (health, snapshot, cams[/report], stake, drive, tracker, debug/probe) and runs `runTick` on cron;
+`index.ts` routes `/api/*` (health, snapshot, cams[/report], stake, drive, tracker, debug/{probe,tick}) and runs `runTick` on cron;
 `frames/` lists timelapse frames (KV archive, HDRelay, Prism, Roundshot; `available.ts` gates the providers). Wire types: `shared/types/`.
 
 ## Source contract (`sources/types.ts`, which also re-exports the only fetchx values adapters may use)
@@ -29,9 +29,9 @@
 - `/api/drive` (`store/drive.ts`): 403 without `X-Requested-With`, 3 dp, 422 outside-wasatch; per Denver day 10 lookups a client
   and 20 OSRM misses in all (then 429); one miss lease (503); 6 OSRM calls 1.1 s apart; `drive_cache` 30 d; no caches.default.
 - `/api/snapshot` sends `X-Build` = `BUILD_ID` (`http.ts`: Vite `define` `__BUILD_ID__`, `'dev'` under Vitest); the wall reloads on change.
-- `/api/debug/probe`: the unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`. `/api/health?strict=1`: 503 until `cron:last`.
+- `debug/{probe,tick}`: unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`; POST tick skips if `cron:last` < 4 min. `health?strict=1`: 503 until `cron:last`.
 - `/api/tracker` (SQL in `store/tracker.ts` + `store/tracker/writes.ts`): GET no-store; POST one op; 409 carries `current`.
-- `api/post-guard.ts` (both POSTs): 403 headers/Origin (localhost if `DEV=1`), 503 `no-salt`, shared `rl:*` 429, 422.
+- `api/post-guard.ts` (cams/report, tracker POSTs): 403 headers/Origin (localhost if `DEV=1`), 503 `no-salt`, shared `rl:*` 429, 422.
 
 ## Tests
 - `unit` project (node): `sources/**` and `lib/**` tests. Adapter tests: field assertions on fixtures plus one gate failure.

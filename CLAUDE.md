@@ -12,7 +12,7 @@
   caps, freshness, json, season, lifts, road-hint, mtnpowder, stake-archive, alta-page, parking (`parkingCal`), cam-url,
   geo (drive matrix, corridors, live-sign delay), `pick/` (the pick engine). `config.test.ts` checks the registries.
 - `src/worker/index.ts`: `export default { fetch, scheduled }`; `/api/*` -> router, else 404 text/plain no-store.
-- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams[/report], stake, drive, tracker, debug/probe) + helpers.
+- `src/worker/{router,http}.ts`: `/api` path table (health, snapshot, cams[/report], stake, drive, tracker, debug/{probe,tick}) + helpers.
 - `src/worker/lib/`: fetchx (all outbound I/O), log, hash.
 - `src/worker/sources/`: `types.ts` (Source contract), `index.ts` (SOURCES: every adapter + `maintenance.ts`),
   `probe-seed.ts` (hosts no adapter probes). Adapters: `<id>.ts` + `<id>.test.ts` + `fixtures/<id>/` (+ `<id>/` helpers).
@@ -28,7 +28,7 @@
   (same-name folders hold their parts; `lib/`: the Node fetchx shim and the job list they share).
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`, `fonts/` (Barlow woff2 + OFL, <= 120 KB).
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
-- `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`), drift (Mondays; `drift` issue).
+- `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`), drift (Mondays; `drift` issue), tick (*/5 cron fallback).
 - Status now: Phase 2 and its polish pass are done: every adapter and `/api` route, all six pages (wall included), scrubbers,
   custom base, MtnPowder browser fallback, model table, scripts. Next: Phase 3, checking parsers as each resort opens.
 
@@ -89,6 +89,7 @@
 - One Worker: assets with SPA fallback, `run_worker_first: ["/api/*"]`, custom domain route creates DNS + cert.
 - Redeploys drop old chunks: the client reloads once on chunk-load error; the wall reloads when `X-Build` differs.
 - D1 holds all structured state (last-good per source, tracker, histories, counters); cron writes `cron:last` first.
+- Cron fallback: `.github/workflows/tick.yml` POSTs `/api/debug/tick` (probe key) every 5 min; it skips when `cron:last` is < 4 min old.
 - `caches.default` fronts only `/api/snapshot`, `/api/cams`, `/api/stake/*`. No Workers Cache, no R2.
 - Open-Meteo is called from the browser only (30 min, 60 on the wall, visible only, shared cache, 429 backoff).
 - The pick runs in the browser (`src/shared/pick/`): crew pick by default, "as me" per person; the wall shows crew.
@@ -96,16 +97,15 @@
 - Worker secrets: `IP_HASH_SALT`, `PROBE_KEY` (required); `YT_API_KEY`, `UDOT_API_KEY` (optional).
 - `SITE.origin` in `config/site.ts` is the single source of the public origin (no wrangler var).
 - Link-only, noindex, `Referrer-Policy: no-referrer` site-wide; YouTube iframes override to strict-origin-when-cross-origin.
-- `/api/debug/probe` returns 404 unless `X-Probe-Key` matches. fetchx never sends Origin or Referer.
+- `/api/debug/{probe,tick}` return 404 unless `X-Probe-Key` matches. fetchx never sends Origin or Referer.
 
 ## Gotchas
 - Cam stills (UDOT, Alta, Ski Utah, Snowbasin) and scrubber frames are plain `<img>` only: no fetch, no canvas, no `crossorigin`.
 - YouTube IDs churn: ordered regexes, CamStreamer and discovery; IDs are only seeds in `config/youtube.ts`.
-- HDRelay needs an explicit UA and never a Referer.
 - KV allows 1,000 writes/day, used only for frames (about 480).
 - Subrequest budget is 45 per tick (redirects and `caches.*` count); 6 connections at a time (fetchx 5, the 6th for KV).
 - CPU is 10 ms: no DOM parsing, no un-memoized Intl.
-- Snowbird's API returns 500 for any foreign Origin. NWS returns 403 without a UA.
+- Snowbird's API returns 500 for any foreign Origin; NWS 403s without a UA; HDRelay needs an explicit UA and never a Referer.
 - MtnPowder sits behind Imperva: `src/web/data/mtnpowder.ts` refetches blocked or red rows in the browser with the same
   parser (`src/shared/mtnpowder.ts`). `blocked` rows are not critical (`isCritical`), so they never fail `?strict=1`.
 - Guardsman Pass (SR-190 from MP `GUARDSMAN_MP` 17) closes every winter: its UDOT posts and events only set the BCC
