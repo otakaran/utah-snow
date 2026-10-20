@@ -2,7 +2,7 @@
  "_note": "SYNTHETIC in-season batch (UDOT re-issued all Cctv ids on 2026-10-08, so no Wayback capture can match these ids). Batch 0 at 2026-01-15 09:50Z: 155967 back online (JPEG), 164806 a 404, 164768 an HTML 403 from the edge and 166000 timed out (both keep their previous state), 165174 the PNG placeholder; the rest live.",
  "batch": 0,
  "checks": {
-  "udot-164559": {
+  "udot-167778": {
    "status": 200,
    "type": "image/jpeg"
   },

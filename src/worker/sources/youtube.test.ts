@@ -121,12 +121,15 @@ describe('youtube keyless (live capture 2026-10-12)', () => {
     const t3 = await tick(liveRoute(1), 11, T0 + 40 * MIN, { 'yt:state': t2.st });
     expect(t3.calls.length).toBe(8);
     expect(t3.calls.every((u) => u.includes('/hqdefault_live.jpg'))).toBe(true);
-    expect(t3.slot('brighton-molly-greens')).toMatchObject({ status: 'live', source: 'etag', etag: '"14587"' });
-    expect(t3.slot('brighton-top-of-crest')?.status).toBe('live');
-    expect(t3.slot('brighton-parking-lot')).toMatchObject({ status: 'unknown', thumbKind: 'custom' });
-    expect(t3.slot('solitude-apex-sunrise')).toMatchObject({ thumbKind: 'custom', status: 'unknown' });
-    const t4 = await tick(liveRoute(1), 3, T0 + 300 * MIN, { 'yt:state': t3.st });
-    expect(t4.slot('brighton-molly-greens')?.status).toBe('unknown');
+    // The ring holds the 24 seeded slots (5 Brighton, 11 Solitude, 8 Deer Valley): the Brighton cams come round
+    // again on the fourth tick, now served round 1 (moved counters).
+    const t4 = await tick(liveRoute(1), 3, T0 + 60 * MIN, { 'yt:state': t3.st });
+    expect(t4.slot('brighton-molly-greens')).toMatchObject({ status: 'live', source: 'etag', etag: '"14587"' });
+    expect(t4.slot('brighton-top-of-crest')?.status).toBe('live');
+    expect(t4.slot('brighton-parking-lot')).toMatchObject({ status: 'unknown', thumbKind: 'custom' });
+    expect(t4.slot('solitude-apex-sunrise')).toMatchObject({ thumbKind: 'custom', status: 'unknown' });
+    const t5 = await tick(liveRoute(1), 3, T0 + 330 * MIN, { 'yt:state': t4.st });
+    expect(t5.slot('brighton-molly-greens')?.status).toBe('unknown');
   });
 
   it('yt:pending cams are checked first; 2 CamStreamer misses mean offline', async () => {
@@ -176,7 +179,7 @@ describe('youtube keyed (synthetic in-season, Data API)', () => {
     expect(p2.slot('deer-valley-sterling')).toMatchObject({ videoId: 'S7erlingCam', status: 'live' });
     expect(p2.slot('brighton-great-western')).toMatchObject({ videoId: 'RPIfUKjRQgI', status: 'live' });
     expect(p2.slot('solitude-summit-express')?.videoId).toBe('rUXoOLxKKX4');
-    expect(p2.slot('solitude-eagle-express')).toMatchObject({ videoId: null, status: 'offline' });
+    expect(p2.slot('solitude-eagle-express')).toMatchObject({ videoId: 'oWaG8txpW1c', status: 'offline' }); // seed, not live
     expect(p2.st.unmapped).toEqual([
       { videoId: 'HailPeakCam', channel: 'deer-valley', title: 'Hail Peak Express Livestream' },
     ]);

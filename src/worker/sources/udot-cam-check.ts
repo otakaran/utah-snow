@@ -81,7 +81,7 @@ export const udotCamCheck: Source<UdotCamCheckRaw> = {
   staleAfterMin: 2880,
   rows: [UDOT_CAMS_ROW],
   maxSubrequests: () => Math.ceil(CCTV.length / BATCHES), // 17: the largest batch; redirects are not followed
-  probes: [{ hostId: 'udot-cctv', url: `${CCTV_URL}164559` }],
+  probes: [{ hostId: 'udot-cctv', url: `${CCTV_URL}167778` }],
   async fetch(ctx: FetchCtx): Promise<UdotCamCheckRaw> {
     const batch = batchIndex(ctx.now);
     const cams = batchCams(batch);

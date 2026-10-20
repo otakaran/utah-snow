@@ -40,14 +40,14 @@ export const SLOTS = {
     { cam: 'solitude-powderhorn-ii-lift-line', re: /^powderhorn\s*(ii|2)\b/i, seed: 'yeoBog_kSzc' },
     { cam: 'solitude-powderhorn', re: /^powderhorn\s*$/i, seed: 'xNER0JHrqLg' },
     { cam: 'solitude-honeycomb-return', re: /honeycomb\s*return/i },
-    { cam: 'solitude-honeycomb-canyon', re: /honeycomb/i },
+    { cam: 'solitude-honeycomb-canyon', re: /honeycomb/i, seed: 'gfHReYIuydU' },
     { cam: 'solitude-moonbeam-parking', re: /moonbeam.*park/i, seed: 'ta-4QZbfMXc' },
     { cam: 'solitude-moonbeam-lift-line', re: /moonbeam/i, seed: 'NSiItCGabfo' },
     { cam: 'solitude-sunshine-bowl', re: /sunshine/i, seed: 'Lnznapxh2xM' },
     { cam: 'solitude-apex-sunrise', re: /apex|sunrise/i, seed: 'l2X9DlRzX54' },
     { cam: 'solitude-link-lift-line', re: /^link\b/i, seed: 'Yx3QmuKfwjY' },
-    { cam: 'solitude-eagle-express', re: /eagle/i },
-    { cam: 'solitude-summit-express', re: /summit/i },
+    { cam: 'solitude-eagle-express', re: /eagle/i, seed: 'oWaG8txpW1c' },
+    { cam: 'solitude-summit-express', re: /summit/i, seed: 'rUXoOLxKKX4' },
   ],
   'deer-valley': [
     {

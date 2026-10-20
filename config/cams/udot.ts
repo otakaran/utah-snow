@@ -24,8 +24,8 @@ const SNOWBASIN = { ...BASE, corridor: 'snowbasin' } as const;
 // biome-ignore format: dense registry, one cam per 2 lines
 export const UDOT_CAMS = [
   // 1–12 LCC → alta, snowbird
-  { ...LCC, id: 'udot-164559', name: 'SR-210 @ SR-209 (canyon mouth)', // ★ briefing
-    still: { card: `${CCTV}/164559?t={m}`, detail: `${CCTV}/164559?t={m}`, wall: `${CCTV}/164559?t={m}` } },
+  { ...LCC, id: 'udot-167778', name: 'SR-210 @ SR-209 (canyon mouth)', // ★ briefing
+    still: { card: `${CCTV}/167778?t={m}`, detail: `${CCTV}/167778?t={m}`, wall: `${CCTV}/167778?t={m}` } },
   { ...LCC, id: 'udot-164806', name: 'SR-210 RWIS @ Powerhouse MP 5.67',
     still: { card: `${CCTV}/164806?t={m}`, detail: `${CCTV}/164806?t={m}`, wall: `${CCTV}/164806?t={m}` } },
   { ...LCC, id: 'udot-164767', name: 'Upper Vault MP 5.96',
@@ -59,8 +59,8 @@ export const UDOT_CAMS = [
     still: { card: `${CCTV}/164335?t={m}`, detail: `${CCTV}/164335?t={m}`, wall: `${CCTV}/164335?t={m}` } },
   { ...LCC, id: 'udot-164812', name: '9400 S @ 2300 E', detailOnly: true,
     still: { card: `${CCTV}/164812?t={m}`, detail: `${CCTV}/164812?t={m}`, wall: `${CCTV}/164812?t={m}` } },
-  { ...LCC, id: 'udot-164567', name: 'SR-209 @ Old Wasatch/9710 S', detailOnly: true,
-    still: { card: `${CCTV}/164567?t={m}`, detail: `${CCTV}/164567?t={m}`, wall: `${CCTV}/164567?t={m}` } },
+  { ...LCC, id: 'udot-167426', name: 'SR-209 @ Old Wasatch/9710 S', detailOnly: true,
+    still: { card: `${CCTV}/167426?t={m}`, detail: `${CCTV}/167426?t={m}`, wall: `${CCTV}/167426?t={m}` } },
   { ...LCC, id: 'udot-165939', name: 'SR-209 @ Wasatch Blvd/3400 E', detailOnly: true,
     still: { card: `${CCTV}/165939?t={m}`, detail: `${CCTV}/165939?t={m}`, wall: `${CCTV}/165939?t={m}` } },
   // 20–22 LCC VMS → alta, snowbird (animated GIFs; not offline-checked)
@@ -71,10 +71,10 @@ export const UDOT_CAMS = [
   { ...LCC, id: 'udot-vms-100219', name: 'Avalanche Warning, Town of Alta', kind: 'udot_vms',
     still: { card: `${GIF}/100219.gif?t={m}`, detail: `${GIF}/100219.gif?t={m}`, wall: `${GIF}/100219.gif?t={m}` } },
   // 23–29 BCC → brighton, solitude
-  { ...BCC, id: 'udot-164333', name: 'Wasatch Blvd @ BCC Rd/Fort Union (mouth)', // ★ briefing
-    still: { card: `${CCTV}/164333?t={m}`, detail: `${CCTV}/164333?t={m}`, wall: `${CCTV}/164333?t={m}` } },
-  { ...BCC, id: 'udot-164416', name: 'Dogwood MP 4.1',
-    still: { card: `${CCTV}/164416?t={m}`, detail: `${CCTV}/164416?t={m}`, wall: `${CCTV}/164416?t={m}` } },
+  { ...BCC, id: 'udot-167802', name: 'Wasatch Blvd @ BCC Rd/Fort Union (mouth)', // ★ briefing
+    still: { card: `${CCTV}/167802?t={m}`, detail: `${CCTV}/167802?t={m}`, wall: `${CCTV}/167802?t={m}` } },
+  { ...BCC, id: 'udot-167437', name: 'Dogwood MP 4.1',
+    still: { card: `${CCTV}/167437?t={m}`, detail: `${CCTV}/167437?t={m}`, wall: `${CCTV}/167437?t={m}` } },
   { ...BCC, id: 'udot-164788', name: 'S-Curves MP 6.38',
     still: { card: `${CCTV}/164788?t={m}`, detail: `${CCTV}/164788?t={m}`, wall: `${CCTV}/164788?t={m}` } },
   { ...BCC, id: 'udot-165945', name: 'Cardiff Fork MP 10.74',
@@ -83,8 +83,8 @@ export const UDOT_CAMS = [
     still: { card: `${CCTV}/164818?t={m}`, detail: `${CCTV}/164818?t={m}`, wall: `${CCTV}/164818?t={m}` } },
   { ...BCC, id: 'udot-165123', name: 'Solitude MP 14.53',
     still: { card: `${CCTV}/165123?t={m}`, detail: `${CCTV}/165123?t={m}`, wall: `${CCTV}/165123?t={m}` } },
-  { ...BCC, id: 'udot-165825', name: 'Brighton MP 16.07', // ★ briefing; GIF
-    still: { card: `${CCTV}/165825?t={m}`, detail: `${CCTV}/165825?t={m}`, wall: `${CCTV}/165825?t={m}` } },
+  { ...BCC, id: 'udot-167944', name: 'Brighton MP 16.07', // ★ briefing; GIF
+    still: { card: `${CCTV}/167944?t={m}`, detail: `${CCTV}/167944?t={m}`, wall: `${CCTV}/167944?t={m}` } },
   // 30–35 Parleys → deer-valley
   { ...PARLEYS, id: 'udot-166089', name: 'I-80 EB mouth MP 128.23', // ★ briefing
     still: { card: `${CCTV}/166089?t={m}`, detail: `${CCTV}/166089?t={m}`, wall: `${CCTV}/166089?t={m}` } },

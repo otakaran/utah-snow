@@ -35,7 +35,7 @@ export const CORRIDORS = {
     signs: { travel: ['6019', '6040'], advisory: ['3687', '3688', '3707'] },
     vmsCams: ['udot-vms-100032', 'udot-vms-100083', 'udot-vms-100219'],
     crossChecks: ['alta alerts[type=road-status]', "snowbird roads 'Highway SR-210'", 'snowbird alerts'],
-    briefingCams: ['udot-164559', 'udot-166033', 'udot-165271'],
+    briefingCams: ['udot-167778', 'udot-166033', 'udot-165271'],
   },
   bcc: {
     label: 'Big Cottonwood',
@@ -45,7 +45,7 @@ export const CORRIDORS = {
     passes: [{ name: 'SR-190 Big Cottonwood Canyon', rowId: 12, apiId: 97 }],
     signs: { travel: ['6019', '6040'], advisory: ['2440'] },
     crossChecks: ['brighton /api/reportpal-roads', "brighton comments 'Road'"],
-    briefingCams: ['udot-164333', 'udot-164818', 'udot-165825'],
+    briefingCams: ['udot-167802', 'udot-164818', 'udot-167944'],
   },
   parleys: {
     label: 'Parleys / Park City',
@@ -94,7 +94,7 @@ export const SIGN_SEARCH = ['Cottonwood', 'SR-210', 'Parley'] as const;
 // listed; their CamDef flags hide them.
 const LCC_CAMS = [
   // LCC canyon 1-12
-  'udot-164559',
+  'udot-167778',
   'udot-164806',
   'udot-164767',
   'udot-164768',
@@ -112,7 +112,7 @@ const LCC_CAMS = [
   'udot-164835',
   'udot-164335',
   'udot-164812',
-  'udot-164567',
+  'udot-167426',
   'udot-165939',
   // LCC VMS GIFs 20-22
   'udot-vms-100032',
@@ -120,13 +120,13 @@ const LCC_CAMS = [
   'udot-vms-100219',
 ] as const;
 const BCC_CAMS = [
-  'udot-164333',
-  'udot-164416',
+  'udot-167802',
+  'udot-167437',
   'udot-164788',
   'udot-165945',
   'udot-164818',
   'udot-165123',
-  'udot-165825',
+  'udot-167944',
 ] as const;
 
 export const RESORT_ROAD_CAMS = {

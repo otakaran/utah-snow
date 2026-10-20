@@ -7,7 +7,7 @@ import synthetic from './fixtures/udot-cam-check/udot-cam-check-synthetic.json?r
 import { type FetchCtx, type FetchOpts, type FetchX, ValidationError } from './types.ts';
 import { batchCams, batchIndex, CCTV, type UdotCamCheckRaw, udotCamCheck, udotCamCheckDue } from './udot-cam-check.ts';
 
-const at = (h: number) => Date.UTC(2026, 9, 13, h, 50);
+const at = (h: number) => Date.UTC(2026, 9, 13, h, 45);
 const BATCHES: UdotCamCheckRaw[] = JSON.parse(live);
 const parse = (raw: unknown, now: number, prev?: UdotCamsRow) =>
   udotCamCheck.parse(raw as UdotCamCheckRaw, { now, prev: prev ? { 'udot:cams': prev } : {} }).rows[
@@ -32,8 +32,8 @@ describe('udot-cam-check', () => {
     expect(Object.keys(row ?? {})).toHaveLength(49);
     const offline = Object.entries(row ?? {}).flatMap(([id, s]) => (s.online ? [] : [id]));
     expect(offline.sort()).toEqual([...OFFLINE].sort());
-    expect(row?.['udot-165868']).toEqual({ online: true, checkedAt: '2026-10-13T11:50:00.000Z' }); // GIF (RWIS)
-    expect(row?.['udot-164559']).toEqual({ online: true, checkedAt: '2026-10-13T09:50:00.000Z' });
+    expect(row?.['udot-165868']).toEqual({ online: true, checkedAt: '2026-10-13T11:45:00.000Z' }); // GIF (RWIS)
+    expect(row?.['udot-167778']).toEqual({ online: true, checkedAt: '2026-10-13T09:45:00.000Z' });
   });
 
   it('in season (synthetic): recoveries, 404s and the placeholder update; 403/timeouts keep the old state', () => {
@@ -43,20 +43,20 @@ describe('udot-cam-check', () => {
       'udot-166000': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
       'udot-gone': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
     };
-    const now = Date.UTC(2026, 0, 15, 9, 50);
+    const now = Date.UTC(2026, 0, 15, 9, 45);
     const row = parse(JSON.parse(synthetic), now, prev);
-    expect(row['udot-155967']).toEqual({ online: true, checkedAt: '2026-01-15T09:50:00.000Z' });
+    expect(row['udot-155967']).toEqual({ online: true, checkedAt: '2026-01-15T09:45:00.000Z' });
     expect(row['udot-164806']?.online).toBe(false);
     expect(row['udot-165174']?.online).toBe(false);
     expect(row['udot-164768']).toEqual(prev['udot-164768']);
     expect(row['udot-166000']).toEqual(prev['udot-166000']);
     expect(row['udot-gone']).toBeUndefined();
-    expect(row['udot-164559']?.online).toBe(true);
+    expect(row['udot-167778']?.online).toBe(true);
   });
 
   it('validation gate: no image answer in the batch -> ValidationError', () => {
     expect(() => parse('garbage', at(9))).toThrow(ValidationError);
-    const blocked = { batch: 0, checks: { 'udot-164559': { status: 403, type: 'text/html' } } };
+    const blocked = { batch: 0, checks: { 'udot-167778': { status: 403, type: 'text/html' } } };
     expect(() => parse(blocked, at(9))).toThrow(ValidationError);
   });
 
