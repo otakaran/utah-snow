@@ -2,10 +2,13 @@
 // Job ids: 'resort:<id>', 'nws-grid:<resort>:<point>', 'avy', else the adapter file name. A job listed here but not
 // registered in src/worker/sources/index.ts is skipped, so slots can name jobs before their adapters exist.
 
-export const BUDGET = 45; // external subrequests per invocation (platform limit 50); redirects and caches.* count
-export const INTERNAL_BUDGET = 25; // D1 + KV calls per invocation
+// The free plan allows 50 subrequests per invocation and counts D1 and KV calls with the fetches, so a tick is
+// admitted against both caps: fetches <= BUDGET and fetches + TICK_CALLS + (1 D1 batch + maxPuts) per job <= 50.
+export const BUDGET = 45; // external subrequests per invocation (fetchx throws past it); redirects and caches.* count
+export const SUBREQUEST_LIMIT = 50; // platform cap per invocation: fetches, D1 and KV calls alike
+export const TICK_CALLS = 2; // D1 calls a tick spends outside its jobs: the tick-start read and the cron:last batch
 export const MAX_CONN = 5; // concurrent outbound fetches; the platform's 6th header-wait slot stays free for KV
-export const TICK_DEADLINE_MS = 45_000; // no fetch permit after scheduledTime + this
+export const TICK_DEADLINE_MS = 45_000; // no fetch permit after the tick's start + this (cron triggers land 30-50 s late)
 export const PROBE_TIMEOUT_MS = 6_000; // /api/debug/probe per-host timeout
 
 // Admission order inside a tick. 'nws-grid' matches every 'nws-grid:*' job.
@@ -58,7 +61,7 @@ export const SLOTS: readonly SlotJobs[] = [
     morning: [],
   },
   {
-    always: ['stake-alta', 'stake-skiutah', 'youtube', 'avy', 'nws-text', 'nws-grid:snowbird:summit'],
+    always: ['stake-alta', 'stake-skiutah', 'youtube', 'nws-text', 'nws-grid:snowbird:summit'],
     morning: ['resort:alta', 'resort:snowbird', 'resort:snowbasin'],
   },
   {
@@ -73,6 +76,7 @@ export const SLOTS: readonly SlotJobs[] = [
       'resort:snowbasin',
       'alta-weather',
       'snotel',
+      'avy', // hourly; slot 3 (keyed YouTube, 24) would reach 51 subrequests with it
       'nws-grid:brighton:summit',
     ],
     morning: [],
@@ -106,6 +110,7 @@ export const SLOTS: readonly SlotJobs[] = [
       'resort:snowbasin',
       'nws-text',
       'nws-grid:deer-valley:summit',
+      'maintenance',
     ],
     morning: [],
   },
@@ -117,7 +122,6 @@ export const SLOTS: readonly SlotJobs[] = [
       'resort:solitude',
       'resort:deer-valley',
       'nws-grid:snowbasin:base',
-      'maintenance',
     ],
     morning: [],
   },
@@ -130,8 +134,9 @@ export const SLOTS: readonly SlotJobs[] = [
 export const MORNING_HOURS = { from: 4, to: 10 } as const; // Denver local, inclusive
 
 // 'maintenance' runs only in this slot at these UTC hours (08Z prune + HDRelay, 09-11Z UDOT cams),
-// plus Mondays at 12Z (NWS /points).
-export const MAINT = { slot: 10, utcHours: [8, 9, 10, 11], mondayUtcHour: 12 } as const;
+// plus Mondays at 12Z (NWS /points). Slot 9 is the lightest slot that has no roads run: its 17 subrequests
+// would push slot 10 (roads + the group B resorts) past the 50-subrequest cap.
+export const MAINT = { slot: 9, utcHours: [8, 9, 10, 11], mondayUtcHour: 12 } as const;
 
 // counters key `cpu-suspect:{job}:{date}` lives this long; /api/health?strict=1 fails on any from the last 24 h.
 export const CPU_SUSPECT_TTL_MS = 7 * 86_400_000;

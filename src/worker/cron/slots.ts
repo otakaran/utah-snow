@@ -9,7 +9,7 @@ export const isMorning = (ms: number): boolean => {
   const h = localHour(ms);
   return h >= MORNING_HOURS.from && h <= MORNING_HOURS.to;
 };
-/** Slot 10 at 08-11Z, plus Mondays at 12Z. */
+/** MAINT.slot (9) at 08-11Z, plus Mondays at 12Z. */
 export function isMaintenance(ms: number): boolean {
   if (slotOf(ms) !== MAINT.slot) return false;
   const h = Math.floor(ms / HOUR) % 24;

@@ -10,7 +10,7 @@ const at = (iso: string) => Date.parse(iso);
 const SLOT0 = at('2026-12-28T15:00:00Z'); // stake-alta, stake-skiutah, roads
 const SLOT1 = at('2026-12-28T15:05:00Z'); // resort:snowbasin
 const SLOT3 = at('2026-12-28T15:15:00Z'); // youtube
-const MAINT = at('2026-12-29T09:50:00Z');
+const MAINT = at('2026-12-29T09:45:00Z');
 
 function job(id: string, rows: string[], parse: (ctx: ParseCtx) => Output, extra: Partial<Source> = {}): Source {
   return {

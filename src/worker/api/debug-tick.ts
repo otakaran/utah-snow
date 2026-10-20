@@ -1,33 +1,24 @@
 // POST /api/debug/tick: the fallback for Cloudflare cron outages (.github/workflows/tick.yml, every 5 min).
-// Gate: the probe route's (X-Probe-Key = PROBE_KEY, constant-time; else the unknown-route 404). When cron:last
-// started < 4 min ago it skips, so the real cron and this fallback can both run; else it awaits runTick exactly
-// like `scheduled` does. Past the gate it also arms the Scheduler alarm chain (waitUntil). no-store.
-import { isoUtc, MIN } from '../../shared/time.ts';
-import { runTick } from '../cron/dispatcher.ts';
+// Gate: the probe route's (X-Probe-Key = PROBE_KEY, constant-time; else the unknown-route 404). Past it, the
+// Scheduler DO runs the tick (scheduler.ts) exactly as it does for `scheduled`: it skips when cron:last started
+// < 4 min ago or a tick is already running, so the real cron and this fallback can both run; it also arms the
+// alarm chain. The response is the DO's TickOutcome. no-store.
 import { json, notFound } from '../http.ts';
 import { safeEqual } from '../lib/hash.ts';
-import { ensureScheduler } from '../scheduler.ts';
-import { readCronLastAt } from '../store/source-state.ts';
-
-const FRESH_MS = 4 * MIN;
+import { tickViaScheduler } from '../scheduler.ts';
 
 /** Test seams: the tick and the clock. */
 export interface DebugTickDeps {
-  runTick?: typeof runTick;
+  tick?: typeof tickViaScheduler;
   now?: () => number;
 }
 
 export function makeDebugTick(deps: DebugTickDeps = {}) {
-  const tick = deps.runTick ?? runTick;
+  const tick = deps.tick ?? tickViaScheduler;
   const clock = deps.now ?? (() => Date.now());
-  return async (req: Request, env: Env, ctx: ExecutionContext): Promise<Response> => {
+  return async (req: Request, env: Env): Promise<Response> => {
     if (!safeEqual(req.headers.get('X-Probe-Key'), env.PROBE_KEY)) return notFound();
-    ctx.waitUntil(ensureScheduler(env));
-    const now = clock();
-    const last = await readCronLastAt(env.DB);
-    if (last !== null && now - last < FRESH_MS) return json({ skipped: 'fresh', lastTickAt: isoUtc(last) });
-    const { cron } = await tick(env, now);
-    return json({ ran: true, slot: cron.slot, jobs: cron.jobs, deferred: cron.deferred });
+    return json(await tick(env, clock()));
   };
 }
 

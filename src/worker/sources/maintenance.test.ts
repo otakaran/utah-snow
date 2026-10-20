@@ -4,7 +4,7 @@ import { type FetchCtx, type FetchX, ValidationError } from './types.ts';
 
 const at = (iso: string) => Date.parse(iso);
 // 2026-12-28 is a Monday.
-const HOURS = { hdrelay: '2026-12-29T08:50:00Z', udot: '2026-12-29T09:50:00Z', points: '2026-12-28T12:50:00Z' };
+const HOURS = { hdrelay: '2026-12-29T08:45:00Z', udot: '2026-12-29T09:45:00Z', points: '2026-12-28T12:45:00Z' };
 
 function mockFetch(contentType: string): { fx: FetchX; calls: string[] } {
   const calls: string[] = [];
@@ -18,7 +18,7 @@ function mockFetch(contentType: string): { fx: FetchX; calls: string[] } {
 const ctxAt = (iso: string, fx: FetchX): FetchCtx => ({
   fetch: fx,
   now: at(iso),
-  slot: 10,
+  slot: 9,
   morning: false,
   keyed: { yt: false, udot: false },
   secrets: {},
@@ -31,9 +31,9 @@ describe('maintenance', () => {
     const due = (iso: string) => [maintenance.rowsDue?.(at(iso)), maintenance.maxSubrequests(ctxAt(iso, fx))];
     expect(due(HOURS.hdrelay)).toEqual([['hdrelay:config'], 12]);
     expect(due(HOURS.udot)).toEqual([['udot:cams'], 17]);
-    expect(due('2026-12-29T11:50:00Z')).toEqual([['udot:cams'], 17]);
+    expect(due('2026-12-29T11:45:00Z')).toEqual([['udot:cams'], 17]);
     expect(due(HOURS.points)).toEqual([['nws:points'], 17]);
-    expect(due('2026-12-29T12:50:00Z')).toEqual([[], 0]); // Tuesday
+    expect(due('2026-12-29T12:45:00Z')).toEqual([[], 0]); // Tuesday
   });
 
   it('fetches and parses only the due sub; a failed gate throws ValidationError for its row', async () => {
@@ -54,7 +54,7 @@ describe('maintenance', () => {
 
   it('outside its hours it fetches nothing and writes no row', async () => {
     const m = mockFetch('image/jpeg');
-    const ctx = ctxAt('2026-12-29T14:50:00Z', m.fx);
+    const ctx = ctxAt('2026-12-29T14:45:00Z', m.fx);
     const raw = await maintenance.fetch(ctx);
     expect(m.calls).toEqual([]);
     expect(maintenance.parse(raw, { now: ctx.now, prev: {} }).rows).toEqual({});

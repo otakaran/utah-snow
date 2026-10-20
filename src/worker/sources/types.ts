@@ -16,7 +16,8 @@ export interface Source<Raw = unknown> {
   reads?: readonly string[]; // other jobs' rows whose last-good payloads the dispatcher also loads into ctx.prev
   staleByRow?: Readonly<Record<string, number>>; // per-row staleAfterMin overrides (rows not listed use the default)
   rowsDue?(now: number): readonly string[]; // rows a run at `now` writes when only some are due (maintenance)
-  maxSubrequests(ctx: FetchCtx): number; // worst case incl. redirects; the dispatcher admits jobs against the budget of 45
+  maxSubrequests(ctx: FetchCtx): number; // worst case incl. redirects; the dispatcher admits jobs against BUDGET (45)
+  maxPuts?: number; // KV puts per run (stake frames); with its one D1 batch they count against SUBREQUEST_LIMIT (50)
   probes: { hostId: string; url: string }[]; // what /api/debug/probe GETs for this source (the allowlist is the union)
   fetch(ctx: FetchCtx): Promise<Raw>; // all I/O via ctx.fetch (fetchx); never D1/KV
   parse(raw: Raw, ctx: ParseCtx): Output; // pure; throws ValidationError → rows keep last-good payload

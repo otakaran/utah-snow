@@ -6,9 +6,10 @@ import {
 } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { isoToMs, MIN } from '../shared/time.ts';
+import { isoToMs, isoUtc, MIN } from '../shared/time.ts';
 import worker from './index.ts';
-import { nextAlarmAt } from './scheduler.ts';
+import { nextAlarmAt, tickViaScheduler } from './scheduler.ts';
+import type { Source } from './sources/types.ts';
 import { cronLastStmt, readCronLastAt } from './store/source-state.ts';
 import { clearStore, migrate } from './store/test-db.ts';
 
@@ -17,6 +18,17 @@ const at = (min: number, sec: number) => NOON + min * MIN + sec * 1000;
 const main = () => env.SCHEDULER.get(env.SCHEDULER.idFromName('main'));
 const alarmOf = () => runInDurableObject(main(), (_o, state) => state.storage.getAlarm());
 const onChain = (t: number | null) => t !== null && t > Date.now() && t % (5 * MIN) === 90_000;
+
+/** A slot-0 job whose fetch takes `ms`; never touches the network. */
+const slow = (id: string, ms: number): Source => ({
+  id,
+  rows: [id],
+  probes: [],
+  staleAfterMin: 30,
+  maxSubrequests: () => 1,
+  fetch: () => new Promise((resolve) => setTimeout(() => resolve({ id }), ms)),
+  parse: (raw) => ({ rows: { [id]: raw } }),
+});
 
 beforeEach(async () => {
   await migrate(env.DB);
@@ -46,5 +58,23 @@ describe('Scheduler', () => {
     expect(await runDurableObjectAlarm(main())).toBe(true);
     expect(onChain(await alarmOf())).toBe(true);
     expect(await readCronLastAt(env.DB)).toBe(last);
+  });
+
+  it('tick: runs inside the DO while cron:last is absent, then /tick skips as fresh and arms the chain', async () => {
+    const out = await runInDurableObject(main(), (o) => o.tick(NOON, { sources: [] }));
+    expect(out).toEqual({ ran: true, slot: 0, jobs: [], deferred: [] });
+    const last = await readCronLastAt(env.DB);
+    expect(last).not.toBeNull();
+    expect(await tickViaScheduler(env, Date.now())).toEqual({ skipped: 'fresh', lastTickAt: isoUtc(last ?? 0) });
+    expect(onChain(await alarmOf())).toBe(true);
+  });
+
+  it('tick: a call while one runs reports busy at once; the running tick still completes', async () => {
+    const [first, second] = await runInDurableObject(main(), (o) =>
+      Promise.all([o.tick(NOON, { sources: [slow('stake-alta', 200)] }), o.tick(NOON)]),
+    );
+    expect(first).toEqual({ ran: true, slot: 0, jobs: ['stake-alta'], deferred: [] });
+    expect(second).toEqual({ skipped: 'busy' });
+    expect(await tickViaScheduler(env, Date.now())).toMatchObject({ skipped: 'fresh' });
   });
 });

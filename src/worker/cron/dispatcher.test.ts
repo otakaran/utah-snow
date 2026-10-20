@@ -1,12 +1,11 @@
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { BUDGET, INTERNAL_BUDGET, SLOTS } from '../../../config/schedule.ts';
+import { BUDGET, SLOTS, SUBREQUEST_LIMIT } from '../../../config/schedule.ts';
 import { isoUtc } from '../../shared/time.ts';
 import { SOURCES } from '../sources/index.ts';
 import { type FetchCtx, type Source, ValidationError } from '../sources/types.ts';
-import { MAX_FRAMES_PER_JOB } from '../store/frames.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
-import { isMaintenance, isMorning, isPruneTick, planTick, runTick, slotOf } from './dispatcher.ts';
+import { internalOf, isMaintenance, isMorning, isPruneTick, planTick, runTick, slotOf } from './dispatcher.ts';
 
 const at = (iso: string) => Date.parse(iso);
 // 2026-12-28 is a Monday; Denver is UTC-7 in winter.
@@ -31,17 +30,17 @@ beforeEach(async () => {
 });
 
 describe('slot math', () => {
-  it('slot = UTC minute / 5, morning = Denver 04-10, maintenance = slot 10 at 08-11Z or Monday 12Z', () => {
+  it('slot = UTC minute / 5, morning = Denver 04-10, maintenance = slot 9 at 08-11Z or Monday 12Z', () => {
     expect(slotOf(at('2026-12-28T15:00:00Z'))).toBe(0);
     expect(slotOf(at('2026-12-28T15:14:59Z'))).toBe(2);
     expect(slotOf(at('2026-12-28T15:55:00Z'))).toBe(11);
     expect(isMorning(at('2026-12-28T11:00:00Z'))).toBe(true); // 04:00 MST
     expect(isMorning(at('2026-12-28T17:59:00Z'))).toBe(true); // 10:59 MST
     expect(isMorning(at('2026-12-28T18:00:00Z'))).toBe(false);
-    expect(isMaintenance(at('2026-12-29T08:50:00Z'))).toBe(true);
-    expect(isMaintenance(at('2026-12-29T08:45:00Z'))).toBe(false);
-    expect(isMaintenance(at('2026-12-28T12:50:00Z'))).toBe(true); // Monday
-    expect(isMaintenance(at('2026-12-29T12:50:00Z'))).toBe(false);
+    expect(isMaintenance(at('2026-12-29T08:45:00Z'))).toBe(true);
+    expect(isMaintenance(at('2026-12-29T08:50:00Z'))).toBe(false);
+    expect(isMaintenance(at('2026-12-28T12:45:00Z'))).toBe(true); // Monday
+    expect(isMaintenance(at('2026-12-29T12:45:00Z'))).toBe(false);
   });
 });
 
@@ -53,10 +52,19 @@ describe('admission', () => {
     expect(plan.deferred.map((s) => s.id)).toEqual(['nws-obs']);
   });
 
+  it('counts the tick-start calls, one D1 batch and the KV puts per job against the 50-subrequest cap', () => {
+    const stake = { ...fake('stake-alta', 1), maxPuts: 5 }; // 1 fetch + 1 batch + 5 puts
+    expect(internalOf([stake, fake('roads', 40)])).toBe(2 + 6 + 1);
+    const fits = planTick(SLOT2_MORNING, [stake, fake('roads', 40)], ctx); // 41 fetches + 9 = 50
+    expect(fits.deferred).toEqual([]);
+    const over = planTick(SLOT2_MORNING, [stake, fake('roads', 41)], ctx); // 42 <= 45, but 42 + 9 = 51
+    expect(over.deferred.map((s) => s.id)).toEqual(['roads']);
+  });
+
   it('maintenance only runs in its hours', () => {
     const src = [fake('maintenance', 17)];
-    expect(planTick(at('2026-12-29T08:50:00Z'), src, ctx).admitted).toHaveLength(1);
-    expect(planTick(at('2026-12-29T14:50:00Z'), src, ctx).admitted).toHaveLength(0);
+    expect(planTick(at('2026-12-29T08:45:00Z'), src, ctx).admitted).toHaveLength(1);
+    expect(planTick(at('2026-12-29T14:45:00Z'), src, ctx).admitted).toHaveLength(0);
   });
 });
 
@@ -64,13 +72,9 @@ describe('admission', () => {
 // 15Z is a Denver morning hour, 20Z is not. Each hour is shifted into every slot.
 const HOURS = ['08', '09', '10', '11', '12', '15', '20'].map((h) => at(`2026-12-28T${h}:00:00Z`));
 
-/** Internal calls (D1 + KV) a tick spends: tick-start read + cron:last write, one batch per job, frame puts. */
-const internalOf = (jobs: readonly Source[]) =>
-  2 + jobs.length + jobs.filter((s) => s.id.startsWith('stake-')).length * MAX_FRAMES_PER_JOB;
-
-/** Worst case over every slot x keyed/keyless x morning x maintenance hour: subrequests, internal calls, deferrals. */
+/** Worst case over every slot x keyed/keyless x morning x maintenance hour: fetches, fetches + internal, deferrals. */
 function worstSlotLoad(sources: readonly Source[]) {
-  const worst = { load: 0, internal: 0, deferred: [] as string[], at: '' };
+  const worst = { load: 0, total: 0, deferred: [] as string[], at: '', totalAt: '' };
   for (const hour of HOURS)
     for (let slot = 0; slot < SLOTS.length; slot++)
       for (const keyed of [true, false]) {
@@ -82,17 +86,18 @@ function worstSlotLoad(sources: readonly Source[]) {
         const load = jobs.reduce((n, s) => n + s.maxSubrequests(c as FetchCtx), 0);
         const label = `${isoUtc(now)} keyed=${keyed}`;
         if (load > worst.load) Object.assign(worst, { load, at: label });
-        worst.internal = Math.max(worst.internal, internalOf(jobs));
+        const total = load + internalOf(jobs);
+        if (total > worst.total) Object.assign(worst, { total, totalAt: label });
         worst.deferred.push(...plan.deferred.map((s) => `${s.id} @ ${label}`));
       }
   return worst;
 }
 
 describe('budget matrix (real registry)', () => {
-  it(`no slot schedules more than ${BUDGET} subrequests or ${INTERNAL_BUDGET} internal calls, nothing deferred`, () => {
+  it(`no slot schedules more than ${BUDGET} fetches or ${SUBREQUEST_LIMIT} subrequests in all, nothing deferred`, () => {
     const worst = worstSlotLoad(SOURCES);
     expect(worst.load, worst.at).toBeLessThanOrEqual(BUDGET);
-    expect(worst.internal).toBeLessThanOrEqual(INTERNAL_BUDGET);
+    expect(worst.total, worst.totalAt).toBeLessThanOrEqual(SUBREQUEST_LIMIT);
     expect(worst.deferred).toEqual([]);
   });
 
@@ -112,7 +117,7 @@ describe('runTick', () => {
     const first = await runTick(env, SLOT2_MORNING, { sources });
     expect(first.cron.jobs).toEqual(['stake-alta', 'roads', 'nws-obs']);
     expect(first.logs.map((l) => l.status).sort()).toEqual(['error', 'ok', 'ok']);
-    expect(first.internal).toBeLessThanOrEqual(25);
+    expect(first.internal).toBe(2 + 3); // tick-start calls + one batch per job, no frames
 
     const row = await env.DB.prepare("SELECT * FROM source_state WHERE source_id = 'obs'").first<{
       status: string;
@@ -133,8 +138,8 @@ describe('runTick', () => {
 });
 
 describe('08Z prune', () => {
-  it('runs only at slot 10 of 08Z and deletes expired frames, counters and old histories', async () => {
-    const t = at('2026-12-29T08:50:00Z');
+  it('runs only at slot 9 of 08Z and deletes expired frames, counters and old histories', async () => {
+    const t = at('2026-12-29T08:45:00Z');
     expect([t, t - 5 * 60_000, t + 3_600_000].map(isPruneTick)).toEqual([true, false, false]);
     const now = Date.now(); // the prune cuts relative to the tick's start, not its scheduled time
     const day = 86_400_000;

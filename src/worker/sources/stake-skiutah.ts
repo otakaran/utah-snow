@@ -42,6 +42,7 @@ export const stakeSkiutah: Source<SkiUtahShot[]> = {
   staleAfterMin: 45,
   rows: [ROW],
   maxSubrequests: () => SKIUTAH_STAKES.length, // one conditional GET per cam; redirects are not followed
+  maxPuts: SKIUTAH_STAKES.length,
   probes: [{ hostId: 'skiutah', url: `${SKIUTAH_BLOB_URL}${SKIUTAH_STAKES[0].blob}` }],
   async fetch(ctx: FetchCtx): Promise<SkiUtahShot[]> {
     const ts = Math.floor(ctx.now / 1000);

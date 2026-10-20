@@ -89,7 +89,7 @@
 - One Worker: assets with SPA fallback, `run_worker_first: ["/api/*"]`, custom domain route creates DNS + cert.
 - Redeploys drop old chunks: the client reloads once on chunk-load error; the wall reloads when `X-Build` differs.
 - D1 holds all structured state (last-good per source, tracker, histories, counters); cron writes `cron:last` first.
-- Scheduling: cron trigger + DO alarm chain (`scheduler.ts`, 5 min + 90 s, armed by `scheduled`, `/api/health`, `/api/debug/tick`) + `tick.yml`; the alarm and tick skip when `cron:last` < 4 min old.
+- Scheduling: every tick runs inside the `Scheduler` DO (`scheduler.ts`): a stateless Worker gets 10 ms CPU per invocation on the free plan and a tick needs 20-25 ms, a DO gets 30 s. Triggers: the cron trigger, the DO alarm chain (5 min + 90 s, armed by `scheduled`, `/api/health`, `/api/debug/tick`) and `tick.yml`; the DO runs one tick at a time and skips when `cron:last` < 4 min old.
 - `caches.default` fronts only `/api/snapshot`, `/api/cams`, `/api/stake/*`. No Workers Cache, no R2.
 - Open-Meteo is called from the browser only (30 min, 60 on the wall, visible only, shared cache, 429 backoff).
 - The pick runs in the browser (`src/shared/pick/`): crew pick by default, "as me" per person; the wall shows crew.
@@ -103,8 +103,8 @@
 - Cam stills (UDOT, Alta, Ski Utah, Snowbasin) and scrubber frames are plain `<img>` only: no fetch, no canvas, no `crossorigin`.
 - YouTube IDs churn: ordered regexes, CamStreamer and discovery; IDs are only seeds in `config/youtube.ts`.
 - KV allows 1,000 writes/day, used only for frames (about 480).
-- Subrequest budget is 45 per tick (redirects and `caches.*` count); 6 connections at a time (fetchx 5, the 6th for KV).
-- CPU is 10 ms: no DOM parsing, no un-memoized Intl.
+- Subrequests are 50 per invocation on the free plan and D1/KV calls count too: the dispatcher admits jobs while fetches <= 45 and fetches + 2 + (one D1 batch + `maxPuts`) per job <= 50; 6 connections at a time (fetchx 5, the 6th for KV).
+- CPU is 10 ms per API request, 30 s in the DO where ticks run (no DOM parsing, no un-memoized Intl); cron triggers fire 30-50 s late, so the 45 s tick deadline counts from the tick's actual start.
 - Snowbird's API returns 500 for any foreign Origin; NWS 403s without a UA; HDRelay needs an explicit UA and never a Referer.
 - MtnPowder sits behind Imperva: `src/web/data/mtnpowder.ts` refetches blocked or red rows in the browser with the same
   parser (`src/shared/mtnpowder.ts`). `blocked` rows are not critical (`isCritical`), so they never fail `?strict=1`.

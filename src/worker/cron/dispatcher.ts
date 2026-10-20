@@ -1,12 +1,13 @@
-// Cron dispatcher (spec §5.3): one */5 trigger. Per tick:
-//   1. admit the slot's registered jobs in PRIORITY order while sum(maxSubrequests) <= BUDGET; the rest are deferred;
+// Cron dispatcher (spec §5.3): runTick, called inside the Scheduler DO (scheduler.ts) for every trigger. Per tick:
+//   1. admit the slot's registered jobs in PRIORITY order while sum(maxSubrequests) <= BUDGET and, with the tick's
+//      D1 and KV calls (internalOf), <= SUBREQUEST_LIMIT; the rest are deferred;
 //   2. D1 call 1: previous cron:last, every row's fetched_at, last-good payloads and other prev inputs (`reads`,
 //      counters, resort_history) for the admitted jobs;
 //   3. D1 call 2: cron:last, deferrals, cpu-suspect counters (previous jobs that wrote none of their due rows) and,
 //      at the 08Z maintenance tick, the D1 prune (store/prune.ts);
 //   4. run admitted jobs under Promise.allSettled; each writes its own rows as soon as it settles (cron/job.ts);
 //   5. one log line per job.
-import { BUDGET, PRIORITY, TICK_DEADLINE_MS } from '../../../config/schedule.ts';
+import { BUDGET, PRIORITY, SUBREQUEST_LIMIT, TICK_CALLS, TICK_DEADLINE_MS } from '../../../config/schedule.ts';
 import { createFetchx } from '../lib/fetchx.ts';
 import { errorText, logLine } from '../lib/log.ts';
 import { SOURCES } from '../sources/index.ts';
@@ -36,6 +37,10 @@ export interface TickPlan {
   deferred: Source[];
 }
 
+/** D1 + KV calls a tick with these jobs spends: TICK_CALLS, then one batch and the KV puts per job. */
+export const internalOf = (jobs: readonly Source[]): number =>
+  TICK_CALLS + jobs.reduce((n, s) => n + 1 + (s.maxPuts ?? 0), 0);
+
 /** Pure admission. Job ids without a registered source are skipped (adapters not written yet). */
 export function planTick(ms: number, sources: readonly Source[], ctx: FetchCtx): TickPlan {
   const slot = slotOf(ms);
@@ -50,7 +55,8 @@ export function planTick(ms: number, sources: readonly Source[], ctx: FetchCtx):
   let used = 0;
   for (const src of jobs) {
     const need = src.maxSubrequests(ctx);
-    if (deferred.length === 0 && used + need <= BUDGET) {
+    const fits = used + need <= BUDGET && used + need + internalOf([...admitted, src]) <= SUBREQUEST_LIMIT;
+    if (deferred.length === 0 && fits) {
       admitted.push(src);
       used += need;
     } else deferred.push(src); // admission stops at the first job that does not fit
@@ -76,7 +82,7 @@ export interface TickResult {
   maintenance: boolean;
   pruned: boolean;
   ext: number;
-  internal: number; // D1 + KV calls (INTERNAL_BUDGET = 25)
+  internal: number; // D1 + KV calls actually spent (<= internalOf(admitted))
   logs: JobLog[];
 }
 
@@ -87,8 +93,8 @@ export interface TickOpts {
 
 export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpts = {}): Promise<TickResult> {
   const sources = opts.sources ?? SOURCES;
-  const startedAt = Date.now();
-  const fx = createFetchx({ deadlineAt: scheduledTime + TICK_DEADLINE_MS, fetchImpl: opts.fetchImpl });
+  const startedAt = Date.now(); // cron triggers land 30-50 s after scheduledTime, so the deadline counts from here
+  const fx = createFetchx({ deadlineAt: startedAt + TICK_DEADLINE_MS, fetchImpl: opts.fetchImpl });
   const ctx: FetchCtx = {
     fetch: fx,
     now: startedAt,
@@ -129,7 +135,7 @@ export async function runTick(env: CronEnv, scheduledTime: number, opts: TickOpt
     maintenance: plan.maintenance,
     pruned,
     ext: fx.used(),
-    internal: 2 + plan.admitted.length + logs.reduce((n, l) => n + l.frames, 0),
+    internal: TICK_CALLS + plan.admitted.length + logs.reduce((n, l) => n + l.frames, 0),
     logs,
   };
   logLine({ tick: plan.slot, jobs: cron.jobs.length, deferred: cron.deferred, suspects, pruned, ext: result.ext });

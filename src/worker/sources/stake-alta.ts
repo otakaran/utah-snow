@@ -20,6 +20,7 @@ export const stakeAlta: Source<StakeShot> = {
   staleAfterMin: 15,
   rows: [ROW],
   maxSubrequests: () => 1, // one conditional GET; redirects are not followed
+  maxPuts: 1,
   probes: [{ hostId: 'alta-do-stake', url: STAKE_ALTA_URL }], // cam-status probes the same host as 'alta-do'
   async fetch(ctx: FetchCtx): Promise<StakeShot> {
     const prev = readCam(ctx.prev[ROW], STAKE_ALTA_CAM);
