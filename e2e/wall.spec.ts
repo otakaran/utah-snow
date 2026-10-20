@@ -94,7 +94,9 @@ test('a new X-Build on /api/snapshot reloads the wall exactly once', async ({ pa
   page.on('response', (res) => {
     if (new URL(res.url()).pathname === '/api/snapshot') snapshots += 1;
   });
-  await page.goto('/#/wall');
+  // hls=0: a reload while a live HLS player is still loading its playlist surfaces as an unhandled
+  // "access control checks" page error on Linux WebKit (CI's phone project), which is noise for this test.
+  await page.goto('/#/wall?hls=0');
   // The reloaded page sees the same foreign build too; the 10-min guard keeps it from reloading again.
   await expect.poll(() => [loads, snapshots >= 2]).toEqual([2, true]);
   await expect(page.getByTestId('wall-tile')).toHaveCount(9);
