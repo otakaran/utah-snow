@@ -81,7 +81,7 @@ describe('/api/cams', () => {
       type: 'iframe',
       url: 'https://snowbird.roundshot.com/tv/',
     });
-    expect(cams.get('udot-167778')).toMatchObject({ status: 'ok', online: null, live: null });
+    expect(cams.get('udot-171387')).toMatchObject({ status: 'ok', online: null, live: null });
     const collins = cams.get('alta-collins-stake');
     expect(collins).toMatchObject({ status: 'unknown', timelapse: { provider: 'archive', available: false } });
     expect(collins?.latestFrame).toBeUndefined();
@@ -117,7 +117,7 @@ describe('/api/cams', () => {
         },
         now - 2 * MIN,
       ),
-      row('udot:cams', { 'udot-167778': { online: false, checkedAt: iso(now) } }, now - 3 * MIN),
+      row('udot:cams', { 'udot-171387': { online: false, checkedAt: iso(now) } }, now - 3 * MIN),
       row(
         'yt:state',
         {
@@ -155,7 +155,7 @@ describe('/api/cams', () => {
     const mineral = cams.get('snowbird-mineral-basin');
     expect(mineral?.status).toBe('offline');
     expect(mineral?.still.card.startsWith('https://b15.hdrelay.com/camera/')).toBe(true); // foreign host ignored
-    expect(cams.get('udot-167778')).toMatchObject({ status: 'offline', online: false });
+    expect(cams.get('udot-171387')).toMatchObject({ status: 'offline', online: false });
     expect(cams.get('brighton-top-of-crest')).toMatchObject({
       status: 'live',
       online: true,

@@ -1,72 +1,72 @@
 {
- "_note": "SYNTHETIC in-season batch (UDOT re-issued all Cctv ids on 2026-10-08, so no Wayback capture can match these ids). Batch 0 at 2026-01-15 09:50Z: 155967 back online (JPEG), 164806 a 404, 164768 an HTML 403 from the edge and 166000 timed out (both keep their previous state), 165174 the PNG placeholder; the rest live.",
+ "_note": "SYNTHETIC in-season batch (UDOT re-issued all Cctv ids on 2026-10-08, so no Wayback capture can match these ids). Batch 0 at 2026-01-15 09:50Z: 170413 back online (JPEG), 170639 a 404, 170487 an HTML 403 from the edge and 172050 timed out (both keep their previous state), 170600 the PNG placeholder; the rest live.",
  "batch": 0,
  "checks": {
-  "udot-167778": {
+  "udot-171387": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-164806": {
+  "udot-170639": {
    "status": 404,
    "type": "text/html"
   },
-  "udot-164767": {
+  "udot-170448": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-164768": {
+  "udot-170487": {
    "status": 403,
    "type": "text/html"
   },
-  "udot-166033": {
+  "udot-171450": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-166000": {
+  "udot-172050": {
    "status": 0,
    "err": "DeadlineError"
   },
-  "udot-165999": {
+  "udot-171134": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-165998": {
+  "udot-172125": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-165174": {
+  "udot-170600": {
    "status": 200,
    "type": "image/png"
   },
-  "udot-155967": {
+  "udot-170413": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-165175": {
+  "udot-171137": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-165271": {
+  "udot-172445": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-165574": {
+  "udot-170476": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-164804": {
+  "udot-171139": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-164835": {
+  "udot-172145": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-164335": {
+  "udot-171415": {
    "status": 200,
    "type": "image/jpeg"
   },
-  "udot-164812": {
+  "udot-172123": {
    "status": 200,
    "type": "image/jpeg"
   }

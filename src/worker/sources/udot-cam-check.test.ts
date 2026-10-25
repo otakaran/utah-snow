@@ -13,7 +13,7 @@ const parse = (raw: unknown, now: number, prev?: UdotCamsRow) =>
   udotCamCheck.parse(raw as UdotCamCheckRaw, { now, prev: prev ? { 'udot:cams': prev } : {} }).rows[
     'udot:cams'
   ] as UdotCamsRow;
-const OFFLINE = ['udot-155967', 'udot-164385', 'udot-141123', 'udot-142189', 'udot-154500'];
+const OFFLINE = ['udot-170413', 'udot-172120', 'udot-170536', 'udot-172460', 'udot-171179'];
 
 describe('udot-cam-check', () => {
   it('49 Cctv cams in batches of 17/16/16 at 09/10/11Z; at most 17 subrequests', () => {
@@ -32,31 +32,31 @@ describe('udot-cam-check', () => {
     expect(Object.keys(row ?? {})).toHaveLength(49);
     const offline = Object.entries(row ?? {}).flatMap(([id, s]) => (s.online ? [] : [id]));
     expect(offline.sort()).toEqual([...OFFLINE].sort());
-    expect(row?.['udot-165868']).toEqual({ online: true, checkedAt: '2026-10-13T11:45:00.000Z' }); // GIF (RWIS)
-    expect(row?.['udot-167778']).toEqual({ online: true, checkedAt: '2026-10-13T09:45:00.000Z' });
+    expect(row?.['udot-172091']).toEqual({ online: true, checkedAt: '2026-10-13T11:45:00.000Z' }); // GIF (RWIS)
+    expect(row?.['udot-171387']).toEqual({ online: true, checkedAt: '2026-10-13T09:45:00.000Z' });
   });
 
   it('in season (synthetic): recoveries, 404s and the placeholder update; 403/timeouts keep the old state', () => {
     const prev: UdotCamsRow = {
-      'udot-155967': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
-      'udot-164768': { online: true, checkedAt: '2026-01-14T09:50:00.000Z' },
-      'udot-166000': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
+      'udot-170413': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
+      'udot-170487': { online: true, checkedAt: '2026-01-14T09:50:00.000Z' },
+      'udot-172050': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
       'udot-gone': { online: false, checkedAt: '2026-01-14T09:50:00.000Z' },
     };
     const now = Date.UTC(2026, 0, 15, 9, 45);
     const row = parse(JSON.parse(synthetic), now, prev);
-    expect(row['udot-155967']).toEqual({ online: true, checkedAt: '2026-01-15T09:45:00.000Z' });
-    expect(row['udot-164806']?.online).toBe(false);
-    expect(row['udot-165174']?.online).toBe(false);
-    expect(row['udot-164768']).toEqual(prev['udot-164768']);
-    expect(row['udot-166000']).toEqual(prev['udot-166000']);
+    expect(row['udot-170413']).toEqual({ online: true, checkedAt: '2026-01-15T09:45:00.000Z' });
+    expect(row['udot-170639']?.online).toBe(false);
+    expect(row['udot-170600']?.online).toBe(false);
+    expect(row['udot-170487']).toEqual(prev['udot-170487']);
+    expect(row['udot-172050']).toEqual(prev['udot-172050']);
     expect(row['udot-gone']).toBeUndefined();
-    expect(row['udot-167778']?.online).toBe(true);
+    expect(row['udot-171387']?.online).toBe(true);
   });
 
   it('validation gate: no image answer in the batch -> ValidationError', () => {
     expect(() => parse('garbage', at(9))).toThrow(ValidationError);
-    const blocked = { batch: 0, checks: { 'udot-167778': { status: 403, type: 'text/html' } } };
+    const blocked = { batch: 0, checks: { 'udot-171387': { status: 403, type: 'text/html' } } };
     expect(() => parse(blocked, at(9))).toThrow(ValidationError);
   });
 
@@ -64,13 +64,13 @@ describe('udot-cam-check', () => {
     const seen: [string, FetchOpts | undefined][] = [];
     const fake = async (url: string, opts?: FetchOpts) => {
       seen.push([url, opts]);
-      const headers = new Headers({ 'content-type': url.endsWith('/154500') ? 'image/png' : 'image/jpeg' });
+      const headers = new Headers({ 'content-type': url.endsWith('/171179') ? 'image/png' : 'image/jpeg' });
       return { status: 200, url, headers, data: null, bytes: 0, blocked: false, wallMs: 1 };
     };
     const fx = Object.assign(fake, { remaining: () => 45, used: () => seen.length }) as unknown as FetchX;
     const raw = await udotCamCheck.fetch({ fetch: fx, now: at(11) } as FetchCtx);
     expect(seen).toHaveLength(16);
     expect(seen.every(([, o]) => o?.method !== 'HEAD' && o?.body === 'none' && o.follow === false)).toBe(true);
-    expect(raw).toMatchObject({ batch: 2, checks: { 'udot-154500': { status: 200, type: 'image/png' } } });
+    expect(raw).toMatchObject({ batch: 2, checks: { 'udot-171179': { status: 200, type: 'image/png' } } });
   });
 });
