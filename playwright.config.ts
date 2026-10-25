@@ -7,6 +7,7 @@ export default defineConfig({
   testDir: 'e2e',
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? undefined : 4, // 8 default workers x 4 projects beside vite preview starved this Mac (2026-10-20)
   reporter: process.env.CI ? 'github' : 'list',
   use: { baseURL, trace: 'retain-on-failure' },
   projects: [
