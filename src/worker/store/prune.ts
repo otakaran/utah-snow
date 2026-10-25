@@ -1,4 +1,4 @@
-// D1 prune (spec §5.3, §6.3): once a day at the 08Z maintenance tick (slot 10), the dispatcher appends these
+// D1 prune (spec §5.3, §6.3): once a day at the 08Z maintenance tick (slot 9, :45), the dispatcher appends these
 // statements to its tick-start batch, so the prune costs no extra D1 call. KV frames expire by their own TTL.
 //   stake_frames > 26 h (the KV TTL), counters past expires_at, drive_cache and histories older than 30 days.
 import { DAY } from '../../shared/time.ts';

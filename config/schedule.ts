@@ -3,10 +3,12 @@
 // registered in src/worker/sources/index.ts is skipped, so slots can name jobs before their adapters exist.
 
 // The free plan allows 50 subrequests per invocation and counts D1 and KV calls with the fetches, so a tick is
-// admitted against both caps: fetches <= BUDGET and fetches + TICK_CALLS + (1 D1 batch + maxPuts) per job <= 50.
+// admitted against both caps: fetches <= BUDGET and fetches + TICK_CALLS + SCHEDULER_CALLS + (1 D1 batch + maxPuts)
+// per job <= 50.
 export const BUDGET = 45; // external subrequests per invocation (fetchx throws past it); redirects and caches.* count
 export const SUBREQUEST_LIMIT = 50; // platform cap per invocation: fetches, D1 and KV calls alike
 export const TICK_CALLS = 2; // D1 calls a tick spends outside its jobs: the tick-start read and the cron:last batch
+export const SCHEDULER_CALLS = 1; // the Scheduler DO's cron:last freshness read before runTick (scheduler.ts run())
 export const MAX_CONN = 5; // concurrent outbound fetches; the platform's 6th header-wait slot stays free for KV
 export const TICK_DEADLINE_MS = 45_000; // no fetch permit after the tick's start + this (cron triggers land 30-50 s late)
 export const PROBE_TIMEOUT_MS = 6_000; // /api/debug/probe per-host timeout
@@ -61,7 +63,7 @@ export const SLOTS: readonly SlotJobs[] = [
     morning: [],
   },
   {
-    always: ['stake-alta', 'stake-skiutah', 'youtube', 'nws-text', 'nws-grid:snowbird:summit'],
+    always: ['stake-alta', 'stake-skiutah', 'youtube', 'nws-grid:snowbird:summit'], // keyed YouTube (24) fills this slot
     morning: ['resort:alta', 'resort:snowbird', 'resort:snowbasin'],
   },
   {
@@ -76,7 +78,8 @@ export const SLOTS: readonly SlotJobs[] = [
       'resort:snowbasin',
       'alta-weather',
       'snotel',
-      'avy', // hourly; slot 3 (keyed YouTube, 24) would reach 51 subrequests with it
+      'avy', // hourly; slot 3 (keyed YouTube, 24) is at the 50-subrequest cap without it
+      'nws-text', // moved from slot 3 for the same reason (AFD/alerts at :25 and :45)
       'nws-grid:brighton:summit',
     ],
     morning: [],

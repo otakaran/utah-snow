@@ -1,5 +1,6 @@
 // Live gates of the pick (spec §10.2 steps 4-5) and the date/route rules behind them (C.7, §4.5).
 import { describe, expect, it } from 'vitest';
+import { HOUR, isoUtc, MIN } from '../time.ts';
 import type { PickArgs, PickResult, ResortId, RoadStatus } from '../types.ts';
 import { parkingRequired } from './calendar.ts';
 import { pick } from './index.ts';
@@ -53,7 +54,8 @@ describe('lift, wind and avalanche gates', () => {
 
   it('reads summit gusts from the live observation after 07:00 and the NWS day max before', () => {
     const late = scenario('2027-01-05 08:00', { o: lccStorm });
-    late.snap.obs.data = { HDP: { station: 'HDP', tempF: 10, windMph: 30, gustMph: 55, dirDeg: 270, at: null } };
+    const at = isoUtc(late.nowMs - 10 * MIN);
+    late.snap.obs.data = { HDP: { station: 'HDP', tempF: 10, windMph: 30, gustMph: 55, dirDeg: 270, at } };
     expect(entry(pick(late), 'snowbird')?.reasons).toContain(
       'Snowbird summit gusts 55 mph – upper lifts may hold (−3)',
     );
@@ -61,6 +63,27 @@ describe('lift, wind and avalanche gates', () => {
     const fc = early.snap.forecast['alta:summit']?.data;
     if (fc) fc.days = [{ date: '2027-01-05', gustMaxMph: 40 } as (typeof fc.days)[number]];
     expect(entry(pick(early), 'alta')?.net).toBeCloseTo(15.9 - 1, 6);
+  });
+
+  it('falls back to the resort sensors when the NWS reading is stale, and says so when both are', () => {
+    const args = scenario('2027-01-05 08:00', { o: lccStorm });
+    const old = isoUtc(args.nowMs - 4 * HOUR);
+    args.snap.obs.data = { HDP: { station: 'HDP', tempF: 10, windMph: 30, gustMph: 55, dirDeg: 270, at: old } };
+    const weather = (w: Record<string, unknown>) => {
+      const data = args.snap.resorts.snowbird.data;
+      if (data)
+        Object.assign(data, { weather: { src: 'snowbird-sensors', obsAt: isoUtc(args.nowMs - 10 * MIN), ...w } });
+      return entry(pick(args), 'snowbird')?.reasons ?? [];
+    };
+    expect(weather({ summitGustMph: 45, summitWindMph: 30 })).toContain(
+      'Snowbird summit gusts 45 mph – upper lifts may hold (−1)',
+    );
+    expect(weather({ summitGustMph: null, summitWindMph: 52 })).toContain(
+      'Snowbird summit gusts 52 mph – upper lifts may hold (−3)',
+    );
+    const both = weather({ summitGustMph: 45, summitWindMph: 30, obsAt: isoUtc(args.nowMs - 5 * HOUR) });
+    expect(both).toContain('Summit wind unknown – NWS HDP and Snowbird sensors older than 3 h');
+    expect(both.some((x) => x.includes('summit gusts'))).toBe(false);
   });
 
   it('charges high avalanche danger', () => {

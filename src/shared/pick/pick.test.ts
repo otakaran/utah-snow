@@ -176,6 +176,10 @@ describe('modes and scope', () => {
     expect(res.ranked).toHaveLength(6);
     expect(res.ranked[0]?.fresh.source).toBe('none');
     expect(pickTomorrow({ ...args, snap, nowMs: Date.parse('2027-01-04T23:00:00Z') })?.pick).toBeTruthy();
+    // 'today' after 07:00 reads live gusts: a {} resort payload has no `weather` and must not throw.
+    const today = pick({ ...args, snap, nowMs: Date.parse('2027-01-05T15:00:00Z') });
+    expect(today.mode).toBe('today');
+    expect(today.ranked.length + today.excluded.length).toBe(6);
   });
 
   it('M3 crew minimum: Eva has 1 A/S day, so the crew takes Solitude while Otakar alone takes Alta', () => {

@@ -1,5 +1,6 @@
 // NWS station observations (spec §5.4 'nws-obs', Appendix C.2). Job id 'nws-obs', row 'obs'.
 // One GET per station (13), all through fetchx; a failed station keeps its last-good entry for up to 6 h.
+// Row 'obs' is advisory (shared/freshness.ts ADVISORY): the pick judges each station by its own `at`.
 // Stored imperial: °C -> °F, km/h -> mph (rounded to 0.1). Values flagged X/B/Q by NWS QC are dropped.
 import { RESORTS, type ResortDef } from '../../../config/resorts.ts';
 import { num, range, round1 } from '../../shared/num.ts';

@@ -8,7 +8,7 @@ import { STRATEGY } from '../../../config/strategy.ts';
 import { group, remaining, skiersOnly } from '../caps.ts';
 import { usable } from '../freshness.ts';
 import { routeCorridors } from '../geo.ts';
-import { formatLocalDate, hm24 } from '../time.ts';
+import { formatLocalDate, HOUR, hm24, isoToMs } from '../time.ts';
 import type { ResortId, RoadStatus } from '../types.ts';
 import { isBusy, parkingRequired, roadName } from './calendar.ts';
 import { type Ctx, lackingDvLift, parkingBooked } from './crew.ts';
@@ -109,18 +109,45 @@ function etoPenalties(ctx: Ctx, r: ResortId): Penalty[] {
   return out;
 }
 
-/** Summit gust: NWS max for the day before 07:00 and in 'tomorrow'; the live observation after 07:00. */
-function gustMph(ctx: Ctx, r: ResortId): number | null {
-  if (ctx.mode === 'preview') return null;
-  if (ctx.mode === 'tomorrow' || ctx.hm < '07:00') {
-    return summitForecast(ctx.snap, r)?.days.find((d) => d.date === ctx.target)?.gustMaxMph ?? null;
-  }
+const READING_FRESH_MS = 3 * HOUR; // a summit reading older than this is not "now" (nws-obs FRESH_MS)
+
+/** An unstamped reading is trusted (the row badge covers it); a stamped one must be under 3 h old. */
+function freshAt(at: string | null | undefined, nowMs: number): boolean {
+  const ms = isoToMs(at ?? null);
+  return ms === null || nowMs - ms <= READING_FRESH_MS;
+}
+
+/** A gust in mph, or the sources that exist but are too old to count (no reason when there is no data at all). */
+type Gust = { mph: number } | { stale: string } | null;
+
+/** After 07:00 in 'today': the NWS station's gust, else the resort's own sensors (gust, else sustained wind). */
+function liveGust(ctx: Ctx, r: ResortId): Gust {
   const def: ResortDef = RESORTS[r];
   const obs = ctx.snap.obs;
-  const live = obs && usable(obs.meta, ctx.nowMs) ? obs.data?.[def.obs.summitGust ?? def.obs.summit]?.gustMph : null;
-  if (live != null) return live;
+  const st = obs && usable(obs.meta, ctx.nowMs) ? obs.data?.[def.obs.summitGust ?? def.obs.summit] : undefined;
+  let stale: string | null = null;
+  if (st?.gustMph != null) {
+    if (freshAt(st.at, ctx.nowMs)) return { mph: st.gustMph };
+    stale = `NWS ${st.station}`;
+  }
   const block = ctx.snap.resorts[r];
-  return block && usable(block.meta, ctx.nowMs) ? (block.data?.weather.summitGustMph ?? null) : null;
+  const w = block && usable(block.meta, ctx.nowMs) ? block.data?.weather : undefined; // `{}` payloads: undefined
+  const mph = w && w.src !== 'none' ? (w.summitGustMph ?? w.summitWindMph ?? null) : null;
+  if (mph != null) {
+    if (freshAt(w?.obsAt, ctx.nowMs)) return { mph };
+    stale = stale ? `${stale} and ${def.name} sensors` : `${def.name} sensors`;
+  }
+  return stale ? { stale } : null;
+}
+
+/** Summit gust: NWS max for the day before 07:00 and in 'tomorrow'; the live reading after 07:00. */
+function gustOf(ctx: Ctx, r: ResortId): Gust {
+  if (ctx.mode === 'preview') return null;
+  if (ctx.mode === 'tomorrow' || ctx.hm < '07:00') {
+    const g = summitForecast(ctx.snap, r)?.days.find((d) => d.date === ctx.target)?.gustMaxMph ?? null;
+    return g === null ? null : { mph: g };
+  }
+  return liveGust(ctx, r);
 }
 
 function livePenalties(ctx: Ctx, r: ResortId): Penalty[] {
@@ -153,11 +180,15 @@ export function penalties(ctx: Ctx, r: ResortId, eff: number): Penalty[] {
   const drive = drivePenalty(ctx, r);
   if (drive) out.push(drive);
   if (ctx.mode === 'today') out.push(...etoPenalties(ctx, r), ...livePenalties(ctx, r));
-  const gust = gustMph(ctx, r);
-  const rule = gust === null ? undefined : STRATEGY.gust.find((x) => gust >= x.gteMph);
-  if (gust !== null && rule) {
-    const why = `${RESORTS[r].name} summit gusts ${wind(gust, ctx.units)} – upper lifts may hold`;
-    out.push({ value: rule.pen, reason: `${why} ${signed(-rule.pen)}` });
+  const gust = gustOf(ctx, r);
+  if (gust && 'stale' in gust) {
+    out.push({ value: 0, reason: `Summit wind unknown – ${gust.stale} older than 3 h` });
+  } else if (gust) {
+    const rule = STRATEGY.gust.find((x) => gust.mph >= x.gteMph);
+    if (rule) {
+      const why = `${RESORTS[r].name} summit gusts ${wind(gust.mph, ctx.units)} – upper lifts may hold`;
+      out.push({ value: rule.pen, reason: `${why} ${signed(-rule.pen)}` });
+    }
   }
   const parking = parkingPenalty(ctx, r);
   if (parking) out.push(parking);

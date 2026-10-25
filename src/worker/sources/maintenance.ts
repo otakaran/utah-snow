@@ -1,4 +1,4 @@
-// Maintenance job (spec §5.3): slot 10 at 08-11Z plus Mondays 12Z. One job id over three sub-jobs, each with its
+// Maintenance job (spec §5.3): slot 9 (:45) at 08-11Z plus Mondays 12Z. One job id over three sub-jobs, each with its
 // own row and due gate: hdrelay-config 08Z (12 subrequests), udot-cam-check 09/10/11Z (17/16/16), nws-points
 // Mondays 12Z (17). The gates never overlap, so a tick spends at most 17. `rowsDue` tells the dispatcher which rows
 // a run writes, so a failed or deferred sub never marks the other subs' rows. The 08Z D1 prune is store work.

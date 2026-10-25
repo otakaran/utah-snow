@@ -23,8 +23,10 @@ describe('gate and age helpers', () => {
   it('dates the list by its newest update, as a clock today and a date before', () => {
     const newest = newestUpdate([lift('2026-04-26T16:34:00-06:00'), lift('2026-04-27T10:28:00-06:00'), lift(null)]);
     expect(newest).toBe('2026-04-27T10:28:00-06:00');
-    expect(asOf(newest, '2026-10-13')).toBe('Apr 27');
-    expect(asOf(newest, '2026-04-27')).toBe('10:28 AM');
+    expect(asOf(newest, '2026-10-13')).toBe('as of Apr 27');
+    expect(asOf(newest, '2026-04-27')).toBe('as of 10:28 AM');
+    expect(asOf(newest, '2026-10-13', 'preseason')).toBe("last season's hours");
+    expect(asOf('2026-11-05T10:00:00-07:00', '2026-11-06', 'preseason')).toBe('as of Nov 5');
     expect(updatedToday(newest, '2026-10-13')).toBe(false);
     expect(updatedToday(null, '2026-10-13')).toBe(true);
   });

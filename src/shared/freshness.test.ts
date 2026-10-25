@@ -39,6 +39,15 @@ describe('freshness', () => {
     expect(badge(meta({ status: 'offseason', okAt: null }), NOW)).toBe('grey');
   });
 
+  it('advisory rows (obs) never go red: amber is their ceiling', () => {
+    expect(badge(meta({ source: 'obs', okAt: null }), NOW)).toBe('amber');
+    expect(badge(meta({ source: 'obs', status: 'error', failCount: 156, okAt: minutesAgo(3 * 1440) }), NOW)).toBe(
+      'amber',
+    );
+    expect(badge(meta({ source: 'obs' }), NOW)).toBe('green');
+    expect(badge(meta({ source: 'snotel', okAt: null }), NOW)).toBe('red');
+  });
+
   it('usable means green or amber', () => {
     expect(usable(meta(), NOW)).toBe(true);
     expect(usable(meta({ status: 'error', failCount: 1 }), NOW)).toBe(true);

@@ -169,7 +169,8 @@ async function refresh(): Promise<void> {
 
 /**
  * Starts the store once (later calls are no-ops). `periodMs` overrides the refresh age (default 30 min, 60 min when a
- * `[data-scale="wall"]` element is on the page). Panels that read `openMeteo` call this; main.tsx may call it too.
+ * `[data-scale="wall"]` element is on the page). Only the panels that read `openMeteo` (ForecastPanel, ModelTable)
+ * call this; the first caller's `periodMs` sticks.
  */
 export function startOpenMeteo(periodMs?: () => number): void {
   if (started) return;

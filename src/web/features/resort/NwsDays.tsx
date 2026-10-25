@@ -1,5 +1,6 @@
-// NWS 3-day point forecast for one resort point (spec §8.7.5): day/night snow split, temperatures, wind and the
-// snow level judged against the point's true elevation (the grid cell's elevation differs, so both are shown).
+// NWS 3-day point forecast for one resort point (spec §8.7.5): day/night snow split (NWS periods 6 AM–6 PM /
+// 6 PM–6 AM), temperatures, wind and the snow level judged against the point's true elevation (the grid cell's
+// elevation differs, so both are shown). The briefing's 8–4 / 4–8 windows are the footnote.
 import { addDays, formatLocalDate } from '../../../shared/time.ts';
 import type { Block, NwsDay, PointForecast } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
@@ -70,7 +71,7 @@ export function NwsDays({ label, block, today, now, units }: Props) {
             <thead>
               <tr>
                 <th scope="col">Day</th>
-                <th scope="col">Snow day / night</th>
+                <th scope="col">Snow 6 AM–6 PM / 6 PM–6 AM</th>
                 <th scope="col">Lo–Hi</th>
                 <th scope="col">Wind</th>
                 <th scope="col">Snow level</th>
@@ -86,8 +87,8 @@ export function NwsDays({ label, block, today, now, units }: Props) {
       )}
       {f ? (
         <p class="rs-dim rs-small">
-          Tonight {qty('snow', f.tonightSnowIn, units)} (16:00–08:00) · tomorrow daytime{' '}
-          {qty('snow', f.tomorrowDaytimeSnowIn, units)}
+          Briefing windows: tonight {qty('snow', f.tonightSnowIn, units)} (4 PM–8 AM) · tomorrow{' '}
+          {qty('snow', f.tomorrowDaytimeSnowIn, units)} (8 AM–4 PM)
         </p>
       ) : null}
     </div>

@@ -103,7 +103,7 @@
 - Cam stills (UDOT, Alta, Ski Utah, Snowbasin) and scrubber frames are plain `<img>` only: no fetch, no canvas, no `crossorigin`.
 - YouTube IDs churn: ordered regexes, CamStreamer and discovery; IDs are only seeds in `config/youtube.ts`.
 - KV allows 1,000 writes/day, used only for frames (about 480).
-- Subrequests are 50 per invocation on the free plan and D1/KV calls count too: the dispatcher admits jobs while fetches <= 45 and fetches + 2 + (one D1 batch + `maxPuts`) per job <= 50; 6 connections at a time (fetchx 5, the 6th for KV).
+- Subrequests are 50 per invocation on the free plan and D1/KV calls count too: the dispatcher admits jobs while fetches <= 45 and fetches + 3 + (one D1 batch + `maxPuts`) per job <= 50; 6 connections at a time (fetchx 5, the 6th for KV).
 - CPU is 10 ms per API request, 30 s in the DO where ticks run (no DOM parsing, no un-memoized Intl); cron triggers fire 30-50 s late, so the 45 s tick deadline counts from the tick's actual start.
 - Snowbird's API returns 500 for any foreign Origin; NWS 403s without a UA; HDRelay needs an explicit UA and never a Referer.
 - MtnPowder sits behind Imperva: `src/web/data/mtnpowder.ts` refetches blocked or red rows in the browser with the same

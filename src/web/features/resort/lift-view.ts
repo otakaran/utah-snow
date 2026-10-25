@@ -1,7 +1,8 @@
 // Pure view helpers for the resort page's lift and gate lists (spec §8.7.4): the status plate under the C.8
 // "closed is news only while lifts run" rule, the one state every gate shares, and the list's "as of" age.
+import { SEASON_FLOOR } from '../../../../config/resorts.ts';
 import { formatClock, formatLocalDate, isoToMs, localDate } from '../../../shared/time.ts';
-import type { Gate, LiftState, LiftStatus } from '../../../shared/types.ts';
+import type { Gate, LiftState, LiftStatus, ResortSnapshot } from '../../../shared/types.ts';
 import { LIFT_STATUS, type StatusWord } from '../../ui/status.ts';
 
 const QUIET_CLOSED: StatusWord = { tone: 'off', word: 'Closed' };
@@ -36,8 +37,14 @@ export function newestUpdate(list: readonly LiftStatus[]): string | null {
 export const updatedToday = (updatedAt: string | null | undefined, today: string): boolean =>
   !updatedAt || localDate(updatedAt) === today;
 
-/** Heading age: '10:28 AM' for today, else 'Apr 26'; '' when unknown. */
-export function asOf(updatedAt: string | null, today: string): string {
+/**
+ * Heading caption: 'as of 10:28 AM' today, 'as of Apr 26' before; a pre-season list still stamped before
+ * SEASON_FLOOR shows "last season's hours" instead of a misleading date; '' when unknown.
+ */
+export function asOf(updatedAt: string | null, today: string, season?: ResortSnapshot['season']): string {
   if (!updatedAt) return '';
-  return localDate(updatedAt) === today ? formatClock(updatedAt) : formatLocalDate(updatedAt, 'md');
+  const date = localDate(updatedAt);
+  if (date === today) return `as of ${formatClock(updatedAt)}`;
+  if (season === 'preseason' && date < SEASON_FLOOR) return "last season's hours";
+  return `as of ${formatLocalDate(updatedAt, 'md')}`;
 }

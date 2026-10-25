@@ -54,10 +54,10 @@ describe('admission', () => {
 
   it('counts the tick-start calls, one D1 batch and the KV puts per job against the 50-subrequest cap', () => {
     const stake = { ...fake('stake-alta', 1), maxPuts: 5 }; // 1 fetch + 1 batch + 5 puts
-    expect(internalOf([stake, fake('roads', 40)])).toBe(2 + 6 + 1);
-    const fits = planTick(SLOT2_MORNING, [stake, fake('roads', 40)], ctx); // 41 fetches + 9 = 50
+    expect(internalOf([stake, fake('roads', 39)])).toBe(1 + 2 + 6 + 1); // + the Scheduler's cron:last read
+    const fits = planTick(SLOT2_MORNING, [stake, fake('roads', 39)], ctx); // 40 fetches + 10 = 50
     expect(fits.deferred).toEqual([]);
-    const over = planTick(SLOT2_MORNING, [stake, fake('roads', 41)], ctx); // 42 <= 45, but 42 + 9 = 51
+    const over = planTick(SLOT2_MORNING, [stake, fake('roads', 40)], ctx); // 41 <= 45, but 41 + 10 = 51
     expect(over.deferred.map((s) => s.id)).toEqual(['roads']);
   });
 
@@ -134,6 +134,42 @@ describe('runTick', () => {
       value: number;
     }>();
     expect(c?.value).toBe(1);
+  });
+});
+
+describe('deferral writes', () => {
+  it('a deferred row keeps its payload, status and ok_at; a never-seen one starts as error/deferred', async () => {
+    const sources = [fake('roads', 45, ['roads:lcc']), fake('nws-obs', 13, ['obs'])];
+    const first = await runTick(env, SLOT2_MORNING, { sources });
+    expect(first.cron.deferred).toEqual(['nws-obs']);
+    const read = () =>
+      env.DB.prepare(
+        "SELECT status, error, fail_count, ok_at, payload, fetched_at FROM source_state WHERE source_id = 'obs'",
+      ).first();
+    expect(await read()).toEqual({
+      status: 'error',
+      error: 'deferred',
+      fail_count: 0,
+      ok_at: null,
+      payload: null,
+      fetched_at: first.cron.startedAt,
+    });
+    const t0 = first.cron.startedAt - 60_000;
+    await env.DB.prepare(
+      "UPDATE source_state SET payload = '{\"HDP\":1}', status = 'ok', ok_at = ?1, error = NULL WHERE source_id = 'obs'",
+    )
+      .bind(t0)
+      .run();
+    const second = await runTick(env, SLOT2_MORNING + 3_600_000, { sources }); // slot 2 again, an hour on
+    expect(second.cron.deferred).toEqual(['nws-obs']);
+    expect(await read()).toEqual({
+      status: 'ok',
+      error: 'deferred',
+      fail_count: 0,
+      ok_at: t0,
+      payload: '{"HDP":1}',
+      fetched_at: second.cron.startedAt,
+    });
   });
 });
 

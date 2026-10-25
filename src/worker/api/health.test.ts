@@ -1,10 +1,13 @@
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { isoUtc } from '../../shared/time.ts';
+import { CRON_STALE_MIN } from '../../../config/schedule.ts';
+import { DAY, isoUtc, MIN } from '../../shared/time.ts';
 import { runTick } from '../cron/dispatcher.ts';
 import worker from '../index.ts';
+import { staleAfterMin } from '../sources/index.ts';
 import { ytUnitsKey } from '../store/counters.ts';
+import { cronLastStmt } from '../store/source-state.ts';
 import { clearStore, migrate } from '../store/test-db.ts';
 
 async function get(path: string): Promise<Response> {
@@ -45,6 +48,45 @@ describe('/api/health', () => {
     const body = (await res.json()) as { ok: boolean; cron: { lastTickAt: string | null } };
     expect(body.ok).toBe(true);
     expect(body.cron.lastTickAt).not.toBeNull();
+  });
+
+  it('strict: cron-stale once the tick ages past CRON_STALE_MIN; a critical row goes red by age; obs stays amber', async () => {
+    const now = Date.now();
+    const tick = (startedAt: number) =>
+      cronLastStmt(env.DB, { slot: 0, startedAt, jobs: [], deferred: [], suspects: [] }).run();
+    await tick(now - (CRON_STALE_MIN - 1) * MIN);
+    expect((await get('/api/health?strict=1')).status).toBe(200);
+    await tick(now - (CRON_STALE_MIN + 1) * MIN);
+    const stale = await get('/api/health?strict=1');
+    expect(stale.status).toBe(503);
+    expect(((await stale.json()) as { failures: string[] }).failures).toEqual(['cron-stale']);
+
+    await tick(now);
+    const s = staleAfterMin('resort:alta');
+    const put = env.DB.prepare(
+      "INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, status, error, fail_count) VALUES ('resort:alta', '{}', ?1, ?2, 'ok', NULL, 0)",
+    );
+    await put.bind(now, now - (2 * s - 1) * MIN).run();
+    expect((await get('/api/health?strict=1')).status).toBe(200);
+    await put.bind(now, now - (2 * s + 1) * MIN).run();
+    const red = await get('/api/health?strict=1');
+    expect(red.status).toBe(503);
+    expect(((await red.json()) as { failures: string[] }).failures).toEqual(['red:resort:alta']);
+
+    await put.bind(now, now).run();
+    await env.DB.prepare(
+      "INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, status, error, fail_count) VALUES ('obs', '{}', ?1, ?2, 'error', 'ValidationError: nws-obs: no station reported in the last 3 h', 156)",
+    )
+      .bind(now, now - 3 * DAY)
+      .run();
+    const res = await get('/api/health?strict=1');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      failures: string[];
+      sources: { id: string; badge: string; failCount: number }[];
+    };
+    expect(body.failures).toEqual([]);
+    expect(body.sources.find((x) => x.id === 'obs')).toMatchObject({ badge: 'amber', failCount: 156 });
   });
 
   it('strict ignores blocked MtnPowder rows (browser fallback) but not other red critical rows', async () => {

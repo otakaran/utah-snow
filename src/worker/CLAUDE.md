@@ -10,7 +10,7 @@
 - `sources/maintenance.ts` (slot 9 at 08-11Z + Mondays 12Z) runs `hdrelay-config`, `udot-cam-check`, `nws-points` (only it may import them); `rowsDue` = the due sub's row.
 
 ## Dispatcher and budget (`cron/dispatcher.ts`)
-- Slots and job ids come from `config/schedule.ts`; admit jobs while `sum(maxSubrequests) <= 45` (redirects and `caches.*` count) and fetches + `internalOf(jobs)` (2 + one D1 batch + `maxPuts` per job) <= 50: the free plan counts D1/KV calls as subrequests.
+- Slots and job ids come from `config/schedule.ts`; admit jobs while `sum(maxSubrequests) <= 45` (redirects and `caches.*` count) and fetches + `internalOf(jobs)` (3 + one D1 batch + `maxPuts` per job, the 3 = Scheduler read + tick-start read + cron:last batch) <= 50: the free plan counts D1/KV calls as subrequests.
 - `MAX_CONN` = 5 fetches (6th slot free for KV). `cron:last` first; `cron/job.ts` writes each job in one batch (failure: `rowsDue` only).
 - `runTick(env, t, { sources, fetchImpl })` -> `{ cron, ext, internal, logs }`; the matrix test (real SOURCES): <= 45 ext, ext + internal <= 50, 0 deferred.
 - `sources/index.ts`: `SOURCES` == `SLOTS` job ids (`index.test.ts`); `staleAfterMin(row)` = `staleByRow[row]` ?? default.

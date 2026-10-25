@@ -85,7 +85,7 @@ export function LiftList({ r, today, stale, running }: Props) {
   const trails = r?.trails;
   const list = lifts?.list ?? [];
   const groups = groupByArea(list);
-  const age = asOf(newestUpdate(list), today);
+  const age = asOf(newestUpdate(list), today, r?.season);
   const tiles = [
     { label: 'Lifts open', v: ofTotal(lifts?.open, lifts?.total) },
     { label: 'On hold', v: lifts ? String(lifts.hold) : '—' },
@@ -103,7 +103,7 @@ export function LiftList({ r, today, stale, running }: Props) {
           ))}
         </dl>
       ) : null}
-      <h3 class="rs-h3">Lifts {age ? <span class="rs-dim">· as of {age}</span> : null}</h3>
+      <h3 class="rs-h3">Lifts {age ? <span class="rs-dim">· {age}</span> : null}</h3>
       {groups.length === 0 ? <p class="rs-dim">The resort has not posted its lift list yet.</p> : null}
       {groups.map((g) => (
         <div key={g.area} class="rs-card">

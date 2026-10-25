@@ -10,6 +10,12 @@ export type Badge = 'green' | 'amber' | 'red' | 'grey';
 const BROWSER_FALLBACK: ReadonlySet<string> = new Set(Object.keys(MTNPOWDER).map((r) => `resort:${r}`));
 
 /**
+ * Advisory rows: never critical, and their consumers judge each reading by its own stamp (pick/gates.ts reads a
+ * station's `at`), so amber is their ceiling. The footer must not say "down" for a source nothing depends on.
+ */
+const ADVISORY: ReadonlySet<string> = new Set(['obs']);
+
+/**
  * Critical rows (§8.1) drive the global badge and /api/health strict: resort:*, roads:*, nws:*:summit, avy:uac.
  * A 'blocked' row with a browser fallback is not critical: being blocked is its expected production state.
  */
@@ -24,14 +30,16 @@ export function ageMin(meta: Pick<Meta, 'okAt'>, nowMs: number): number | null {
 }
 
 /**
- * grey: offseason. red: never ok, older than 2 x staleAfter, or error/blocked twice in a row.
- * amber: older than staleAfter, or one failed fetch. green: otherwise.
+ * grey: offseason. red: never ok, older than 2 x staleAfter, or error/blocked twice in a row (amber for an
+ * ADVISORY row). amber: older than staleAfter, or one failed fetch. green: otherwise.
  */
 export function badge(meta: Meta, nowMs: number): Badge {
   if (meta.status === 'offseason') return 'grey';
   const age = ageMin(meta, nowMs);
   const failing = meta.status === 'error' || meta.status === 'blocked';
-  if (age === null || age > 2 * meta.staleAfterMin || (failing && meta.failCount >= 2)) return 'red';
+  if (age === null || age > 2 * meta.staleAfterMin || (failing && meta.failCount >= 2)) {
+    return ADVISORY.has(meta.source) ? 'amber' : 'red';
+  }
   if (age > meta.staleAfterMin || failing) return 'amber';
   return 'green';
 }

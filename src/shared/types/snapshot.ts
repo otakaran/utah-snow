@@ -3,7 +3,9 @@ import type { Afd, AvalancheZone, NwsAlert, ObsNow, PointForecast, SnotelSeries 
 import type { ResortId, ResortSnapshot } from './resort.ts';
 import type { Corridor, RoadStatus } from './roads.ts';
 
-export type SourceStatus = 'ok' | 'error' | 'blocked' | 'offseason'; // last real outcome; a deferred run never changes it
+// Last real outcome. A deferral keeps an existing row's status; a row deferred before its first run starts as
+// 'error' with error 'deferred' and okAt null (store/source-state.ts deferStmt).
+export type SourceStatus = 'ok' | 'error' | 'blocked' | 'offseason';
 
 // No ageMin on the wire. Clients derive age and badge from okAt plus server time (§5.8),
 // so a payload changes only when its data changes.
