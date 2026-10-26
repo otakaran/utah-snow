@@ -2,6 +2,7 @@
 // long-task totals, V8 coverage merging and the fix-1 card estimate. No Playwright import, so it unit-tests.
 import type { JumpProbe } from './jump.ts';
 import type { CardBox, ImgState, Layout } from './metrics.ts';
+import type { Replay } from './replay.ts';
 
 export type Phase = 'load' | 'scroll';
 export interface Req {
@@ -31,6 +32,8 @@ export interface Audit {
   at: string;
   url: string;
   route: string;
+  /** The --snapshot replay (file, sizes, modelled wire delay, times served), or null for the server's snapshot. */
+  snapshot: Replay | null;
   engine: 'chromium' | 'webkit';
   device: { width: number; height: number; dpr: number };
   throttle: { rttMs: number; downKbps: number; upKbps: number; cpu: number } | null;
@@ -38,8 +41,8 @@ export interface Audit {
   timing: { fcp: number | null; dcl: number | null; load: number | null; lcp: number | null; settle: number };
   lcp: { start: number; size: number; url: string; el: string } | null;
   longTasks: { load: Tasks; scroll: Tasks; list: { start: number; dur: number }[] } | null;
-  /** Layout shifts (no recent input) up to the settle point, with each shift's first source; null where unsupported. */
-  cls: { sum: number; shifts: { start: number; value: number; src: string }[] } | null;
+  /** Layout shifts (no recent input) up to the settle point: first source and every source's move; null where unsupported. */
+  cls: { sum: number; shifts: { start: number; value: number; src: string; moves: string[] }[] } | null;
   ends: { path: string; end: number }[];
   layout: Layout;
   afterScroll: Layout;

@@ -16,6 +16,7 @@ import {
 import { initAudit, readAudit } from './init.ts';
 import { probeJump } from './jump.ts';
 import { collectLayout, type Opts } from './metrics.ts';
+import { type Replay, replaySnapshot } from './replay.ts';
 import {
   type Audit,
   aboveFold,
@@ -32,6 +33,8 @@ export interface RunOpts {
   url: string;
   route: string;
   webkit: boolean;
+  /** A saved /api/snapshot body to answer the app with (replay.ts); omit to use the server's. */
+  snapshot?: string | undefined;
 }
 
 const { defaultBrowserType: _engine, ...IPHONE } = devices['iPhone 15'];
@@ -134,9 +137,10 @@ async function scrollThrough(page: Page): Promise<void> {
   }
 }
 
-async function coverage(browser: Browser, target: string, origin: string) {
+async function coverage(browser: Browser, target: string, origin: string, snapshot: string | undefined) {
   const { page } = await openPage(browser);
   const net = trackNet(page);
+  if (snapshot) await replaySnapshot(page, snapshot, null);
   await page.coverage.startJSCoverage({ resetOnNavigation: false });
   await page.goto(target, { waitUntil: 'load' });
   await page.waitForSelector('main [data-testid]');
@@ -155,6 +159,9 @@ export async function audit(o: RunOpts): Promise<Omit<Audit, 'at'>> {
     const { context, page } = await openPage(browser);
     const net = trackNet(page);
     if (!o.webkit) await throttle(context, page);
+    const replay: Replay | null = o.snapshot
+      ? await replaySnapshot(page, o.snapshot, o.webkit ? null : THROTTLE)
+      : null;
     await page.goto(target, { waitUntil: 'load', timeout: 120_000 });
     await page.waitForSelector('main [data-testid]');
     await settle(net, 2_000, 45_000);
@@ -170,6 +177,8 @@ export async function audit(o: RunOpts): Promise<Omit<Audit, 'at'>> {
     const afterScroll = await page.evaluate(collectLayout, OPTS);
     await Promise.all(net.pending);
     const reqs = [...net.log.values()];
+    // A fulfilled route reports the raw body; count the replayed snapshot at its gzip size, as the wire carries it.
+    if (replay) for (const r of reqs) if (new URL(r.url).pathname === '/api/snapshot') r.bytes = replay.wire;
     const loadReqs = reqs.filter((r) => r.phase === 'load');
     const loaded = new Set(loadReqs.map((r) => r.url));
     const heroes = layout.cards.filter((c) => c.heroSrc && loaded.has(c.heroSrc));
@@ -178,6 +187,7 @@ export async function audit(o: RunOpts): Promise<Omit<Audit, 'at'>> {
       tool: 'audit-phone',
       url: origin,
       route: o.route,
+      snapshot: replay,
       engine: o.webkit ? 'webkit' : 'chromium',
       device: { width: IPHONE.viewport.width, height: IPHONE.viewport.height, dpr: IPHONE.deviceScaleFactor },
       throttle: o.webkit ? null : THROTTLE,
@@ -219,7 +229,7 @@ export async function audit(o: RunOpts): Promise<Omit<Audit, 'at'>> {
         other: heroes.filter((c) => !c.pick).length,
         cards: layout.cards.length,
       },
-      coverage: o.webkit ? null : await coverage(browser, target, origin),
+      coverage: o.webkit ? null : await coverage(browser, target, origin, o.snapshot),
       requests: reqs.map((r) => ({ ...r, url: r.url.length > 200 ? `${r.url.slice(0, 200)}…` : r.url })),
     };
   } finally {
