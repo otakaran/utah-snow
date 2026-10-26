@@ -1,9 +1,17 @@
 // Pure wall paging (spec §8.4): which cams cells 1–5 page through for a `set` (heroes first, then the set's other
-// cams, then its ★ road cams), one page of them, the featured YouTube cell's order (Solitude stake first) and the
-// night stake list. The caller keeps only the tiles the cams feature shows right now (visibleCams).
+// cams, then its ★ road cams), one page of them, where the full-screen weather page falls in the rotation, the
+// featured YouTube cell's order (Solitude stake first) and the night stake list. The caller keeps only the tiles the
+// cams feature shows right now (visibleCams).
 import { CAM_BY_ID, CAMS, HEROES, RESORT_CAMS, STAKE_ORDER } from '../../../../config/cams/index.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
-import { WALL_NIGHT_STILL, WALL_PINNED, WALL_SET_DEFS, WALL_YT_FIRST, type WallSet } from '../../../../config/wall.ts';
+import {
+  WALL_LIMITS,
+  WALL_NIGHT_STILL,
+  WALL_PINNED,
+  WALL_SET_DEFS,
+  WALL_YT_FIRST,
+  type WallSet,
+} from '../../../../config/wall.ts';
 import type { CamDef } from '../../../shared/types.ts';
 
 const PINNED: ReadonlySet<string> = new Set(WALL_PINNED);
@@ -40,6 +48,20 @@ export function pageOf<T>(list: readonly T[], page: number, size: number): T[] {
   if (list.length <= size) return [...list];
   const start = (Math.max(0, Math.floor(page)) % pageCount(list.length, size)) * size;
   return Array.from({ length: size }, (_, i) => list[(start + i) % list.length] as T);
+}
+
+/**
+ * Rotation step `n` (one `rotate` period each) with a weather page after every `wx` cam pages: step n is the weather
+ * page when `wx > 0` and n % (wx + 1) === wx, and otherwise shows cam page n − floor(n / (wx + 1)), so cam pages
+ * never skip or repeat. A weather step carries the cam page that follows it (the hidden grid already holds it).
+ * `wx` clamps to WALL_LIMITS.wx; 0 never shows the weather page.
+ */
+export function wxSequence(n: number, wx: number): { weather: boolean; camPage: number } {
+  const step = Math.max(0, Math.floor(n) || 0);
+  const [lo, hi] = WALL_LIMITS.wx;
+  const every = Math.min(hi, Math.max(lo, Math.floor(wx) || 0));
+  if (every === 0) return { weather: false, camPage: step };
+  return { weather: step % (every + 1) === every, camPage: step - Math.floor(step / (every + 1)) };
 }
 
 const isYt = (c: CamDef): boolean => c.live?.type === 'youtube';

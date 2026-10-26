@@ -1,0 +1,77 @@
+/* Imported by ../wall.css after grid.css: the 7-day week strip (WeekStrip.tsx), six columns across the ~224 px band
+   under the cam grid: name, week total, 7 summit bars, day initials (~190 px). */
+.wall-week {
+  margin-top: auto;
+}
+
+.wall-week-cols {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.wall-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.wall-week-col > p {
+  margin: 0;
+}
+
+.wall-week-name {
+  overflow: hidden;
+  color: var(--text);
+  font: 800 var(--fs-5) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wall-week-col[data-pick] .wall-week-name {
+  color: var(--accent);
+}
+
+.wall-week-total {
+  overflow: hidden;
+  color: var(--snow);
+  font: 900 var(--fs-2) / 1 var(--font-num);
+  font-feature-settings: var(--num-features);
+  white-space: nowrap;
+}
+
+.wall-week-bars {
+  display: block;
+  width: 100%;
+  height: 56px;
+}
+
+.wall-week-bars rect {
+  fill: var(--peak);
+}
+
+.wall-week-bars .wall-week-storm {
+  fill: var(--snow);
+}
+
+/* one initial under each bar; the storm day's is lit and capped with a --snow rule */
+.wall-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  color: var(--text-dim);
+  font: 800 var(--fs-5) / 1.2 var(--font-display);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.wall-week-days > span {
+  border-top: 4px solid transparent;
+}
+
+.wall-week-days > [data-storm] {
+  border-top-color: var(--snow);
+  color: var(--text);
+}

@@ -4,7 +4,7 @@ import { CORRIDORS } from '../../../../config/roads.ts';
 import { WALL_PINNED } from '../../../../config/wall.ts';
 import type { CamDef } from '../../../shared/types.ts';
 import { WALL_SETS } from '../../router.ts';
-import { nightStakes, pageCount, pageOf, setCams, stepSet, ytOrder } from './rotation.ts';
+import { nightStakes, pageCount, pageOf, setCams, stepSet, wxSequence, ytOrder } from './rotation.ts';
 
 const ids = (list: readonly { id: string }[]) => list.map((c) => c.id);
 
@@ -20,6 +20,32 @@ describe('pageOf', () => {
   it('returns a list that fits on one page whole', () => {
     expect(pageOf(['a', 'b'], 3, 5)).toEqual(['a', 'b']);
     expect(pageOf([], 1, 5)).toEqual([]);
+  });
+});
+
+describe('wxSequence', () => {
+  const run = (wx: number, steps: number) => Array.from({ length: steps }, (_, n) => wxSequence(n, wx));
+  const shown = (seq: ReturnType<typeof run>) => seq.map((s) => (s.weather ? 'W' : s.camPage));
+
+  it('shows a weather page after every wx cam pages, and never with wx 0', () => {
+    expect(shown(run(0, 6))).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(shown(run(1, 7))).toEqual([0, 'W', 1, 'W', 2, 'W', 3]);
+    expect(shown(run(4, 11))).toEqual([0, 1, 2, 3, 'W', 4, 5, 6, 7, 'W', 8]);
+  });
+  it('never skips or repeats a cam page, and a weather step carries the next one', () => {
+    for (const wx of [0, 1, 2, 4, 24]) {
+      const cams = run(wx, 200).filter((s) => !s.weather);
+      expect(cams.map((s) => s.camPage)).toEqual(cams.map((_, i) => i));
+    }
+    expect(wxSequence(4, 4)).toEqual({ weather: true, camPage: 4 });
+  });
+  it('clamps wx to WALL_LIMITS and the step to a whole number from 0', () => {
+    expect(shown(run(-3, 3))).toEqual([0, 1, 2]);
+    expect(wxSequence(24, 99)).toEqual({ weather: true, camPage: 24 });
+    expect(wxSequence(25, 99)).toEqual({ weather: false, camPage: 24 });
+    expect(wxSequence(-2, 1)).toEqual({ weather: false, camPage: 0 });
+    expect(wxSequence(1.7, 1)).toEqual({ weather: true, camPage: 1 });
+    expect(wxSequence(Number.NaN, 4)).toEqual({ weather: false, camPage: 0 });
   });
 });
 

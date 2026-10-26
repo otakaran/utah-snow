@@ -1,4 +1,5 @@
-// Wall defaults (spec §8.5 item 6, §8.4): rotate / yt seconds, HLS cap and cam set, stored in utahsnow.wall.
+// Wall defaults (spec §8.5 item 6, §8.4): rotate / yt seconds, HLS cap, weather-page cadence (wx) and cam set,
+// stored in utahsnow.wall.
 // #/wall URL params override them; "Open wall window" carries the current values as params into a new window.
 // Typed values are clamped to their range, and `onSaved` flashes what was stored in the section heading.
 import { WALL_LIMITS, WALL_SET_DEFS, WALL_SETS } from '../../../../config/wall.ts';
@@ -24,6 +25,7 @@ const NUMBERS: NumberField[] = [
   field('rotate', 'Page every (s)', 'page', '\u00a0s'),
   field('yt', 'YouTube cam (s)', 'YouTube', '\u00a0s'),
   field('hls', 'Live streams', 'streams', ''),
+  field('wx', 'Weather page after (pages)', 'weather', ''),
 ];
 // A word joiner after the dash and the no-break space in `unit` keep each range on one line.
 const RANGES = NUMBERS.map((n) => `${n.range} ${n.min}–\u2060${n.max}${n.unit}`).join(' · ');
@@ -70,7 +72,8 @@ export function WallDefaults({ onSaved }: { onSaved: (f: Flash) => void }) {
         </label>
       </div>
       <p class="field-note">
-        Ranges: {RANGES}. With 0 streams the wall shows stills only. URL params on #/wall override these.
+        Ranges: {RANGES}. With 0 streams the wall shows stills only; 0 = no weather page. URL params on #/wall override
+        these.
       </p>
       <a class="btn btn-primary" href={wallHref(w)} target="_blank" rel="noopener" data-testid="open-wall">
         Open wall window <span aria-hidden="true">↗</span>

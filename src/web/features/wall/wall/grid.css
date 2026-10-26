@@ -1,5 +1,4 @@
-/* Imported first by ../wall.css: page layout, the 3x3 cam grid, the rotation bar, the featured YouTube cell, the snow
-   table. */
+/* Imported first by ../wall.css: page layout, the 3x3 cam grid, the rotation bar and the featured YouTube cell. */
 .wall-main:focus {
   outline: none;
 }
@@ -25,9 +24,22 @@
 .wall-left {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
   min-width: 0;
   min-height: 0;
+}
+
+/* the cam page: grid + week strip. During a weather page it stays mounted but display:none (the shared
+   IntersectionObserver then pauses its players), so [hidden] has to beat the flex display here. */
+.wall-cams {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+.wall-cams[hidden] {
+  display: none;
 }
 
 .wall-grid {
@@ -138,53 +150,4 @@
 
 .wall-star {
   color: var(--accent);
-}
-
-/* 3-day snow table: the band under the grid, resorts as columns */
-.wall-snow {
-  margin-top: auto;
-}
-
-.wall-snow-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.wall-snow-table caption,
-.wall-snow-table th {
-  font: 800 var(--fs-caption) / 1.2 var(--font-display);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.wall-snow-table caption {
-  padding-bottom: var(--space-1);
-  color: var(--text-dim);
-  text-align: left;
-}
-
-.wall-snow-table :is(th, td) {
-  overflow: hidden;
-  padding: 2px var(--space-2);
-  border-top: 1px solid var(--line);
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.wall-snow-table thead th {
-  border-top: 0;
-}
-
-.wall-snow-table th[scope="row"] {
-  width: 6em;
-  color: var(--text-dim);
-  text-align: left;
-}
-
-.wall-snow-table td {
-  color: var(--snow);
-  font: 800 var(--fs-3) / 1.1 var(--font-num);
-  font-feature-settings: var(--num-features);
 }

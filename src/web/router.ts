@@ -14,6 +14,7 @@ export interface WallParams {
   yt: number; // seconds a YouTube player may run
   set: WallSet;
   hls: number; // max concurrent HLS players (0 = stills only)
+  wx: number; // cam pages between full-screen weather pages (0 = never)
 }
 
 export type Route =
@@ -26,7 +27,7 @@ export type Route =
 
 export type RouteName = Route['name'];
 
-export const WALL_DEFAULTS: WallParams = { rotate: 20, yt: 180, set: 'all', hls: 2 };
+export const WALL_DEFAULTS: WallParams = { rotate: 20, yt: 180, set: 'all', hls: 2, wx: 4 };
 const BRIEFING: Route = { name: 'briefing' };
 const SIMPLE = ['cams', 'tracker', 'settings'] as const;
 
@@ -49,6 +50,7 @@ export function wallParams(get: (key: keyof WallParams) => unknown, defaults: Wa
     yt: intIn(get('yt'), WALL_LIMITS.yt, defaults.yt),
     set: typeof set === 'string' && (WALL_SETS as readonly string[]).includes(set) ? (set as WallSet) : defaults.set,
     hls: intIn(get('hls'), WALL_LIMITS.hls, defaults.hls),
+    wx: intIn(get('wx'), WALL_LIMITS.wx, defaults.wx),
   };
 }
 
@@ -84,9 +86,9 @@ export function parseHash(hash: string, wallDefaults: WallParams = WALL_DEFAULTS
 
 export const resortHref = (id: ResortId): string => `#/resort/${id}`;
 
-/** '#/wall?rotate=20&yt=180&set=all&hls=2': the settings page's "Open wall" link. */
+/** '#/wall?rotate=20&yt=180&set=all&hls=2&wx=4': the settings page's "Open wall" link. */
 export function wallHref(p: WallParams): string {
-  return `#/wall?rotate=${p.rotate}&yt=${p.yt}&set=${p.set}&hls=${p.hls}`;
+  return `#/wall?rotate=${p.rotate}&yt=${p.yt}&set=${p.set}&hls=${p.hls}&wx=${p.wx}`;
 }
 
 export const route = signal<Route>(BRIEFING);

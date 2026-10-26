@@ -15,12 +15,13 @@ export function WallLaunch({ params, now }: { params: WallParams; now: number })
       </h1>
       <Countdown today={localDate(now)} />
       <p class="wall-launch-text">
-        Stake cams, the crew pick, roads and avalanche on one screen. Open this page on a TV or a laptop on HDMI, at
-        least {WALL_MIN_WIDTH} px wide.
+        Stake cams, the crew pick, the week's snow, roads and avalanche on one screen. Open this page on a TV or a
+        laptop on HDMI, at least {WALL_MIN_WIDTH} px wide.
       </p>
       <p class="wall-launch-note">
-        Set: {WALL_SET_DEFS[params.set].long} · new page every {params.rotate} s. Cast a dedicated browser window to the
-        TV, never a tab you will switch away from.
+        Set: {WALL_SET_DEFS[params.set].long} · new page every {params.rotate} s ·{' '}
+        {params.wx > 0 ? `weather page after every ${params.wx} cam pages` : 'no weather page'}. Cast a dedicated
+        browser window to the TV, never a tab you will switch away from.
       </p>
       <p class="wall-launch-links">
         <a class="btn btn-primary" href="#/">

@@ -75,7 +75,7 @@ export const WALL_CANVAS = { width: 1920, height: 1080 } as const;
 export const WALL_MIN_WIDTH = 1280;
 
 /**
- * [min, max] of the wall numbers (Settings inputs, #/wall params, the player cap): page and YouTube seconds, and
- * concurrent HLS players (0 = stills only).
+ * [min, max] of the wall numbers (Settings inputs, #/wall params, the player cap): page and YouTube seconds,
+ * concurrent HLS players (0 = stills only) and cam pages between weather pages (0 = no weather page).
  */
-export const WALL_LIMITS = { rotate: [5, 600], yt: [30, 3600], hls: [0, 3] } as const;
+export const WALL_LIMITS = { rotate: [5, 600], yt: [30, 3600], hls: [0, 3], wx: [0, 24] } as const;
