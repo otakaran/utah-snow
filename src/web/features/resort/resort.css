@@ -37,10 +37,21 @@
   grid-column: 1 / -1;
 }
 
+/* every resort-page link or button is at least a 44 x 44 tap target (a short name such as 'Alta' is centred in it) */
 .rs-tap {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
   min-height: var(--tap);
+}
+
+/* a tap inside a line of text (a head fact, the credits, a heading sub-line) keeps its 44 px box without growing
+   the line, so a value never drifts off its label: the negative block margins hand back what the box adds */
+.rs-facts .rs-tap,
+.rs-credit .rs-tap,
+.sec-sub .rs-tap {
+  margin-block: calc((1lh - var(--tap)) / 2);
 }
 
 .rs-btn {

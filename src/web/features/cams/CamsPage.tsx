@@ -62,7 +62,10 @@ export function CamsPage({ pick = null }: Props) {
             sub={
               <>
                 {isPick ? "Today's pick · " : ''}
-                {n} cams{off > 0 ? ` · ${off} off-season` : ''} · <a href={`#/resort/${id}`}>Resort page</a>
+                {n} cams{off > 0 ? ` · ${off} off-season` : ''} ·{' '}
+                <a class="cams-sub-link" href={`#/resort/${id}`}>
+                  Resort page
+                </a>
               </>
             }
           >

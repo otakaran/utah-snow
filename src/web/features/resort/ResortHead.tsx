@@ -8,7 +8,7 @@ import { parkingCal } from '../../../shared/parking.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { Block, ResortId, ResortSnapshot } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
-import { clockRel } from '../../lib/format.ts';
+import { clockRel, qty } from '../../lib/format.ts';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
 import { Amount, Count, Tile } from './Amount.tsx';
@@ -97,7 +97,7 @@ export function ResortHead({ id, block, drive, today, now, units, days }: Props)
   return (
     <section data-testid="head" class="rs-head" aria-labelledby="rs-name">
       <p class="rs-label rs-dim">
-        {CORRIDORS[def.corridor].label} · base <Amount kind="elevation" value={def.base.ft} units={units} />
+        {CORRIDORS[def.corridor].label} · base {qty('elevation', def.base.ft, units)}
       </p>
       <h1 id="rs-name" class="rs-name">
         {def.name}

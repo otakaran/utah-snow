@@ -10,9 +10,10 @@
   font-weight: 800;
 }
 
+/* the unit after a number: about half the number's size, floored at the caption size (never above the number) */
 .rs-u {
   margin-left: 0.06em;
-  font-size: 0.55em;
+  font-size: max(0.55em, min(1em, var(--fs-caption)));
 }
 
 .rs-snow {
@@ -147,12 +148,4 @@
   padding-bottom: var(--space-2);
   border-bottom: 1px dotted var(--line);
   overflow-wrap: anywhere;
-}
-
-/* inline links keep a 44 px tap area without growing the line (and pushing the value off its label) */
-.rs-facts .rs-tap {
-  display: inline-block;
-  min-height: 0;
-  padding-block: calc((var(--tap) - 1.5em) / 2);
-  margin-block: calc((1.5em - var(--tap)) / 2);
 }
