@@ -1,0 +1,57 @@
+/* Imported after cards.css by ../briefing.css: compact resort cards where the list is one column (below 720 px;
+   ResortCard `compact`). The card is a <details> kept a plain block (its .rc-body carries the flex column); the
+   summary is the name row, a full-width tap target ending in a chevron, so a closed card is one row that still shows
+   its status chip. tokens.css variables only. */
+@media (max-width: 719px) {
+  .rc-list {
+    row-gap: var(--space-4);
+  }
+}
+
+details.rc {
+  display: block;
+  padding-block: 0;
+}
+
+details.rc > .rc-body {
+  padding-bottom: var(--space-3);
+}
+
+@media (hover: hover) {
+  details.rc:not(.is-pick):hover {
+    border-color: var(--line-strong);
+  }
+}
+
+summary.rc-top {
+  flex-wrap: nowrap;
+  min-height: calc(var(--tap) + var(--space-1));
+  list-style: none;
+  cursor: pointer;
+}
+
+summary.rc-top::-webkit-details-marker {
+  display: none;
+}
+
+summary.rc-top .rc-name {
+  margin-right: auto;
+}
+
+/* the cue: a chevron after the status chip, down while closed, up while open */
+summary.rc-top::after {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 var(--space-1) 3px var(--space-2);
+  border-right: 2px solid var(--text-dim);
+  border-bottom: 2px solid var(--text-dim);
+  rotate: 45deg;
+  transition: rotate 0.15s;
+}
+
+details.rc[open] > summary.rc-top::after {
+  margin-block: 3px 0;
+  rotate: 225deg;
+}

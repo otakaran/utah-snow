@@ -1,6 +1,7 @@
 // In-page jump row: one button per target `id`, a tap scrolls it to the top (smooth unless reduced motion); an item
 // with an `href` is a link instead (the resort page's other resorts). Targets are section roots (ui/Section sets
-// id = testid); `.section` keeps them clear of the bar via scroll-margin-top: var(--jump-h).
+// id = testid); `.section` keeps them clear of the bar via scroll-margin-top: var(--jump-h). `current` marks the
+// page a link points at (aria-current="page") or the section on screen (aria-current="true"; the briefing's bar).
 // <JumpBar items={[{ id, label, accent?, star?, href?, current?, rule? }]} sticky? label? /> sticks to the viewport
 // top by default (sticky={false} keeps it in flow).
 import { Fragment } from 'preact';
@@ -12,7 +13,7 @@ export interface JumpItem {
   label: string;
   /** A link instead of a jump button. */
   href?: string;
-  /** The page the link points at (aria-current). */
+  /** aria-current: the page a link points at, or (a button) its section is the one on screen. */
   current?: boolean;
   /** Accent ink and edge, e.g. the pick resort. */
   accent?: boolean;
@@ -63,7 +64,12 @@ export function JumpBar({ items, sticky = true, label = 'Jump to section' }: Pro
                 <Label it={it} />
               </a>
             ) : (
-              <button type="button" class={cls} onClick={() => jump(it.id)}>
+              <button
+                type="button"
+                class={cls}
+                aria-current={it.current ? 'true' : undefined}
+                onClick={() => jump(it.id)}
+              >
                 <Label it={it} />
               </button>
             )}
