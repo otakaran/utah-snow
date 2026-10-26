@@ -40,6 +40,7 @@ export interface Audit {
   connection: { effectiveType: string | null; saveData: boolean | null };
   timing: { fcp: number | null; dcl: number | null; load: number | null; lcp: number | null; settle: number };
   lcp: { start: number; size: number; url: string; el: string } | null;
+  lcps: { start: number; size: number; el: string }[];
   longTasks: { load: Tasks; scroll: Tasks; list: { start: number; dur: number }[] } | null;
   /** Layout shifts (no recent input) up to the settle point: first source and every source's move; null where unsupported. */
   cls: { sum: number; shifts: { start: number; value: number; src: string; moves: string[] }[] } | null;

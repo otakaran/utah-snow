@@ -194,6 +194,7 @@ export async function audit(o: RunOpts): Promise<Omit<Audit, 'at'>> {
       connection: r0.connection,
       timing: { fcp: r0.fcp, dcl: r0.dcl, load: r0.load, lcp: buf?.lcp?.start ?? null, settle: r0.now },
       lcp: buf?.lcp ?? null,
+      lcps: buf?.lcps ?? [],
       longTasks:
         buf?.supported.longtask === true
           ? {

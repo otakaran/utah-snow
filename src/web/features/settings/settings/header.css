@@ -84,19 +84,40 @@
 }
 
 .iam-label {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
 }
 
+/* appearance: none, or WebKit keeps a 19 px menulist whatever min-height says; the fixed width (it always reads
+   "choose…") stops the chip growing when the names arrive. The caret sits over the select's right padding. */
 .iam-select {
+  width: 6.4em;
   min-height: var(--tap);
+  padding: 0 1.3em 0 var(--space-1);
   border: 0;
   background: transparent;
   color: var(--text);
+  appearance: none;
+  cursor: pointer;
+}
+
+.iam-select:disabled {
+  opacity: 1;
+  color: var(--text);
+  cursor: progress;
+}
+
+.iam-caret {
+  position: absolute;
+  right: var(--space-1);
+  color: var(--text-dim);
+  pointer-events: none;
 }
 
 .iam-skip {
+  min-width: var(--tap);
   min-height: var(--tap);
   padding: 0 var(--space-2);
   border: 0;

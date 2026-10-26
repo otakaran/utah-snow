@@ -7,6 +7,8 @@
 export interface PageBuf {
   long: { start: number; dur: number }[];
   lcp: { start: number; size: number; url: string; el: string } | null;
+  /** Every LCP candidate in order (the last one is `lcp`). */
+  lcps: { start: number; size: number; el: string }[];
   /** `moves`: every source (at most 5 per entry) as 'element x,y wxh -> x,y wxh'. */
   shifts: { start: number; value: number; src: string; moves: string[] }[];
   om: number;
@@ -28,6 +30,7 @@ export function initAudit(body: string): void {
   const buf: PageBuf = {
     long: [],
     lcp: null,
+    lcps: [],
     shifts: [],
     om: 0,
     supported: {
@@ -59,6 +62,7 @@ export function initAudit(body: string): void {
     new PerformanceObserver((list) => {
       for (const e of list.getEntries() as LargestContentfulPaint[]) {
         buf.lcp = { start: e.startTime, size: e.size, url: e.url, el: describe(e.element) };
+        buf.lcps.push({ start: Math.round(e.startTime), size: e.size, el: buf.lcp.el });
       }
     }).observe({ type: 'largest-contentful-paint', buffered: true });
   }
