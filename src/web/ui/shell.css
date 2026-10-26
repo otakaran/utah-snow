@@ -164,7 +164,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
-  padding-inline: var(--space-2);
+  padding-inline: clamp(var(--space-1), 2.4vw - 4px, var(--space-2)); /* five items on one row from 360 px */
   border-bottom: 3px solid transparent;
   color: var(--text-dim);
   font: 800 var(--fs-caption) / 1 var(--font-display);

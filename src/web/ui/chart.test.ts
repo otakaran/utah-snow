@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { areaPath, barRects, linePath, linScale, niceMax, slotCenter, tickXs } from './chart.ts';
+import {
+  areaPath,
+  barRects,
+  linePath,
+  linScale,
+  niceMax,
+  pairRects,
+  slotCenter,
+  slotEdge,
+  slotPct,
+  spanRects,
+  tickXs,
+  yPct,
+} from './chart.ts';
 
 describe('linScale', () => {
   it('maps a domain onto a range, inverted ranges included, and a flat domain onto range[0]', () => {
@@ -56,5 +69,49 @@ describe('tickXs', () => {
     expect(tickXs(8, 2)).toEqual([6.3, 31.3, 56.3, 81.3]);
     expect(tickXs(4, 1)).toEqual([12.5, 37.5, 62.5, 87.5]);
     expect(tickXs(0, 3)).toEqual([]);
+  });
+});
+
+describe('slot helpers', () => {
+  it('gives slot edges in px, slot centers in % and heights as % from the top', () => {
+    expect(slotEdge(2, 8, 40)).toBe(10);
+    expect(slotEdge(1, 0, 40)).toBe(0);
+    expect(slotPct(0, 48)).toBe(1);
+    expect(slotPct(47, 48)).toBe(99);
+    expect(yPct(8530, 4000, 12000)).toBe(43.4);
+    expect(yPct(20000, 4000, 12000)).toBe(0); // clamped
+    expect(yPct(5, 5, 5)).toBe(100);
+  });
+
+  it('turns [start, end) spans into full-height rects on slot edges', () => {
+    expect(
+      spanRects(
+        [
+          [0, 2],
+          [6, 8],
+        ],
+        8,
+        40,
+        12,
+      ),
+    ).toEqual([
+      { x: 0, y: 0, width: 10, height: 12 },
+      { x: 30, y: 0, width: 10, height: 12 },
+    ]);
+  });
+});
+
+describe('pairRects', () => {
+  it('splits each slot into two bars on one scale, nulls as zero height', () => {
+    const [day, night] = pairRects([5, null], [10, 2.5], 40, 20, 10, 0.5);
+    expect(day).toEqual([
+      { x: 5, y: 10, width: 4.4, height: 10 },
+      { x: 25, y: 20, width: 4.4, height: 0 },
+    ]);
+    expect(night).toEqual([
+      { x: 10.6, y: 0, width: 4.4, height: 20 },
+      { x: 30.6, y: 15, width: 4.4, height: 5 },
+    ]);
+    expect(pairRects([], [], 40, 20, 10)).toEqual([[], []]);
   });
 });

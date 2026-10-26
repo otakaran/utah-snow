@@ -123,7 +123,7 @@ test('header clock shows Denver time and the pick runs for today on a trip morni
 });
 
 test('no horizontal scroll on any page', async ({ page }) => {
-  for (const hash of ['#/', '#/resort/alta', '#/cams', '#/tracker', '#/settings']) {
+  for (const hash of ['#/', '#/weather', '#/resort/alta', '#/cams', '#/tracker', '#/settings']) {
     await page.goto(`/${hash}`);
     await expect(page.getByTestId('footer')).toBeVisible();
     const overflow = Number(await page.evaluate('document.documentElement.scrollWidth - innerWidth'));

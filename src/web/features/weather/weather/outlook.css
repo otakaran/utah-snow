@@ -1,0 +1,102 @@
+/* Imported by ../weather.css after week.css: §02 day columns. Phones scroll-snap the cards sideways inside the
+   card (never the page); from 600 px they sit in four columns. The big number sizes to its card (cqi). */
+.wx-cols {
+  display: grid;
+  grid-auto-columns: minmax(136px, 1fr);
+  grid-auto-flow: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  list-style: none;
+}
+
+.wx-col {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  scroll-snap-align: start;
+  container-type: inline-size;
+}
+
+.wx-col.is-peak {
+  border: 2px solid var(--snow);
+}
+
+.wx-dy {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wx-dy b {
+  color: var(--text);
+}
+
+.wx-big {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-end;
+  align-items: baseline;
+  height: calc(var(--fs-resort-num) * 1.1); /* one height for every card, so the rows below line up */
+  font-size: min(var(--fs-resort-num), 28cqi);
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.wx-big.is-long {
+  font-size: min(var(--fs-resort-num), 20cqi);
+}
+
+.wx-big small {
+  margin-left: 1px;
+  font-size: 0.7em;
+}
+
+.wx-rows {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.wx-rows > div {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 26px;
+  font-size: var(--fs-caption);
+}
+
+.wx-rows dt {
+  color: var(--text-dim);
+}
+
+.wx-rows dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (min-width: 600px) {
+  .wx-cols {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .wx-one-note {
+    display: none;
+  }
+}

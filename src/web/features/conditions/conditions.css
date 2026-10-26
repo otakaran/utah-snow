@@ -146,6 +146,16 @@
   padding-left: 1.2em;
   list-style: disc;
 }
+/* compact (briefing teaser): the week's leader line above the notes, then the "Full weather →" link */
+.cond-fc-lead {
+  margin-bottom: var(--space-1);
+  font: 800 var(--fs-body) / 1.25 var(--font-display);
+}
+.cond-fc-lead .cond-dim {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 /* from 900 px: a compact table (resort column 30 %, numbers 10ch) beside its notes and the key messages */
 @media (min-width: 900px) {
   .cond-fc-card {

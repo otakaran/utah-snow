@@ -1,0 +1,180 @@
+/* Chart primitives (ui/Chart.tsx): tokens.css variables only, no SVG filters or url(#id) paints. Every stroke keeps
+   its width while preserveAspectRatio="none" stretches the lane (vector-effect). Rules use --line / --line-strong,
+   which are hard ink in the sun theme; --snow-glow stays on HTML text only. Features set lane heights. */
+.chart {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  margin: 0;
+}
+
+.chart-plot {
+  position: relative;
+  min-width: 0;
+}
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: 64px;
+  overflow: visible;
+}
+
+.chart-bar {
+  fill: var(--snow);
+}
+
+.chart-bar-dim {
+  fill: var(--snow);
+  opacity: 0.38;
+}
+
+.chart-band {
+  fill: var(--snow);
+  opacity: 0.2;
+}
+
+.chart-shade {
+  fill: var(--surface-2);
+}
+
+.chart-line,
+.chart-line-dim,
+.chart-line-alt,
+.chart-line-gust {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-line {
+  stroke: var(--text);
+}
+
+.chart-line-dim {
+  stroke: var(--text-dim);
+}
+
+/* freezing level: an elevation line, so the map's contour ink */
+.chart-line-alt {
+  stroke: var(--contour);
+  stroke-width: 2.5;
+}
+
+.chart-line-gust {
+  stroke: var(--warn-text);
+  stroke-dasharray: 5 3;
+}
+
+.chart-rule,
+.chart-rule-strong,
+.chart-seam,
+.chart-now {
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-rule {
+  stroke: var(--line);
+}
+
+.chart-rule-strong {
+  stroke: var(--line-strong);
+  stroke-dasharray: 4 3;
+}
+
+.chart-seam {
+  stroke: var(--text-dim);
+  stroke-dasharray: 2 3;
+}
+
+.chart-now {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+/* HTML labels over a lane (PlotLabel); the plate keeps a crossing line from cutting the text */
+.chart-label {
+  position: absolute;
+  top: 0;
+  padding: 0 2px;
+  border-radius: 2px;
+  background: var(--surface);
+  color: var(--text-dim);
+  font: 700 11px / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  translate: var(--tx, -50%) var(--ty, -100%);
+  pointer-events: none;
+}
+
+.chart-start {
+  --tx: 0;
+}
+
+.chart-end {
+  --tx: -100%;
+}
+
+.chart-below {
+  --ty: 0;
+}
+
+/* legend: a swatch per series, the same classes' colors */
+.chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  list-style: none;
+}
+
+.chart-key i {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.chart-key .k-snow,
+.chart-key .k-band {
+  height: 10px;
+  background: var(--snow);
+}
+
+.chart-key .k-band {
+  opacity: 0.35;
+}
+
+.chart-key .k-line {
+  background: var(--text);
+}
+
+.chart-key .k-dim {
+  background: var(--text-dim);
+}
+
+.chart-key .k-alt {
+  background: var(--contour);
+}
+
+.chart-key .k-gust {
+  background: repeating-linear-gradient(90deg, var(--warn-text) 0 5px, transparent 5px 8px);
+}
+
+.chart-key .k-night {
+  height: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.chart-key .k-now {
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+}

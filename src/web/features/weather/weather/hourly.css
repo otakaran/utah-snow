@@ -1,0 +1,117 @@
+/* Imported by ../weather.css after outlook.css: §03 hourly lanes (one figure), 6-hourly ticks, legend, table. */
+.wx-hourly .wx-kicker {
+  margin-top: var(--space-2);
+}
+
+.wx-hourly .wx-kicker:first-child {
+  margin-top: 0;
+}
+
+.wx-h-snow .chart-svg {
+  height: 64px;
+}
+
+.wx-h-temp .chart-svg {
+  height: 112px;
+}
+
+.wx-h-wind .chart-svg {
+  height: 56px;
+}
+
+.wx-ticks {
+  position: relative;
+  height: 1.5em;
+  color: var(--text-dim);
+  font: 700 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wx-tick {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.wx-tick-start {
+  translate: 0 0;
+}
+
+.wx-tick.is-day {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.wx-hourly + .chart-key {
+  margin-top: var(--space-3);
+}
+
+.wx-more {
+  margin-top: var(--space-2);
+}
+
+.wx-more > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.25 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.wx-wrap {
+  overflow-x: auto;
+}
+
+.wx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-num);
+  font-size: var(--fs-caption);
+  font-feature-settings: var(--num-features);
+}
+
+.wx-table th,
+.wx-table td {
+  padding: var(--space-2) var(--space-1);
+  border-top: 1px solid var(--line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wx-table thead th {
+  border-top: 0;
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: bottom;
+  white-space: normal;
+}
+
+.wx-table :is(th[scope="row"], thead th:first-child) {
+  text-align: left;
+}
+
+.wx-table .wx-snow {
+  color: var(--snow);
+  font-weight: 800;
+}
+
+@media (min-width: 900px) {
+  .wx-h-snow .chart-svg {
+    height: 80px;
+  }
+
+  .wx-h-temp .chart-svg {
+    height: 128px;
+  }
+
+  .wx-h-wind .chart-svg {
+    height: 64px;
+  }
+}

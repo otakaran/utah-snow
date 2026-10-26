@@ -15,6 +15,7 @@ import { Resort } from './features/resort/index.ts';
 import { BaseChip, IAmChip, Settings, ThemeToggle, UnitsToggle } from './features/settings/index.ts';
 import { TrackerPage } from './features/tracker/index.ts';
 import { Wall } from './features/wall/index.ts';
+import { WeatherPage } from './features/weather/index.ts';
 import { clock, shortDate, tzAbbr } from './lib/format.ts';
 import { type Route, type RouteName, route } from './router.ts';
 import { Attribution } from './ui/Attribution.tsx';
@@ -24,6 +25,7 @@ import { SourceList, type SourceRow } from './ui/SourceList.tsx';
 
 const NAV: { href: string; label: string; name: RouteName; wide?: true }[] = [
   { href: '#/', label: 'Briefing', name: 'briefing' },
+  { href: '#/weather', label: 'Weather', name: 'weather' },
   { href: '#/cams', label: 'Cams', name: 'cams' },
   { href: '#/tracker', label: 'Tracker', name: 'tracker' },
   { href: '#/settings', label: 'Settings', name: 'settings' },
@@ -138,6 +140,8 @@ function Outlet({ r }: { r: Route }) {
       return <Settings />;
     case 'resort':
       return <Resort id={r.id} />;
+    case 'weather':
+      return <WeatherPage resort={r.resort} />;
     case 'cams': // ★ on the crew pick's cams, as on the briefing and resort pages
       return <CamsPage pick={crewPick.value?.pick ?? null} />;
     case 'tracker':

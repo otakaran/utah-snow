@@ -1,0 +1,148 @@
+/* Weather page (#/weather, concept B "Storm Timeline"): tokens.css variables only; section headings, chips, the
+   jump bar and chart strokes come from ui/. Classes are prefixed wx-. Leading parts live in weather/ (week lanes,
+   day columns, hourly lanes); the page frame, alerts strip, discussion and the two-column layout are here. */
+@import "./weather/week.css";
+@import "./weather/outlook.css";
+@import "./weather/hourly.css";
+
+.wx {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.wx > *,
+.wx-pair > * {
+  min-width: 0;
+}
+
+.wx-top {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.wx-sub,
+.wx-note,
+.wx-dim,
+.wx-empty,
+.wx-issued {
+  color: var(--text-dim);
+}
+
+.wx-sub,
+.wx-note,
+.wx-issued {
+  font-size: var(--fs-caption);
+}
+
+.wx-issued {
+  white-space: nowrap;
+}
+
+.wx-empty,
+.wx-disc p {
+  margin: 0;
+}
+
+.wx-card {
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.wx-kicker {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.wx-note {
+  margin-top: var(--space-2);
+}
+
+.wx-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--accent);
+  font: 800 var(--fs-caption) / 1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-underline-offset: 3px;
+}
+
+.wx-foot,
+.wx-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
+/* alerts strip: one row per alert, the left edge in the alert's tone */
+.wx-alert-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wx-alert {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--tone, var(--off));
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.wx-t-ok {
+  --tone: var(--ok);
+}
+
+.wx-t-warn {
+  --tone: var(--warn);
+}
+
+.wx-t-bad {
+  --tone: var(--bad);
+}
+
+.wx-t-off {
+  --tone: var(--off);
+}
+
+.wx-alert-ev {
+  font: 800 var(--fs-body) / 1.2 var(--font-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* discussion */
+.wx-disc {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.wx-alert-more {
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* 02 and 03 side by side from 1100 px; document order unchanged */
+.wx-pair {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 1100px) {
+  .wx-pair {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
