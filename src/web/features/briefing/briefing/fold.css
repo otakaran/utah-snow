@@ -17,8 +17,10 @@ details.rc > .rc-body {
   padding-bottom: var(--space-3);
 }
 
-details.rc:not(.is-pick):hover {
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  details.rc:not(.is-pick):hover {
+    border-color: var(--line-strong);
+  }
 }
 
 summary.rc-top {
