@@ -9,7 +9,7 @@ import './conditions.css';
 export { AfdNotes } from './AfdNotes.tsx';
 export { AvalanchePanel, type AvalanchePanelProps } from './AvalanchePanel.tsx';
 export { ForecastPanel, type ForecastPanelProps } from './ForecastPanel.tsx';
-export { dayOf, gridRow, levelStatus, modelSpread, range, windText } from './forecast-rows.ts';
+export { afdBullets, dayOf, gridRow, levelStatus, modelSpread, range, windText } from './forecast-rows.ts';
 export {
   band,
   freezingLevel,
@@ -23,12 +23,15 @@ export {
   omHourly,
 } from './hourly-series.ts';
 export { ModelTable, type ModelTableProps } from './ModelTable.tsx';
+export { MODEL_LABEL } from './model-rows.ts';
 export { worstMeta } from './panel-meta.ts';
 export { RoadsPanel, type RoadsPanelProps } from './RoadsPanel.tsx';
 export { CORRIDOR_NAME, CORRIDOR_ORDER, type RoadView, roadView, showTraction } from './road-view.ts';
 export { SourceLine } from './SourceLine.tsx';
 export {
   barFractions,
+  leaderText,
+  peakWhen,
   stormDay,
   type WeekDay,
   type WeekLeader,

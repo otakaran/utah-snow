@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Block, NwsDay, PointForecast } from '../../../shared/types.ts';
 import type { OmLocation } from '../../data/open-meteo.ts';
-import { barFractions, stormDay, weekDates, weekLeader, weekRows } from './week-rows.ts';
+import { barFractions, leaderText, peakWhen, stormDay, weekDates, weekLeader, weekRows } from './week-rows.ts';
 
 const DATES = weekDates('2027-01-04', 3); // Mon, Tue, Wed
 
@@ -110,5 +110,22 @@ describe('barFractions', () => {
     expect(barFractions([12, 6, 0, null])).toEqual([1, 0.5, 0.08, 0]);
     expect(barFractions([3, 1.5])).toEqual([0.5, 0.25]);
     expect(barFractions([3, 1.5], 3)).toEqual([1, 0.5]);
+  });
+});
+
+describe('peakWhen and leaderText', () => {
+  it('names the peak relative to today', () => {
+    expect(peakWhen('2027-01-04', 'day', '2027-01-04')).toBe('today');
+    expect(peakWhen('2027-01-04', 'night', '2027-01-04')).toBe('tonight');
+    expect(peakWhen('2027-01-05', 'night', '2027-01-04')).toBe('tomorrow night');
+    expect(peakWhen('2027-01-07', 'day', '2027-01-04')).toBe('Thu');
+    expect(peakWhen('2027-01-07', 'night', '2027-01-04')).toBe('Thu night');
+    expect(peakWhen(null, null, '2027-01-04')).toBeNull();
+  });
+
+  it('builds the headline sentence, null without a leader', () => {
+    const leader = weekLeader(weekRows(FORECAST, DATES, 'imperial'));
+    expect(leaderText(leader, '2027-01-04')).toBe('Most snow: Alta 3–10″, peaking tomorrow night');
+    expect(leaderText(null, '2027-01-04')).toBeNull();
   });
 });

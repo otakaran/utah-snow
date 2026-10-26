@@ -1,0 +1,135 @@
+/* Imported first by ../weather.css: §01, six resort lanes on one 7-day axis. Every lane is the same 3-column grid
+   (name, bars, total) so the bars line up day for day; phones hide every other day label (`is-thin`). */
+.wx-lead {
+  margin: var(--space-1) 0 var(--space-3);
+  font: 800 var(--fs-3) / 1.15 var(--font-display);
+}
+
+.wx-lead em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+.wx-lead b {
+  color: var(--snow);
+  font-weight: 900;
+  text-shadow: 0 0 18px var(--snow-glow);
+}
+
+.wx-lanes,
+.wx-lane-list {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.wx-lane-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wx-lane {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 64px;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.wx-lane > * {
+  min-width: 0;
+}
+
+.wx-nm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.3em;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--text);
+  font: 800 var(--fs-caption) / 1.1 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.wx-nm.is-lead {
+  color: var(--accent);
+}
+
+.wx-star {
+  color: var(--accent);
+}
+
+.wx-week-plot .chart-svg {
+  height: 36px;
+}
+
+.wx-tot {
+  justify-self: end;
+  color: var(--snow);
+  font: 900 var(--fs-body) / 1 var(--font-num);
+  font-feature-settings: var(--num-features);
+  text-shadow: 0 0 14px var(--snow-glow);
+  white-space: nowrap;
+}
+
+.wx-axis .wx-tot,
+.wx-days {
+  color: var(--text-dim);
+  font: 800 var(--fs-caption) / 1 var(--font-display);
+  letter-spacing: 0.06em;
+  text-shadow: none;
+  text-transform: uppercase;
+}
+
+.wx-days {
+  display: flex;
+}
+
+.wx-days > span {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-bottom: 4px;
+  border-bottom: 3px solid transparent;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.wx-days > .is-storm {
+  border-bottom-color: var(--snow);
+  color: var(--text);
+}
+
+.wx-two,
+.wx-two-note {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .wx-days > .is-thin {
+    visibility: hidden;
+  }
+}
+
+@media (min-width: 600px) {
+  .wx-lane {
+    grid-template-columns: 128px minmax(0, 1fr) 96px;
+  }
+
+  .wx-tot {
+    font-size: var(--fs-3);
+  }
+
+  .wx-one {
+    display: none;
+  }
+
+  .wx-two,
+  .wx-two-note {
+    display: inline;
+  }
+
+  .wx-week-plot .chart-svg {
+    height: 44px;
+  }
+}

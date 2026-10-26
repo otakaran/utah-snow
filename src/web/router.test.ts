@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseHash, WALL_DEFAULTS, wallHref, wallParams } from './router.ts';
+import { parseHash, WALL_DEFAULTS, wallHref, wallParams, weatherHref } from './router.ts';
 
 describe('parseHash', () => {
   it('maps every route and redirects unknown paths', () => {
@@ -43,5 +43,32 @@ describe('wall params', () => {
       set: 'pc',
       hls: WALL_DEFAULTS.hls,
     });
+  });
+});
+
+describe('weather route', () => {
+  it('bare #/weather leaves the resort to the page (the crew pick)', () => {
+    expect(parseHash('#/weather')).toEqual({ name: 'weather', resort: null });
+    expect(parseHash('#/weather/')).toEqual({ name: 'weather', resort: null });
+  });
+
+  it('?r= selects a resort', () => {
+    expect(parseHash('#/weather?r=snowbird')).toEqual({ name: 'weather', resort: 'snowbird' });
+    expect(parseHash('#/weather?x=1&r=deer-valley')).toEqual({ name: 'weather', resort: 'deer-valley' });
+  });
+
+  it('an unknown or empty ?r= falls back to the default without a redirect', () => {
+    expect(parseHash('#/weather?r=vail')).toEqual({ name: 'weather', resort: null });
+    expect(parseHash('#/weather?r=')).toEqual({ name: 'weather', resort: null });
+  });
+
+  it('extra path segments redirect', () => {
+    expect(parseHash('#/weather/alta')).toBeNull();
+  });
+
+  it('round-trips through weatherHref', () => {
+    expect(weatherHref()).toBe('#/weather');
+    expect(weatherHref(null)).toBe('#/weather');
+    expect(parseHash(weatherHref('alta'))).toEqual({ name: 'weather', resort: 'alta' });
   });
 });

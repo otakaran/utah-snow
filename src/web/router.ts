@@ -20,6 +20,7 @@ export type Route =
   | { name: 'briefing' }
   | { name: 'resort'; id: ResortId }
   | { name: 'cams' }
+  | { name: 'weather'; resort: ResortId | null }
   | { name: 'wall'; params: WallParams }
   | { name: 'tracker' }
   | { name: 'settings' };
@@ -78,11 +79,18 @@ export function parseHash(hash: string, wallDefaults: WallParams = WALL_DEFAULTS
     const q = new URLSearchParams(query);
     return { name: 'wall', params: wallParams((k) => q.get(k), wallDefaults) };
   }
+  if (head === 'weather') {
+    const r = new URLSearchParams(query).get('r');
+    return { name: 'weather', resort: r !== null && isResortId(r) ? r : null }; // an unknown ?r= falls back, no redirect
+  }
   const simple = SIMPLE.find((s) => s === head);
   return simple ? { name: simple } : null;
 }
 
 export const resortHref = (id: ResortId): string => `#/resort/${id}`;
+
+/** '#/weather' (the crew pick's resort) or '#/weather?r=snowbird'. */
+export const weatherHref = (id?: ResortId | null): string => (id ? `#/weather?r=${id}` : '#/weather');
 
 /** '#/wall?rotate=20&yt=180&set=all&hls=2': the settings page's "Open wall" link. */
 export function wallHref(p: WallParams): string {

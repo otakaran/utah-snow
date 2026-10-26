@@ -2,7 +2,7 @@
 // NWS base and summit snow for each of the next dates, the week total, the Open-Meteo model spread, the peak day
 // and a 0..1 bar fraction. Values arrive imperial and are formatted with src/shared/units.ts only.
 import { RESORT_IDS, RESORTS } from '../../../../config/resorts.ts';
-import { addDays } from '../../../shared/time.ts';
+import { addDays, formatLocalDate } from '../../../shared/time.ts';
 import type { Block, PointForecast, ResortId } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
 import { type OmData, omFor } from '../../data/open-meteo.ts';
@@ -119,6 +119,22 @@ export function weekLeader(rows: readonly WeekRow[]): WeekLeader | null {
   if (!best) return null;
   const { id, name, total, peakDate, peakHalf } = best;
   return { id, name, text: total.text, peakDate, peakHalf };
+}
+
+/** When a peak falls, from `today`: 'today', 'tonight', 'tomorrow night', 'Thu', 'Thu night'; null without one. */
+export function peakWhen(peakDate: string | null, half: 'day' | 'night' | null, today: string): string | null {
+  if (!peakDate) return null;
+  const tail = half === 'night' ? ' night' : '';
+  if (peakDate === today) return tail ? 'tonight' : 'today';
+  const name = today && peakDate === addDays(today, 1) ? 'tomorrow' : formatLocalDate(peakDate, 'weekday');
+  return name ? `${name}${tail}` : null;
+}
+
+/** The week's headline as plain text: 'Most snow: Alta 12–18″, peaking Thu night'; null when no row has snow. */
+export function leaderText(leader: WeekLeader | null, today: string): string | null {
+  if (!leader) return null;
+  const when = peakWhen(leader.peakDate, leader.peakHalf, today);
+  return `Most snow: ${leader.name} ${leader.text}${when ? `, peaking ${when}` : ''}`;
 }
 
 /** The single biggest summit day across every row (ties: the earliest date); null when no day has snow. */
