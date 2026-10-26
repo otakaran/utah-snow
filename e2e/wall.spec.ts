@@ -4,22 +4,37 @@
 // (serverNow = Date.now() + skew).
 import type { Page } from '@playwright/test';
 import { expect, test } from './fixtures.ts';
+import { richOpenMeteo, richSnapshot } from './wall-data.ts';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
-const DAY = '2027-01-05T19:00:00Z'; // 12:00 MST
+const DAY = '2027-01-05T19:00:00Z'; // 12:00 MST, a Tuesday
 const NIGHT = '2027-01-06T02:00:00Z'; // 19:00 MST
 const DAWN = '2027-01-05T13:30:00Z'; // 06:30 MST: 05:30 in the tz project's Los Angeles browser (spec §8.10)
+const SAFE_BOTTOM = 1080 - 24; // --wall-safe
 
-/** Installs the page clock at `iso`, pins the API Date header to it and optionally stamps /api/snapshot X-Build. */
-async function wallAt(page: Page, iso: string, build?: string): Promise<void> {
+interface WallAt {
+  /** Stamps /api/snapshot X-Build. */
+  build?: string;
+  /** Rewrites the /api/snapshot body (one handler for the Date pin and the body: the last registered one wins). */
+  snapshot?: (body: { forecast: Record<string, { data: unknown }> }) => void;
+}
+
+/** Installs the page clock at `iso`, pins the API Date header to it and optionally patches /api/snapshot. */
+async function wallAt(page: Page, iso: string, opts: WallAt = {}): Promise<void> {
   const ms = Date.parse(iso);
   await page.clock.install({ time: ms });
   await page.route('**/api/**', async (route) => {
     const res = await route.fetch();
     const headers: Record<string, string> = { ...res.headers(), date: new Date(ms).toUTCString() };
-    if (build && new URL(route.request().url()).pathname === '/api/snapshot') headers['x-build'] = build;
-    await route.fulfill({ response: res, headers });
+    const snap = new URL(route.request().url()).pathname === '/api/snapshot';
+    if (opts.build && snap) headers['x-build'] = opts.build;
+    if (!opts.snapshot || !snap || res.status() !== 200) return route.fulfill({ response: res, headers });
+    const body = await res.json();
+    opts.snapshot(body);
+    delete headers['content-length'];
+    delete headers['content-encoding'];
+    await route.fulfill({ response: res, headers, body: JSON.stringify(body) });
   });
 }
 
@@ -28,9 +43,21 @@ const camsOf = (page: Page, slot: string) =>
     .locator(`[data-testid="wall-tile"][data-slot="${slot}"] [data-cam]`)
     .evaluateAll((els) => els.map((el) => el.getAttribute('data-cam')));
 
+/** Visible elements under `testId` whose box ends below the --wall-safe margin (clipped content included). */
+const belowSafe = (page: Page, testId: string) =>
+  page.getByTestId(testId).evaluate((root, max) => {
+    const out: string[] = [];
+    for (const el of [root, ...root.querySelectorAll('*')]) {
+      const r = el.getBoundingClientRect();
+      if (el.closest('.sr-only') || r.height === 0) continue;
+      if (r.bottom > max + 0.5) out.push(`${el.tagName.toLowerCase()}.${el.getAttribute('class')} ${r.bottom}`);
+    }
+    return out;
+  }, SAFE_BOTTOM);
+
 test('by day: 9 tiles without the app shell, cells 1-5 page after 20 s with a turn bar', async ({ page }) => {
   await wallAt(page, DAY);
-  await page.goto('/#/wall?rotate=20&yt=180&set=all&hls=2');
+  await page.goto('/#/wall?rotate=20&yt=180&set=all&hls=2&wx=0');
   const wall = page.getByTestId('wall');
   await expect(wall).toHaveAttribute('data-night', 'false');
   await expect(page.getByTestId('wall-tile')).toHaveCount(9);
@@ -45,6 +72,67 @@ test('by day: 9 tiles without the app shell, cells 1-5 page after 20 s with a tu
   await page.clock.fastForward(20_000);
   await expect.poll(() => camsOf(page, 'rotating')).not.toEqual(before);
   await expect(page.getByTestId('wall-tile')).toHaveCount(9);
+});
+
+test('the strip under the grid shows 7 days for every resort', async ({ page }) => {
+  await wallAt(page, DAY);
+  await page.goto('/#/wall?wx=0');
+  const cols = page.getByTestId('wall-week-col');
+  await expect(cols).toHaveCount(6);
+  const days = page.locator('[data-testid="wall-week-col"] [data-date]');
+  await expect(days).toHaveCount(42);
+  await expect(days.first()).toHaveText('T'); // Tuesday
+  await expect(days.first()).toHaveAttribute('data-date', '2027-01-05');
+  await expect(cols.first()).toContainText('—'); // the seed's '{}' NWS payloads
+  expect(await belowSafe(page, 'wall-snow')).toEqual([]);
+});
+
+test('weather page every wx pages: the cams stay mounted, then come back on the next page', async ({ page }) => {
+  await wallAt(page, DAY);
+  await page.goto('/#/wall?rotate=20&wx=1&hls=0&set=all');
+  await expect(page.getByTestId('wall-tile')).toHaveCount(9);
+  await expect(page.getByTestId('wall-weather')).toHaveCount(0);
+  const before = await camsOf(page, 'rotating');
+  await expect(page.getByTestId('wall-count')).toContainText('page 1/');
+
+  await page.clock.fastForward(20_000);
+  await expect(page.getByTestId('wall-weather')).toBeVisible();
+  await expect(page.getByTestId('wall-grid')).toBeHidden();
+  await expect(page.getByTestId('wall-count')).toContainText('· weather');
+  await expect(page.getByTestId('wall-tile')).toHaveCount(9);
+  await expect(page.getByTestId('wall-wx-storm')).toHaveText('No NWS forecast'); // the seed's '{}' NWS payloads
+  await expect(page.getByTestId('wall-hourly')).toHaveAttribute('data-mode', 'nws'); // fixtures' empty Open-Meteo
+  await expect(page.getByTestId('wall-hourly')).toContainText('showing NWS day/night totals');
+  await expect(page.locator('[data-testid="wall-weather"] > [data-testid="wall-turn"]')).toHaveCount(1);
+  expect(await belowSafe(page, 'wall-weather')).toEqual([]);
+
+  await page.clock.fastForward(20_000);
+  await expect(page.getByTestId('wall-weather')).toHaveCount(0);
+  await expect(page.getByTestId('wall-grid')).toBeVisible();
+  await expect(page.getByTestId('wall-count')).toContainText('page 2/'); // the next cam page, none skipped
+  expect(await camsOf(page, 'rotating')).not.toEqual(before);
+});
+
+test('with a week of NWS and hourly models: storm day in the strip, storm headline and hourly lanes', async ({
+  page,
+}) => {
+  await wallAt(page, DAY, { snapshot: richSnapshot });
+  await page.route('https://api.open-meteo.com/**', (route) =>
+    route.fulfill({ contentType: 'application/json', body: richOpenMeteo() }),
+  );
+  await page.goto('/#/wall?rotate=20&wx=1&hls=0');
+  const storm = page.locator('[data-testid="wall-week-col"] [data-storm="true"]');
+  await expect(storm).toHaveCount(6);
+  await expect(storm.first()).toHaveAttribute('data-date', '2027-01-07');
+  await expect(page.getByTestId('wall-week-col').first()).toContainText('14–23″'); // Alta's week, base–summit
+
+  await page.clock.fastForward(20_000);
+  await expect(page.getByTestId('wall-wx-storm')).toHaveText('Thu 8–14″ · Alta');
+  await expect(page.locator('[data-testid="wall-wx-week"] tbody tr')).toHaveCount(6);
+  await expect(page.getByTestId('wall-hourly')).toHaveAttribute('data-mode', 'models');
+  await expect(page.locator('.wall-hr-svg')).toHaveCount(6);
+  await expect(page.getByTestId('wall-hourly')).toContainText('NBM via Open-Meteo');
+  expect(await belowSafe(page, 'wall-weather')).toEqual([]);
 });
 
 test('a live stake slot with no stream never doubles its -still twin (set=stakes)', async ({ page }) => {
@@ -71,6 +159,7 @@ test('at 19:00 local: night mode, stake stills only and no video', async ({ page
   await expect(page.getByTestId('wall')).toHaveAttribute('data-night', 'true');
   await expect(page.getByTestId('wall-roads')).toBeVisible();
   await expect(page.getByTestId('wall-snow')).toBeVisible();
+  await expect(page.getByTestId('wall-weather')).toHaveCount(0);
   await expect(page.getByTestId('pick-compact')).toHaveCount(0);
   await expect(page.locator('[data-testid="wall-tile"][data-slot="stake"]').first()).toBeVisible();
   await expect(page.locator('video')).toHaveCount(0);
@@ -85,7 +174,7 @@ test('at 06:30 Denver time night mode is off, whatever the browser time zone', a
 });
 
 test('a new X-Build on /api/snapshot reloads the wall exactly once', async ({ page }) => {
-  await wallAt(page, DAY, 'other');
+  await wallAt(page, DAY, { build: 'other' });
   let loads = 0; // document requests: a reload can land before the first page's load event
   let snapshots = 0;
   page.on('request', (req) => {

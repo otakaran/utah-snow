@@ -41,7 +41,10 @@ export interface StormHeadline {
   text: string;
 }
 
-/** The week's single biggest summit day across every resort, with that resort's base–summit range; null when dry. */
+/**
+ * The week's single biggest summit day across every resort, with that resort's base–summit range; null when dry or
+ * when NWS has no day at all (`weekHeadline` tells the two apart).
+ */
 export function stormHeadline(rows: readonly WeekRow[], units: Units): StormHeadline | null {
   const s = stormDay(rows);
   const row = s ? rows.find((r) => r.id === s.id) : undefined;
@@ -49,6 +52,14 @@ export function stormHeadline(rows: readonly WeekRow[], units: Units): StormHead
   if (!s || !row || !day) return null;
   const snow = range('snow', [day.baseIn, day.summitIn], units);
   return { date: s.date, id: s.id, text: `${formatLocalDate(s.date, 'weekday')} ${snow} · ${row.name}` };
+}
+
+/** The weather page's callout: the storm day, else 'Dry week', or 'No NWS forecast' when no resort has a known day. */
+export function weekHeadline(rows: readonly WeekRow[], storm: StormHeadline | null): string {
+  if (storm) return storm.text;
+  return rows.some((r) => r.days.some((d) => d.summitIn !== null || d.baseIn !== null))
+    ? 'Dry week'
+    : 'No NWS forecast';
 }
 
 /** Per row and day, the cell wash (0..1): summit snow over the table's biggest day, 6″ at least; 0 when dry. */

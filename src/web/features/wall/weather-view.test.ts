@@ -13,6 +13,7 @@ import {
   nwsHalves,
   pickHourly,
   stormHeadline,
+  weekHeadline,
 } from './weather-view.ts';
 
 const DATES = weekDates('2027-01-05'); // Tuesday
@@ -42,14 +43,14 @@ describe('stormHeadline', () => {
     expect(stormHeadline(ROWS, 'imperial')).toEqual({ date: '2027-01-07', id: 'alta', text: 'Thu 8–14″ · Alta' });
     expect(stormHeadline(weekRows(FORECAST, DATES, 'metric'), 'metric')?.text).toBe('Thu 20–36 cm · Alta');
   });
-  it('is null on a dry week and on placeholder payloads (the page then says DRY WEEK)', () => {
-    expect(
-      stormHeadline(
-        weekRows({ 'alta:summit': block([{ date: '2027-01-05', snowIn: 0 }]) }, DATES, 'imperial'),
-        'imperial',
-      ),
-    ).toBeNull();
-    expect(stormHeadline(weekRows({ 'alta:base': PLACEHOLDER }, DATES, 'imperial'), 'imperial')).toBeNull();
+  it('is null on a dry week and without NWS days; the callout tells the two apart', () => {
+    const dry = weekRows({ 'alta:summit': block([{ date: '2027-01-05', snowIn: 0 }]) }, DATES, 'imperial');
+    const blank = weekRows({ 'alta:base': PLACEHOLDER }, DATES, 'imperial');
+    expect(stormHeadline(dry, 'imperial')).toBeNull();
+    expect(stormHeadline(blank, 'imperial')).toBeNull();
+    expect(weekHeadline(dry, null)).toBe('Dry week');
+    expect(weekHeadline(blank, null)).toBe('No NWS forecast');
+    expect(weekHeadline(ROWS, stormHeadline(ROWS, 'imperial'))).toBe('Thu 8–14″ · Alta');
   });
 });
 

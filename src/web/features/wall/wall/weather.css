@@ -2,8 +2,10 @@
    1032 px: headline band (~110 px), the week table (~430), the hourly block (~380) with its status line, and the turn
    bar on the bottom edge. Nothing may spill: the page clips. Cells carry no text-shadow (no --snow-glow). */
 .wall-wx {
-  --wx-name: 16%; /* resort-name column of the week table, the halves table and the hourly lanes */
-  --wx-total: 7.5em; /* 48 h total column of the hourly lanes */
+  /* the tables' resort-name column, and the hourly lanes' name | lane | total columns: the lane spans the week
+     table's 7 day columns and the 48 h total sits under WEEK (8 equal columns share the rest) */
+  --wx-name: 16%;
+  --wx-total: 10.5%;
 
   position: relative;
   display: flex;
@@ -88,6 +90,10 @@
   background: color-mix(in srgb, var(--snow-glow) calc(var(--h, 0) * 100%), transparent);
 }
 
+.wall-wx-week :is(th, td) {
+  padding-block: var(--space-2);
+}
+
 .wall-wx-week thead th[data-storm] {
   color: var(--text);
 }
@@ -124,7 +130,6 @@
 .wall-hr-lane {
   display: grid;
   grid-template-columns: var(--wx-name) minmax(0, 1fr) var(--wx-total);
-  gap: var(--space-2);
   align-items: center;
 }
 
@@ -136,6 +141,7 @@
 
 .wall-hr-name {
   overflow: hidden;
+  padding-right: var(--space-2);
   color: var(--text);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -148,7 +154,7 @@
 .wall-hr-svg {
   display: block;
   width: 100%;
-  height: 44px;
+  height: 50px;
   background: var(--surface-2);
 }
 
@@ -176,6 +182,7 @@
 }
 
 .wall-hr-total {
+  padding-right: var(--space-2);
   color: var(--snow);
   font: 900 var(--fs-3) / 1.1 var(--font-num);
   font-feature-settings: var(--num-features);
@@ -187,7 +194,7 @@
 .wall-hr-ticks {
   position: relative;
   height: 1.2em;
-  margin: 0 calc(var(--wx-total) + var(--space-2)) 0 calc(var(--wx-name) + var(--space-2));
+  margin: 0 var(--wx-total) 0 var(--wx-name);
 }
 
 .wall-hr-ticks > span {

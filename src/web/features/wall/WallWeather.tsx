@@ -1,8 +1,8 @@
 // The wall's full-screen weather page (spec §8.4): after every `wx` cam pages it takes the left 3fr for one `rotate`
 // period (Wall.tsx, rotation.ts wxSequence) while the sidebar stays. Read from 3 m, top to bottom: the headline band
-// (kicker with the NWS age, then the storm callout or DRY WEEK), the 7-day NWS table (base–summit per resort and
-// day, washed by summit snow, the storm day underlined, the pick row in --accent), the 48 h hourly block
-// (WallHourly) and its status line, and the turn bar (left out while paused). NWS feeds everything but the lanes.
+// (kicker with the NWS age, then the storm callout, DRY WEEK or NO NWS FORECAST), the 7-day NWS table (base–summit
+// per resort and day, washed by summit snow, the storm day underlined, the pick row in --accent), the 48 h hourly
+// block (WallHourly) and its status line, and the turn bar (left out while paused). NWS feeds all but the lanes.
 import { RESORT_IDS } from '../../../../config/resorts.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { Block, PointForecast, ResortId } from '../../../shared/types.ts';
@@ -11,7 +11,7 @@ import { ageText } from '../../lib/format.ts';
 import { range, type WeekRow, worstMeta } from '../conditions/index.ts';
 import { Turn } from './Turn.tsx';
 import { WallHourly } from './WallHourly.tsx';
-import { dayWash, type StormHeadline } from './weather-view.ts';
+import { dayWash, type StormHeadline, weekHeadline } from './weather-view.ts';
 
 interface Props {
   rows: readonly WeekRow[];
@@ -89,7 +89,7 @@ export function WallWeather(props: Props) {
           {fresh ? ` · updated ${ageText(fresh.age)}` : null}
         </h2>
         <p class="wall-wx-storm num" data-testid="wall-wx-storm">
-          {storm ? storm.text : 'Dry week'}
+          {weekHeadline(props.rows, storm)}
         </p>
       </header>
       <WeekTable {...props} />
