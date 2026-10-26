@@ -5,16 +5,33 @@
 // with its age. Times here are server time (Date.now() + skew), like every other age in the UI.
 import { signal } from '@preact/signals';
 import { RESORT_IDS, RESORTS } from '../../../config/resorts.ts';
-import { MIN } from '../../shared/time.ts';
-import type { ResortId } from '../../shared/types.ts';
+import { isoUtc, MIN } from '../../shared/time.ts';
+import type { Meta, ResortId } from '../../shared/types.ts';
 import { skewMs } from './snapshot.ts';
 
-/** Model suffixes on every key (`snowfall_sum_ecmwf_ifs`). HRRR covers ~48 h; NBM and ECMWF lack some fields. */
+/**
+ * Model suffixes on every key (`snowfall_sum_ecmwf_ifs`). Coverage measured 2026-10-25: HRRR carries all seven
+ * hourly fields but only for the first ~48-60 h; NBM runs the full 168 h for snowfall, temperature_2m,
+ * wind_speed_10m, wind_gusts_10m and precipitation but has no snow_depth and no freezing_level_height; ECMWF has
+ * everything except freezing_level_height; GFS has everything. A field a model lacks is null (or absent) per hour.
+ */
 export const OM_MODELS = ['ncep_hrrr_conus', 'ncep_nbm_conus', 'ecmwf_ifs', 'ncep_gfs_global'] as const;
 export type OmModel = (typeof OM_MODELS)[number];
 
+/** The hourly fields the C.5 URL asks for, in URL order (`hourly=` is built from this list). */
+export const OM_HOURLY_FIELDS = [
+  'snowfall',
+  'snow_depth',
+  'temperature_2m',
+  'freezing_level_height',
+  'wind_speed_10m',
+  'wind_gusts_10m',
+  'precipitation',
+] as const;
+export type OmHourlyField = (typeof OM_HOURLY_FIELDS)[number];
+
 const PTS = RESORT_IDS.map((id) => RESORTS[id].openMeteo);
-const HOURLY = 'snowfall,snow_depth,temperature_2m,freezing_level_height,wind_speed_10m,wind_gusts_10m,precipitation';
+const HOURLY = OM_HOURLY_FIELDS.join(',');
 
 /** The C.5 request: six resort points in RESORT_IDS order, imperial units, Denver days. */
 export const OM_URL = `https://api.open-meteo.com/v1/forecast?${[
@@ -89,6 +106,42 @@ export function parseOm(body: unknown): OmLocation[] {
 /** The response entry for one resort (array index = RESORT_IDS position). */
 export function omFor(data: OmLocation[] | null | undefined, id: ResortId): OmLocation | null {
   return data?.[RESORT_IDS.indexOf(id)] ?? null;
+}
+
+/**
+ * One model's series for a field (`hourly` 'snowfall' or `daily` 'snowfall_sum'): the `{field}_{model}` array, or
+ * null when the key is missing, is not an array, or holds no number at all (a field the model does not carry).
+ */
+export function omSeries(
+  loc: OmLocation | null | undefined,
+  block: 'hourly' | 'daily',
+  field: string,
+  model: OmModel,
+): (number | null)[] | null {
+  const arr = loc?.[block]?.[`${field}_${model}`];
+  if (!Array.isArray(arr) || !arr.some((v) => typeof v === 'number')) return null;
+  return arr as (number | null)[];
+}
+
+/**
+ * A `Meta` for the browser-fetched Open-Meteo data so `badge()` / `worstMeta` / SourceLine treat it like a source
+ * row: ok at the fetch time with a 60 min stale window (the store refreshes every 30). 'idle' counts as ok, since a
+ * fresh cache never triggers a refresh and so never changes the status; only 'error' and 'rate-limited' are failures,
+ * and then `fetchedAt` is the failed attempt (`nowMs`). Null without cached data.
+ */
+export function omMeta(om: OmData | null | undefined, status: OmStatus, nowMs: number): Meta | null {
+  if (!om) return null;
+  const failed = status === 'error' || status === 'rate-limited';
+  return {
+    source: 'open-meteo',
+    fetchedAt: isoUtc(failed ? nowMs : om.at),
+    okAt: isoUtc(om.at),
+    asOf: null,
+    status: failed ? 'error' : 'ok',
+    failCount: failed ? 1 : 0,
+    staleAfterMin: 60,
+    via: 'browser',
+  };
 }
 
 function load(): Stored {

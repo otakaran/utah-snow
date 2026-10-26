@@ -1,6 +1,6 @@
 // ForecastPanel (spec §8.2 `forecast`): per resort, NWS snow for today (08-16), tonight (16-08) and tomorrow
 // (08-16) as base–summit ranges, the Open-Meteo model spread for today + tomorrow, summit wind, then snow level and
-// summit temperatures as notes, and the AFD KEY MESSAGES in a collapsible block. Units follow the settings toggle.
+// summit temperatures as notes, and the AFD KEY MESSAGES (AfdNotes) in a collapsible block. Units follow the toggle.
 // From 900 px the notes sit beside the table (conditions.css).
 import { useEffect } from 'preact/hooks';
 import { RESORT_IDS } from '../../../../config/resorts.ts';
@@ -9,9 +9,10 @@ import type { ResortId } from '../../../shared/types.ts';
 import { type Units, unitOf } from '../../../shared/units.ts';
 import { omFor, openMeteo, openMeteoRetryAt, openMeteoStatus, startOpenMeteo } from '../../data/open-meteo.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
-import { ageText, clock, clockRel } from '../../lib/format.ts';
+import { ageText, clock } from '../../lib/format.ts';
 import { Section } from '../../ui/Section.tsx';
-import { afdBullets, forecastRow, snowLevelNote, tempNote } from './forecast-rows.ts';
+import { AfdNotes } from './AfdNotes.tsx';
+import { forecastRow, snowLevelNote, tempNote } from './forecast-rows.ts';
 import { worstMeta } from './panel-meta.ts';
 import { SourceLine } from './SourceLine.tsx';
 
@@ -28,7 +29,6 @@ export interface ForecastPanelProps {
   testId?: string;
 }
 
-const external = { target: '_blank', rel: 'noreferrer' } as const;
 const rangesNote = (units: Units, wd: string): string =>
   `Snow in ${units === 'metric' ? 'cm' : 'inches'}, base to summit: today 8 AM–4 PM, tonight 4 PM–8 AM, ${wd} 8 AM–4 PM.`;
 const BLANK_NOTE = '— = NWS grid not reported.';
@@ -45,25 +45,6 @@ function ModelsNote({ now, wd }: { now: number; wd: string }) {
       Models: range of 4 Open-Meteo models (HRRR, NBM, ECMWF, GFS) for today + {wd}, updated {age}
       {held}.
     </p>
-  );
-}
-
-function Afd({ now }: { now: number }) {
-  const afd = snapshot.value?.afd?.data;
-  const bullets = afdBullets(afd?.keyMessages);
-  if (!afd || bullets.length === 0) return null;
-  return (
-    <details class="cond-more">
-      <summary class="disclosure">NWS key messages · {clockRel(afd.issuedAt, now)}</summary>
-      <ul class="cond-afd">
-        {bullets.map((b) => (
-          <li key={b}>{b}</li>
-        ))}
-      </ul>
-      <a class="cond-link" href={afd.url} {...external}>
-        Full NWS discussion ↗
-      </a>
-    </details>
   );
 }
 
@@ -144,7 +125,7 @@ export function ForecastPanel({
               </p>
             ))}
             <ModelsNote now={now} wd={wd} />
-            {afd ? <Afd now={now} /> : null}
+            {afd ? <AfdNotes now={now} /> : null}
           </div>
         </div>
       ) : (

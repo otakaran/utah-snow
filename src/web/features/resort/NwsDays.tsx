@@ -6,7 +6,8 @@ import type { Block, NwsDay, PointForecast } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
 import { clockRel, qty } from '../../lib/format.ts';
 import { StatusChip } from '../../ui/StatusChip.tsx';
-import { forecastData, levelStatus } from './resort-model.ts';
+import { levelStatus } from '../conditions/index.ts';
+import { forecastData } from './resort-model.ts';
 
 interface Props {
   label: string;

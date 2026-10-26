@@ -1,23 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { NwsDay, ResortSnapshot } from '../../../shared/types.ts';
-import { daysLeft, driveInfo, groupByArea, hm12, hoursLines, levelStatus, resortData, span12 } from './resort-model.ts';
+import type { ResortSnapshot } from '../../../shared/types.ts';
+import { daysLeft, driveInfo, groupByArea, hm12, hoursLines, resortData, span12 } from './resort-model.ts';
 
 const lift = (id: string, area: string | null) => ({ id, name: id, state: 'open' as const, raw: 'Open', area });
-const day = (o: Partial<NwsDay>): NwsDay => ({
-  date: '2027-01-09',
-  snowIn: 0,
-  snowDayIn: 0,
-  snowNightIn: 0,
-  qpfIn: 0.3,
-  snowLevelMinFt: null,
-  snowLevelMaxFt: null,
-  gustMaxMph: null,
-  windMaxMph: null,
-  tMinF: null,
-  tMaxF: null,
-  popMax: null,
-  ...o,
-});
 
 describe('resort page helpers', () => {
   it('groups lifts by area, flattening feeds whose areas are the lift names', () => {
@@ -39,13 +24,6 @@ describe('resort page helpers', () => {
     const brighton = hoursLines('brighton');
     expect(brighton.at(-1)).toMatchObject({ hours: '4:00 PM–9:00 PM', note: 'not Tues, Dec 24, Dec 25, Dec 31' });
     expect(hoursLines('alta')[0]).toEqual({ label: 'Collins, Sunnyside', hours: '9:15 AM–4:30 PM' });
-  });
-
-  it('judges the snow level against the true elevation', () => {
-    expect(levelStatus(day({ snowLevelMinFt: 5000, snowLevelMaxFt: 6000 }), 8530)?.word).toBe('Snow');
-    expect(levelStatus(day({ snowLevelMinFt: 8000, snowLevelMaxFt: 9000 }), 8530)?.word).toBe('Mix');
-    expect(levelStatus(day({ snowLevelMinFt: 9000, snowLevelMaxFt: 9500 }), 8530)?.word).toBe('Rain');
-    expect(levelStatus(day({ qpfIn: 0, snowLevelMaxFt: 9500 }), 8530)).toBeNull();
   });
 
   it('builds the drive line and the days left', () => {

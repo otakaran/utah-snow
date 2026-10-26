@@ -1,10 +1,12 @@
 // Pure view logic for ForecastPanel (spec §8.2, §8.8): NWS base/summit rows -> per-resort snow ranges
-// (today 08-16, tonight 16-08, tomorrow 08-16), summit wind, temps and snow level against the true elevations,
-// plus the Open-Meteo model spread. Values arrive imperial and are formatted with src/shared/units.ts only.
+// (today 08-16, tonight 16-08, tomorrow 08-16), summit wind, temps and snow level against the true elevations
+// (`levelStatus` is the Snow / Mix / Rain word the resort and weather pages chip), plus the Open-Meteo model
+// spread. Values arrive imperial and are formatted with src/shared/units.ts only.
 import { RESORTS } from '../../../../config/resorts.ts';
 import type { NwsDay, PointForecast, ResortId } from '../../../shared/types.ts';
 import { fmt, type Kind, type Units } from '../../../shared/units.ts';
 import type { OmSeries } from '../../data/open-meteo.ts';
+import type { StatusWord } from '../../ui/status.ts';
 
 const DASH = '—';
 const finite = (v: number | null | undefined): v is number => typeof v === 'number' && Number.isFinite(v);
@@ -104,6 +106,14 @@ export function forecastRow(
     tMinF: (sDay ?? bDay)?.tMinF ?? null,
     tMaxF: (sDay ?? bDay)?.tMaxF ?? null,
   };
+}
+
+/** Snow level against the point's true elevation on a day with precipitation: Snow / Mix / Rain, else null. */
+export function levelStatus(d: NwsDay, elevFt: number): StatusWord | null {
+  if (!(d.qpfIn > 0) || d.snowLevelMaxFt === null) return null;
+  if (d.snowLevelMaxFt <= elevFt) return { tone: 'ok', word: 'Snow' };
+  if ((d.snowLevelMinFt ?? d.snowLevelMaxFt) > elevFt) return { tone: 'bad', word: 'Rain' };
+  return { tone: 'warn', word: 'Mix' };
 }
 
 const names = (rows: readonly ForecastRow[]): string => rows.map((r) => r.name).join(', ');

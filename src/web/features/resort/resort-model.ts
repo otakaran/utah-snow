@@ -1,5 +1,5 @@
-// Pure view helpers for the resort page (spec §8.7): season and snow-level status words, lift grouping, C.8 lift
-// hours, days left and the drive line. No Date/Intl; times are 'HH:MM'.
+// Pure view helpers for the resort page (spec §8.7): the season status word, lift grouping, C.8 lift hours, days
+// left and the drive line (the snow-level word is conditions/forecast-rows.ts `levelStatus`). No Date/Intl.
 import { CAP_GROUPS } from '../../../../config/ikon.ts';
 import { type LiftHours, type LiftWindow, RESORTS } from '../../../../config/resorts.ts';
 import { type CapDay, crewRemaining, group, remaining } from '../../../shared/caps.ts';
@@ -7,7 +7,7 @@ import type { Badge } from '../../../shared/freshness.ts';
 import type { DriveMatrix } from '../../../shared/geo.ts';
 import type { ParkingDay } from '../../../shared/parking.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
-import type { LiftStatus, NwsDay, PointForecast, ResortId, ResortSnapshot } from '../../../shared/types.ts';
+import type { LiftStatus, PointForecast, ResortId, ResortSnapshot } from '../../../shared/types.ts';
 import type { StatusWord } from '../../ui/status.ts';
 
 const SEASON: Record<ResortSnapshot['season'], StatusWord> = {
@@ -138,14 +138,6 @@ export function daysLeft(id: ResortId, days: readonly CapDay[], crew: readonly s
     me: me ? remaining(days, me, g) : null,
     crew: crew.length > 0 ? crewRemaining(days, crew, g) : null,
   };
-}
-
-/** Snow level against the point's true elevation on a day with precipitation: Snow / Mix / Rain, else null. */
-export function levelStatus(d: NwsDay, elevFt: number): StatusWord | null {
-  if (!(d.qpfIn > 0) || d.snowLevelMaxFt === null) return null;
-  if (d.snowLevelMaxFt <= elevFt) return { tone: 'ok', word: 'Snow' };
-  if ((d.snowLevelMinFt ?? d.snowLevelMaxFt) > elevFt) return { tone: 'bad', word: 'Rain' };
-  return { tone: 'warn', word: 'Mix' };
 }
 
 /** Link text for a parking day's booking URL. */

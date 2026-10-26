@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import type { NwsDay, PointForecast } from '../../../shared/types.ts';
 import type { OmSeries } from '../../data/open-meteo.ts';
-import { afdBullets, forecastRow, modelSpread, range, snowLevelNote, tempNote, windText } from './forecast-rows.ts';
+import {
+  afdBullets,
+  forecastRow,
+  levelStatus,
+  modelSpread,
+  range,
+  snowLevelNote,
+  tempNote,
+  windText,
+} from './forecast-rows.ts';
 
 const DATES = { today: '2026-12-28', tomorrow: '2026-12-29' };
 
@@ -105,6 +114,16 @@ describe('forecastRow and notes', () => {
     expect(snowLevelNote([alta, basin], 'imperial')).toBe('Snow level today 6,000–9,000 ft: above the base at Alta.');
     expect(snowLevelNote([basin], 'metric')).toBe('Snow level today 1,830 m: below the base.');
     expect(tempNote([alta], 'imperial')).toBe('Summit today: high 22°F, low 12°F.');
+  });
+});
+
+describe('levelStatus', () => {
+  it('judges the snow level against the true elevation on a day with precipitation', () => {
+    const wet = (o: Partial<NwsDay>) => day({ qpfIn: 0.3, ...o });
+    expect(levelStatus(wet({ snowLevelMinFt: 5000, snowLevelMaxFt: 6000 }), 8530)?.word).toBe('Snow');
+    expect(levelStatus(wet({ snowLevelMinFt: 8000, snowLevelMaxFt: 9000 }), 8530)?.word).toBe('Mix');
+    expect(levelStatus(wet({ snowLevelMinFt: 9000, snowLevelMaxFt: 9500 }), 8530)?.word).toBe('Rain');
+    expect(levelStatus(day({ qpfIn: 0, snowLevelMaxFt: 9500 }), 8530)).toBeNull();
   });
 });
 
