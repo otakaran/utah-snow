@@ -64,7 +64,7 @@ test('"I am" already chosen: no chip, and [Crew | As me] holds its place while t
   await seedStorage(page, { 'utahsnow.me': 'otakar0001', 'utahsnow.snap': snap });
   const release = await holdApi(page);
   await page.goto('/');
-  await expect(page.locator('.pick-who')).toContainText('One skier');
+  await expect(page.locator('.pick-who')).toHaveText('Loading the crew…');
   await expect(page.getByTestId('iam-chip')).toHaveCount(0);
   await expect(page.getByTestId('pick-view')).toBeVisible();
   const before = await boxes(page);

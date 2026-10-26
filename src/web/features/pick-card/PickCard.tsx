@@ -37,6 +37,9 @@ const VIEW_OPTIONS = [
 
 function Who({ r }: { r: PickResult }) {
   if (people.value.length === 0) {
+    // Before the first /api/tracker answer the crew is unknown, not absent: one plain line, as tall as the crew line
+    // (the one-skier line carries a 44 px link), so the hero does not jump when the crew arrives.
+    if (trackerStatus.value === 'idle') return <p class="pick-who">Loading the crew…</p>;
     return (
       <p class="pick-who">
         One skier, full caps · <a href="#/tracker">Add the crew in Tracker</a>
