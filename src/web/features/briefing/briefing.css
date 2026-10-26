@@ -1,6 +1,7 @@
 /* Briefing: header + countdown, phone jump bar, stake plates and the footer status line; resort cards come from
-   briefing/cards.css. tokens.css variables only (B Topo Night). */
+   briefing/cards.css, their compact phone fold from briefing/fold.css. tokens.css variables only (B Topo Night). */
 @import "./briefing/cards.css";
+@import "./briefing/fold.css";
 
 .brief-head h1 {
   margin: 0;
@@ -30,7 +31,8 @@
   background: var(--bg);
 }
 
-/* all six targets fit a 390 px phone without sideways scrolling */
+/* all seven targets fit a 375 px phone without sideways scrolling: they need 346 px at the --space-1 padding, so
+   below 390 px the padding halves (318 px; the chips still grow to fill the bar) */
 .brief-jump .jumpbar {
   gap: var(--space-1);
 }
@@ -39,6 +41,12 @@
   flex: 1 1 auto;
   justify-content: center;
   padding-inline: var(--space-1);
+}
+
+@media (max-width: 389px) {
+  .brief-jump .jump {
+    padding-inline: calc(var(--space-1) / 2);
+  }
 }
 
 @media (min-width: 900px) {

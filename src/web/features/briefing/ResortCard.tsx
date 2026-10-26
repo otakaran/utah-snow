@@ -2,7 +2,10 @@
 // trails, summit wind, parking chip, freshness and a link to #/resort/:id. Pre-season hides the snow numbers, lifts
 // and trails, and counts the days to the projected opening. The picked resort gets the "Today's pick" outline and
 // flag. The hero still comes in as a slot (the cams feature). A flex column, so every card's foot lines up.
+// `compact` (one-column phones): a <details> whose summary is the name row; only the pick starts open, and a closed
+// card mounts no hero until it is first opened, so it requests no still.
 import type { ComponentChildren } from 'preact';
+import { useState } from 'preact/hooks';
 import { RESORTS } from '../../../../config/resorts.ts';
 import { ageMin, badge } from '../../../shared/freshness.ts';
 import { parkingCal } from '../../../shared/parking.ts';
@@ -26,6 +29,8 @@ export interface ResortCardProps {
   drive: string;
   daysLeft: DaysPart[];
   hero: ComponentChildren;
+  /** One-column phones: a <details> that only the pick opens by itself. */
+  compact: boolean;
 }
 
 /** '6 me · 4 crew min', each number first. */
@@ -92,29 +97,27 @@ export function ResortCard(p: ResortCardProps) {
   const st = resortStatus(data);
   const pre = data?.season === 'preseason';
   const park = p.date ? parkingCal(p.id, p.date) : null;
+  const [opened, setOpened] = useState(false); // compact: opened once, so the hero stays mounted
   const tags = [
     park?.required ? 'P · Parking reservation' : null,
     park?.liftReservation ? 'Ikon lift reservation' : null,
     def.skiersOnly ? 'Skiers only' : null,
   ].filter((t) => t !== null);
-  return (
-    <article
-      class={`rc${p.isPick ? ' is-pick' : ''}`}
-      aria-label={p.isPick ? `${def.name}, today's pick` : def.name}
-      data-testid="resort-card"
-      data-resort={p.id}
-    >
+  const top = (
+    <>
       {p.isPick ? (
         <span class="rc-flag">
           <span aria-hidden="true">★</span> Today's pick
         </span>
       ) : null}
-      <div class="rc-top">
-        <h3 class="rc-name">{def.name}</h3>
-        <StatusChip tone={st.tone} word={st.word} stale={b === 'red' && st.tone !== 'off'} />
-      </div>
+      <h3 class="rc-name">{def.name}</h3>
+      <StatusChip tone={st.tone} word={st.word} stale={b === 'red' && st.tone !== 'off'} />
+    </>
+  );
+  const body = (
+    <div class="rc-body">
       <div class="rc-mid">
-        <div class="rc-hero">{p.hero}</div>
+        <div class="rc-hero">{!p.compact || p.isPick || opened ? p.hero : null}</div>
         {pre ? <PreSeason id={p.id} now={p.now} /> : <Snow data={data} units={p.units} now={p.now} />}
       </div>
       <dl class="rc-facts">
@@ -160,6 +163,33 @@ export function ResortCard(p: ResortCardProps) {
           Details →
         </a>
       </div>
-    </article>
+    </div>
+  );
+  const root = {
+    class: `rc${p.isPick ? ' is-pick' : ''}`,
+    'aria-label': p.isPick ? `${def.name}, today's pick` : def.name,
+    'data-testid': 'resort-card',
+    'data-resort': p.id,
+  };
+  if (!p.compact) {
+    return (
+      <article {...root}>
+        <div class="rc-top">{top}</div>
+        {body}
+      </article>
+    );
+  }
+  // `open` is written only when isPick changes, so a tap's own open/closed state survives re-renders.
+  return (
+    <details
+      {...root}
+      open={p.isPick}
+      onToggle={(e) => {
+        if ((e.currentTarget as HTMLDetailsElement).open) setOpened(true);
+      }}
+    >
+      <summary class="rc-top">{top}</summary>
+      {body}
+    </details>
   );
 }

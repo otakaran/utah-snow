@@ -1,5 +1,6 @@
-/* Imported first by ../briefing.css: resort cards. A flex column per card, so every foot (freshness + Details →)
-   sits on the card's bottom edge and a row of cards lines up. */
+/* Imported first by ../briefing.css: resort cards. A flex column per card (name row, then .rc-body, a flex column
+   of its own), so every foot (freshness + Details →) sits on the card's bottom edge and a row of cards lines up.
+   The compact phone cards (<details>) are in fold.css. */
 .rc-list {
   display: grid;
   gap: var(--space-5) var(--space-4);
@@ -57,6 +58,14 @@
   gap: var(--space-2);
   align-items: center;
   justify-content: space-between;
+}
+
+.rc-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
 }
 
 .rc-name {
