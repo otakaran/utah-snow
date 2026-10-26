@@ -1,7 +1,7 @@
 // Pure parts of scripts/audit-phone.ts: the result shape, byte totals by kind (above the fold, on load, full page),
-// long-task totals, V8 coverage merging and the fix-1 card estimate. No Playwright import, so it unit-tests.
+// long-task totals and V8 coverage merging. No Playwright import, so it unit-tests.
 import type { JumpProbe } from './jump.ts';
-import type { CardBox, ImgState, Layout } from './metrics.ts';
+import type { ImgState, Layout } from './metrics.ts';
 import type { Replay } from './replay.ts';
 
 export type Phase = 'load' | 'scroll';

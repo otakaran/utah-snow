@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import type { CardBox } from './metrics.ts';
 import { aboveFold, foldImages, type Req, shiftSum, sumBytes, tasks, usedChars } from './report.ts';
 
 const O = 'https://utah.otakar.dev';
