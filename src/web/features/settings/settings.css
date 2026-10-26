@@ -152,7 +152,7 @@
   min-height: var(--tap);
 }
 
-/* Wall: three number fields in one row, the cam set below */
+/* Wall: four number fields in two rows, the cam set below */
 .wall-form {
   display: grid;
   gap: var(--space-3);
@@ -160,7 +160,7 @@
 }
 
 .wall-fields {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
 }
 

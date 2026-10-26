@@ -12,6 +12,7 @@ import type { WallParams } from '../../router.ts';
 import { CamTile, liveSource, visibleCams, YouTubePlayer } from '../cams/index.ts';
 import { crewPick } from '../pick-card/index.ts';
 import { nightStakes, ytOrder } from './rotation.ts';
+import { Turn } from './Turn.tsx';
 
 interface Props {
   params: WallParams;
@@ -20,18 +21,13 @@ interface Props {
   /** Cells 1–5: this page's stills, and whether there is more than one page. */
   stills: CamDef[];
   paging: boolean;
-  /** Rotation steps so far for cells 1–5 and for the featured cell. */
-  page: number;
+  /** Rotation steps so far for cells 1–5 (weather pages included: it keys their turn bar) and the featured cell. */
+  step: number;
   ytPage: number;
 }
 
 const [ALTA, ...LIVE_STAKES] = WALL_PINNED;
 const FEATURE_STILL = WALL_NIGHT_STILL[WALL_YT_FIRST] ?? WALL_YT_FIRST;
-
-/** Fills along the cell's bottom edge over one `s`-second turn, CSS only; the caller keys it per turn to restart it. */
-function Turn({ s }: { s: number }) {
-  return <i class="wall-turn" style={{ '--turn': `${s}s` }} data-testid="wall-turn" aria-hidden="true" />;
-}
 
 /** The featured cell: a YouTube player reused across cams, or the cam's still when it cannot play. */
 function Featured({ cam, turn, pick }: { cam: CamDef | null; turn: number; pick: ResortId | null }) {
@@ -67,7 +63,7 @@ function Featured({ cam, turn, pick }: { cam: CamDef | null; turn: number; pick:
   );
 }
 
-export function WallGrid({ params, night, paused, stills, paging, page, ytPage }: Props) {
+export function WallGrid({ params, night, paused, stills, paging, step, ytPage }: Props) {
   const states = camStates.value;
   const pick = crewPick.value?.pick ?? null;
   const now = serverNow.value;
@@ -88,7 +84,7 @@ export function WallGrid({ params, night, paused, stills, paging, page, ytPage }
   const yts = shown(ytOrder(params.set)).filter((d) => liveSource(d, states.get(d.id))?.type === 'youtube');
   const yt = yts.length > 0 ? (yts[ytPage % yts.length] ?? null) : null;
   // A turn key changes whenever the matching ticker restarts its period (Wall.tsx useTicker): step, set, seconds.
-  const stillTurn = !paused && paging ? `${params.set}:${params.rotate}:${page}` : null;
+  const stillTurn = !paused && paging ? `${params.set}:${params.rotate}:${step}` : null;
   const ytTurn = !paused && yts.length > 1 ? `${params.set}:${params.yt}:${ytPage}` : null;
   return (
     <ul class="wall-grid" data-testid="wall-grid">

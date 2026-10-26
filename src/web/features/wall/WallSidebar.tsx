@@ -1,6 +1,7 @@
 // The wall sidebar (spec §8.4): clock and date (and before the trip the countdown), the crew pick with its top 2
-// reasons, road chips, avalanche badges and the freshness footer (the set, its "set 2/6 · page 3/5" counter and a
-// Paused marker); the 3-day snow mini-table runs under the cam grid (SnowDays). Night: clock, roads and footer only.
+// reasons, road chips, avalanche badges and the freshness footer (the set, its "set 2/6 · page 3/5" counter, or
+// "set 2/6 · weather" during the weather page, and a Paused marker); the 7-day week strip runs under the cam grid
+// (WeekStrip). It stays beside the weather page too. Night: clock, roads and footer only.
 // Sizes: countdown < clock (--fs-clock) <= pick name (--fs-pick-name); everything inside --wall-safe (wall.css).
 import { WALL_SET_DEFS, WALL_SETS, type WallSet } from '../../../../config/wall.ts';
 import { isoToMs, localDate } from '../../../shared/time.ts';
@@ -18,8 +19,8 @@ interface Props {
   night: boolean;
   set: WallSet;
   paused: boolean;
-  /** Cells 1–5: [this page, pages], or null when they do not page (one page, night). */
-  page: readonly [number, number] | null;
+  /** Cells 1–5: [this page, pages], 'weather' during the weather page, or null when they do not page (one page, night). */
+  page: readonly [number, number] | 'weather' | null;
 }
 
 /** PickCompact (crew, no ridge) plus the pick's top 2 reasons, which replace the card's single line (wall.css). */
@@ -53,7 +54,7 @@ function Footer({ now, set, paused, page }: Omit<Props, 'night'>) {
       <span class="wall-set">{WALL_SET_DEFS[set].short}</span>
       <span class="wall-count" data-testid="wall-count">
         set {WALL_SETS.indexOf(set) + 1}/{WALL_SETS.length}
-        {page ? ` · page ${page[0]}/${page[1]}` : null}
+        {page === 'weather' ? ' · weather' : page ? ` · page ${page[0]}/${page[1]}` : null}
         {paused ? <b class="wall-paused"> · Paused</b> : null}
       </span>
     </footer>

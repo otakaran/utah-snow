@@ -1,0 +1,198 @@
+/* Imported by ../wall.css: the full-screen weather page (WallWeather.tsx, WallHourly.tsx) in the left 3fr, 1386 x
+   1032 px: headline band (~110 px), the week table (~430), the hourly block (~380) with its status line, and the turn
+   bar on the bottom edge. Nothing may spill: the page clips. Cells carry no text-shadow (no --snow-glow). */
+.wall-wx {
+  --wx-name: 16%; /* resort-name column of the week table, the halves table and the hourly lanes */
+  --wx-total: 7.5em; /* 48 h total column of the hourly lanes */
+
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wall-wx-head > * {
+  margin: 0;
+}
+
+.wall-wx-kicker,
+.wall-wx :is(th, .wall-hr-name, .wall-hr-ticks, .wall-hr-note) {
+  font: 800 var(--fs-5) / 1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wall-wx-kicker,
+.wall-wx thead th,
+.wall-hr-ticks,
+.wall-hr-note {
+  color: var(--text-dim);
+}
+
+.wall-wx-storm {
+  overflow: hidden;
+  color: var(--snow);
+  font: 900 var(--fs-1) / 1.05 var(--font-num);
+  font-feature-settings: var(--num-features);
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* the week table and the NWS halves table */
+.wall-wx table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.wall-wx :is(th, td) {
+  overflow: hidden;
+  padding: var(--space-1) var(--space-2);
+  border-top: 1px solid var(--line);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-wx thead th {
+  border-top: 0;
+}
+
+/* table-layout: fixed sizes the columns from the first row, so the name column is set on every row's first cell */
+.wall-wx tr > :first-child {
+  width: var(--wx-name);
+  padding-left: 0;
+  text-align: left;
+}
+
+.wall-wx th[scope="row"] {
+  color: var(--text);
+}
+
+.wall-wx [data-pick] > th {
+  color: var(--accent);
+}
+
+.wall-wx td {
+  color: var(--snow);
+  font: 800 var(--fs-3) / 1.1 var(--font-num);
+  font-feature-settings: var(--num-features);
+}
+
+/* --h (0..1, inline) = the cell's summit snow against the table's biggest day: a --snow-glow wash */
+.wall-wx-week td {
+  background: color-mix(in srgb, var(--snow-glow) calc(var(--h, 0) * 100%), transparent);
+}
+
+.wall-wx-week thead th[data-storm] {
+  color: var(--text);
+}
+
+.wall-wx-week [data-storm] {
+  text-decoration: underline var(--snow) 4px;
+  text-underline-offset: 6px;
+}
+
+.wall-wx-week .wall-wx-sum {
+  border-left: 2px solid var(--line-strong);
+}
+
+.wall-wx-week td.wall-wx-sum {
+  font-weight: 900;
+}
+
+/* hourly: name | lane | 48 h total, ticks under the lane column, then the status line */
+.wall-hr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 0;
+}
+
+.wall-hr-lanes {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wall-hr-lane {
+  display: grid;
+  grid-template-columns: var(--wx-name) minmax(0, 1fr) var(--wx-total);
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.wall-hr-lane > p,
+.wall-hr-ticks,
+.wall-hr-note {
+  margin: 0;
+}
+
+.wall-hr-name {
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wall-hr-lane[data-pick] > .wall-hr-name {
+  color: var(--accent);
+}
+
+.wall-hr-svg {
+  display: block;
+  width: 100%;
+  height: 44px;
+  background: var(--surface-2);
+}
+
+.wall-hr-night {
+  fill: var(--bg);
+}
+
+.wall-hr-rule,
+.wall-hr-now {
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.wall-hr-rule {
+  stroke: var(--line-strong);
+}
+
+.wall-hr-now {
+  stroke: var(--text-dim);
+  stroke-width: 4px;
+}
+
+.wall-hr-bar {
+  fill: var(--snow);
+}
+
+.wall-hr-total {
+  color: var(--snow);
+  font: 900 var(--fs-3) / 1.1 var(--font-num);
+  font-feature-settings: var(--num-features);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* tick labels centered on their hour boundary (left: X%, inline) over the lane column only */
+.wall-hr-ticks {
+  position: relative;
+  height: 1.2em;
+  margin: 0 calc(var(--wx-total) + var(--space-2)) 0 calc(var(--wx-name) + var(--space-2));
+}
+
+.wall-hr-ticks > span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}

@@ -1,8 +1,10 @@
 /* TV wall (spec §8.4), tokens.css variables only. 1920x1080, always dark, [data-scale="wall"] type ladder:
-   3fr = 16:9 cam grid + the snow table in the band under it | 1fr = sidebar, all inside --wall-safe. The clock stays
-   at or below the pick name; night = the --wall-dim veil; kiosk = no cursor and no controls after 3 s idle.
-   Under 1280 px: the launcher (wall/launch.css). */
+   3fr = 16:9 cam grid + the 7-day week strip in the band under it (or, every `wx` pages, the weather page) | 1fr =
+   sidebar, all inside --wall-safe. The clock stays at or below the pick name; night = the --wall-dim veil; kiosk = no
+   cursor and no controls after 3 s idle. Under 1280 px: the launcher (wall/launch.css). */
 @import "./wall/grid.css";
+@import "./wall/week.css";
+@import "./wall/weather.css";
 @import "./wall/launch.css";
 
 /* sidebar: one column, footer pinned to the bottom. The 1fr column is ~460 px wide, so the hero sizes step down
