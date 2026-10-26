@@ -17,6 +17,7 @@
     "drift": "node scripts/drift-check.ts",
     "fixtures": "node scripts/refresh-fixtures.ts",
     "bench": "node scripts/bench-parsers.ts",
+    "audit:phone": "node scripts/audit-phone.ts",
     "cf-typegen": "wrangler types -c wrangler.jsonc",
     "db:local": "wrangler d1 migrations apply DB --local -c wrangler.jsonc && wrangler d1 execute DB --local -c wrangler.jsonc --file e2e/seed.sql"
   },

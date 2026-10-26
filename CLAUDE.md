@@ -22,24 +22,24 @@
 - `src/worker/api/`: one file per route + contract test (`edge.ts`: caches.default + ETag; `post-guard.ts`: shared POST checks);
   `cams/`, `tracker/` helpers. `src/worker/frames/`: timelapse frame lists (KV archive, HDRelay, Prism, Roundshot).
 - `src/web/`: Preact SPA (map in `src/web/CLAUDE.md`): shell, `data/` stores, `lib/`, `ui/`, `features/` (briefing,
-  pick-card, cams, conditions, resort, settings, tracker, wall), `styles/` (tokens.css, base.css, fonts.css).
+  pick-card, cams, conditions, resort, settings, tracker, wall, weather), `styles/` (tokens.css, base.css, fonts.css).
 - `e2e/`: Playwright `smoke.spec.ts` + one spec per feature, `fixtures.ts` (console-error gate, stubs), `tracker-api.ts`, `seed.sql`.
-- `scripts/`: plain-node tools: `check-repo.ts` enforces the rules below; `drift-check.ts`, `refresh-fixtures.ts`, `bench-parsers.ts`
-  (same-name folders hold their parts; `lib/`: the Node fetchx shim and the job list they share).
+- `scripts/`: plain-node tools: `check-repo.ts` enforces the rules below; `drift-check.ts`, `refresh-fixtures.ts`, `bench-parsers.ts`,
+  `audit-phone.ts` (same-name folders hold their parts; `lib/`: the Node fetchx shim and the job list they share).
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`, `fonts/` (Barlow woff2 + OFL, <= 120 KB).
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
 - `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`), drift (Mondays; `drift` issue), tick (*/5 cron fallback).
-- Status now: Phase 2 and its polish pass are done: every adapter and `/api` route, all six pages (wall included), scrubbers,
+- Status now: Phase 2 and its polish pass are done: every adapter and `/api` route, all seven pages (wall, weather), scrubbers,
   custom base, MtnPowder browser fallback, model table, scripts. Next: Phase 3, checking parsers as each resort opens.
 
 ## Commands
 - `pnpm dev`: Vite + workerd at http://localhost:5173. `pnpm build`. `pnpm run deploy` (pnpm's own `deploy` shadows it; CI deploys on main). Logs: `pnpm wrangler tail`.
 - `pnpm check` = `node scripts/check-repo.ts && biome check . && tsc -b && vitest run`. Must pass before commit.
 - `pnpm test` (vitest projects `unit` = node, `worker` = workerd). `pnpm e2e` (Playwright on `vite preview :4173`;
-  `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused).
-- `pnpm exec biome check --write .` formats and applies safe fixes.
+  `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused). `pnpm exec biome check --write .` formats.
 - Network scripts (not in `pnpm check`): `pnpm drift` (cam pages vs `config/cams/`; exit 1 on drift; a blocked host is only
-  "unreachable"), `pnpm fixtures [dir|job id] [--wayback <ts>]`, `pnpm bench [--refresh]` (parse ms per cron slot, <= 5).
+  "unreachable"), `pnpm fixtures [dir|job id] [--wayback <ts>]`, `pnpm bench [--refresh]` (parse ms per cron slot, <= 5),
+  `pnpm audit:phone [--url] [--route] [--webkit]` (iPhone 15 metrics of a route, JSON in `.cache/audit/`).
 - `pnpm cf-typegen` after any `wrangler.jsonc` change; commit `worker-configuration.d.ts`.
 - `pnpm db:local`: local D1 migrations + `e2e/seed.sql` (resets the tracker). Tracker writes need a non-empty
   `IP_HASH_SALT` in `.dev.vars` (else 503 `no-salt`).
@@ -91,7 +91,7 @@
 - D1 holds all structured state (last-good per source, tracker, histories, counters); cron writes `cron:last` first.
 - Scheduling: every tick runs inside the `Scheduler` DO (`scheduler.ts`): a stateless Worker gets 10 ms CPU per invocation on the free plan and a tick needs 20-25 ms, a DO gets 30 s. Triggers: the cron trigger, the DO alarm chain (5 min + 90 s, armed by `scheduled`, `/api/health`, `/api/debug/tick`) and `tick.yml`; the DO runs one tick at a time and skips when `cron:last` < 4 min old.
 - `caches.default` fronts only `/api/snapshot`, `/api/cams`, `/api/stake/*`. No Workers Cache, no R2.
-- Open-Meteo is called from the browser only (30 min, 60 on the wall, visible only, shared cache, 429 backoff).
+- Open-Meteo is called from the browser only (30 min; 60 on the wall, only if `wx` > 0; visible only, shared cache, 429 backoff).
 - The pick runs in the browser (`src/shared/pick/`): crew pick by default, "as me" per person; the wall shows crew.
 - YouTube works keyless first; `YT_API_KEY` only adds liveness/discovery.
 - Worker secrets: `IP_HASH_SALT`, `PROBE_KEY` (required); `YT_API_KEY`, `UDOT_API_KEY` (optional).

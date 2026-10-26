@@ -9,11 +9,12 @@ Shell: `main.tsx` (build guard, router, stores, theme), `app.tsx` (header, `Outl
   of `src/shared/pick/`), conditions (Roads/Avalanche/Forecast panels, ModelTable), resort (a lift or gate is the red ◆
   Closed only while `liftsRunning`, else grey ◌), settings (+ header chips, CustomBase, DriveChips; typed fields clamp and
   flash in the Section sub), tracker (§9.5: Grid from 900 px, DayList below; DayPicker, caps, thresholds, bookings, crew,
-  undo), wall (`config/wall.ts` sets; 1920x1080 canvas zoomed to fit; below `WALL_MIN_WIDTH`: WallLaunch, no nav item).
+  undo), wall (`config/wall.ts` sets; WeekStrip; WallWeather every `wx` pages; under `WALL_MIN_WIDTH`: WallLaunch),
+  weather (`?r=` or the crew pick; week lanes, outlook columns, 48 h lanes on `ui/Chart`; briefing §06 is its teaser).
 - cams (CamTile + `cam-tile/`, CamGallery, StakeRow, CamsPage, players, Lightbox Scrubber): every gallery lists cams via
   cam-view `visibleCams()` (dedupes fallback twins; offlineGated UDOT cams need `online: true`) and `leadCam()`.
-- `ui/`: presentational pieces (+ ui, forms, overlays, shell, jumpbar, countdown css); never imports a feature. `Section`
-  sets `id` = its testid: the sticky `JumpBar` target (briefing, cams, resort). `Countdown`: days to first chair or opening.
+- `ui/`: presentational pieces (+ ui, forms, overlays, shell, jumpbar, countdown, chart css); never imports a feature.
+  `Section` sets `id` = its testid: the `JumpBar` target (briefing, cams, resort, weather). `Countdown`: days to first chair.
 
 ## Data stores (`data/`, Preact signals)
 - `snapshot.ts`: `/api/snapshot` (ETag, 120 s, 60 s on the wall, visible only), `serverNow`, X-Build -> `build-guard.ts`;
@@ -21,9 +22,8 @@ Shell: `main.tsx` (build guard, router, stores, theme), `app.tsx` (header, `Outl
 - `cams.ts`: `/api/cams` every 60 s once a cam view calls `ensureCams()`. `open-meteo.ts`: browser-only, 30 min,
   shared localStorage cache, 429 backoff. `tracker.ts` (+ `tracker/`; wire types `shared/types/tracker.ts`): 10 min
   (30 s on #/tracker) + focus; ops apply optimistically, in order, with `prevUpdatedAt` + `clientId`; 200/409 replace it.
-
-## Settings keys (`data/settings.ts`, localStorage `utahsnow.<key>`, per device)
-- units, theme (dark|sun|auto), base, me, ride, pickView, crewToday, dataSaver, wall, skiFraction, admin.
+- `settings.ts`: localStorage `utahsnow.<key>` per device: units, theme (dark|sun|auto), base, me, ride, pickView,
+  crewToday, dataSaver, wall (decoded through `wallParams`), skiFraction, admin.
 
 ## Tokens and themes
 - Colors only via `styles/tokens.css` (locked; obey its header's UI rules); `styles/fonts.css` maps `public/fonts`.

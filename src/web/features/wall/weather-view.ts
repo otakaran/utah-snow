@@ -14,6 +14,7 @@ import {
   headline,
   hourLabel,
   hourlyWindow,
+  MODEL_LABEL,
   range,
   stormDay,
   type WeekRow,
@@ -106,16 +107,9 @@ export function pickHourly(om: OmData['data'] | null | undefined, fromIso: strin
   return { window: axis, lanes, max: hourlyScale(lanes.map((l) => l.values)) };
 }
 
-const LABEL: Record<OmModel, string> = {
-  ncep_hrrr_conus: 'HRRR',
-  ncep_nbm_conus: 'NBM',
-  ecmwf_ifs: 'ECMWF',
-  ncep_gfs_global: 'GFS',
-};
-
 /** 'NBM' or 'NBM, HRRR': the models the lanes drew, in lane order. */
 export const laneModels = (lanes: readonly HourlyLane[]): string =>
-  [...new Set(lanes.flatMap((l) => (l.model ? [LABEL[l.model]] : [])))].join(', ');
+  [...new Set(lanes.flatMap((l) => (l.model ? [MODEL_LABEL[l.model]] : [])))].join(', ');
 
 /** Axis labels at every local 00/06/12/18 (a weekday at midnight), as % of the width; none at the very edges. */
 export function hourTicks(w: HourlyWindow): { left: number; label: string }[] {

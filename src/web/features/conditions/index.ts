@@ -2,7 +2,7 @@
 // page, wall sidebar), ForecastPanel (briefing only) and the resort page's ModelTable (HRRR/NBM/ECMWF/GFS).
 // `roadView` gives other features (resort cards, wall tiles) a corridor's status word, tone and staleness for
 // ui/StatusChip, and `showTraction` its extra "Traction law" chip; `range` / `dayOf` format NWS snow ranges (the
-// wall's snow table); `SourceLine` + `worstMeta` give any section heading the conditions panels'
+// wall's week strip and weather page); `SourceLine` + `worstMeta` give any section heading the conditions panels'
 // 'SOURCE ◆ Down · 16 h ago' sub-line.
 import './conditions.css';
 
