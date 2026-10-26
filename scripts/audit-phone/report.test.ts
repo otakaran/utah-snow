@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CardBox } from './metrics.ts';
-import { aboveFold, collapseSaving, foldImages, type Req, shiftSum, sumBytes, tasks, usedChars } from './report.ts';
+import { aboveFold, foldImages, type Req, shiftSum, sumBytes, tasks, usedChars } from './report.ts';
 
 const O = 'https://utah.otakar.dev';
 const req = (url: string, type: string, bytes: number, phase: Req['phase'] = 'load'): Req => ({
@@ -64,22 +64,5 @@ describe('audit-phone report', () => {
       },
     ];
     expect(usedChars(fns, 100)).toBe(70);
-  });
-
-  it('estimates the closed-card saving from non-pick cards only', () => {
-    const card = (name: string, height: number, pick = false): CardBox => ({
-      name,
-      top: 0,
-      height,
-      nodes: 0,
-      pick,
-      preseason: true,
-      heroSrc: '',
-      collapsed: 60,
-    });
-    expect(collapseSaving([card('alta', 400), card('solitude', 350, true), card('snowbasin', 300)], 6000)).toEqual({
-      px: 580,
-      pct: 10,
-    });
   });
 });

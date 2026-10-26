@@ -5,15 +5,15 @@ Shell: `main.tsx` (build guard, router, stores, theme), `app.tsx` (header, `Outl
 ## Feature folders (`features/<f>/`)
 - `index.ts` is the only import surface; `PascalCase.tsx` components; one `<f>.css` (tokens only; over 250 lines it
   `@import`s its leading sections from `<f>/`, keeping cascade order). Features import each other only via `index.ts`.
-- briefing (BriefJump: phone jump bar once `#pick` scrolls away), pick-card (PickCard, PickCompact, Ridge; the only caller
+- briefing (BriefJump once `#pick` scrolls off; ResortCard folds < 720 px), pick-card (PickCard, PickCompact, Ridge; the only caller
   of `src/shared/pick/`), conditions (Roads/Avalanche/Forecast panels, ModelTable), resort (a lift or gate is the red ◆
-  Closed only while `liftsRunning`, else grey ◌), settings (+ header chips, CustomBase, DriveChips; typed fields clamp and
+  Closed only while `liftsRunning`, else grey ◌), settings (+ header chips sized before data lands: `e2e/layout.spec.ts`; CustomBase, DriveChips; typed fields clamp and
   flash in the Section sub), tracker (§9.5: Grid from 900 px, DayList below; DayPicker, caps, thresholds, bookings, crew,
   undo), wall (`config/wall.ts` sets; WeekStrip; WallWeather every `wx` pages; under `WALL_MIN_WIDTH`: WallLaunch),
   weather (`?r=` or the crew pick; week lanes, outlook columns, 48 h lanes on `ui/Chart`; briefing §06 is its teaser).
 - cams (CamTile + `cam-tile/`, CamGallery, StakeRow, CamsPage, players, Lightbox Scrubber): every gallery lists cams via
   cam-view `visibleCams()` (dedupes fallback twins; offlineGated UDOT cams need `online: true`) and `leadCam()`.
-- `ui/`: presentational pieces (+ ui, forms, overlays, shell, jumpbar, countdown, chart css); never imports a feature.
+- `ui/`: presentational pieces (+ ui, forms, overlays, shell (+ `shell/header.css`), jumpbar, countdown, chart css); never imports a feature.
   `Section` sets `id` = its testid: the `JumpBar` target (briefing, cams, resort, weather). `Countdown`: days to first chair.
 
 ## Data stores (`data/`, Preact signals)

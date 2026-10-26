@@ -1,6 +1,6 @@
 // The ~20-line console summary of one audit-phone run (scripts/audit-phone.ts); the JSON holds the detail.
 import type { Hit, Layout } from './metrics.ts';
-import { type Audit, type Bytes, collapseSaving, foldImages, kind } from './report.ts';
+import { type Audit, type Bytes, foldImages, kind } from './report.ts';
 
 const kb = (n: number) => `${Math.round(n / 1024)} KB`;
 const ms = (n: number | null) => (n === null ? 'n/a' : `${Math.round(n)} ms`);
@@ -33,11 +33,10 @@ function cards(a: Audit): string[] {
   const c = a.layout.cards;
   if (c.length === 0) return [];
   const pre = c.filter((x) => x.preseason).length;
-  const save = collapseSaving(c, a.layout.scrollHeight);
   const h = a.heroesOnLoad;
   return [
     `resort cards (${pre}/${c.length} pre-season, * = pick): ${c.map((x) => `${x.name}${x.pick ? '*' : ''} ${x.height}`).join(' · ')}`,
-    `closing non-pick cards to ~${c[0]?.collapsed ?? 0} px saves ${save.px} px (${save.pct} % of page); hero stills fetched on load: pick ${h.pick}, other ${h.other} of ${h.cards - 1}`,
+    `closed card row ~${c[0]?.collapsed ?? 0} px; hero stills fetched on load: pick ${h.pick}, other ${h.other} of ${h.cards - 1}`,
   ];
 }
 

@@ -39,10 +39,10 @@
   `E2E_PORT=4193 pnpm e2e` if 4173 is busy, since a running server there is reused). `pnpm exec biome check --write .` formats.
 - Network scripts (not in `pnpm check`): `pnpm drift` (cam pages vs `config/cams/`; exit 1 on drift; a blocked host is only
   "unreachable"), `pnpm fixtures [dir|job id] [--wayback <ts>]`, `pnpm bench [--refresh]` (parse ms per cron slot, <= 5),
-  `pnpm audit:phone [--url] [--route] [--webkit]` (iPhone 15 metrics of a route, JSON in `.cache/audit/`).
+  `pnpm audit:phone [--url] [--route] [--webkit] [--snapshot <file>]` (iPhone 15 metrics of a route, JSON in `.cache/audit/`;
+  `--snapshot` replays a saved live `/api/snapshot` on a local preview).
 - `pnpm cf-typegen` after any `wrangler.jsonc` change; commit `worker-configuration.d.ts`.
-- `pnpm db:local`: local D1 migrations + `e2e/seed.sql` (resets the tracker). Tracker writes need a non-empty
-  `IP_HASH_SALT` in `.dev.vars` (else 503 `no-salt`).
+- `pnpm db:local`: local D1 migrations + `e2e/seed.sql` (resets the tracker). Tracker writes need a non-empty `IP_HASH_SALT` in `.dev.vars` (else 503 `no-salt`).
 - Local cron tick: `curl "http://localhost:5173/cdn-cgi/local/scheduled?cron=*/5+*+*+*+*&time=<ms>&format=json"`.
 - Every wrangler command except `deploy` passes `-c wrangler.jsonc` (after a build wrangler otherwise follows the generated config).
 - Never run interactive commands (`pnpm approve-builds`); add packages to `allowBuilds` in `pnpm-workspace.yaml` instead.

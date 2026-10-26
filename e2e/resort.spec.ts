@@ -50,9 +50,9 @@ async function seasonAt(page: Page, season: Season): Promise<void> {
   });
 }
 
-/** What breaks the rules in <main>: small controls, tiny text, units larger than their number; plus overflow. */
+/** What breaks the rules on the page: small controls, tiny text, units larger than their number; plus overflow. */
 const audit = (page: Page) =>
-  page.locator('main').evaluate((main) => {
+  page.locator('body').evaluate((main) => {
     const TAP = 44;
     const MIN_TEXT = 12;
     const shown = (el: Element): boolean => {

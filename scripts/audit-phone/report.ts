@@ -118,9 +118,3 @@ export function usedChars(functions: readonly { ranges: readonly V8Range[] }[], 
   for (const r of ranges) used.fill(r.count > 0 ? 1 : 0, r.startOffset, Math.min(r.endOffset, length));
   return used.reduce((s, u) => s + u, 0);
 }
-
-/** Pixels saved if every non-pick card closed down to its name row (fix 1), and the share of the page. */
-export function collapseSaving(cards: readonly CardBox[], page: number): { px: number; pct: number } {
-  const px = cards.filter((c) => !c.pick).reduce((s, c) => s + Math.max(0, c.height - c.collapsed), 0);
-  return { px, pct: page > 0 ? Math.round((100 * px) / page) : 0 };
-}
