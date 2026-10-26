@@ -1,7 +1,8 @@
 // Layout stability (the phone audit's CLS): every /api answer is held back until the first paint has been measured,
 // then released. The header row keeps its height and the nav its top whether the data is there or not (the "I am"
-// chip holds its slot while the tracker loads), and on a phone the waiting pick card keeps about its data height
-// with no empty ridge. pinTime's pattern pins the clock; the hold handler, registered last, runs first.
+// chip, or for a set "I am" the [Crew | As me] toggle, holds its slot while the tracker loads), and on a phone the
+// waiting pick card keeps about its data height with no empty ridge. pinTime's pattern pins the clock; the hold
+// handler, registered last, runs first.
 import type { Page } from '@playwright/test';
 import { expect, pinTime, seedStorage, test } from './fixtures.ts';
 
@@ -31,6 +32,7 @@ async function boxes(page: Page) {
       row: box('.hdr-row')?.height ?? null,
       nav: box('.app-nav')?.top ?? null,
       fresh: box('[data-testid="global-fresh"]')?.width ?? null,
+      band: box('.pick-band')?.height ?? null,
       pick: pick?.getBoundingClientRect().height ?? null,
       pickMin: pick ? getComputedStyle(pick).minHeight : null,
     };
@@ -53,19 +55,26 @@ test('a first visit: the header keeps its height and the nav its top when the da
   expect(after.fresh).toBe(before.fresh);
 });
 
-test('"I am" already chosen: no chip while the tracker loads, none after', async ({ page }) => {
-  await seedStorage(page, { 'utahsnow.me': 'otakar0001' });
+// A returning crew member: the cached snapshot paints the pick at once, the tracker (not cached) lands later.
+test('"I am" already chosen: no chip, and [Crew | As me] holds its place while the tracker loads', async ({
+  page,
+  request,
+}) => {
+  const snap = await (await request.get('/api/snapshot')).json();
+  await seedStorage(page, { 'utahsnow.me': 'otakar0001', 'utahsnow.snap': snap });
   const release = await holdApi(page);
   await page.goto('/');
-  await expect(page.getByTestId('pick')).toContainText('Waiting for data…');
+  await expect(page.locator('.pick-who')).toContainText('One skier');
   await expect(page.getByTestId('iam-chip')).toHaveCount(0);
+  await expect(page.getByTestId('pick-view')).toBeVisible();
   const before = await boxes(page);
   release();
+  await expect(page.locator('.pick-who')).toContainText(/Crew pick · \d+ going/);
   await expect(page.getByTestId('pick-view')).toBeVisible();
-  await expect(page.getByTestId('iam-chip')).toHaveCount(0);
   const after = await boxes(page);
   expect(after.row).toBe(before.row);
   expect(after.nav).toBe(before.nav);
+  expect(after.band).toBe(before.band);
 });
 
 test.describe('phone width', () => {

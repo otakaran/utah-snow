@@ -5,13 +5,14 @@
 // divergences, the crew chips' block beside the crew line) and .pick-aside (ridge, alternatives, actions, tomorrow)
 // become two columns of about equal height. The root's id is a JumpBar target. Until the first snapshot, phones get
 // .pick--wait (pick-card.css): the card keeps about its data height and no empty ridge, so nothing moves on arrival.
+// Likewise [Crew | As me] shows the saved view while a set "I am" waits for the tracker, so the band never grows.
 import { RESORTS } from '../../../../config/resorts.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { PickResult, PickScope } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
-import { setPickView, units } from '../../data/settings.ts';
+import { me as meSetting, pickView, setPickView, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
-import { people } from '../../data/tracker.ts';
+import { people, trackerStatus } from '../../data/tracker.ts';
 import { Toggle, type ToggleOption } from '../../ui/Toggle.tsx';
 import { crewNames, previewLabel, scoreText, snowQty, TIER_LABEL } from './labels.ts';
 import { PickMore } from './PickMore.tsx';
@@ -87,6 +88,7 @@ export function PickCard() {
   const u = units.value;
   const live = r !== null && r.mode !== 'post';
   const waiting = snapshot.value === null;
+  const meLoading = !me.value && !!meSetting.value && trackerStatus.value === 'idle';
   return (
     <section
       id="pick"
@@ -102,11 +104,11 @@ export function PickCard() {
           </span>
           {modeLabel(r, serverNow.value)}
         </p>
-        {me.value ? (
+        {me.value || meLoading ? (
           <Toggle
             label="Pick for"
             name="pick-view"
-            value={effectiveView.value}
+            value={meLoading ? pickView.value : effectiveView.value}
             options={VIEW_OPTIONS}
             onChange={setPickView}
             testid="pick-view"
