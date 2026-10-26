@@ -1,6 +1,7 @@
 // Morning briefing (spec §8.2). Fixed order inside <main>, each section root carrying its data-testid: header, pick,
-// stakes, resorts, roads, avalanche, forecast, then the system-status line; `footer` is app.tsx's <footer> right
-// after <main>. Nothing autoplays here. Phones get a jump bar once the pick card has scrolled away (BriefJump).
+// stakes, resorts, roads, avalanche, forecast (the compact teaser; #/weather has the rest), then the system-status
+// line; `footer` is app.tsx's <footer> right after <main>. Nothing autoplays here. Phones get a jump bar once the
+// pick card has scrolled away (BriefJump).
 import { HEROES } from '../../../../config/cams/index.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
 import { localDate } from '../../../shared/time.ts';
@@ -50,7 +51,7 @@ export function Briefing() {
       <ResortCards hero={(id, isPick) => <CamTile id={HEROES[id]} variant="card" star={isPick} />} />
       <RoadsPanel units={u} no="04" cams={(c) => <CamGallery cams={roadCams(c)} variant="card" pick={pick} />} />
       <AvalanchePanel no="05" />
-      <ForecastPanel units={u} no="06" />
+      <ForecastPanel units={u} no="06" compact />
       <SystemStatus />
     </>
   );
