@@ -60,7 +60,10 @@ export function WeatherPanel({ id, r, forecast, today, now, units }: Props) {
       index="05"
       sub={
         <>
-          NWS Salt Lake City · <a href={weatherHref(id)}>Full weather →</a>
+          NWS Salt Lake City ·{' '}
+          <a class="rs-tap" href={weatherHref(id)}>
+            Full weather →
+          </a>
         </>
       }
     >

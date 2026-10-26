@@ -122,3 +122,11 @@
   gap: var(--space-1) var(--space-2);
   line-height: 1.3;
 }
+
+/* 'Resort page': a 44 px tall tap target that keeps the heading line's height (the margins hand back the extra) */
+.cams-sub-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  margin-block: calc((1lh - var(--tap)) / 2);
+}

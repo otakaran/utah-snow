@@ -95,10 +95,10 @@ export function ParkingInfo({ id, today }: { id: ResortId; today: string }) {
           {rule.limits ? <li>Limits: {rule.limits}</li> : null}
         </ul>
       ) : null}
-      <p class="rs-dim rs-small">
+      <p class="rs-credit rs-dim rs-small">
         Snow, lift and trail data:{' '}
         <a class="rs-tap" href={def.links.conditions} target="_blank" rel="noreferrer">
-          {def.name}
+          {def.name} report ↗
         </a>
         . Cams © {credits(id)}. Forecast: NWS Salt Lake City. Avalanche: Utah Avalanche Center. Roads: UDOT.
       </p>
