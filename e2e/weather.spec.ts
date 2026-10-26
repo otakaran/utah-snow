@@ -63,13 +63,10 @@ test('bare #/weather shows the crew pick (★ in the jump row), else the first r
   await page.goto('/#/weather');
   await expect(page.getByTestId('week').locator('.wx-lead')).toBeVisible();
   const star = page.getByTestId('jumpbar').locator('a:has(.jump-star)');
-  const href = (await star.count()) ? await star.getAttribute('href') : '#/weather?r=alta';
-  const id = href?.split('r=')[1] ?? '';
-  await expect(page.getByTestId('weather')).toHaveAttribute('data-resort', id);
-  await expect(page.getByTestId('jumpbar').locator('a[aria-current="page"]')).toHaveAttribute(
-    'href',
-    `#/weather?r=${id}`,
-  );
+  const shown = async () => `#/weather?r=${await page.getByTestId('weather').getAttribute('data-resort')}`;
+  const wanted = async () => ((await star.count()) ? await star.getAttribute('href') : '#/weather?r=alta');
+  await expect.poll(async () => (await shown()) === (await wanted())).toBe(true); // the pick may land a beat later
+  await expect(page.getByTestId('jumpbar').locator('a[aria-current="page"]')).toHaveAttribute('href', await shown());
 });
 
 test('the briefing forecast is a compact teaser linking to #/weather; the resort page links too', async ({ page }) => {
