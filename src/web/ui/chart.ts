@@ -99,3 +99,49 @@ export function tickXs(n: number, every: number): number[] {
   for (let i = 0; i < n; i += every) out.push(round(((i + 0.5) / n) * 100));
   return out;
 }
+
+/** The x of the boundary before slot `i` (midnight and day rules, shading edges sit between slots). */
+export const slotEdge = (i: number, n: number, w: number): number => (n > 0 ? round((i * w) / n) : 0);
+
+/** Slot `i`'s center as a percentage of the width (an HTML label's `left`). */
+export const slotPct = (i: number, n: number): number => (n > 0 ? round(((i + 0.5) / n) * 100) : 0);
+
+/** A value's height as a percentage from the top (an HTML label's `top`), clamped to 0..100. */
+export function yPct(v: number, min: number, max: number): number {
+  if (!(max > min)) return 100;
+  return round(Math.max(0, Math.min(100, (1 - (v - min) / (max - min)) * 100)));
+}
+
+/** One full-height rect per [start, end) span of slots (night shading). */
+export function spanRects(spans: readonly (readonly [number, number])[], n: number, w: number, h: number): Rect[] {
+  return spans.map(([a, b]) => {
+    const x = slotEdge(a, n, w);
+    return { x, y: 0, width: round(slotEdge(b, n, w) - x), height: h };
+  });
+}
+
+/** Two bars per slot side by side (`a` left, `b` right), together as wide as barRects' single bar. */
+export function pairRects(
+  a: readonly (number | null)[],
+  b: readonly (number | null)[],
+  w: number,
+  h: number,
+  max: number,
+  gap = 0.3,
+): [Rect[], Rect[]] {
+  const n = Math.max(a.length, b.length);
+  if (n === 0) return [[], []];
+  const slot = w / n;
+  const inner = slot * (1 - gap);
+  const sep = inner * 0.12;
+  const bw = (inner - sep) / 2;
+  const bar = (v: number | null | undefined, x: number): Rect => {
+    const height = finite(v) && max > 0 ? Math.max(0, Math.min(h, (v / max) * h)) : 0;
+    return { x: round(x), y: round(h - height), width: round(bw), height: round(height) };
+  };
+  const left = (i: number) => i * slot + (slot - inner) / 2;
+  return [
+    Array.from({ length: n }, (_, i) => bar(a[i], left(i))),
+    Array.from({ length: n }, (_, i) => bar(b[i], left(i) + bw + sep)),
+  ];
+}
