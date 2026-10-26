@@ -174,6 +174,19 @@
   order: 5;
 }
 
+/* phone, before the first snapshot: the empty ridge would slide down under the arriving hero, and the stakes row
+   under a 260 px card would jump ~500 px, so the card keeps about its data height (pre-season 773, in season 840
+   at 393 px) until the data lands; the plain "Waiting for data…" text stays. */
+@media (max-width: 899px) {
+  .pick--wait {
+    min-height: 760px;
+  }
+
+  .pick--wait .ridge {
+    display: none;
+  }
+}
+
 @media (min-width: 900px) {
   .pick-body {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

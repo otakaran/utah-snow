@@ -18,6 +18,11 @@ function head(a: Audit): string[] {
   const net = t ? `${t.rttMs} ms RTT, ${t.downKbps} kbps, ${t.cpu}x CPU` : 'no throttle';
   return [
     `audit-phone ${a.engine} ${a.url}/${a.route} · ${a.device.width}x${a.device.height} @${a.device.dpr}x · ${net} · ect ${a.connection.effectiveType ?? 'n/a'}`,
+    ...(a.snapshot
+      ? [
+          `snapshot replayed from ${a.snapshot.file}: ${kb(a.snapshot.raw)} raw, ${kb(a.snapshot.wire)} gzip, +${a.snapshot.delayMs} ms, served ${a.snapshot.served}x`,
+        ]
+      : []),
     `page ${L.scrollHeight} px = ${(L.scrollHeight / L.fold).toFixed(1)} viewports of ${L.fold} px (after scroll ${a.afterScroll.scrollHeight})`,
     `chrome: ${L.chrome.map((b) => `${b.name} ${b.height}`).join(' · ')}`,
     `sections (height@top): ${L.sections.map((b) => `${b.name} ${b.height}@${b.top}`).join(' · ')}`,

@@ -1,0 +1,194 @@
+/* Imported first by ../shell.css: the page column, the header row (brand, clock, freshness, ⋯ menu) and its phone
+   grid. Only tokens.css variables. */
+
+/* Shell: one centred column with the page gutter */
+.hdr-row,
+.app-nav,
+.app-banner,
+.app-main,
+.app-footer {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.app-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.hdr-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-height: 56px;
+  padding-block: var(--space-1);
+}
+
+.app-brand,
+.app-clock,
+.hdr-fresh,
+.hdr-more {
+  flex-shrink: 0; /* the base chip is the one header item that shrinks (ellipsis) */
+}
+
+/* Every header slot keeps one box from the first paint, before the data and the web fonts arrive (layout shift):
+   the freshness word reserves its widest value, the "I am" chip shows while the tracker is still loading. */
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: var(--tap);
+  min-height: var(--tap);
+  color: var(--text);
+  font: 800 var(--fs-3) / 1 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-brand .icon,
+.brand-word b {
+  color: var(--accent);
+}
+
+.app-brand .icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.brand-word b {
+  font-weight: 900;
+}
+
+.app-clock {
+  margin-left: auto;
+  line-height: 1.15;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.clock-time {
+  font-size: var(--fs-clock); /* never above --fs-pick-name */
+  font-weight: 800;
+}
+
+.clock-date {
+  display: block;
+  font-size: var(--fs-caption);
+  color: var(--text-dim);
+}
+
+.hdr-fresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.hdr-fresh .fresh-long {
+  display: inline-block;
+  min-width: 5em; /* 'No data yet', the widest label */
+}
+
+.hdr-menu .seg label {
+  padding-inline: var(--space-2);
+}
+
+/* Units + theme: inline from 600 px; below that inside the ⋯ popover (spec §8.1). */
+@media (min-width: 600px) {
+  .hdr-more {
+    display: none;
+  }
+
+  .hdr-menu,
+  .hdr-menu:popover-open {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: none;
+    color: inherit;
+  }
+}
+
+@media (max-width: 599px) {
+  /* One first row whatever the fonts or the data (a wrapping flex row reflowed when they arrived): brand | clock |
+     freshness | base chip (the one slot that yields, with an ellipsis) | ⋯; the "I am" chip alone on a second row. */
+  .hdr-row {
+    display: grid;
+    grid-template-columns: auto minmax(max-content, 1fr) auto minmax(0, max-content) auto;
+  }
+
+  .app-clock {
+    justify-self: end;
+  }
+
+  .hdr-more {
+    grid-area: 1 / 5;
+  }
+
+  .hdr-row > .iam-chip {
+    grid-area: 2 / 1 / auto / -1;
+    justify-self: start;
+  }
+
+  .hdr-fresh .fresh-long {
+    display: none;
+  }
+
+  .hdr-fresh .fresh-short {
+    display: inline-block;
+    min-width: 2.5em; /* 'Down', the widest word */
+    font-size: var(--fs-5);
+  }
+
+  .hdr-menu:popover-open {
+    inset: 60px var(--gutter) auto auto;
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+    margin: 0;
+    padding: var(--space-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 12px 40px var(--shadow);
+  }
+}
+
+@media (max-width: 419px) {
+  /* narrow phones: tighter columns leave the base chip room for its short label */
+  .hdr-row {
+    column-gap: var(--space-1);
+  }
+
+  .hdr-fresh {
+    padding: 0;
+  }
+
+  .clock-tz,
+  .brand-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

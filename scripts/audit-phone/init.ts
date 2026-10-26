@@ -7,7 +7,10 @@
 export interface PageBuf {
   long: { start: number; dur: number }[];
   lcp: { start: number; size: number; url: string; el: string } | null;
-  shifts: { start: number; value: number; src: string }[];
+  /** Every LCP candidate in order (the last one is `lcp`). */
+  lcps: { start: number; size: number; el: string }[];
+  /** `moves`: every source (at most 5 per entry) as 'element x,y wxh -> x,y wxh'. */
+  shifts: { start: number; value: number; src: string; moves: string[] }[];
   om: number;
   supported: { longtask: boolean; lcp: boolean; cls: boolean };
 }
@@ -27,6 +30,7 @@ export function initAudit(body: string): void {
   const buf: PageBuf = {
     long: [],
     lcp: null,
+    lcps: [],
     shifts: [],
     om: 0,
     supported: {
@@ -58,16 +62,22 @@ export function initAudit(body: string): void {
     new PerformanceObserver((list) => {
       for (const e of list.getEntries() as LargestContentfulPaint[]) {
         buf.lcp = { start: e.startTime, size: e.size, url: e.url, el: describe(e.element) };
+        buf.lcps.push({ start: Math.round(e.startTime), size: e.size, el: buf.lcp.el });
       }
     }).observe({ type: 'largest-contentful-paint', buffered: true });
   }
   if (buf.supported.cls) {
     new PerformanceObserver((list) => {
-      type Shift = PerformanceEntry & { value: number; hadRecentInput: boolean; sources?: { node: Node | null }[] };
+      type Src = { node: Node | null; previousRect: DOMRectReadOnly; currentRect: DOMRectReadOnly };
+      type Shift = PerformanceEntry & { value: number; hadRecentInput: boolean; sources?: Src[] };
+      const elOf = (node: Node | null) => (node instanceof Element ? node : (node?.parentElement ?? null));
+      const rect = (r: DOMRectReadOnly) =>
+        `${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)}`;
       for (const e of list.getEntries() as Shift[]) {
-        const node = e.sources?.[0]?.node ?? null;
-        const el = node instanceof Element ? node : (node?.parentElement ?? null);
-        if (!e.hadRecentInput) buf.shifts.push({ start: e.startTime, value: e.value, src: describe(el) });
+        if (e.hadRecentInput) continue;
+        const srcs = e.sources ?? [];
+        const moves = srcs.map((s) => `${describe(elOf(s.node))} ${rect(s.previousRect)} -> ${rect(s.currentRect)}`);
+        buf.shifts.push({ start: e.startTime, value: e.value, src: describe(elOf(srcs[0]?.node ?? null)), moves });
       }
     }).observe({ type: 'layout-shift', buffered: true });
   }

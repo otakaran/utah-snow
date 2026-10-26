@@ -3,14 +3,16 @@
 // the six-peak ridge (CSS `order` lifts it above the fold), reasons, divergences, alternatives, action links, the
 // collapsed crew/excluded/inputs block, the tomorrow outlook. From 900 px, .pick-main (who, hero, reasons,
 // divergences, the crew chips' block beside the crew line) and .pick-aside (ridge, alternatives, actions, tomorrow)
-// become two columns of about equal height. The root's id is a JumpBar target.
+// become two columns of about equal height. The root's id is a JumpBar target. Until the first snapshot, phones get
+// .pick--wait (pick-card.css): the card keeps about its data height and no empty ridge, so nothing moves on arrival.
+// Likewise [Crew | As me] shows the saved view while a set "I am" waits for the tracker, so the band never grows.
 import { RESORTS } from '../../../../config/resorts.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { PickResult, PickScope } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
-import { setPickView, units } from '../../data/settings.ts';
+import { me as meSetting, pickView, setPickView, units } from '../../data/settings.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
-import { people } from '../../data/tracker.ts';
+import { people, trackerStatus } from '../../data/tracker.ts';
 import { Toggle, type ToggleOption } from '../../ui/Toggle.tsx';
 import { crewNames, previewLabel, scoreText, snowQty, TIER_LABEL } from './labels.ts';
 import { PickMore } from './PickMore.tsx';
@@ -35,6 +37,9 @@ const VIEW_OPTIONS = [
 
 function Who({ r }: { r: PickResult }) {
   if (people.value.length === 0) {
+    // Before the first /api/tracker answer the crew is unknown, not absent: one plain line, as tall as the crew line
+    // (the one-skier line carries a 44 px link), so the hero does not jump when the crew arrives.
+    if (trackerStatus.value === 'idle') return <p class="pick-who">Loading the crew…</p>;
     return (
       <p class="pick-who">
         One skier, full caps · <a href="#/tracker">Add the crew in Tracker</a>
@@ -85,8 +90,16 @@ export function PickCard() {
   const r = shownPick.value;
   const u = units.value;
   const live = r !== null && r.mode !== 'post';
+  const waiting = snapshot.value === null;
+  const meLoading = !me.value && !!meSetting.value && trackerStatus.value === 'idle';
   return (
-    <section id="pick" data-testid="pick" class="pick" aria-live="polite" aria-labelledby="pick-title">
+    <section
+      id="pick"
+      data-testid="pick"
+      class={waiting ? 'pick pick--wait' : 'pick'}
+      aria-live="polite"
+      aria-labelledby="pick-title"
+    >
       <div class="pick-band">
         <p class="pick-mode">
           <span class="pick-no num" aria-hidden="true">
@@ -94,11 +107,11 @@ export function PickCard() {
           </span>
           {modeLabel(r, serverNow.value)}
         </p>
-        {me.value ? (
+        {me.value || meLoading ? (
           <Toggle
             label="Pick for"
             name="pick-view"
-            value={effectiveView.value}
+            value={meLoading ? pickView.value : effectiveView.value}
             options={VIEW_OPTIONS}
             onChange={setPickView}
             testid="pick-view"
@@ -112,7 +125,7 @@ export function PickCard() {
             <PickHero r={r} units={u} />
           ) : (
             <h2 id="pick-title" class="pick-name">
-              {r ? 'Trip over' : snapshot.value ? 'Pick unavailable' : 'Waiting for data…'}
+              {r ? 'Trip over' : waiting ? 'Waiting for data…' : 'Pick unavailable'}
             </h2>
           )}
           {live && r.lowValue ? <p class="pick-low">Low-value day: consider a rest day.</p> : null}

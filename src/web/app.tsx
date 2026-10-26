@@ -1,6 +1,7 @@
 // App shell (spec §8.1): Header, route outlet, Footer; the #/wall route renders full-bleed without them (§8.4).
 // Header order: brand, Denver date + clock, global freshness badge (tap: every source with its age; a short word
 // under 600 px), base chip, "I am" chip, then units + theme (inside the ⋯ popover under 600 px), and the nav row.
+// Under 600 px the row is a grid (ui/shell/header.css): one fixed first row, the "I am" chip alone below it.
 // Wall leaves the nav below WALL_MIN_WIDTH, 1280 px (smaller screens open it from Settings → Wall defaults).
 
 import type { ComponentChildren } from 'preact';
@@ -42,17 +43,21 @@ const RANK: Record<Badge, number> = { red: 0, amber: 1, green: 2, grey: 3 };
 
 function GlobalFreshness({ now }: { now: number }) {
   const g = globalBadge.value;
+  const label = g ? GLOBAL_LABEL[g] : 'No data yet';
   const rows: SourceRow[] = sources.value
     .map((m) => ({ id: m.source, badge: badge(m, now), age: ageMin(m, now), error: m.error, via: m.via }))
     .sort((a, b) => RANK[a.badge] - RANK[b.badge] || (a.id < b.id ? -1 : 1));
   return (
     <>
-      <button type="button" class="hdr-fresh" popovertarget="fresh-pop" data-testid="global-fresh">
-        <FreshnessBadge
-          badge={g ?? 'grey'}
-          label={g ? GLOBAL_LABEL[g] : 'No data yet'}
-          short={g ? GLOBAL_SHORT[g] : 'No data'}
-        />
+      <button
+        type="button"
+        class="hdr-fresh"
+        popovertarget="fresh-pop"
+        data-testid="global-fresh"
+        aria-label={`${label}: list every source`}
+      >
+        {/* The phone word fits the box 'Down' reserves (shell/header.css), so the header never reflows. */}
+        <FreshnessBadge badge={g ?? 'grey'} label={label} short={g ? GLOBAL_SHORT[g] : '—'} />
       </button>
       <div id="fresh-pop" popover="auto" class="pop">
         <p class="pop-title">Sources · worst first</p>
