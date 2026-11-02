@@ -113,12 +113,7 @@
 - The OSRM demo server allows 1 req/s: `/api/drive` spaces calls 1.1 s, caps 10 lookups/client and 20 misses per day.
 - fetchx sends `cache: 'no-store'`, which workerd turns into `Cache-Control: no-cache`: conditional GETs
   (If-None-Match / If-Modified-Since) must also send `Cache-Control: max-age=0` or they never get a 304.
-- Ski Utah blob URLs (`skiutah.com/files/blob/...`) 404 on any `_=` query: never `bust: true` there.
-- Alta's DigitalOcean stills get a fresh Last-Modified every minute even when a camera is frozen (High Rustler served an
-  Oct 21 frame for 11 days): cam-status tracks the ETag like Ski Utah, so `asOf` is the ETag's first sight. Alta's page
-  lists only the cameras that work that week; the drift check notes an unlisted cam whose still still answers.
-- The six-peak ridge's mountains are 1.5 columns wide: the grid's `0.25fr` spacer tracks hold the outer slopes (an
-  `overflow: hidden` ridge clipped them on phones) and `.is-pick` paints above its neighbours.
+- Ski Utah blob URLs (`skiutah.com/files/blob/...`) 404 on any `_=` query: never `bust: true` there. Alta's DO stills get a fresh Last-Modified every minute even when a camera is frozen (High Rustler served an Oct 21 frame for 11 days): cam-status tracks both by ETag (`asOf` = first sight). Alta's page lists only the cams that work that week; the drift check only notes an unlisted cam whose still still answers.
 - Deployed Workers freeze `Date.now()` during CPU work, so per-job timings show wall time only.
 - `biome migrate` rewrote `recommended: true` to `preset: "none"`; keep `"preset": "recommended"`.
 - `CamId` (`config/cams/index.ts`) is the union of real cam ids, so a wrong id in `STAKE_ORDER`/`HEROES` fails `tsc -b`.
