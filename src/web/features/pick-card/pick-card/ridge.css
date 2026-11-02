@@ -3,9 +3,14 @@
    side (the ::before/::after grid items) holds the outer mountains' outer slopes: without it overflow: hidden cut
    them flat at the card edge (phones, 2026-11-01). Tracks in fr share the ridge's own width exactly (a percentage
    padding would resolve against the parent, 32 px narrower on phones). The first and last names reach into the
-   spacers so the ground line still runs edge to edge. */
+   spacers so the ground line still runs edge to edge.
+   Phone clarity (2026-11-01, pre-season): a 0″ hill is bare (.is-dry), since a 28% cap on a 6 px sliver was a white
+   smear on every flat row; names carry --ridge-name-pad so Deer Valley wraps instead of touching Snowbasin at 393 px;
+   the pick's accent ground line is the same 2 px as its neighbours' and spans its mountain's 1.5-column base, where a
+   4 px one-column line read as a pedestal under the orange peak. */
 .ridge {
   --ridge-h: calc(72px * var(--wall-scale));
+  --ridge-name-pad: var(--space-1);
   display: grid;
   grid-template-columns: 0.25fr repeat(6, minmax(0, 1fr)) 0.25fr;
   align-items: end;
@@ -57,12 +62,14 @@
   text-shadow: none;
 }
 
+/* a snow cap marks fresh snow only; a dry night is bare ground. no-repeat: a fractional height let the gradient
+   tile once more at the base, a pale hairline under the hill */
 .ridge-mtn {
   display: block;
   width: 150%;
   height: calc(var(--h) * var(--ridge-h));
   min-height: 2px;
-  background: linear-gradient(var(--peak-cap) 0 28%, var(--peak) 28%);
+  background: linear-gradient(var(--peak-cap) 0 28%, var(--peak) 28%) no-repeat;
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
@@ -70,28 +77,40 @@
   background: linear-gradient(var(--peak-cap) 0 28%, var(--accent) 28%);
 }
 
+.is-dry .ridge-mtn {
+  background: var(--peak);
+}
+
+.is-pick.is-dry .ridge-mtn {
+  background: var(--accent);
+}
+
 .ridge-name {
   align-self: stretch;
   min-height: calc(2.3em + 6px);
-  padding-top: var(--space-1);
+  padding: var(--space-1) var(--ridge-name-pad) 0;
   border-top: 2px solid var(--line-strong);
   color: var(--text-dim);
   font: 700 var(--fs-5) / 1.15 var(--font-display);
   text-align: center;
 }
 
+/* the pick's line is accent for exactly its mountain's base: the name box grows a quarter column each side
+   (over its neighbours' boxes, which it paints above) and pads the same back, so the text stays centred */
 .is-pick .ridge-name {
-  border-top: 4px solid var(--accent);
+  margin-inline: -25%;
+  padding-inline: calc(25% + var(--ridge-name-pad));
+  border-top-color: var(--accent);
   color: var(--accent);
 }
 
 /* the outer names grow by the spacer track on their side (25% of a column) */
 .ridge-pk:first-child .ridge-name {
   margin-left: -25%;
-  padding-left: 25%;
+  padding-left: calc(25% + var(--ridge-name-pad));
 }
 
 .ridge-pk:last-child .ridge-name {
   margin-right: -25%;
-  padding-right: 25%;
+  padding-right: calc(25% + var(--ridge-name-pad));
 }

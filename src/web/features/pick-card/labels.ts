@@ -66,8 +66,10 @@ export function crewNames(members: readonly PickMember[]): string {
   return members.map((m) => `${m.name}${mode[m.mode]}`).join(', ');
 }
 
-/** Peak heights as 0..1 fractions of the tallest plausible night (a 6″ floor keeps a 1″ night from looking deep). */
-export function peakFractions(values: readonly (number | null)[], floorIn = 6): number[] {
+/** Peak heights as 0..1 fractions of the tallest plausible night (a 6″ floor keeps a 1″ night from looking deep).
+ * 0″ sits on a `lo` sliver and any snow at all rises above it (0.5″ on a 6″ night is 0.15, not the sliver);
+ * a missing value is flat. */
+export function peakFractions(values: readonly (number | null)[], floorIn = 6, lo = 0.08): number[] {
   const top = Math.max(floorIn, ...values.map((v) => v ?? 0));
-  return values.map((v) => (v === null || !Number.isFinite(v) ? 0 : Math.max(0.08, Math.min(1, v / top))));
+  return values.map((v) => (v === null || !Number.isFinite(v) ? 0 : lo + (1 - lo) * Math.min(1, v / top)));
 }

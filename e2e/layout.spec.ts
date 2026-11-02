@@ -129,4 +129,46 @@ test.describe('phone width', () => {
     }
     expect(got.front).toBe(true);
   });
+
+  // 2026-11-01: at 393 px "Deer Valley" and "Snowbasin" touched (3 px apart), a 0″ hill was a 6 px sliver with a white
+  // cap smear, and the pick's 4 px one-column underline sat as a pedestal under its 1.5-column peak.
+  test('ridge names keep their distance, dry hills carry no cap and the pick line spans its base', async ({ page }) => {
+    await pinTime(page, AT);
+    await page.goto('/');
+    await expect(page.getByTestId('pick-ridge')).toBeVisible();
+    const got = await page.evaluate(async () => {
+      await document.fonts.ready;
+      const peaks = [...document.querySelectorAll('[data-testid="pick-ridge"] .ridge-pk')];
+      const text = peaks.map((p) => {
+        const range = document.createRange();
+        range.selectNodeContents(p.querySelector('.ridge-name') as HTMLElement);
+        return range.getBoundingClientRect();
+      });
+      const gaps = text.slice(1).map((t, i) => t.left - (text[i] as DOMRect).right);
+      const hills = peaks.map((p) => {
+        const mtn = p.querySelector('.ridge-mtn') as HTMLElement;
+        const num = (p.querySelector('.ridge-num') as HTMLElement).textContent ?? '';
+        return { dry: num === '0″' || num === '—', capped: getComputedStyle(mtn).backgroundImage !== 'none' };
+      });
+      const pick = peaks.find((p) => p.classList.contains('is-pick'));
+      const line = pick?.querySelector('.ridge-name')?.getBoundingClientRect();
+      const base = pick?.querySelector('.ridge-mtn')?.getBoundingClientRect();
+      const lineWidth = line && base ? [line.left - base.left, line.right - base.right] : null;
+      return {
+        gaps,
+        hills,
+        lineWidth,
+        lineThick: pick ? getComputedStyle(pick.querySelector('.ridge-name') as HTMLElement).borderTopWidth : null,
+        nameHeights: peaks.map((p) => (p.querySelector('.ridge-name') as HTMLElement).getBoundingClientRect().height),
+      };
+    });
+    expect(got.gaps).toHaveLength(5);
+    for (const gap of got.gaps) expect(gap).toBeGreaterThanOrEqual(8);
+    for (const hill of got.hills) expect(hill.capped).toBe(!hill.dry);
+    expect(got.lineWidth?.[0]).toBeCloseTo(0, 0);
+    expect(got.lineWidth?.[1]).toBeCloseTo(0, 0);
+    expect(got.lineThick).toBe('2px');
+    // every name box is the same height, so the ground line is one straight line
+    expect(new Set(got.nameHeights.map((h) => Math.round(h))).size).toBe(1);
+  });
 });

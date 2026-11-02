@@ -1,5 +1,6 @@
 // Six-peak overnight ridge chart (tokens.css UI rule): every resort's overnight inches as a mountain, full resort
 // names, the pick's peak lit in --accent. `baseline` puts every number on one shared line (the wall's strip).
+// A snow cap marks fresh snow only: a 0″ or unknown night (`is-dry`) is bare ground.
 import { RESORTS } from '../../../../config/resorts.ts';
 import type { ResortId } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
@@ -26,7 +27,11 @@ export function Ridge({ values, pick, units, baseline = false }: RidgeProps) {
       {values.map((v, i) => {
         const q = snowQty(v.inches, units);
         return (
-          <div key={v.id} class={`ridge-pk${v.id === pick ? ' is-pick' : ''}`} style={{ '--h': fr[i] ?? 0 }}>
+          <div
+            key={v.id}
+            class={`ridge-pk${v.id === pick ? ' is-pick' : ''}${v.inches ? '' : ' is-dry'}`}
+            style={{ '--h': fr[i] ?? 0 }}
+          >
             <b class={`ridge-num num${v.inches === null ? ' is-empty' : ''}`}>
               {q.value}
               {v.inches === null ? null : <span class="ridge-unit">{q.unit}</span>}
