@@ -59,7 +59,12 @@ export const youtube: Source<YtRaw> = {
   probes: [
     { hostId: 'camstreamer', url: 'https://camstreamer.com/embed/M5ToybhwNTDP6Y5Yt6lIr9hylOONXTv892poZIyH' },
     { hostId: 'ytimg', url: 'https://i.ytimg.com/vi/QozKoFs-hL0/mqdefault_live.jpg' },
-    { hostId: 'youtube-api', url: 'https://www.googleapis.com/youtube/v3/videos?part=id&id=lkEM6EC8NVA' },
+    // The probe GETs without a key, and every Data API method 403s unregistered callers, so it reads the 80-byte
+    // discovery entry on the same host instead (200 unkeyed); the keyed /videos call is exercised by the tick itself.
+    {
+      hostId: 'youtube-api',
+      url: 'https://www.googleapis.com/discovery/v1/apis?name=youtube&preferred=true&fields=items(name,version)',
+    },
   ],
 
   async fetch(ctx) {
