@@ -21,6 +21,17 @@ import { HISTORY_KEY, multiDay, stampMs } from './snowbasin/season.ts';
 import { type FetchCtx, type Output, type ParseCtx, type Source, ValidationError } from './types.ts';
 
 export const SNOWBASIN_URL = 'https://www.snowbasin.com/the-mountain/mountain-report/'; // keep the trailing slash
+
+/** The absolute Location of a 3xx answer when it stays on snowbasin.com, else null. */
+export function sameHostRedirect(status: number, location: string | null | undefined): string | null {
+  if (status < 300 || status >= 400 || !location) return null;
+  try {
+    const to = new URL(location, SNOWBASIN_URL);
+    return to.host === new URL(SNOWBASIN_URL).host ? to.href : null;
+  } catch {
+    return null;
+  }
+}
 const ID = 'resort:snowbasin';
 const LIFTS_EXPECTED = 13; // 2025/26 lift count; the gate allows ± 2 (§5.2)
 const LIFTS_SLACK = 2;
@@ -137,15 +148,16 @@ export const snowbasin: Source<string> = {
   staleAfterMin: 40,
   rows: [ID],
   // The canonical URL answers 200 directly; redirects are not followed, so the worst case is one request.
-  maxSubrequests: () => 1,
+  // One GET plus at most one hop for a same-host redirect (the page answered 307 for a day on 2026-10-28 and the
+  // row went red; a cross-host Location is not followed), so the worst case is exactly 2.
+  maxSubrequests: () => 2,
   probes: [{ hostId: 'snowbasin', url: SNOWBASIN_URL }],
   async fetch(ctx: FetchCtx): Promise<string> {
-    const res = await ctx.fetch<string>(SNOWBASIN_URL, {
-      headers: { Accept: 'text/html' },
-      timeoutMs: 10_000,
-      follow: false,
-    });
-    if (res.status !== 200) throw new Error(`snowbasin: HTTP ${res.status} (redirects are not followed)`);
+    const opts = { headers: { Accept: 'text/html' }, timeoutMs: 10_000, follow: false } as const;
+    let res = await ctx.fetch<string>(SNOWBASIN_URL, opts);
+    const hop = sameHostRedirect(res.status, res.headers?.get('location'));
+    if (hop) res = await ctx.fetch<string>(hop, opts);
+    if (res.status !== 200) throw new Error(`snowbasin: HTTP ${res.status} (only one same-host redirect is followed)`);
     return res.data;
   },
   parse: parseSnowbasin,

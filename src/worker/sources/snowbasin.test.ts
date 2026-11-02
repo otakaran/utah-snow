@@ -8,7 +8,7 @@ import feb09 from './fixtures/snowbasin/20260209-inseason.html?raw';
 import mar01 from './fixtures/snowbasin/20260301-inseason.html?raw';
 import live from './fixtures/snowbasin/20261012-live.html?raw';
 import { HISTORY_KEY } from './snowbasin/season.ts';
-import { SNOWBASIN_URL, snowbasin } from './snowbasin.ts';
+import { SNOWBASIN_URL, sameHostRedirect, snowbasin } from './snowbasin.ts';
 import { type FetchCtx, type FetchX, type PrevRows, ValidationError } from './types.ts';
 
 const OPENED = { 'resort:snowbasin': { seasonOpenedAt: '2025-11-27T09:00:00-07:00' } };
@@ -189,20 +189,38 @@ describe('snowbasin: validation gate and fetch', () => {
     expect(bad([...rows.slice(0, 6), ...rows.slice(12)].join('<tr>'))).toThrow(/lifts in winter/);
   });
 
-  it('GETs the canonical URL once without following redirects', async () => {
+  it('GETs the canonical URL once, follows one same-host redirect itself and no other', async () => {
     const calls: unknown[] = [];
-    let status = 200;
+    const answers: { status: number; location?: string }[] = [];
     const fx = (async (url: string, opts: { follow?: boolean; timeoutMs?: number }) => {
       calls.push({ url, follow: opts.follow, timeoutMs: opts.timeoutMs });
-      return { status, url, data: live };
+      const a = answers.shift() ?? { status: 200 };
+      const headers = new Headers(a.location ? { location: a.location } : {});
+      return { status: a.status, url, headers, data: live };
     }) as unknown as FetchX;
     const ctx = { fetch: fx } as FetchCtx;
     await expect(snowbasin.fetch(ctx)).resolves.toBe(live);
     expect(calls).toEqual([{ url: SNOWBASIN_URL, follow: false, timeoutMs: 10_000 }]);
-    expect(snowbasin.maxSubrequests(ctx)).toBe(1);
-    expect(snowbasin.maxSubrequests(ctx)).toBe(calls.length);
+    expect(snowbasin.maxSubrequests(ctx)).toBe(2);
     expect(snowbasin.probes).toEqual([{ hostId: 'snowbasin', url: SNOWBASIN_URL }]);
-    status = 301;
+    // 2026-10-28: a day of 307s. A relative same-host Location is fetched once more; the worst case stays at 2.
+    calls.length = 0;
+    answers.push({ status: 307, location: '/the-mountain/mountain-report' }, { status: 200 });
+    await expect(snowbasin.fetch(ctx)).resolves.toBe(live);
+    expect(calls).toHaveLength(2);
+    expect(calls[1]).toMatchObject({ url: 'https://www.snowbasin.com/the-mountain/mountain-report', follow: false });
+    answers.push({ status: 301, location: 'https://example.com/report' });
     await expect(snowbasin.fetch(ctx)).rejects.toThrow(/HTTP 301/);
+    answers.push({ status: 307, location: '/maintenance' }, { status: 307, location: '/again' });
+    await expect(snowbasin.fetch(ctx)).rejects.toThrow(/HTTP 307/);
+  });
+
+  it('sameHostRedirect keeps snowbasin.com hops only', () => {
+    expect(sameHostRedirect(307, '/x/')).toBe('https://www.snowbasin.com/x/');
+    expect(sameHostRedirect(301, 'https://www.snowbasin.com/y')).toBe('https://www.snowbasin.com/y');
+    expect(sameHostRedirect(302, 'https://snowbasin.com/y')).toBeNull(); // another host (no www)
+    expect(sameHostRedirect(200, '/x/')).toBeNull();
+    expect(sameHostRedirect(307, null)).toBeNull();
+    expect(sameHostRedirect(307, 'http://[bad')).toBeNull();
   });
 });
