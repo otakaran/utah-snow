@@ -1,5 +1,8 @@
 // (a) Alta /weather: window.Alta.weather.mountainCams[] (slug -> image) vs config/cams/alta.ts, and the board-clear
 // times in the collins-snow-stake text vs the 04:00/16:00 the stake row assumes (features/cams/StakeRow.tsx).
+// Alta lists only the cameras that work that week (East Greeley and Albion Basin were gone on 2026-10-26, High
+// Rustler on 2026-11-01), so a config cam missing from the page is a note while its still still answers (cam-status
+// marks a frozen one stale); it is drift once the still is gone.
 import { ALTA_CAMS } from '../../config/cams/alta.ts';
 import { altaJson } from '../../src/shared/alta-page.ts';
 import { arr, obj, str } from '../../src/shared/json.ts';
@@ -16,6 +19,12 @@ const image = (url: string): string => {
   const prism = /prism-cam-0*(\d+)\//.exec(url)?.[1];
   return prism ? `prism ${prism}` : url.replace(/\?.*$/, '');
 };
+
+/** HEAD of a still template without its query: 2xx means the camera's image is still published. */
+async function stillServes(template: string): Promise<boolean> {
+  const got = await get(template.split('?')[0] ?? template, { head: true, accept: 'image/*' });
+  return got.ok;
+}
 
 const plain = (html: string): string =>
   html
@@ -39,14 +48,20 @@ export async function checkAlta(): Promise<SiteResult> {
   const cams = arr(obj(altaJson(page.text)?.weather)?.mountainCams).map((c) => obj(c) ?? {});
   if (cams.length === 0) r.problems.push('window.Alta.weather.mountainCams not found');
 
-  const expected = ALTA_CAMS.map(
-    (c) => `${c.isStake ? STAKE_SLUG : c.id.replace(/^alta-/, '')} -> ${image(c.still.card)}`,
-  );
   const live = cams.map((c) => {
     const prism = c.archr_cam_id;
     const img = typeof prism === 'number' ? `prism ${prism}` : image(str(c.url) ?? '(no url)');
     return `${str(c.slug) ?? '(no slug)'} -> ${img}`;
   });
+  const expected: string[] = [];
+  for (const c of ALTA_CAMS) {
+    const key = `${c.isStake ? STAKE_SLUG : c.id.replace(/^alta-/, '')} -> ${image(c.still.card)}`;
+    if (live.includes(key) || !(await stillServes(c.still.card))) {
+      expected.push(key);
+      continue;
+    }
+    r.notes.push(`${c.id} is not on the page this week, but its still answers (${c.still.card.split('?')[0]})`);
+  }
   r.checks.push({ what: 'mountainCams (slug -> image)', expected, live });
 
   const text = plain(str(cams.find((c) => c.slug === STAKE_SLUG)?.text) ?? '');
