@@ -110,6 +110,11 @@
   pointer-events: none;
 }
 
+/* the wall's floor is its caption size itself (tokens.css: nothing smaller than --fs-5 on the wall) */
+[data-scale="wall"] .chart-label {
+  font-size: var(--fs-5);
+}
+
 .chart-start {
   --tx: 0;
 }
