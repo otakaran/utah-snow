@@ -1,5 +1,7 @@
 // Request runner and small helpers shared by the cam-status kind checks.
 import { tryJson } from '../../../shared/json.ts';
+import { httpDateToMs, isoToMs, isoUtc } from '../../../shared/time.ts';
+import type { CamStatusEntry } from '../../../shared/types.ts';
 import type { FetchX } from '../types.ts';
 import type { CheckReq, Probe } from './types.ts';
 
@@ -7,6 +9,25 @@ const HEAD_TIMEOUT_MS = 6_000;
 
 /** A still template without its query (`…/Superior.jpg?t={m}` -> `…/Superior.jpg`); the check adds its own buster. */
 export const stillBase = (template: string): string => template.split('?')[0] ?? template;
+
+/** An ETag without its weak marker and quotes; undefined when the probe carried none. */
+export const cleanEtag = (raw: string | undefined): string | undefined => raw?.replace(/^W\//, '').replace(/"/g, '');
+
+/**
+ * When this ETag was first seen, as ISO: the previous entry's `etagSince` while the ETag repeats, else Last-Modified
+ * (when it is in the past) or now. Hosts that rewrite an object on a timer move Last-Modified even for a frozen
+ * camera, so the body hash is the freshness that counts (Ski Utah blobs, Alta's DigitalOcean stills).
+ */
+export function etagSince(
+  prev: CamStatusEntry | undefined,
+  etag: string,
+  lastModified: string | undefined,
+  now: number,
+): string {
+  const lm = httpDateToMs(lastModified);
+  const since = (prev?.etag === etag ? isoToMs(prev.etagSince) : null) ?? (lm !== null && lm < now ? lm : now);
+  return isoUtc(since);
+}
 
 /**
  * One request, never thrown: redirects are not followed (one subrequest each, Location is read instead),

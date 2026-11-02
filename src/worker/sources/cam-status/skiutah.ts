@@ -6,7 +6,7 @@
 import { CAMS } from '../../../../config/cams/index.ts';
 import { HOUR, httpDateToMs, isoToMs, isoUtc } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
-import { stillBase } from './probe.ts';
+import { cleanEtag, etagSince, stillBase } from './probe.ts';
 import type { EntryPatch, KindCheck, ReadCtx } from './types.ts';
 
 const BLOB = 'https://www.skiutah.com/files/blob/webcam/';
@@ -16,12 +16,8 @@ const CAMS_SU = (CAMS as readonly CamDef[]).filter((c) => c.still.card.startsWit
 const byId = new Map(CAMS_SU.map((c) => [c.id, c]));
 
 function etagEntry(id: string, etag: string, lastModified: string | undefined, ctx: ReadCtx): EntryPatch {
-  const prev = ctx.prev[id];
-  const lm = httpDateToMs(lastModified);
-  // First sight of this ETag: it is at least as old as Last-Modified (when that is in the past).
-  const since = (prev?.etag === etag ? isoToMs(prev.etagSince) : null) ?? (lm !== null && lm < ctx.now ? lm : ctx.now);
-  const at = isoUtc(since);
-  return { online: true, asOf: at, etag, etagSince: at, hidden: ctx.now - since >= HIDE_AFTER_MS };
+  const at = etagSince(ctx.prev[id], etag, lastModified, ctx.now);
+  return { online: true, asOf: at, etag, etagSince: at, hidden: ctx.now - (isoToMs(at) ?? ctx.now) >= HIDE_AFTER_MS };
 }
 
 export const skiutah: KindCheck = {
@@ -39,7 +35,7 @@ export const skiutah: KindCheck = {
     const image = probe.status === 200 && /^image\//i.test(probe.contentType ?? '');
     if (probe.status === 404) return { [id]: { online: false } };
     if (!image) return null;
-    const etag = probe.etag?.replace(/^W\//, '').replace(/"/g, '');
+    const etag = cleanEtag(probe.etag);
     if (cam.hiddenUntilFresh && etag) return { [id]: etagEntry(id, etag, probe.lastModified, ctx) };
     const lm = httpDateToMs(probe.lastModified);
     return lm === null ? null : { [id]: { online: true, asOf: isoUtc(lm) } };

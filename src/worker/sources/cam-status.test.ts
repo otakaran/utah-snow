@@ -58,11 +58,13 @@ describe('cam-status plan', () => {
 describe('cam-status parse, live 2026-10-12 (pre-season, after dusk)', () => {
   const r = row(LIVE, LIVE_NOW);
 
-  it('Alta DO stills: online, asOf = Last-Modified', () => {
+  it('Alta DO stills: online, asOf = Last-Modified on first sight, the ETag remembered', () => {
     expect(r['alta-mount-superior']).toEqual({
       online: true,
       asOf: '2026-10-13T02:08:14.000Z',
       checkedAt: '2026-10-13T02:09:05.625Z',
+      etag: 'e30842f566a251bd461f2103dd29ed2c',
+      etagSince: '2026-10-13T02:08:14.000Z',
     });
     expect(r['alta-collins-stake']).toBeUndefined(); // stake-alta's archive owns it
   });
@@ -99,6 +101,30 @@ describe('cam-status parse, live 2026-10-12 (pre-season, after dusk)', () => {
   it('Roundshot: the 19:20 MDT dusk frame from the Location is the newest (night: old by design)', () => {
     expect(r['snowbird-hidden-peak']).toMatchObject({ online: true, asOf: '2026-10-13T01:20:00.000Z' });
     expect(r['snowbird-hidden-peak-360']?.asOf).toBe('2026-10-13T01:20:00.000Z');
+  });
+
+  it('Alta DO: asOf = Last-Modified on first sight; a repeat ETag keeps the first sight (frozen camera)', () => {
+    // 2026-11-01: High Rustler served an Oct 21 frame, re-uploaded every minute with a fresh Last-Modified.
+    const first = r['alta-high-rustler'];
+    expect(first).toMatchObject({
+      online: true,
+      asOf: '2026-10-13T02:08:13.000Z',
+      etag: '705fccb82cd5880b4fa515af06ab48f7',
+    });
+    const since = '2026-10-12T20:08:13.000Z'; // the same ETag, first seen 6 h earlier
+    const prev = { 'cams:status': { 'alta-high-rustler': { ...first, etagSince: since } } };
+    const again = row(LIVE, LIVE_NOW, prev)['alta-high-rustler'];
+    expect(again).toMatchObject({ online: true, asOf: since, etagSince: since }); // > 45 min: /api/cams says stale
+    expect(again?.hidden).toBeUndefined(); // only hiddenUntilFresh cams hide; Alta's show as stale with their age
+    // a new ETag (the camera moved on) starts over from its Last-Modified
+    const moved = {
+      ...LIVE,
+      probes: { ...LIVE.probes, 'do:alta-high-rustler': { ...LIVE.probes['do:alta-high-rustler'], etag: '"new"' } },
+    };
+    expect(row(moved, LIVE_NOW, prev)['alta-high-rustler']).toMatchObject({
+      asOf: '2026-10-13T02:08:13.000Z',
+      etag: 'new',
+    });
   });
 
   it('Ski Utah: Apex asOf = Last-Modified; Brighton stake tracks its ETag, not the moving Last-Modified', () => {
