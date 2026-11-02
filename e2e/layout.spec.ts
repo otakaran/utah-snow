@@ -98,4 +98,35 @@ test.describe('phone width', () => {
     expect(data.row).toBe(waiting.row);
     expect(data.nav).toBe(waiting.nav);
   });
+
+  // 2026-11-01: the outer mountains lost their outer slopes to the ridge's overflow: hidden, and a later column's
+  // slope painted over the pick's peak. Mountains are 1.5 columns wide, so this is checked where two overlap.
+  test('every ridge mountain fits inside the ridge and the pick peak paints over its neighbour', async ({ page }) => {
+    await pinTime(page, AT);
+    await page.goto('/');
+    await expect(page.getByTestId('pick-ridge')).toBeVisible();
+    const got = await page.evaluate(async () => {
+      await document.fonts.ready;
+      const ridge = document.querySelector('[data-testid="pick-ridge"]') as HTMLElement;
+      const box = ridge.getBoundingClientRect();
+      const mtns = [...ridge.querySelectorAll('.ridge-mtn')].map((m) => m.getBoundingClientRect());
+      const peaks = [...ridge.querySelectorAll('.ridge-pk')];
+      const i = peaks.findIndex((p) => p.classList.contains('is-pick'));
+      const b = mtns[i];
+      let front: boolean | null = null;
+      if (b) {
+        // a point near the base on the side of a neighbour, inside both triangles: the pick must win
+        const x = i < peaks.length - 1 ? b.left + b.width * 0.8 : b.left + b.width * 0.2;
+        const y = b.top + b.height * 0.95;
+        front = document.elementFromPoint(x, y)?.closest('.ridge-pk')?.classList.contains('is-pick') ?? false;
+      }
+      return { left: box.left, right: box.right, mtns: mtns.map((m) => [m.left, m.right]), front };
+    });
+    expect(got.mtns).toHaveLength(6);
+    for (const [left, right] of got.mtns) {
+      expect(left).toBeGreaterThanOrEqual(got.left - 0.5);
+      expect(right).toBeLessThanOrEqual(got.right + 0.5);
+    }
+    expect(got.front).toBe(true);
+  });
 });
