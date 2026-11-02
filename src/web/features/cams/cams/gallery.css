@@ -44,6 +44,16 @@
     flex-wrap: nowrap;
     gap: 2px;
   }
+
+  /* stacked: the age stays right under the name (the title's flex: 1 otherwise pushes it to the tile's foot)
+     and only the Timelapse button drops to the bottom, level with its neighbour's */
+  .cam-gallery-detail > li:not(.cam-lead) .cam-title {
+    flex: none;
+  }
+
+  .cam-gallery-detail > li:not(.cam-lead) .cam-cap > .cam-tl {
+    margin-top: auto;
+  }
 }
 
 /* from 600 px at least two columns, so the 2x2 lead tile always fits */

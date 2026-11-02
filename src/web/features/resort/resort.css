@@ -148,6 +148,18 @@
   text-align: left;
 }
 
+/* values never wrap (the table scrolls sideways instead, .rs-table-wrap); headers may */
+.rs-table td {
+  white-space: nowrap;
+}
+
+/* a value with its status chip under it (snow level) */
+.rs-stack {
+  display: inline-grid;
+  gap: 2px;
+  justify-items: end;
+}
+
 .rs-details summary {
   min-height: var(--tap);
   cursor: pointer;

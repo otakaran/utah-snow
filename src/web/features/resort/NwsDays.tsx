@@ -1,12 +1,13 @@
 // NWS 3-day point forecast for one resort point (spec §8.7.5): day/night snow split (NWS periods 6 AM–6 PM /
 // 6 PM–6 AM), temperatures, wind and the snow level judged against the point's true elevation (the grid cell's
-// elevation differs, so both are shown). The briefing's 8–4 / 4–8 windows are the footnote.
-import { addDays, formatLocalDate } from '../../../shared/time.ts';
+// elevation differs, so both are shown). The period hours, the wind unit and the briefing's 8–4 / 4–8 windows are
+// footnotes, so each cell is one short, unwrapped value (five columns fit a 360 px phone; ranges carry one unit).
+import { formatLocalDate } from '../../../shared/time.ts';
 import type { Block, NwsDay, PointForecast } from '../../../shared/types.ts';
-import type { Units } from '../../../shared/units.ts';
+import { fmt, type Units } from '../../../shared/units.ts';
 import { clockRel, qty } from '../../lib/format.ts';
 import { StatusChip } from '../../ui/StatusChip.tsx';
-import { levelStatus } from '../conditions/index.ts';
+import { levelStatus, range, windText } from '../conditions/index.ts';
 import { forecastData } from './resort-model.ts';
 
 interface Props {
@@ -17,17 +18,7 @@ interface Props {
   units: Units;
 }
 
-function dayName(date: string, today: string): string {
-  if (date === today) return 'Today';
-  if (date === addDays(today, 1)) return 'Tomorrow';
-  return formatLocalDate(date, 'weekday');
-}
-
-function range(lo: number | null, hi: number | null, kind: 'temp' | 'snowLevel', units: Units): string {
-  if (lo === null && hi === null) return '—';
-  if (lo === null || hi === null || lo === hi) return qty(kind, hi ?? lo, units);
-  return `${qty(kind, lo, units)}–${qty(kind, hi, units)}`;
-}
+const dayName = (date: string, today: string): string => (date === today ? 'Today' : formatLocalDate(date, 'weekday'));
 
 function DayRow({ d, today, elevFt, units }: { d: NwsDay; today: string; elevFt: number; units: Units }) {
   const lvl = levelStatus(d, elevFt);
@@ -37,14 +28,13 @@ function DayRow({ d, today, elevFt, units }: { d: NwsDay; today: string; elevFt:
       <td class="rs-num rs-snow">
         {qty('snow', d.snowDayIn, units)} <span class="rs-dim">/</span> {qty('snow', d.snowNightIn, units)}
       </td>
-      <td class="rs-num">{range(d.tMinF, d.tMaxF, 'temp', units)}</td>
-      <td class="rs-num">
-        {qty('wind', d.windMaxMph, units)}
-        {d.gustMaxMph !== null ? <span class="rs-dim"> g{qty('wind', d.gustMaxMph, units)}</span> : null}
-      </td>
+      <td class="rs-num">{range('temp', [d.tMinF, d.tMaxF], units)}</td>
+      <td class="rs-num">{windText(d, units)}</td>
       <td>
-        <span class="rs-num">{range(d.snowLevelMinFt, d.snowLevelMaxFt, 'snowLevel', units)}</span>
-        {lvl ? <StatusChip tone={lvl.tone} word={lvl.word} /> : null}
+        <span class="rs-stack">
+          <span class="rs-num">{range('snowLevel', [d.snowLevelMinFt, d.snowLevelMaxFt], units)}</span>
+          {lvl ? <StatusChip tone={lvl.tone} word={lvl.word} /> : null}
+        </span>
       </td>
     </tr>
   );
@@ -72,9 +62,9 @@ export function NwsDays({ label, block, today, now, units }: Props) {
             <thead>
               <tr>
                 <th scope="col">Day</th>
-                <th scope="col">Snow 6 AM–6 PM / 6 PM–6 AM</th>
+                <th scope="col">Snow day / night</th>
                 <th scope="col">Lo–Hi</th>
-                <th scope="col">Wind</th>
+                <th scope="col">Wind {fmt('wind', 0, units).unit}</th>
                 <th scope="col">Snow level</th>
               </tr>
             </thead>
@@ -88,8 +78,8 @@ export function NwsDays({ label, block, today, now, units }: Props) {
       )}
       {f ? (
         <p class="rs-dim rs-small">
-          Briefing windows: tonight {qty('snow', f.tonightSnowIn, units)} (4 PM–8 AM) · tomorrow{' '}
-          {qty('snow', f.tomorrowDaytimeSnowIn, units)} (8 AM–4 PM)
+          Day 6 AM–6 PM, night 6 PM–6 AM; wind G gust. Briefing windows: tonight {qty('snow', f.tonightSnowIn, units)}{' '}
+          (4 PM–8 AM) · tomorrow {qty('snow', f.tomorrowDaytimeSnowIn, units)} (8 AM–4 PM)
         </p>
       ) : null}
     </div>

@@ -102,7 +102,8 @@
   border-radius: 2px;
   background: var(--surface);
   color: var(--text-dim);
-  font: 700 11px / 1.2 var(--font-display);
+  font: 700 var(--fs-5) / 1.2 var(--font-display);
+  font-size: max(12px, calc(var(--fs-5) - 1px)); /* one step under the caption, never under the 12 px floor */
   letter-spacing: 0.04em;
   white-space: nowrap;
   translate: var(--tx, -50%) var(--ty, -100%);
