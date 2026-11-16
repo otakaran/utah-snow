@@ -128,6 +128,12 @@
   background: var(--img-empty);
 }
 
+/* A cam with no picture to enlarge: one plain line over the credit, not an empty box */
+.cam-zoom-none {
+  margin: 0;
+  padding: var(--space-4) var(--space-2) var(--space-2);
+}
+
 /* Stake strip: the one element allowed to scroll sideways on phones */
 .cam-strip {
   display: flex;

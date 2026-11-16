@@ -22,6 +22,8 @@ export interface KindSpec {
   altUrl?: (url: string) => string | null;
   /** False for cams that must never start playing on their own (wall autoplay). */
   autoplay?: (def: CamDef) => boolean;
+  /** A caption line saying what the picture is when it is not a camera view (a road sign, dark while it has no message). */
+  caption?: string;
 }
 
 /** Default cadence: the registry's refresh period, which tracks how often the provider uploads. */

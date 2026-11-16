@@ -6,6 +6,7 @@ import type { CamDef } from '../../../shared/types.ts';
 import { StatusChip } from '../../ui/StatusChip.tsx';
 import type { LiveSource, TileStatus } from './cam-view.ts';
 import { HlsPlayer } from './HlsPlayer.tsx';
+import { NOTE } from './notes.ts';
 import { Roundshot360 } from './Roundshot360.tsx';
 import { YouTubePlayer } from './YouTubePlayer.tsx';
 
@@ -108,13 +109,18 @@ export function LivePlayer({ source, camId, title, poster, unlimited, rewind, on
   }
 }
 
-/** The enlarged still in the Lightbox, with the provider credit and a link to its page. */
+/**
+ * The enlarged still in the Lightbox, with the provider credit and a link to its page. A cam without a picture (an
+ * offline YouTube stream) says so, so the box is never just a credit line.
+ */
 export function Zoom({ def, src, title }: { def: CamDef; src: string | null; title: string }) {
   return (
     <div class="cam-zoom">
       {src ? (
         <img class="cam-zoom-img" src={src} alt={`${title} webcam`} decoding="async" referrerpolicy="no-referrer" />
-      ) : null}
+      ) : (
+        <p class="cam-zoom-none">{NOTE.noPicture}</p>
+      )}
       <p class="cam-credit">
         © {def.credit} ·{' '}
         <a href={def.pageUrl} target="_blank" rel="noreferrer">

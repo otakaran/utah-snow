@@ -6,4 +6,5 @@ export const NOTE = {
   ytError: 'Stream restarting',
   ytUnknown: 'Status unknown – tap to try',
   tapToLoad: 'Tap to load',
+  noPicture: 'No picture right now. The source page may say why.',
 } as const;

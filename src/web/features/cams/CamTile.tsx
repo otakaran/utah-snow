@@ -142,7 +142,7 @@ function Tile(p: CamTileProps & { def: CamDef }) {
       name={name}
       age={age}
       note={note}
-      extra={p.note}
+      extra={p.note ?? KINDS[def.kind].caption}
       onStop={inTile && !wall ? () => setMode(STILL) : null}
       onTimelapse={timelapse ? () => setMode({ m: 'scrub' }) : null}
     />
