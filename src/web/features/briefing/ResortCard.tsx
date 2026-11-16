@@ -16,6 +16,7 @@ import { clockRel } from '../../lib/format.ts';
 import { Countdown } from '../../ui/Countdown.tsx';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
+import { resortFreshWord } from '../../ui/status.ts';
 import { type DaysPart, liftsText, preseasonLine, resortStatus, trailsText, windText } from './resort-facts.ts';
 
 export interface ResortCardProps {
@@ -158,7 +159,7 @@ export function ResortCard(p: ResortCardProps) {
         </p>
       ) : null}
       <div class="rc-foot">
-        {meta ? <FreshnessBadge badge={b} age={ageMin(meta, p.now)} /> : null}
+        {meta ? <FreshnessBadge badge={b} age={ageMin(meta, p.now)} label={resortFreshWord(b, data?.season)} /> : null}
         <a class="rc-link" href={`#/resort/${p.id}`}>
           Details →
         </a>

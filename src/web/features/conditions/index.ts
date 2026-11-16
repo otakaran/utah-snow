@@ -9,7 +9,16 @@ import './conditions.css';
 export { AfdNotes } from './AfdNotes.tsx';
 export { AvalanchePanel, type AvalanchePanelProps } from './AvalanchePanel.tsx';
 export { ForecastPanel, type ForecastPanelProps } from './ForecastPanel.tsx';
-export { afdBullets, dayOf, gridRow, levelStatus, modelSpread, range, windText } from './forecast-rows.ts';
+export {
+  afdBullets,
+  dayOf,
+  gridRow,
+  levelStatus,
+  modelSpread,
+  range,
+  windParts,
+  windText,
+} from './forecast-rows.ts';
 export {
   band,
   freezingLevel,

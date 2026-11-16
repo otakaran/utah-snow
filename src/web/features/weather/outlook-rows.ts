@@ -7,7 +7,7 @@ import type { NwsDay, PointForecast, ResortId } from '../../../shared/types.ts';
 import { type Units, unitOf } from '../../../shared/units.ts';
 import type { OmSeries } from '../../data/open-meteo.ts';
 import type { StatusWord } from '../../ui/status.ts';
-import { dayOf, gridRow, levelStatus, modelSpread, range, weekDates, windText } from '../conditions/index.ts';
+import { dayOf, gridRow, levelStatus, modelSpread, range, weekDates, windParts } from '../conditions/index.ts';
 
 const DASH = '—';
 
@@ -24,7 +24,7 @@ export interface OutlookDay {
   long: boolean;
   /** Summit low–high with the unit ('20–31°F'). */
   temps: string;
-  /** Summit wind and gust with the unit ('13 G25 mph'). */
+  /** Summit wind and gust in words with the unit ('13, gust 25 mph'; a card has the room a table cell lacks). */
   wind: string;
   /** Snow / Mix / Rain against the base elevation on a day with precipitation. */
   level: StatusWord | null;
@@ -34,6 +34,14 @@ export interface OutlookDay {
   models: string;
   /** The resort's biggest summit day (snow > 0). */
   peak: boolean;
+}
+
+/** '13, gust 25 mph', '13 mph', 'gust 25 mph' or '—'. */
+function windLine(day: NwsDay | undefined, units: Units): string {
+  const { wind, gust } = windParts(day, units);
+  if (wind === null && gust === null) return DASH;
+  const words = [wind, gust === null ? null : `gust ${gust}`].filter((x) => x !== null).join(', ');
+  return `${words} ${unitOf('wind', units)}`;
 }
 
 function levelText(days: readonly (NwsDay | undefined)[], units: Units): string {
@@ -68,7 +76,6 @@ export function outlookDays(
     const spread = modelSpread(om, [date]);
     const snow = range('snow', [b?.snowIn, s?.snowIn], units, true);
     const lvlDay = b ?? s;
-    const wind = windText(top, units);
     return [
       {
         date,
@@ -78,7 +85,7 @@ export function outlookDays(
         unit: snow === DASH ? '' : unitOf('snow', units),
         long: snow.length >= 6,
         temps: range('temp', [top?.tMinF, top?.tMaxF], units),
-        wind: wind === DASH ? DASH : `${wind} ${unitOf('wind', units)}`,
+        wind: windLine(top, units),
         level: lvlDay ? levelStatus(lvlDay, baseFt) : null,
         levelText: levelText([b, s], units),
         models: spread ? range('snow', [spread.min, spread.max], units, true) : DASH,

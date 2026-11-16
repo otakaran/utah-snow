@@ -79,7 +79,7 @@ describe('tableRows', () => {
   it('formats every third hour in the chosen units', () => {
     const rows = tableRows(hourlyTable(LOC, WIN.idx, 3), 'imperial');
     expect(rows).toHaveLength(16);
-    expect(rows[0]).toEqual({ time: 'Tue 1 PM', snow: '0.3', temp: '20°F', wind: '12 G25', frz: '7,000 ft' });
-    expect(tableRows(hourlyTable(LOC, WIN.idx, 3), 'metric')[0]).toMatchObject({ snow: '1', wind: '19 G40' });
+    expect(rows[0]).toEqual({ time: 'Tue 1 PM', snow: '0.3', temp: '20°F', wind: '12 g25', frz: '7,000 ft' });
+    expect(tableRows(hourlyTable(LOC, WIN.idx, 3), 'metric')[0]).toMatchObject({ snow: '1', wind: '19 g40' });
   });
 });

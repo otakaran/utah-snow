@@ -58,7 +58,7 @@ describe('outlookDays', () => {
       unit: '″',
       long: true,
       temps: '20–31°F',
-      wind: '12 G22 mph',
+      wind: '12, gust 22 mph',
       models: '0.3–0.6',
     });
     expect(days[1]).toMatchObject({ snow: '5.2–8', long: false, temps: '—', wind: '—', models: '6–9.2' });
@@ -76,7 +76,7 @@ describe('outlookDays', () => {
   it('follows the units toggle', () => {
     const metric = outlookDays('alta', BASE, SUMMIT, TODAY, 'metric', OM) ?? [];
     expect(metric[1]).toMatchObject({ snow: '13–20', unit: 'cm' });
-    expect(metric[0]?.wind).toBe('19 G35 km/h');
+    expect(metric[0]?.wind).toBe('19, gust 35 km/h');
   });
 
   it('is null for placeholder rows (the e2e seed stores {})', () => {

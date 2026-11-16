@@ -49,8 +49,7 @@ export const PARKING = {
     book: 'https://reserve.altaparking.com/',
     cancelBy: '08:00',
     fines: 'no-res $150; 2nd+ no-show $100',
-    releases:
-      'open now (partial fall release); more Sundays 15:00 MT for the next weekend/holiday; max 4 active per account',
+    releases: 'open now (partial fall release); more Sundays 15:00 MT for the next weekend/holiday',
     limits: 'max 4 active per account; cancellations reopen spots daily; rental car: plate RENTAL, update later',
   },
   brighton: {

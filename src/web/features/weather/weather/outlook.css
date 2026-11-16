@@ -70,7 +70,8 @@
 
 .wx-rows > div {
   display: flex;
-  gap: var(--space-1);
+  flex-wrap: wrap; /* a value too long for the line ('64, gust 113 km/h') drops under its label, right-aligned */
+  gap: 0 var(--space-1);
   align-items: center;
   justify-content: space-between;
   min-height: 26px;
@@ -82,7 +83,7 @@
 }
 
 .wx-rows dd {
-  margin: 0;
+  margin: 0 0 0 auto;
   font-weight: 600;
   text-align: right;
   white-space: nowrap;

@@ -164,7 +164,7 @@ export interface TableRow {
 export function tableRows(rows: readonly HourlyRow[], units: Units): TableRow[] {
   return rows.map((r) => {
     const w = fmt('wind', r.windMph, units).value;
-    const g = finite(r.gustMph) ? ` G${fmt('wind', r.gustMph, units).value}` : '';
+    const g = finite(r.gustMph) ? ` g${fmt('wind', r.gustMph, units).value}` : ''; // lowercase: 'G25' reads as '625'
     return {
       time: r.time ? `${formatLocalDate(r.time.slice(0, 10), 'weekday')} ${hourLabel(r.time)}` : '—',
       snow: range('snow', [r.snowIn], units, true),

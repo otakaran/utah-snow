@@ -33,12 +33,22 @@ export const gridRow = (pf: PointForecast | null | undefined): PointForecast | n
 export const dayOf = (pf: PointForecast | null | undefined, date: string): NwsDay | undefined =>
   gridRow(pf)?.days.find((d) => d.date === date);
 
-/** Sustained wind and gust as '13 G25' (unit in the column header); '—' when neither is known. */
+/** Sustained wind and gust of a day as bare numbers in the chosen units; null where NWS has none. */
+export function windParts(day: NwsDay | undefined, units: Units): { wind: string | null; gust: string | null } {
+  return {
+    wind: finite(day?.windMaxMph) ? fmt('wind', day.windMaxMph, units).value : null,
+    gust: finite(day?.gustMaxMph) ? fmt('wind', day.gustMaxMph, units).value : null,
+  };
+}
+
+/**
+ * Sustained wind and gust for a table cell as '13 g25' (unit in the column header); '—' when neither is known.
+ * The g is lowercase: a capital G beside tabular digits reads as a 6 ('13 G25' as '13 625').
+ */
 export function windText(day: NwsDay | undefined, units: Units): string {
-  const wind = finite(day?.windMaxMph) ? fmt('wind', day.windMaxMph, units).value : null;
-  const gust = finite(day?.gustMaxMph) ? fmt('wind', day.gustMaxMph, units).value : null;
+  const { wind, gust } = windParts(day, units);
   if (gust === null) return wind ?? DASH;
-  return wind === null ? `G${gust}` : `${wind} G${gust}`;
+  return wind === null ? `g${gust}` : `${wind} g${gust}`;
 }
 
 /** Per-model sums of `snowfall_sum` over `dates`, then min–max across models (models missing a day drop out). */

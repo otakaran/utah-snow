@@ -54,7 +54,7 @@ describe('range', () => {
 
 describe('windText', () => {
   it('prints sustained wind and gust', () => {
-    expect(windText(day({ windMaxMph: 13, gustMaxMph: 25 }), 'imperial')).toBe('13 G25');
+    expect(windText(day({ windMaxMph: 13, gustMaxMph: 25 }), 'imperial')).toBe('13 g25');
     expect(windText(day({ windMaxMph: 10, gustMaxMph: null }), 'metric')).toBe('16');
     expect(windText(undefined, 'imperial')).toBe('—');
   });
@@ -98,7 +98,7 @@ describe('forecastRow and notes', () => {
       '2–5',
       '0–1',
       '—',
-      '25 G45',
+      '25 g45',
     ]);
     expect(alta.level).toEqual({ minFt: 7000, maxFt: 9000, baseFt: 8530, summitFt: 10556 });
   });

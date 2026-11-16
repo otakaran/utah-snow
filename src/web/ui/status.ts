@@ -31,5 +31,12 @@ export const LIFT_STATUS: Record<LiftState, StatusWord> = {
   unknown: { tone: 'off', word: 'Unknown' },
 };
 
+/**
+ * The freshness word under a resort that has not opened yet: its chip says PRE-SEASON, so a grey badge says
+ * 'Pre-season' too, not the badge's own 'Off-season'. Undefined keeps the badge's word (OK, Stale, Down).
+ */
+export const resortFreshWord = (badge: Badge | null, season: string | undefined): string | undefined =>
+  badge === 'grey' && season === 'preseason' ? 'Pre-season' : undefined;
+
 /** The word a stale status shows: 'Last known: Open?' (a stale road never claims a solid OPEN). */
 export const lastKnown = (word: string): string => `Last known: ${word}?`;

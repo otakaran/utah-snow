@@ -11,6 +11,7 @@ import type { Units } from '../../../shared/units.ts';
 import { clockRel, qty } from '../../lib/format.ts';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
+import { resortFreshWord } from '../../ui/status.ts';
 import { Amount, Count, Tile } from './Amount.tsx';
 import {
   bookLabel,
@@ -160,7 +161,13 @@ export function ResortHead({ id, block, drive, today, now, units, days }: Props)
             Lifts &amp; trails ↗
           </a>
         ) : null}
-        {block ? <FreshnessBadge badge={fresh ?? 'grey'} age={ageMin(block.meta, now)} /> : null}
+        {block ? (
+          <FreshnessBadge
+            badge={fresh ?? 'grey'}
+            age={ageMin(block.meta, now)}
+            label={resortFreshWord(fresh, r?.season)}
+          />
+        ) : null}
       </p>
     </section>
   );

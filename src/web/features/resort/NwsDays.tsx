@@ -78,8 +78,8 @@ export function NwsDays({ label, block, today, now, units }: Props) {
       )}
       {f ? (
         <p class="rs-dim rs-small">
-          Day 6 AM–6 PM, night 6 PM–6 AM; wind G gust. Briefing windows: tonight {qty('snow', f.tonightSnowIn, units)}{' '}
-          (4 PM–8 AM) · tomorrow {qty('snow', f.tomorrowDaytimeSnowIn, units)} (8 AM–4 PM)
+          Day 6 AM–6 PM, night 6 PM–6 AM; g = gust. Briefing windows: tonight {qty('snow', f.tonightSnowIn, units)} (4
+          PM–8 AM) · tomorrow {qty('snow', f.tomorrowDaytimeSnowIn, units)} (8 AM–4 PM)
         </p>
       ) : null}
     </div>
