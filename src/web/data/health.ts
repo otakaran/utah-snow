@@ -1,7 +1,7 @@
 // Health store: GET /api/health once per minute while visible (spec §7 shape; only the fields the UI reads).
 // Also derives the source list and the global freshness badge shown in the header (§8.1).
 import { computed, signal } from '@preact/signals';
-import { type Badge, badge, isCritical } from '../../shared/freshness.ts';
+import { type Badge, type FreshSummary, freshSummary } from '../../shared/freshness.ts';
 import type { Meta, SourceStatus } from '../../shared/types.ts';
 import { noteServerDate, serverNow, snapshot } from './snapshot.ts';
 
@@ -53,19 +53,11 @@ export const sources = computed<Meta[]>(() => {
   return (health.value?.sources ?? []).map(toMeta);
 });
 
-const RANK: Record<Badge, number> = { grey: 0, green: 1, amber: 2, red: 3 };
+/** The critical sources' worst badge with its counts (freshLabel words it), or null before any source is known. */
+export const globalFresh = computed<FreshSummary | null>(() => freshSummary(sources.value, serverNow.value));
 
 /** Worst badge among the critical sources, or null before any source is known. */
-export const globalBadge = computed<Badge | null>(() => {
-  const now = serverNow.value;
-  let worst: Badge | null = null;
-  for (const m of sources.value) {
-    if (!isCritical(m.source, m.status)) continue;
-    const b = badge(m, now);
-    if (worst === null || RANK[b] > RANK[worst]) worst = b;
-  }
-  return worst;
-});
+export const globalBadge = computed<Badge | null>(() => globalFresh.value?.badge ?? null);
 
 async function refresh(): Promise<void> {
   try {

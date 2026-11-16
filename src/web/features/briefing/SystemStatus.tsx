@@ -2,14 +2,12 @@
 // of label/value pairs (data badge, builds, last cron tick, snapshot time; a 2-column grid on phones) and every
 // source behind a disclosure. The `footer` testid,
 // credits, build id, repo link and "Not affiliated" line live on app.tsx's <footer> (ui/Attribution), every route.
-import { ageMin, badge } from '../../../shared/freshness.ts';
-import { CLIENT_BUILD, globalBadge, health, healthError, sources } from '../../data/health.ts';
+import { ageMin, badge, freshLabel } from '../../../shared/freshness.ts';
+import { CLIENT_BUILD, globalFresh, health, healthError, sources } from '../../data/health.ts';
 import { serverNow, snapshot, snapshotError } from '../../data/snapshot.ts';
 import { clockRel } from '../../lib/format.ts';
 import { FreshnessBadge } from '../../ui/FreshnessBadge.tsx';
 import { SourceList, type SourceRow } from '../../ui/SourceList.tsx';
-
-const GLOBAL_LABEL = { green: 'Data OK', amber: 'Data stale', red: 'Data down', grey: 'Off-season' } as const;
 
 function snapshotText(now: number): string {
   const snap = snapshot.value;
@@ -21,7 +19,7 @@ function snapshotText(now: number): string {
 export function SystemStatus() {
   const now = serverNow.value;
   const h = health.value;
-  const g = globalBadge.value;
+  const g = globalFresh.value;
   const rows: SourceRow[] = sources.value.map((m) => ({
     id: m.source,
     badge: badge(m, now),
@@ -37,7 +35,7 @@ export function SystemStatus() {
           <div>
             <dt>Data</dt>
             <dd>
-              <FreshnessBadge badge={g} label={GLOBAL_LABEL[g]} />
+              <FreshnessBadge badge={g.badge} label={freshLabel(g).long} />
             </dd>
           </div>
         ) : null}

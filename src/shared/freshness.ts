@@ -49,3 +49,50 @@ export function usable(meta: Meta, nowMs: number): boolean {
   const b = badge(meta, nowMs);
   return b === 'green' || b === 'amber';
 }
+
+/** How the critical rows stand: the worst badge, and how many of the rows that count (not grey) are red or amber. */
+export interface FreshSummary {
+  badge: Badge;
+  red: number;
+  amber: number;
+  total: number;
+}
+
+/**
+ * The global badge (§8.1) with its numbers, so a label can say "1 source down" instead of calling the whole site
+ * down for one row. Null before any critical row is known; grey when every critical row is off-season.
+ */
+export function freshSummary(metas: readonly Meta[], nowMs: number): FreshSummary | null {
+  const out: FreshSummary = { badge: 'grey', red: 0, amber: 0, total: 0 };
+  let known = false;
+  for (const m of metas) {
+    if (!isCritical(m.source, m.status)) continue;
+    known = true;
+    const b = badge(m, nowMs);
+    if (b === 'grey') continue;
+    out.total++;
+    if (b === 'red') out.red++;
+    else if (b === 'amber') out.amber++;
+  }
+  if (!known) return null;
+  out.badge = out.red > 0 ? 'red' : out.amber > 0 ? 'amber' : out.total > 0 ? 'green' : 'grey';
+  return out;
+}
+
+const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+/**
+ * The words for a summary: `long` for desktop and the wall, `short` for the phone header. "Data down" and "Data
+ * stale" are kept for when half or more of the rows that count are affected; below that the label counts them.
+ */
+export function freshLabel(f: FreshSummary | null): { long: string; short: string } {
+  if (!f) return { long: 'No data yet', short: '—' };
+  if (f.badge === 'grey') return { long: 'Off-season', short: 'Off' };
+  if (f.badge === 'green') return { long: 'Data OK', short: 'OK' };
+  if (f.badge === 'red') {
+    if (2 * f.red >= f.total) return { long: 'Data down', short: 'Down' };
+    return { long: `${plural(f.red, 'source')} down`, short: `${f.red} down` };
+  }
+  if (2 * f.amber >= f.total) return { long: 'Data stale', short: 'Stale' };
+  return { long: `${plural(f.amber, 'source')} stale`, short: 'Stale' };
+}

@@ -141,6 +141,8 @@ export const MORNING_HOURS = { from: 4, to: 10 } as const; // Denver local, incl
 // would push slot 10 (roads + the group B resorts) past the 50-subrequest cap.
 export const MAINT = { slot: 9, utcHours: [8, 9, 10, 11], mondayUtcHour: 12 } as const;
 
-// counters key `cpu-suspect:{job}:{date}` lives this long; /api/health?strict=1 fails on any from the last 24 h.
+// counters key `cpu-suspect:{job}:{date}` lives this long; /api/health lists the last 24 h as warnings and
+// ?strict=1 fails once one job was flagged CPU_SUSPECT_FAIL times in them.
 export const CPU_SUSPECT_TTL_MS = 7 * 86_400_000;
+export const CPU_SUSPECT_FAIL = 3;
 export const CRON_STALE_MIN = 15; // /api/health?strict=1 fails when the last tick is older

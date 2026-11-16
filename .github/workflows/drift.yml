@@ -1,5 +1,6 @@
 # Weekly cam drift check (spec §11): Mondays 15:00 UTC, plus manual dispatch. On drift, comment on the open "drift"
-# issue or create one. Hosts that block the runner are reported as unreachable and do not fail the run.
+# issue or create one. Hosts that block the runner are reported as unreachable and do not fail the run; a clean run
+# closes the issue only when every site was reached (an unreachable site may still be the one that drifted).
 name: Drift
 
 on:
@@ -61,3 +62,18 @@ jobs:
             num=$(gh issue list --label drift --state open --limit 1 --json number --jq '.[0].number')
             gh issue comment "$num" --body-file body.md
           fi
+      - name: Close the drift issue on a clean run
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if grep -q ': unreachable' drift.md; then
+            echo 'A site was unreachable: leaving any open drift issue as it is.'
+            exit 0
+          fi
+          for num in $(gh issue list --label drift --state open --json number --jq '.[].number'); do
+            gh issue close "$num" --comment "No drift at $(date -u +%Y-%m-%dT%H:%MZ), every site reached ([run]($RUN_URL))."
+          done

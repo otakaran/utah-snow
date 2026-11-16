@@ -6,8 +6,8 @@
 
 import type { ComponentChildren } from 'preact';
 import { useErrorBoundary } from 'preact/hooks';
-import { ageMin, type Badge, badge } from '../shared/freshness.ts';
-import { CLIENT_BUILD, globalBadge, sources } from './data/health.ts';
+import { ageMin, type Badge, badge, freshLabel } from '../shared/freshness.ts';
+import { CLIENT_BUILD, globalFresh, sources } from './data/health.ts';
 import { offline, serverNow, snapshot } from './data/snapshot.ts';
 import { Briefing } from './features/briefing/index.ts';
 import { CamsPage } from './features/cams/index.ts';
@@ -32,18 +32,11 @@ const NAV: { href: string; label: string; name: RouteName; wide?: true }[] = [
   { href: '#/settings', label: 'Settings', name: 'settings' },
   { href: '#/wall', label: 'Wall', name: 'wall', wide: true },
 ];
-const GLOBAL_LABEL: Record<Badge, string> = {
-  green: 'Data OK',
-  amber: 'Data stale',
-  red: 'Data down',
-  grey: 'Off-season',
-};
-const GLOBAL_SHORT: Record<Badge, string> = { green: 'OK', amber: 'Stale', red: 'Down', grey: 'Off' };
 const RANK: Record<Badge, number> = { red: 0, amber: 1, green: 2, grey: 3 };
 
 function GlobalFreshness({ now }: { now: number }) {
-  const g = globalBadge.value;
-  const label = g ? GLOBAL_LABEL[g] : 'No data yet';
+  const g = globalFresh.value;
+  const { long: label, short } = freshLabel(g);
   const rows: SourceRow[] = sources.value
     .map((m) => ({ id: m.source, badge: badge(m, now), age: ageMin(m, now), error: m.error, via: m.via }))
     .sort((a, b) => RANK[a.badge] - RANK[b.badge] || (a.id < b.id ? -1 : 1));
@@ -56,8 +49,8 @@ function GlobalFreshness({ now }: { now: number }) {
         data-testid="global-fresh"
         aria-label={`${label}: list every source`}
       >
-        {/* The phone word fits the box 'Down' reserves (shell/header.css), so the header never reflows. */}
-        <FreshnessBadge badge={g ?? 'grey'} label={label} short={g ? GLOBAL_SHORT[g] : '—'} />
+        {/* The words fit the boxes shell/header.css reserves ('2 down' on a phone), so the header never reflows. */}
+        <FreshnessBadge badge={g?.badge ?? 'grey'} label={label} short={short} />
       </button>
       <div id="fresh-pop" popover="auto" class="pop">
         <p class="pop-title">Sources · worst first</p>

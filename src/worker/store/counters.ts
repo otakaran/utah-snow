@@ -129,7 +129,7 @@ export function ytAfterStmts(db: D1Database, row: unknown, pending: unknown, now
 }
 
 export interface HealthCounters {
-  cpuSuspects: string[]; // jobs flagged in the last 24 h
+  cpuSuspects: Record<string, number>; // job -> times flagged, over the date keys written in the last 24 h
   ytUnitsToday: number;
   kvWritesToday: number; // stake_frames rows since 00:00 UTC
   trackerWritesToday: number; // audit_log rows since 00:00 UTC
@@ -140,15 +140,17 @@ export async function readHealthCounters(db: D1Database, now: number): Promise<H
   const utcMidnight = now - (now % DAY);
   const [sus, yt, kv, tr] = await db.batch([
     db
-      .prepare("SELECT key FROM counters WHERE key LIKE 'cpu-suspect:%' AND expires_at > ?1")
+      .prepare("SELECT key, value FROM counters WHERE key LIKE 'cpu-suspect:%' AND expires_at > ?1")
       .bind(now + CPU_SUSPECT_TTL_MS - DAY),
     db.prepare('SELECT value AS n FROM counters WHERE key = ?1').bind(ytUnitsKey(now)),
     db.prepare('SELECT COUNT(*) AS n FROM stake_frames WHERE t >= ?1').bind(utcMidnight),
     db.prepare('SELECT COUNT(*) AS n FROM audit_log WHERE at >= ?1').bind(utcMidnight),
   ]);
   const n = (r: D1Result | undefined) => Number((r?.results[0] as { n?: number } | undefined)?.n ?? 0);
-  const jobs = new Set(
-    (sus?.results as { key: string }[] | undefined)?.map((r) => r.key.split(':').slice(1, -1).join(':')),
-  );
-  return { cpuSuspects: [...jobs], ytUnitsToday: n(yt), kvWritesToday: n(kv), trackerWritesToday: n(tr) };
+  const cpuSuspects: Record<string, number> = {};
+  for (const r of (sus?.results as { key: string; value: number }[] | undefined) ?? []) {
+    const job = r.key.split(':').slice(1, -1).join(':');
+    cpuSuspects[job] = (cpuSuspects[job] ?? 0) + Number(r.value);
+  }
+  return { cpuSuspects, ytUnitsToday: n(yt), kvWritesToday: n(kv), trackerWritesToday: n(tr) };
 }

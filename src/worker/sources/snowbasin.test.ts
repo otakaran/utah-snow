@@ -191,10 +191,11 @@ describe('snowbasin: validation gate and fetch', () => {
 
   it('GETs the canonical URL once, follows one same-host redirect itself and no other', async () => {
     const calls: unknown[] = [];
-    const answers: { status: number; location?: string }[] = [];
+    const answers: { status: number; location?: string; fail?: string }[] = [];
     const fx = (async (url: string, opts: { follow?: boolean; timeoutMs?: number }) => {
       calls.push({ url, follow: opts.follow, timeoutMs: opts.timeoutMs });
       const a = answers.shift() ?? { status: 200 };
+      if (a.fail) throw Object.assign(new Error('The operation was aborted due to timeout'), { name: a.fail });
       const headers = new Headers(a.location ? { location: a.location } : {});
       return { status: a.status, url, headers, data: live };
     }) as unknown as FetchX;
@@ -213,6 +214,20 @@ describe('snowbasin: validation gate and fetch', () => {
     await expect(snowbasin.fetch(ctx)).rejects.toThrow(/HTTP 301/);
     answers.push({ status: 307, location: '/maintenance' }, { status: 307, location: '/again' });
     await expect(snowbasin.fetch(ctx)).rejects.toThrow(/HTTP 307/);
+    // 2026-11-15: two timeouts 20 min apart turned the row red. A timeout is retried once, within the same 2.
+    calls.length = 0;
+    answers.push({ status: 0, fail: 'TimeoutError' }, { status: 200 });
+    await expect(snowbasin.fetch(ctx)).resolves.toBe(live);
+    expect(calls).toHaveLength(2);
+    answers.push({ status: 0, fail: 'TimeoutError' }, { status: 307, location: '/x' }, { status: 200 });
+    await expect(snowbasin.fetch(ctx)).rejects.toThrow(/HTTP 307/); // a retry leaves no request for a hop
+    answers.length = 0;
+    answers.push({ status: 0, fail: 'TimeoutError' }, { status: 0, fail: 'TimeoutError' });
+    await expect(snowbasin.fetch(ctx)).rejects.toThrow(/timeout/);
+    calls.length = 0;
+    answers.push({ status: 0, fail: 'BudgetError' });
+    await expect(snowbasin.fetch(ctx)).rejects.toThrow();
+    expect(calls).toHaveLength(1); // not transient: no retry
   });
 
   it('sameHostRedirect keeps snowbasin.com hops only', () => {

@@ -1,8 +1,11 @@
 // GET /api/health[?strict=1] (spec §7, §11). no-store. strict=1 -> 503 when a critical source is red, the last
-// cron tick is older than 15 min (or never ran), any job was flagged cpu-suspect in the last 24 h, or the weekly
-// NWS /points check found a grid or zone change (Appendix C.1). Also arms the Scheduler alarm chain (waitUntil).
+// cron tick is older than 15 min (or never ran), one job was flagged cpu-suspect CPU_SUSPECT_FAIL times in the last
+// 24 h, or the weekly NWS /points check found a grid or zone change (Appendix C.1). A job flagged less often is
+// only a warning: the flag means "the previous tick wrote none of this job's rows", which one interrupted tick
+// (a Durable Object reset, a D1 hiccup) causes too, and on 2026-11-12 that failed strict for a day while every row
+// was green. A job that is killed every time still turns its rows red. Also arms the Scheduler alarm chain.
 import { CAMS } from '../../../config/cams/index.ts';
-import { CRON_STALE_MIN } from '../../../config/schedule.ts';
+import { CPU_SUSPECT_FAIL, CRON_STALE_MIN } from '../../../config/schedule.ts';
 import { camFresh } from '../../shared/cam-fresh.ts';
 import { ageMin, badge, isCritical } from '../../shared/freshness.ts';
 import { isoUtc, MIN } from '../../shared/time.ts';
@@ -70,7 +73,7 @@ export async function health(_req: Request, env: Env, ctx: ExecutionContext, url
   const now = Date.now();
   const [rows, counters] = await Promise.all([readMetaRows(env.DB), readHealthCounters(env.DB, now)]);
   const cron = cronLastOf(rows);
-  const suspects = new Set(counters.cpuSuspects);
+  const suspects = new Map(Object.entries(counters.cpuSuspects));
 
   const sources = rows
     .filter((r) => r.source_id !== CRON_LAST)
@@ -95,7 +98,9 @@ export async function health(_req: Request, env: Env, ctx: ExecutionContext, url
   const tickAgeMin = cron ? (now - cron.startedAt) / MIN : null;
   const failures: string[] = [];
   if (tickAgeMin === null || tickAgeMin > CRON_STALE_MIN) failures.push('cron-stale');
-  if (suspects.size) failures.push('cpu-suspect');
+  const warnings = [...suspects].sort().map(([job, n]) => `cpu-suspect:${job}${n > 1 ? ` x${n}` : ''}`);
+  const repeat = [...suspects].filter(([, n]) => n >= CPU_SUSPECT_FAIL).map(([job]) => job);
+  if (repeat.length) failures.push(`cpu-suspect:${repeat.sort().join(',')}`);
   const red = sources.filter((s) => isCritical(s.id, s.status) && s.badge === 'red').map((s) => s.id);
   if (red.length) failures.push(`red:${red.join(',')}`);
   const pointChanges = payloadOf(rows, 'nws:points')?.changes;
@@ -108,6 +113,7 @@ export async function health(_req: Request, env: Env, ctx: ExecutionContext, url
     version: BUILD_ID,
     generatedAt: iso(now),
     failures,
+    warnings,
     cron: {
       lastTickAt: cron ? iso(cron.startedAt) : null,
       lastSlot: cron?.slot ?? null,

@@ -1,7 +1,7 @@
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CRON_STALE_MIN } from '../../../config/schedule.ts';
+import { CPU_SUSPECT_TTL_MS, CRON_STALE_MIN } from '../../../config/schedule.ts';
 import { DAY, isoUtc, MIN } from '../../shared/time.ts';
 import { runTick } from '../cron/dispatcher.ts';
 import worker from '../index.ts';
@@ -133,6 +133,28 @@ describe('/api/health', () => {
     expect(body.cams).toEqual({ total: 6, live: 1, ok: 2, stale: 2, offline: 1 });
     expect(body.youtube).toEqual({ mode: 'api', unitsToday: 1200, unmapped: 2, anomaly: true });
     expect(body.failures).toEqual(['nws-points:1']);
+  });
+
+  it('a job flagged cpu-suspect once or twice in 24 h is a warning; three times fails strict', async () => {
+    const now = Date.now();
+    await runTick(env, now, { sources: [] });
+    const flag = (job: string, n: number, writtenAt = now) =>
+      env.DB.prepare('INSERT INTO counters (key, value, expires_at) VALUES (?1, ?2, ?3)')
+        .bind(`cpu-suspect:${job}:2026-11-12`, n, writtenAt + CPU_SUSPECT_TTL_MS)
+        .run();
+    // 2026-11-12: one slot-0 tick wrote nothing, and strict health failed for a day with every row green
+    await Promise.all([flag('roads', 1), flag('nws-grid:alta:base', 2), flag('stake-alta', 9, now - 2 * DAY)]);
+    const once = await get('/api/health?strict=1');
+    expect(once.status).toBe(200);
+    expect(await once.json()).toMatchObject({
+      ok: true,
+      failures: [],
+      warnings: ['cpu-suspect:nws-grid:alta:base x2', 'cpu-suspect:roads'],
+    });
+    await flag('resort:brighton', 3);
+    const repeat = await get('/api/health?strict=1');
+    expect(repeat.status).toBe(503);
+    expect(((await repeat.json()) as { failures: string[] }).failures).toEqual(['cpu-suspect:resort:brighton']);
   });
 
   it('unknown routes: /api 404 and 405 are no-store JSON, other paths 404 text/plain', async () => {

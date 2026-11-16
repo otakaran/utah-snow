@@ -77,6 +77,47 @@ test('"I am" already chosen: no chip, and [Crew | As me] holds its place while t
   expect(after.band).toBe(before.band);
 });
 
+// 2026-11-15: one resort report timing out twice put a red "Down" on every page while 34 of 35 sources were green.
+// The header now counts it ("1 source down", "1 down" on a phone) in the box it reserves, and the Resorts heading
+// says how many reports are affected.
+test('one source down: the header counts it in the same box, and the section says 1 of 6', async ({ page }) => {
+  const ms = Date.parse(AT);
+  let down = false;
+  await page.clock.setFixedTime(ms);
+  await page.route('**/api/**', async (route) => {
+    const res = await route.fetch();
+    const headers: Record<string, string> = { ...res.headers(), date: new Date(ms).toUTCString() };
+    if (!down || new URL(route.request().url()).pathname !== '/api/snapshot' || res.status() !== 200) {
+      return route.fulfill({ response: res, headers });
+    }
+    const snap = (await res.json()) as {
+      sources: { source: string; status: string; failCount: number }[];
+      resorts: Record<string, { meta: { status: string; failCount: number } }>;
+    };
+    const bad = { status: 'error', failCount: 2 };
+    for (const s of snap.sources) if (s.source === 'resort:snowbasin') Object.assign(s, bad);
+    if (snap.resorts.snowbasin) Object.assign(snap.resorts.snowbasin.meta, bad);
+    delete headers['content-length'];
+    delete headers['content-encoding'];
+    return route.fulfill({ response: res, headers, body: JSON.stringify(snap) });
+  });
+  const fresh = page.getByTestId('global-fresh').locator('.fresh');
+  await page.goto('/');
+  await expect(fresh).toHaveAttribute('data-badge', 'green');
+  const ok = await boxes(page);
+  down = true;
+  await page.reload();
+  await expect(fresh).toHaveAttribute('data-badge', 'red');
+  await expect(fresh).toContainText('1 source down');
+  await expect(fresh.locator('.fresh-short')).toHaveText('1 down');
+  await expect(page.getByTestId('resorts').locator('.cond-src')).toContainText('1 of 6 down');
+  const bad = await boxes(page);
+  expect(bad.row).toBe(ok.row);
+  expect(bad.nav).toBe(ok.nav);
+  expect(bad.fresh).toBe(ok.fresh);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+});
+
 test.describe('phone width', () => {
   test.use({ viewport: { width: 393, height: 659 } });
 

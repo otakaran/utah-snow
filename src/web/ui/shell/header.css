@@ -96,7 +96,7 @@
 
 .hdr-fresh .fresh-long {
   display: inline-block;
-  min-width: 5em; /* 'No data yet', the widest label */
+  min-width: 7em; /* '2 sources stale': room for a partial outage's count, so no state reflows the row */
 }
 
 .hdr-menu .seg label {
@@ -153,7 +153,7 @@
 
   .hdr-fresh .fresh-short {
     display: inline-block;
-    min-width: 2.5em; /* 'Down', the widest word */
+    min-width: 3.1em; /* '2 down', the widest word */
     font-size: var(--fs-5);
   }
 

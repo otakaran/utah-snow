@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageMin, badge, isCritical, usable } from './freshness.ts';
+import { ageMin, badge, freshLabel, freshSummary, isCritical, usable } from './freshness.ts';
 import type { Meta } from './types.ts';
 
 const NOW = Date.parse('2027-01-05T13:00:00Z');
@@ -67,5 +67,62 @@ describe('isCritical', () => {
     expect(isCritical('resort:deer-valley', 'blocked')).toBe(false);
     expect(isCritical('resort:solitude', 'error')).toBe(true);
     expect(isCritical('resort:brighton', 'blocked')).toBe(true);
+  });
+});
+
+describe('freshSummary and freshLabel', () => {
+  const CRITICAL = [
+    ...['alta', 'snowbird', 'brighton', 'solitude', 'deer-valley', 'snowbasin'].flatMap((r) => [
+      `resort:${r}`,
+      `nws:${r}:summit`,
+    ]),
+    ...['lcc', 'bcc', 'parleys', 'snowbasin'].map((c) => `roads:${c}`),
+    'avy:uac',
+  ];
+  const rows = (over: Record<string, Partial<Meta>> = {}): Meta[] => [
+    ...CRITICAL.map((source) => meta({ source, ...over[source] })),
+    meta({ source: 'obs', okAt: null }), // advisory and not critical: never counted
+    meta({ source: 'cams:status', okAt: null }),
+  ];
+  const down: Partial<Meta> = { status: 'error', failCount: 2 };
+
+  it('one resort row down out of 17 is "1 source down", not the whole site', () => {
+    const f = freshSummary(rows({ 'resort:snowbasin': down }), NOW);
+    expect(f).toEqual({ badge: 'red', red: 1, amber: 0, total: 17 });
+    expect(freshLabel(f)).toEqual({ long: '1 source down', short: '1 down' });
+    const two = freshSummary(rows({ 'resort:snowbasin': down, 'roads:lcc': down }), NOW);
+    expect(freshLabel(two)).toEqual({ long: '2 sources down', short: '2 down' });
+  });
+
+  it('half or more of the rows that count down is "Data down"', () => {
+    const nine = Object.fromEntries(CRITICAL.slice(0, 9).map((id) => [id, down]));
+    expect(freshLabel(freshSummary(rows(nine), NOW))).toEqual({ long: 'Data down', short: 'Down' });
+  });
+
+  it('off-season rows do not count, and blocked MtnPowder rows are not critical', () => {
+    const off = Object.fromEntries(
+      CRITICAL.filter((id) => id.startsWith('resort:')).map((id) => [id, { status: 'offseason' } as const]),
+    );
+    const f = freshSummary(
+      rows({ ...off, 'resort:snowbasin': down, 'resort:solitude': { status: 'blocked', failCount: 9 } }),
+      NOW,
+    );
+    expect(f).toEqual({ badge: 'red', red: 1, amber: 0, total: 12 });
+    const allOff = freshSummary(
+      CRITICAL.slice(0, 2).map((source) => meta({ source, status: 'offseason' })),
+      NOW,
+    );
+    expect(freshLabel(allOff)).toEqual({ long: 'Off-season', short: 'Off' });
+  });
+
+  it('amber counts its rows; green and no rows have their own words', () => {
+    const stale = freshSummary(
+      rows({ 'avy:uac': { okAt: minutesAgo(45) }, 'roads:bcc': { okAt: minutesAgo(45) } }),
+      NOW,
+    );
+    expect(freshLabel(stale)).toEqual({ long: '2 sources stale', short: 'Stale' });
+    expect(freshLabel(freshSummary(rows(), NOW))).toEqual({ long: 'Data OK', short: 'OK' });
+    expect(freshSummary([meta({ source: 'obs' })], NOW)).toBeNull();
+    expect(freshLabel(null)).toEqual({ long: 'No data yet', short: '—' });
   });
 });

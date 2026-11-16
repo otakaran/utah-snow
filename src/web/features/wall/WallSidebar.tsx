@@ -4,8 +4,9 @@
 // (WeekStrip). It stays beside the weather page too. Night: clock, roads and footer only.
 // Sizes: countdown < clock (--fs-clock) <= pick name (--fs-pick-name); everything inside --wall-safe (wall.css).
 import { WALL_SET_DEFS, WALL_SETS, type WallSet } from '../../../../config/wall.ts';
+import { freshLabel } from '../../../shared/freshness.ts';
 import { isoToMs, localDate } from '../../../shared/time.ts';
-import { globalBadge } from '../../data/health.ts';
+import { globalFresh } from '../../data/health.ts';
 import { units } from '../../data/settings.ts';
 import { offline, snapshot } from '../../data/snapshot.ts';
 import { clock, shortDate } from '../../lib/format.ts';
@@ -45,10 +46,15 @@ function WallPick() {
 function Footer({ now, set, paused, page }: Omit<Props, 'night'>) {
   const snap = snapshot.value;
   const at = isoToMs(snap?.generatedAt);
+  const g = globalFresh.value; // "1 source down", not "Down": the age beside it is the snapshot's
   return (
     <footer class="wall-foot" data-testid="wall-fresh">
       <span class="wall-fresh">
-        Data <FreshnessBadge badge={globalBadge.value ?? 'grey'} age={at === null ? null : (now - at) / 60_000} />
+        <FreshnessBadge
+          badge={g?.badge ?? 'grey'}
+          label={freshLabel(g).long}
+          age={at === null ? null : (now - at) / 60_000}
+        />
         {offline.value ? <b class="wall-offline">Offline</b> : null}
       </span>
       <span class="wall-set">{WALL_SET_DEFS[set].short}</span>

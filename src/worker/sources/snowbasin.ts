@@ -143,21 +143,31 @@ export function parseSnowbasin(raw: unknown, ctx: ParseCtx): Output {
   return { rows: { [ID]: row } };
 }
 
+/** A timeout or a dropped connection earns one retry; budget, deadline, block and HTTP errors do not. */
+const transient = (err: unknown): boolean =>
+  err instanceof Error && (err.name === 'TimeoutError' || err.name === 'TypeError');
+
 export const snowbasin: Source<string> = {
   id: ID,
   staleAfterMin: 40,
   rows: [ID],
-  // The canonical URL answers 200 directly; redirects are not followed, so the worst case is one request.
-  // One GET plus at most one hop for a same-host redirect (the page answered 307 for a day on 2026-10-28 and the
-  // row went red; a cross-host Location is not followed), so the worst case is exactly 2.
+  // The canonical URL answers 200 directly. One GET plus at most one more request, so the worst case is exactly 2:
+  // either the hop of a same-host redirect (the page answered 307 for a day on 2026-10-28 and the row went red; a
+  // cross-host Location is not followed), or one retry after a timeout or a dropped connection (two 10 s timeouts
+  // in a row on 2026-11-15 turned the row red while the page answered in 0.5 s elsewhere). Never both.
   maxSubrequests: () => 2,
   probes: [{ hostId: 'snowbasin', url: SNOWBASIN_URL }],
   async fetch(ctx: FetchCtx): Promise<string> {
     const opts = { headers: { Accept: 'text/html' }, timeoutMs: 10_000, follow: false } as const;
-    let res = await ctx.fetch<string>(SNOWBASIN_URL, opts);
-    const hop = sameHostRedirect(res.status, res.headers?.get('location'));
+    let retried = false;
+    let res = await ctx.fetch<string>(SNOWBASIN_URL, opts).catch((err: unknown) => {
+      if (!transient(err)) throw err;
+      retried = true;
+      return ctx.fetch<string>(SNOWBASIN_URL, opts);
+    });
+    const hop = retried ? null : sameHostRedirect(res.status, res.headers?.get('location'));
     if (hop) res = await ctx.fetch<string>(hop, opts);
-    if (res.status !== 200) throw new Error(`snowbasin: HTTP ${res.status} (only one same-host redirect is followed)`);
+    if (res.status !== 200) throw new Error(`snowbasin: HTTP ${res.status} (one retry or one same-host hop, no more)`);
     return res.data;
   },
   parse: parseSnowbasin,

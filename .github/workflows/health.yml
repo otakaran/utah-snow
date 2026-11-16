@@ -1,4 +1,5 @@
-# Scheduled strict health check (spec §11): 14:00 and 23:00 UTC. On failure, open one "health" issue or comment on it.
+# Scheduled strict health check (spec §11): 14:00 and 23:00 UTC. On failure, open one "health" issue or comment on it;
+# on a pass, close it with a note (an issue left open after a recovery hides the next failure in its comments).
 name: Health
 
 on:
@@ -54,3 +55,14 @@ jobs:
             num=$(gh issue list --label health --state open --limit 1 --json number --jq '.[0].number')
             gh issue comment "$num" --body-file body.md
           fi
+      - name: Close the health issue on recovery
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          for num in $(gh issue list --label health --state open --json number --jq '.[].number'); do
+            gh issue close "$num" --comment "Recovered: strict health passed at $(date -u +%Y-%m-%dT%H:%MZ) ([run]($RUN_URL))."
+          done
