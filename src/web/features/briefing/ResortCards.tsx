@@ -34,7 +34,12 @@ export function ResortCards({ hero }: { hero: (id: ResortId, isPick: boolean) =>
     now,
   );
   return (
-    <Section testid="resorts" index="03" title="Resorts" sub={<SourceLine source="Reports" fresh={fresh} />}>
+    <Section
+      testid="resorts"
+      index="03"
+      title="Resorts"
+      sub={<SourceLine source="Reports" fresh={fresh} greyWord="Pre-season" />}
+    >
       <div class="rc-list">
         {RESORT_IDS.map((id) => {
           const isPick = pick?.pick === id;

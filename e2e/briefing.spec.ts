@@ -42,6 +42,31 @@ test('phones get a jump bar once the pick card has scrolled away; Wall leaves th
   expect(await fits()).toBe(true);
 });
 
+// 2026-11-15: under six PRE-SEASON chips the heading and the card feet said "Off-season · 3 min ago".
+test('before opening day the Resorts heading and the cards say Pre-season, not Off-season', async ({ page }) => {
+  await page.route(
+    (url) => url.pathname === '/api/snapshot',
+    async (route) => {
+      const res = await route.fetch();
+      const snap = (await res.json()) as { resorts: Record<string, { data: object; meta: { status: string } }> };
+      for (const block of Object.values(snap.resorts)) {
+        block.data = { ...block.data, season: 'preseason' };
+        block.meta.status = 'offseason'; // as the Worker stores a pre-season report
+      }
+      const headers = { ...res.headers() };
+      delete headers['content-length'];
+      delete headers['content-encoding'];
+      delete headers.etag;
+      await route.fulfill({ response: res, headers, body: JSON.stringify(snap) });
+    },
+  );
+  await page.goto('/');
+  const resorts = page.getByTestId('resorts');
+  await expect(resorts.locator('.cond-src')).toContainText('Pre-season');
+  await expect(resorts.locator('.rc-foot .fresh:visible').first()).toContainText('Pre-season');
+  await expect(resorts).not.toContainText('Off-season');
+});
+
 // Where the list is one column (below 720 px) each card is a <details>: only the pick starts open, and a closed card
 // mounts no hero, so its still is first requested when the card is opened. Wider, six plain open articles.
 test('resort cards fold on phones: only the pick is open and a closed card requests no hero still', async ({

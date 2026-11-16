@@ -139,7 +139,7 @@ test.describe('large phone width', () => {
       };
     });
     expect(got.gap, `brand to date gap ${got.gap.toFixed(1)} px`).toBeGreaterThanOrEqual(8);
-    expect(got.cut, `base chip "${got.chip}" cut by ${got.cut} px`).toBeLessThanOrEqual(0);
+    expect(got.cut, `base chip "${got.chip}" cut by ${got.cut} px`).toBeLessThanOrEqual(1); // 1 px: rounding
   });
 });
 
