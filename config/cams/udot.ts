@@ -2,8 +2,9 @@
 // Array order is the maintenance offline-check order (§5.3: 09Z/10Z/11Z batches of 17/16/16 Cctv ids; VMS not checked).
 // Plain <img> only, never crossorigin (malformed CORS headers). ★ = briefing cam (config/roads.ts briefingCams).
 // GIF = animated RWIS image, 0.5–1.3 MB, tap-to-load in data saver. Excluded: VMS 100109 (stale since 2024-03-13).
-// UDOT re-issues every Cctv id now and then (all 49 on 2026-10-21; old ids keep serving the same image for weeks):
-// `pnpm drift` flags it; remap by byte-identical images against /List/GetData/Cameras (see the 2026-10-25 commit).
+// UDOT re-issues Cctv ids (all 49 on 2026-10-21; the Cottonwood Canyons page lists new ids every week) and the old
+// ids keep serving the same live image: `pnpm drift` pairs page ids with these by location + identical image bytes and
+// flags only a real move; remap by byte-identical images against /List/GetData/Cameras (see the 2026-10-25 commit).
 import type { CamDef } from '../../src/shared/types.ts';
 
 const CCTV = 'https://www.udottraffic.utah.gov/map/Cctv';

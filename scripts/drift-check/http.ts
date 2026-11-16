@@ -43,6 +43,25 @@ export async function get(url: string, opts: Opts = {}): Promise<Got> {
   return { ok: false, status: res.status, reason: `HTTP ${res.status}` };
 }
 
+export type GotBytes = { ok: true; type: string; sha256: string } | { ok: false; reason: string };
+
+/** An image's content-type and SHA-256 (hex), to tell whether two URLs serve the same bytes. */
+export async function getBytes(url: string): Promise<GotBytes> {
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, Accept: 'image/*,*/*;q=0.8' },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return { ok: false, reason: `HTTP ${res.status}` };
+    const digest = await crypto.subtle.digest('SHA-256', await res.arrayBuffer());
+    const sha256 = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    return { ok: true, type: (res.headers.get('content-type') ?? '').split(';')[0]?.trim() ?? '', sha256 };
+  } catch (err) {
+    const code = err instanceof Error ? ((err.cause as { code?: string } | undefined)?.code ?? err.name) : 'Error';
+    return { ok: false, reason: `network error ${code}` };
+  }
+}
+
 /** 404/410: the page itself is gone, which is drift. Anything else means the host did not serve this runner. */
 export const isGone = (status: number): boolean => status === 404 || status === 410;
 
