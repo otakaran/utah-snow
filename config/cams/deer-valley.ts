@@ -1,4 +1,4 @@
-// Deer Valley cams, spec Appendix A.5 (10). Channel UCTqz2P_u5ewpc7ICo9p-TMg. Data only.
+// Deer Valley cams, spec Appendix A.5 (10) plus the Park Peak stake (11). Channel UCTqz2P_u5ewpc7ICo9p-TMg. Data only.
 // camstreamer_youtube: the Worker sends HEAD https://camstreamer.com/embed/{handle} (redirect manual) and reads {id}
 // from the Location. Handles and seed IDs live in config/youtube.ts. Images follow the YT convention; refresh 300 s.
 import type { CamDef } from '../../src/shared/types.ts';
@@ -47,4 +47,6 @@ export const DEER_VALLEY_CAMS = [
     pageUrl: 'https://www.skiutah.com/members/deer-valley/snowreport',
     still: { card: `${SU}/ZFfEsBSprV7GfFinXUifK3?_ts={s}`, detail: `${SU}/ZFfEsBSprV7GfFinXUifK3?_ts={s}`,
       wall: `${SU}/ZFfEsBSprV7GfFinXUifK3?_ts={s}` } },
+  // A second stake the resort added on 2026-10-28. A plain cam here: Ontario stays the resort's stake (STAKE_ORDER).
+  { ...CS_CAM, id: 'deer-valley-park-peak-snowstake', name: 'Park Peak Snow Stake' },
 ] as const satisfies readonly CamDef[];

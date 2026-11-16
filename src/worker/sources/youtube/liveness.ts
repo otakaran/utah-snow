@@ -1,22 +1,22 @@
 // §6.1 B/D state transitions for Data API answers (pure). LIVE(id) = the item exists, liveBroadcastContent is
-// 'live', there is no actualEndTime, embeddable is not false and the channel is the slot's channel. Live titles
-// are re-matched against the ordered slot regexes, so a re-pointed stream moves to its proper slot.
-import { CHANNELS } from '../../../../config/youtube.ts';
+// 'live', there is no actualEndTime, embeddable is not false and the channel is one of the resort's (state.ts
+// channelIds). Live titles are re-matched against the ordered slot regexes, so a re-pointed stream moves to its
+// proper slot.
 import { isoToMs } from '../../../shared/time.ts';
 import type { YtChannel, YtSlotState, YtState } from '../../../shared/types.ts';
 import { type CsHit, csCandidate } from './camstreamer.ts';
 import type { ApiCall, DiscoveryRun, VideoItem } from './data-api.ts';
-import { DEF_BY_CAM, matchSlot, SLOT_DEFS, type SlotDef, setVideo } from './state.ts';
+import { channelIds, DEF_BY_CAM, matchSlot, SLOT_DEFS, type SlotDef, setVideo } from './state.ts';
 
 const DEATH_RETRIES = 3; // the immediate run plus the next 2 youtube ticks
 
-export function isLive(it: VideoItem | undefined, channelId: string): it is VideoItem {
+export function isLive(it: VideoItem | undefined, channel: YtChannel): it is VideoItem {
   return (
     it !== undefined &&
     it.snippet?.liveBroadcastContent === 'live' &&
     !it.liveStreamingDetails?.actualEndTime &&
     it.status?.embeddable !== false &&
-    it.snippet?.channelId === channelId
+    channelIds(channel).includes(it.snippet?.channelId ?? '')
   );
 }
 
@@ -67,7 +67,7 @@ function markDeaths(st: YtState, wasLive: Map<string, boolean>, now: number): vo
 }
 
 function remember(st: YtState, id: string, channel: YtChannel, it: VideoItem | undefined, now: number): void {
-  st.seen[id] = { channel, title: titleOf(it), live: isLive(it, CHANNELS[channel].channelId), checkedAt: now };
+  st.seen[id] = { channel, title: titleOf(it), live: isLive(it, channel), checkedAt: now };
 }
 
 /** Applies the per-tick videos.list answer (call.items must be non-null). */
@@ -97,7 +97,7 @@ export function applyLiveness(st: YtState, call: ApiCall, hits: readonly CsHit[]
     const s = st.slots[def.cam];
     if (!s?.videoId || !call.ids.includes(s.videoId)) continue;
     const it = byId.get(s.videoId);
-    if (!isLive(it, def.channelId)) {
+    if (!isLive(it, def.channel)) {
       setDead(s, now);
       continue;
     }
@@ -111,7 +111,7 @@ export function applyLiveness(st: YtState, call: ApiCall, hits: readonly CsHit[]
   for (const [def, it] of moves) offerLive(st, def, it, now);
   for (const [def, id] of candidates) {
     const it = byId.get(id);
-    if (st.slots[def.cam]?.videoId === id || !isLive(it, def.channelId)) continue;
+    if (st.slots[def.cam]?.videoId === id || !isLive(it, def.channel)) continue;
     const target = matchSlot(def.channel, titleOf(it)); // accepted only when the title matches a slot
     if (target) offerLive(st, target, it, now);
   }
@@ -127,11 +127,10 @@ export function applyDiscovery(st: YtState, runs: readonly DiscoveryRun[], now: 
     if (left > 0) st.retries[run.channel] = left - 1;
     if (!run.videos?.items) continue;
     const byId = new Map(run.videos.items.map((it) => [it.id, it]));
-    const channelId = CHANNELS[run.channel].channelId;
     for (const id of run.videos.ids) {
       const it = byId.get(id);
       remember(st, id, run.channel, it, now);
-      if (!isLive(it, channelId)) continue;
+      if (!isLive(it, run.channel)) continue;
       const def = matchSlot(run.channel, titleOf(it));
       if (def) offerLive(st, def, it, now);
       else if (!st.unmapped.some((u) => u.videoId === id)) {

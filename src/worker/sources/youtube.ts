@@ -2,8 +2,8 @@
 // Keyless first: CamStreamer redirects (DV), config seeds and hqdefault_live ETag hints. With YT_API_KEY the
 // Data API adds liveness (1 unit per tick) and discovery (<= 2 units per channel). Runs in slots 3, 7 and 11;
 // slot 11 is lite (no CamStreamer, no hourly discovery). Worst-case subrequests (maxSubrequests):
-//   keyless: slots 3/7 = 9 CamStreamer + 8 ETag HEADs = 17; slot 11 = 8.
-//   keyed:   slots 3/7 = 9 + 1 liveness + 6 discovery + 8 maxres HEADs = 24; slot 11 = 1 + 6 = 7
+//   keyless: slots 3/7 = 10 CamStreamer + 8 ETag HEADs = 18; slot 11 = 8.
+//   keyed:   slots 3/7 = 10 + 1 liveness + 6 discovery + 8 maxres HEADs = 25; slot 11 = 1 + 6 = 7
 //            (in slots 7/11 the 6 cover death/pending discovery; after an API failure they cover ETag HEADs).
 // Inputs the dispatcher may provide in ctx.prev besides the row: 'yt:pending' (cam ids reported broken) and
 // 'yt:units' (units spent today, America/Los_Angeles). The row's `unitsTick` is what this run spent.
@@ -95,7 +95,7 @@ export const youtube: Source<YtRaw> = {
       });
       raw.discovery = await Promise.all(plan.map((run) => fetchDiscovery(ctx.fetch, key, st, run, ctx.now)));
       applyDiscovery(st, raw.discovery, ctx.now);
-      if (!lite) raw.thumbs = await fetchThumbs(ctx.fetch, maxresTargets(st, THUMB_MAX), 'maxres');
+      if (!lite) raw.thumbs = await fetchThumbs(ctx.fetch, maxresTargets(st, THUMB_MAX, ctx.now), 'maxres');
     } else {
       // Keyless, or the API failed (403/5xx/quota): this tick runs keyless and skips discovery.
       const { targets, cursor } = etagTargets(st, pending, keyed && lite ? DISCOVERY_MAX : THUMB_MAX);

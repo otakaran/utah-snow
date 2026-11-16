@@ -1,5 +1,6 @@
 // The tile's tap target (split from ../CamTile.tsx): the still as a plain <img> (no crossorigin; UDOT, Alta, Ski Utah
-// and Snowbasin hosts send no ACAO), an empty plate while nothing loaded, and the "▶ Watch live" hint when a tap plays.
+// and Snowbasin hosts send no ACAO), an empty plate while nothing loaded ("No preview" for a YouTube cam without a
+// usable thumbnail: offline, or live behind a static image), and the "▶ Watch live" hint when a tap plays.
 import { Icon } from '../../../ui/Icon.tsx';
 import { NOTE } from '../notes.ts';
 import type { Still } from '../use-still.ts';
@@ -36,7 +37,9 @@ export function StillButton({ title, age, still, playable, deferred, eager, hint
           onError={still.onError}
         />
       ) : (
-        <span class="cam-empty">{deferred && !still.src ? NOTE.tapToLoad : still.broken ? 'No picture' : ''}</span>
+        <span class="cam-empty">
+          {deferred && !still.src ? NOTE.tapToLoad : still.broken ? 'No picture' : still.src ? '' : 'No preview'}
+        </span>
       )}
       {hint ? (
         <span class="cam-play">

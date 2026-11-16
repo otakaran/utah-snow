@@ -12,7 +12,8 @@ export interface YtSlotState {
   title: string | null;
   actualStartTime: string | null; // ISO, from the Data API
   thumbKind: 'live' | 'custom';
-  maxres: boolean | null; // first-sight maxresdefault_live HEAD (keyed only); null = never checked
+  maxres: boolean | null; // maxresdefault_live HEAD (keyed only): a live frame is there; null = never checked
+  maxresAt?: number | null; // when that HEAD last answered; re-asked daily
   lastLiveAt: number | null;
   deadSince: number | null;
   apiAt: number | null; // last Data API classification
@@ -20,6 +21,7 @@ export interface YtSlotState {
   etag: string | null; // hqdefault_live ETag of `videoId`; resets when the ID changes
   etagAt: number | null;
   csMisses: number; // consecutive CamStreamer "not live" answers
+  seed?: string | null; // the config seed this slot was last reconciled with (state.ts readState)
 }
 export interface YtSeen {
   channel: YtChannel;

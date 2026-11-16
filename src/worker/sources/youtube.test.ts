@@ -53,7 +53,8 @@ function liveRoute(round: 0 | 1, csOverride: Record<string, number> = {}): Route
     if (u.hostname === 'camstreamer.com') {
       const h = lastSeg(url);
       if (csOverride[h]) return { status: csOverride[h] };
-      return { status: r.camstreamer[h].status, headers: { location: r.camstreamer[h].location } };
+      const c = r.camstreamer[h] ?? { status: 200, location: null }; // a handle newer than the capture: not live
+      return { status: c.status, headers: c.location ? { location: c.location } : {} };
     }
     if (u.hostname === 'i.ytimg.com') {
       const [, , id, file] = u.pathname.split('/');
@@ -103,9 +104,9 @@ function apiRoute(phase: 'earlier' | 'now', ended: string[] = []): Route {
 }
 
 describe('youtube keyless (live capture 2026-10-12)', () => {
-  it('slot 3: 9 CamStreamer + 8 ETag HEADs; seeds and candidates fill slots, the stake is never promoted', async () => {
+  it('slot 3: 10 CamStreamer + 8 ETag HEADs; seeds and candidates fill slots, the stake is never promoted', async () => {
     const t = await tick(liveRoute(0), 3, T0, {});
-    expect([t.calls.length, t.max]).toEqual([17, 17]);
+    expect([t.calls.length, t.max]).toEqual([18, 18]);
     expect(t.st).toMatchObject({ mode: 'keyless', unitsTick: 0, etagCursor: 8 });
     expect(t.slot('deer-valley-snow-park')).toMatchObject({ videoId: 'QozKoFs-hL0', status: 'unknown', csMisses: 0 });
     expect(t.slot('deer-valley-sultan')?.videoId).toBe('sAjdqw-lzgI');
@@ -121,7 +122,7 @@ describe('youtube keyless (live capture 2026-10-12)', () => {
     const t3 = await tick(liveRoute(1), 11, T0 + 40 * MIN, { 'yt:state': t2.st });
     expect(t3.calls.length).toBe(8);
     expect(t3.calls.every((u) => u.includes('/hqdefault_live.jpg'))).toBe(true);
-    // The ring holds the 24 seeded slots (5 Brighton, 11 Solitude, 8 Deer Valley): the Brighton cams come round
+    // The ring holds the 25 seeded slots (5 Brighton, 11 Solitude, 9 Deer Valley): the Brighton cams come round
     // again on the fourth tick, now served round 1 (moved counters).
     const t4 = await tick(liveRoute(1), 3, T0 + 60 * MIN, { 'yt:state': t3.st });
     expect(t4.slot('brighton-molly-greens')).toMatchObject({ status: 'live', source: 'etag', etag: '"14587"' });
@@ -158,7 +159,7 @@ describe('youtube keyless (live capture 2026-10-12)', () => {
 describe('youtube keyed (synthetic in-season, Data API)', () => {
   it('liveness, CamStreamer candidates, hourly and death discovery, quota units', async () => {
     const p1 = await tick(apiRoute('earlier'), 7, J0, {}, true);
-    expect([p1.calls.length, p1.max]).toEqual([18, 24]);
+    expect([p1.calls.length, p1.max]).toEqual([19, 25]);
     expect(p1.st).toMatchObject({ mode: 'api', unitsTick: 1 });
     const videosCall = p1.calls.find((u) => u.includes('/videos?')) ?? '';
     expect(videosCall).toContain('part=snippet,liveStreamingDetails,status&id=');
@@ -172,13 +173,15 @@ describe('youtube keyed (synthetic in-season, Data API)', () => {
     expect(p1.slot('brighton-parking-lot')).toMatchObject({ maxres: true, thumbKind: 'custom' });
 
     const p2 = await tick(apiRoute('now'), 3, J0 + 20 * MIN, { 'yt:state': p1.st }, true);
-    expect([p2.calls.length, p2.max]).toEqual([24, 24]);
+    expect([p2.calls.length, p2.max]).toEqual([25, 25]);
     expect(p2.st.unitsTick).toBe(7);
     expect(p2.slot('solitude-snowstake')).toMatchObject({ videoId: 'Q7nS3wStk26', status: 'live', deadSince: null });
     expect(p2.st.retries).toEqual({ solitude: 2 });
     expect(p2.slot('deer-valley-sterling')).toMatchObject({ videoId: 'S7erlingCam', status: 'live' });
     expect(p2.slot('brighton-great-western')).toMatchObject({ videoId: 'RPIfUKjRQgI', status: 'live' });
-    expect(p2.slot('solitude-summit-express')?.videoId).toBe('rUXoOLxKKX4');
+    // Summit Express streams from Solitude's second channel (CHANNELS.solitude.also): its seed is accepted
+    expect(p2.slot('solitude-summit-express')).toMatchObject({ videoId: 'Yblyfl97Mhc', status: 'live' });
+    expect(p2.slot('deer-valley-park-peak-snowstake')).toMatchObject({ videoId: 'k8NiVrlQACQ', status: 'live' });
     expect(p2.slot('solitude-eagle-express')).toMatchObject({ videoId: 'oWaG8txpW1c', status: 'offline' }); // seed, not live
     expect(p2.st.unmapped).toEqual([
       { videoId: 'HailPeakCam', channel: 'deer-valley', title: 'Hail Peak Express Livestream' },
@@ -205,11 +208,11 @@ describe('youtube keyed (synthetic in-season, Data API)', () => {
 });
 
 describe('youtube gates', () => {
-  it('maxSubrequests: keyless 17/17/8, keyed 24/24/7 in slots 3/7/11', () => {
+  it('maxSubrequests: keyless 18/18/8, keyed 25/25/7 in slots 3/7/11', () => {
     const at = (slot: number, yt: boolean) =>
       youtube.maxSubrequests({ slot, keyed: { yt, udot: false }, secrets: yt ? { yt: 'k' } : {} } as FetchCtx);
-    expect([3, 7, 11].map((s) => at(s, false))).toEqual([17, 17, 8]);
-    expect([3, 7, 11].map((s) => at(s, true))).toEqual([24, 24, 7]);
+    expect([3, 7, 11].map((s) => at(s, false))).toEqual([18, 18, 8]);
+    expect([3, 7, 11].map((s) => at(s, true))).toEqual([25, 25, 7]);
   });
 
   it('a garbage or unanswered payload throws ValidationError', () => {

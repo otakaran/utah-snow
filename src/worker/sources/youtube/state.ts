@@ -1,12 +1,11 @@
 // Pure helpers shared by the youtube job's steps (spec §6.1); the yt:state row type is in src/shared/types/youtube.ts.
-import { CHANNELS, SLOTS, type YtSlot } from '../../../../config/youtube.ts';
+import { CHANNELS, type YtChannel as ChannelDef, SLOTS, type YtSlot } from '../../../../config/youtube.ts';
 import { isObj } from '../../../shared/json.ts';
 import { HOUR } from '../../../shared/time.ts';
 import type { YtChannel, YtSlotState, YtSource, YtState, YtUnmapped } from '../../../shared/types.ts';
 
 export interface SlotDef extends YtSlot {
   channel: YtChannel;
-  channelId: string;
 }
 
 export const API_FRESH_MS = HOUR; // an API status older than this decays to unknown
@@ -14,13 +13,18 @@ export const ETAG_FRESH_MS = 4 * HOUR; // an ETag hint younger than this still a
 const SEEN_TTL_MS = 30 * 24 * HOUR;
 const UNMAPPED_MAX = 20;
 export const ID_RE = /^[A-Za-z0-9_-]{11}$/;
-/** Never promoted to live without an API LIVE result (§6.1 C: its handle points at an unavailable video). */
+/** Never promoted to live without an API LIVE result (§6.1 C: off-season its handle points at a dead video). */
 export const API_ONLY: ReadonlySet<string> = new Set(['deer-valley-ontario-snowstake-live']);
 
 export const CHANNEL_IDS = Object.keys(CHANNELS) as YtChannel[];
 export const SLOT_DEFS: readonly SlotDef[] = CHANNEL_IDS.flatMap((channel) =>
-  (SLOTS[channel] as readonly YtSlot[]).map((s) => ({ ...s, channel, channelId: CHANNELS[channel].channelId })),
+  (SLOTS[channel] as readonly YtSlot[]).map((s) => ({ ...s, channel })),
 );
+/** The channel ids a resort's streams may come from: its own, plus the ones config lists under `also`. */
+export const channelIds = (channel: YtChannel): readonly string[] => {
+  const def: ChannelDef = CHANNELS[channel];
+  return [def.channelId, ...(def.also ?? [])];
+};
 export const DEF_BY_CAM: ReadonlyMap<string, SlotDef> = new Map(SLOT_DEFS.map((d) => [d.cam, d]));
 export const CS_DEFS = SLOT_DEFS.filter((d) => d.camstreamer);
 
@@ -37,6 +41,7 @@ export function initSlot(def: SlotDef): YtSlotState {
     actualStartTime: null,
     thumbKind: 'live',
     maxres: null,
+    maxresAt: null,
     lastLiveAt: null,
     deadSince: null,
     apiAt: null,
@@ -44,6 +49,7 @@ export function initSlot(def: SlotDef): YtSlotState {
     etag: null,
     etagAt: null,
     csMisses: 0,
+    seed: def.seed ?? null,
   };
 }
 
@@ -56,6 +62,7 @@ export function setVideo(s: YtSlotState, id: string | null, source: YtSource): v
     actualStartTime: null,
     thumbKind: 'live',
     maxres: null,
+    maxresAt: null,
     source,
     etag: null,
     etagAt: null,
@@ -73,14 +80,26 @@ function isSlotState(v: unknown): v is YtSlotState {
   );
 }
 
+/**
+ * A config seed the slot does not hold replaces it: at once while the slot still came from a seed, and for a slot
+ * that has moved on (API, CamStreamer, ETag) once per seed edit and only while it is not live. That is how a stream
+ * that discovery cannot find reaches its slot (Solitude's Summit Express moved to a second channel on 2026-11-09
+ * and the slot sat on a dead ID). `seed` remembers the seed last looked at, so one edit resets a slot once.
+ */
+function reseeded(p: YtSlotState, def: SlotDef): boolean {
+  const seed = def.seed ?? null;
+  if (seed === null || p.videoId === seed) return false;
+  return p.source === 'seed' || (p.seed !== seed && p.status !== 'live');
+}
+
 /** Working copy of the last-good row (or a fresh one from the config seeds), aligned with today's slot list. */
 export function readState(row: unknown, now: number): YtState {
   const prev = isObj(row) && row.v === 1 && isObj(row.slots) ? (structuredClone(row) as unknown as YtState) : null;
   const slots: Record<string, YtSlotState> = {};
   for (const def of SLOT_DEFS) {
     const p = prev?.slots[def.cam];
-    const reseeded = isSlotState(p) && p.source === 'seed' && def.seed !== undefined && p.videoId !== def.seed;
-    slots[def.cam] = isSlotState(p) && !reseeded ? { ...initSlot(def), ...p } : initSlot(def);
+    const fresh = initSlot(def);
+    slots[def.cam] = isSlotState(p) && !reseeded(p, def) ? { ...fresh, ...p, seed: fresh.seed } : fresh;
   }
   return {
     v: 1,

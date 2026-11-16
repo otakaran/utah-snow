@@ -111,13 +111,15 @@ export function useStill(o: StillOpts): Still {
     img.src = url;
   }, [accept]);
 
-  // A different cam, variant, frame or live source (new video ID, new HDRelay host): fetch its picture now.
+  // A different cam, variant, frame or live source (new video ID, new HDRelay host), or a picture that came or
+  // went (a YouTube stream going offline on the same ID has none): fetch its picture now, or drop the old one.
   const liveKey = o.state?.live ? JSON.stringify(o.state.live) : '';
+  const pictured = urlAt(Date.now()) !== null;
   useEffect(() => {
     if (o.deferred && !srcRef.current) return;
     if (latest.current(Date.now())) refresh();
     else setSrc(null); // this cam has no picture: never keep another cam's
-  }, [key, o.frame, liveKey, o.deferred]);
+  }, [key, o.frame, liveKey, o.deferred, pictured]);
 
   useEffect(() => {
     if (!o.auto) return;

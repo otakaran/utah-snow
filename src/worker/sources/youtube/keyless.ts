@@ -3,7 +3,10 @@
 // camstreamer.ts). Channel /live, /streams, embed and watch pages are never fetched: Developer Policies III.E.6
 // forbid scraping YouTube applications. A live stream's auto-generated hqdefault_live ETag is a small counter
 // that grows about every 5 min; a 10-digit ETag is a custom thumbnail (inconclusive); a 404 is a removed video.
+// maxresdefault_live can be a static upload while hqdefault_live is live frames: its ETag is then "0" (Solitude's
+// Eagle Express showed a powder-day promo photo under LIVE on 2026-11-15), so that answer counts as "no maxres".
 
+import { DAY } from '../../../shared/time.ts';
 import type { YtState, YtStatus } from '../../../shared/types.ts';
 import type { FetchX } from '../types.ts';
 import { API_ONLY, apiOutranks, SLOT_DEFS } from './state.ts';
@@ -24,6 +27,8 @@ export const THUMB_MAX = 8; // i.ytimg HEADs per youtube tick (§5.3)
 const YTIMG = 'https://i.ytimg.com/vi/';
 const CUSTOM_RE = /^"\d{10}"$/; // Unix-timestamp ETag: channel-uploaded thumbnail
 const COUNTER_RE = /^"\d{1,9}"$/; // auto-generated live thumbnail counter
+const STATIC_ETAG = '"0"'; // a counter that never moved: an uploaded image, not a live frame
+const MAXRES_RECHECK_MS = DAY; // a wrong verdict (a stream HEADed in its first minutes) heals within a day
 
 export const thumbUrl = (id: string, kind: ThumbHit['kind']) =>
   `${YTIMG}${id}/${kind === 'maxres' ? 'maxresdefault_live' : 'hqdefault_live'}.jpg`;
@@ -45,15 +50,17 @@ export function etagTargets(
   return { targets: picked.map((cam) => ({ cam, id: st.slots[cam]?.videoId as string })), cursor };
 }
 
-/** Keyed first-sight check: live slots whose maxresdefault_live was never HEADed. */
-export function maxresTargets(st: YtState, n: number): ThumbTarget[] {
-  const out: ThumbTarget[] = [];
-  for (const d of SLOT_DEFS) {
+/** Keyed check: live slots whose maxresdefault_live was never HEADed, then the ones last HEADed over a day ago. */
+export function maxresTargets(st: YtState, n: number, now: number): ThumbTarget[] {
+  const live = SLOT_DEFS.flatMap((d) => {
     const s = st.slots[d.cam];
-    if (out.length < n && s?.videoId && s.status === 'live' && s.maxres === null)
-      out.push({ cam: d.cam, id: s.videoId });
-  }
-  return out;
+    return s?.videoId && s.status === 'live' ? [{ cam: d.cam, id: s.videoId, s }] : [];
+  });
+  const due = [
+    ...live.filter((t) => t.s.maxres === null),
+    ...live.filter((t) => t.s.maxres !== null && now - (t.s.maxresAt ?? 0) > MAXRES_RECHECK_MS),
+  ];
+  return due.slice(0, n).map(({ cam, id }) => ({ cam, id }));
 }
 
 export async function fetchThumbs(
@@ -97,7 +104,10 @@ export function applyThumbs(st: YtState, hits: readonly ThumbHit[], now: number)
     if (!s || s.videoId !== h.id || h.status === null) continue;
     const custom = h.status === 200 && h.etag !== null && CUSTOM_RE.test(h.etag);
     if (h.kind === 'maxres') {
-      if (h.status === 200 || h.status === 404) s.maxres = h.status === 200;
+      if (h.status === 200 || h.status === 404) {
+        s.maxres = h.status === 200 && h.etag !== STATIC_ETAG;
+        s.maxresAt = now;
+      }
       if (custom) s.thumbKind = 'custom';
       continue;
     }

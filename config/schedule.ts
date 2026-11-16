@@ -63,7 +63,7 @@ export const SLOTS: readonly SlotJobs[] = [
     morning: [],
   },
   {
-    always: ['stake-alta', 'stake-skiutah', 'youtube', 'nws-grid:snowbird:summit'], // keyed YouTube (24) fills this slot
+    always: ['stake-alta', 'stake-skiutah', 'youtube', 'nws-grid:snowbird:summit'], // keyed YouTube (25) fills this slot
     morning: ['resort:alta', 'resort:snowbird', 'resort:snowbasin'],
   },
   {
@@ -78,7 +78,7 @@ export const SLOTS: readonly SlotJobs[] = [
       'resort:snowbasin',
       'alta-weather',
       'snotel',
-      'avy', // hourly; slot 3 (keyed YouTube, 24) is at the 50-subrequest cap without it
+      'avy', // hourly; slot 3 (keyed YouTube, 25) is one under the 50-subrequest cap without it
       'nws-text', // moved from slot 3 for the same reason (AFD/alerts at :25 and :45)
       'nws-grid:brighton:summit',
     ],

@@ -5,6 +5,8 @@ import type { ResortId } from '../src/shared/types.ts';
 export interface YtChannel {
   channelId: string;
   uploads: string; // uploads playlist id
+  /** Other channels whose streams the resort's slots accept. Never discovered: only a slot's seed lets one in. */
+  also?: readonly string[];
 }
 export interface YtSlot {
   cam: string; // CamDef id
@@ -17,7 +19,12 @@ type YtResort = Extract<ResortId, 'brighton' | 'solitude' | 'deer-valley'>;
 
 export const CHANNELS = {
   brighton: { channelId: 'UC3NvXJeIa_dBZ2ygCKrfCCQ', uploads: 'UU3NvXJeIa_dBZ2ygCKrfCCQ' },
-  solitude: { channelId: 'UCsG59EVXq_OZatwq299yThg', uploads: 'UUsG59EVXq_OZatwq299yThg' },
+  // "Solitude Webcams" (UC7doi…) carries the Summit Express stream since 2026-11-09.
+  solitude: {
+    channelId: 'UCsG59EVXq_OZatwq299yThg',
+    uploads: 'UUsG59EVXq_OZatwq299yThg',
+    also: ['UC7doi0RX8jMJS1_cbb5gX-A'],
+  },
   'deer-valley': { channelId: 'UCTqz2P_u5ewpc7ICo9p-TMg', uploads: 'UUTqz2P_u5ewpc7ICo9p-TMg' },
 } as const satisfies Record<YtResort, YtChannel>;
 
@@ -40,16 +47,23 @@ export const SLOTS = {
     { cam: 'solitude-powderhorn-ii-lift-line', re: /^powderhorn\s*(ii|2)\b/i, seed: 'yeoBog_kSzc' },
     { cam: 'solitude-powderhorn', re: /^powderhorn\s*$/i, seed: 'xNER0JHrqLg' },
     { cam: 'solitude-honeycomb-return', re: /honeycomb\s*return/i },
-    { cam: 'solitude-honeycomb-canyon', re: /honeycomb/i, seed: 'gfHReYIuydU' },
-    { cam: 'solitude-moonbeam-parking', re: /moonbeam.*park/i, seed: 'ta-4QZbfMXc' },
+    { cam: 'solitude-honeycomb-canyon', re: /honeycomb/i, seed: 'ta-4QZbfMXc' },
+    { cam: 'solitude-moonbeam-parking', re: /moonbeam.*park/i, seed: 'jZ09h9qo-Vs' },
     { cam: 'solitude-moonbeam-lift-line', re: /moonbeam/i, seed: 'NSiItCGabfo' },
     { cam: 'solitude-sunshine-bowl', re: /sunshine/i, seed: 'Lnznapxh2xM' },
     { cam: 'solitude-apex-sunrise', re: /apex|sunrise/i, seed: 'l2X9DlRzX54' },
     { cam: 'solitude-link-lift-line', re: /^link\b/i, seed: 'Yx3QmuKfwjY' },
     { cam: 'solitude-eagle-express', re: /eagle/i, seed: 'oWaG8txpW1c' },
-    { cam: 'solitude-summit-express', re: /summit/i, seed: 'rUXoOLxKKX4' },
+    { cam: 'solitude-summit-express', re: /summit/i, seed: 'Yblyfl97Mhc' }, // on the `also` channel
   ],
   'deer-valley': [
+    // Before Ontario: "Park Peak Snow Stake Livestream" also matches Ontario's /snow\s*stake/, and took its slot.
+    {
+      cam: 'deer-valley-park-peak-snowstake',
+      re: /park\s*peak/i,
+      camstreamer: 'b1STE780bp1s4jglWG9ohL1s6YOI5EaKT51Ni5XO',
+      seed: 'k8NiVrlQACQ',
+    },
     {
       cam: 'deer-valley-ontario-snowstake-live',
       re: /snow\s*stake|ontario/i,

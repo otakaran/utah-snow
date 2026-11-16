@@ -1,4 +1,4 @@
-// Cam registry (spec §4.3, Appendix A): CAMS = 56 resort cams + 52 UDOT cams, STAKE_ORDER, HEROES. Data only;
+// Cam registry (spec §4.3, Appendix A): CAMS = 57 resort cams + 52 UDOT cams, STAKE_ORDER, HEROES. Data only;
 // URL templates expand in src/shared/cam-url.ts. Integrity checks live in src/shared/config.test.ts.
 import type { CamDef, ResortId } from '../../src/shared/types.ts';
 import { ALTA_CAMS } from './alta.ts';

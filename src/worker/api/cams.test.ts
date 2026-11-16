@@ -54,7 +54,7 @@ describe('/api/cams', () => {
     expect(res.headers.get('Referrer-Policy')).toBe('no-referrer');
     const b = (await res.json()) as CamsBody;
     expect(b.cams.map((c) => c.id)).toEqual(CAMS.map((c) => c.id));
-    expect(b.cams).toHaveLength(108);
+    expect(b.cams).toHaveLength(109);
     expect(b.unmapped).toEqual([]);
     const cams = new Map(b.cams.map((c) => [c.id, c]));
 
@@ -174,7 +174,13 @@ describe('/api/cams', () => {
       still: { card: '', detail: '', wall: '' },
       live: { type: 'youtube', videoId: '4a-3iEM7bHk' },
     });
-    expect(cams.get('brighton-explorer')).toMatchObject({ status: 'offline', online: false });
+    // an offline stream's thumbnails answer 404 with YouTube's grey placeholder: no still, the ID stays
+    expect(cams.get('brighton-explorer')).toMatchObject({
+      status: 'offline',
+      online: false,
+      still: { card: '', detail: '', wall: '' },
+      live: { type: 'youtube', videoId: 'vMwQRjlfqtA' },
+    });
 
     expect(cams.get('alta-collins-stake')?.checkedAt).toBeUndefined(); // an archive's frame time is not a probe's
     expect(cams.get('alta-collins-stake')).toMatchObject({

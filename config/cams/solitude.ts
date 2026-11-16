@@ -1,4 +1,5 @@
-// Solitude cams, spec Appendix A.4 (13). Channel UCsG59EVXq_OZatwq299yThg. Data only: YouTube seeds and title regexes
+// Solitude cams, spec Appendix A.4 (13). Channel UCsG59EVXq_OZatwq299yThg (Summit Express streams from a second
+// one, `also` in config/youtube.ts). Data only: YouTube seeds and title regexes
 // (powderhorn-ii is matched before plain powderhorn) live in config/youtube.ts; {id} is the resolved video ID (§6.1).
 // YT convention: detail/wall use maxresdefault_live when the Worker's first-sight HEAD found it, else hqdefault_live.
 import type { CamDef } from '../../src/shared/types.ts';

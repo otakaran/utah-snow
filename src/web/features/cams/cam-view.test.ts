@@ -3,7 +3,7 @@ import { RESORT_CAMS, UDOT_CAMS } from '../../../../config/cams/index.ts';
 import { isoUtc as iso, MIN } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
 import type { CamApiState } from '../../data/cams.ts';
-import { ageLabel, leadCam, visibleCams } from './cam-view.ts';
+import { ageLabel, leadCam, shownCam, stillUrl, visibleCams } from './cam-view.ts';
 
 const NOW = Date.parse('2027-01-05T13:30:00Z');
 const LIVE = 'deer-valley-ontario-snowstake-live';
@@ -67,5 +67,38 @@ describe('ageLabel', () => {
     expect(ageLabel(peak, night, null, NOW - MIN, NOW)).toBe('4 h ago');
     const archived = state('alta-collins-stake', { asOf: iso(NOW - 6 * MIN) }); // no checkedAt: the frame's time
     expect(ageLabel(superior, archived, null, NOW - MIN, NOW)).toBe('6 min ago');
+  });
+});
+
+describe('a YouTube cam the Worker sent no still for', () => {
+  const SOLITUDE: readonly CamDef[] = RESORT_CAMS.solitude;
+  const summit = SOLITUDE.find((d) => d.id === 'solitude-summit-express');
+  if (!summit) throw new Error('fixture');
+  const live = { type: 'youtube', videoId: '5ZNLOc1thIc' } as const;
+  // 2026-11-15: an offline stream still loaded i.ytimg's grey 404 placeholder under "≤ 5 min ago"
+  const offline = state(summit.id, { status: 'offline', online: false, live });
+
+  it('has no picture (config is not asked to rebuild the URL), an em dash for an age, and keeps its tile', () => {
+    expect(stillUrl(summit, offline, 'card', NOW)).toBeNull();
+    expect(stillUrl(summit, offline, 'detail', NOW)).toBeNull();
+    expect(ageLabel(summit, offline, null, null, NOW)).toBe('—');
+    const states = new Map([[summit.id, offline]]);
+    expect(shownCam(summit, states, NOW)).toBe(summit);
+    expect(ids(visibleCams(SOLITUDE, states, 'detail', NOW))).toContain(summit.id);
+  });
+
+  it('before /api/cams answers, and for a cam whose still is not a YouTube thumbnail, config still gives the URL', () => {
+    expect(stillUrl(summit, undefined, 'card', NOW)).toMatch(
+      /^https:\/\/i\.ytimg\.com\/vi\/[\w-]{11}\/mqdefault_live\.jpg/,
+    );
+    const withStill = state(summit.id, {
+      status: 'live',
+      live,
+      still: { card: 'https://i.ytimg.com/vi/5ZNLOc1thIc/mqdefault_live.jpg?t={m5}', detail: '', wall: '' },
+    });
+    expect(stillUrl(summit, withStill, 'card', NOW)).toContain('/5ZNLOc1thIc/mqdefault_live.jpg?t=');
+    const superior = RESORT_CAMS.alta.find((d) => d.id === 'alta-mount-superior');
+    if (!superior) throw new Error('fixture');
+    expect(stillUrl(superior, state(superior.id), 'card', NOW)).toContain('Superior.jpg'); // '' from the test helper
   });
 });

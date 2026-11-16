@@ -59,12 +59,15 @@ function freshness(def: CamDef, seen: Seen, now: number): Status {
 /** `checkedAt` only where there is one: the body stays as small as it was for the other cams. */
 const checked = (checkedAt: string | null | undefined): { checkedAt?: string } => (checkedAt ? { checkedAt } : {});
 
-/** YouTube stills: '' when there is no usable thumbnail (no ID, or a frozen custom one): a "LIVE · tap" card. */
+/**
+ * YouTube stills: '' when there is no usable thumbnail (no ID, a frozen custom one, or an offline stream, whose
+ * `_live` thumbnails answer 404 with a grey placeholder): the tile then shows no picture, with "Play" if it is live.
+ */
 function ytStill(still: Still, slot: YtSlotState | undefined): Still {
   const id = slot?.videoId ?? null;
   return mapStill(still, (tpl) => {
     if (!tpl.includes('{id}')) return tpl; // a non-YouTube override (Solitude Apex: Ski Utah)
-    if (!id || slot?.thumbKind === 'custom') return '';
+    if (!id || slot?.thumbKind === 'custom' || slot?.status === 'offline') return '';
     const url = tpl.replaceAll('{id}', id);
     return slot?.maxres === true ? url : url.replace('/maxresdefault_live.jpg', '/hqdefault_live.jpg');
   });

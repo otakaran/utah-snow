@@ -22,20 +22,27 @@ type States = ReadonlyMap<string, CamApiState>;
 export { CAM_BY_ID };
 
 const DOWN: ReadonlySet<CamApiState['status']> = new Set(['stale', 'offline', 'seasonal-off']);
+const DASH = '—';
 
 /** The state says this cam has no usable picture or stream right now. */
 export const isDown = (state: CamApiState | undefined): boolean =>
   state !== undefined && (DOWN.has(state.status) || state.online === false);
 
-/** The still template for a variant: the API's when it is still a template (it knows maxres vs hq), else config's. */
-function stillTemplate(def: CamDef, state: CamApiState | undefined, variant: Variant): string {
+/**
+ * The still template for a variant: the API's when it is still a template (it knows maxres vs hq), else config's.
+ * Null when the API sent '' for a YouTube thumbnail: the Worker knows there is no usable one (an offline stream, a
+ * static custom image), and config's template would only rebuild the same URL from the video ID.
+ */
+function stillTemplate(def: CamDef, state: CamApiState | undefined, variant: Variant): string | null {
   const api = state?.still?.[variant];
-  return api && hasTimeBucket(api) ? api : def.still[variant];
+  if (api && hasTimeBucket(api)) return api;
+  return api === '' && def.still[variant].includes('{id}') ? null : def.still[variant];
 }
 
-/** The still URL at nowMs, or null when a placeholder cannot be filled (a YouTube cam with no known ID). */
+/** The still URL at nowMs, or null when there is no picture (the Worker said so, or a YouTube cam has no known ID). */
 export function stillUrl(def: CamDef, state: CamApiState | undefined, variant: Variant, nowMs: number): string | null {
-  return expandCamUrl(stillTemplate(def, state, variant), nowMs, KINDS[def.kind].vars(def, state));
+  const template = stillTemplate(def, state, variant);
+  return template === null ? null : expandCamUrl(template, nowMs, KINDS[def.kind].vars(def, state));
 }
 
 /**
@@ -122,6 +129,7 @@ export function ageLabel(
   const asOf = isoToMs(state?.asOf);
   const passed = (state?.status === 'ok' || state?.status === 'live') && freshAtCheck(state.asOf, state.checkedAt);
   if (asOf !== null && !passed) return ageText((nowMs - asOf) / 60_000);
+  if (stillUrl(def, state, 'card', nowMs) === null) return DASH; // no picture to date
   if (loadedAt === null) return 'loading…';
   const cadence = KINDS[def.kind].cadenceMin(def, url ?? '');
   const min = (nowMs - loadedAt) / 60_000 + cadence;
