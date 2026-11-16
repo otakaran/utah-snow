@@ -29,7 +29,7 @@
 - `/api/drive` (`store/drive.ts`): 403 without `X-Requested-With`, 3 dp, 422 outside-wasatch; per Denver day 10 lookups a client
   and 20 OSRM misses in all (then 429); one miss lease (503); 6 OSRM calls 1.1 s apart; `drive_cache` 30 d; no caches.default.
 - `/api/snapshot` sends `X-Build` = `BUILD_ID` (`http.ts`: Vite `define` `__BUILD_ID__`, `'dev'` under Vitest); the wall reloads on change.
-- `debug/{probe,tick}`: unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`; POST tick runs through the Scheduler DO (skips if `cron:last` < 4 min or a tick is running). `health?strict=1`: 503 until `cron:last`.
+- `debug/{probe,tick}`: unknown-route 404 unless `X-Probe-Key` = `PROBE_KEY`; POST tick runs through the Scheduler DO (skips if `cron:last` < 4 min or a tick is running). `health?strict=1`: 503 until `cron:last`; a `cpu-suspect` job is a `warnings` entry, a failure only at 3 flags in a day.
 - `/api/tracker` (SQL in `store/tracker.ts` + `store/tracker/writes.ts`): GET no-store; POST one op; 409 carries `current`.
 - `api/post-guard.ts` (cams/report, tracker POSTs): 403 headers/Origin (localhost if `DEV=1`), 503 `no-salt`, shared `rl:*` 429, 422.
 

@@ -11,10 +11,10 @@ Shell: `main.tsx` (build guard, router, stores, theme), `app.tsx` (header, `Outl
   flash in the Section sub), tracker (§9.5: Grid from 900 px, DayList below; DayPicker, caps, thresholds, bookings, crew,
   undo), wall (`config/wall.ts` sets; WeekStrip; WallWeather every `wx` pages; under `WALL_MIN_WIDTH`: WallLaunch),
   weather (`?r=` or the crew pick; week lanes, outlook columns, 48 h lanes on `ui/Chart`; briefing §06 is its teaser).
-- cams (CamTile + `cam-tile/`, CamGallery, StakeRow, CamsPage, players, Lightbox Scrubber): every gallery lists cams via
-  cam-view `visibleCams()` (dedupes fallback twins; offlineGated UDOT cams need `online: true`) and `leadCam()`.
-- `ui/`: presentational pieces (+ ui, forms, overlays, shell (+ `shell/header.css`), jumpbar, countdown, chart css); never imports a feature.
-  `Section` sets `id` = its testid: the `JumpBar` target (briefing, cams, resort, weather). `Countdown`: days to first chair.
+- cams (CamTile + `cam-tile/`, CamGallery, StakeRow, CamsPage, players, Lightbox Scrubber): every gallery lists cams via cam-view `visibleCams()` (dedupes fallback twins; offlineGated UDOT cams need `online: true`) and `leadCam()`.
+  A still of `''` from `/api/cams` means no picture ("No preview" tile; its tap says so); `KindSpec.caption` names a non-camera picture (message signs).
+- `ui/`: presentational pieces (+ ui, forms, overlays, shell, jumpbar, countdown, chart css); never imports a feature. `shell/header.css`: under
+  600 px the header is compact (no wordmark, zone or long base label). `Section` sets `id` = its testid: the `JumpBar` target. `Countdown`: days to first chair.
 
 ## Data stores (`data/`, Preact signals)
 - `snapshot.ts`: `/api/snapshot` (ETag, 120 s, 60 s on the wall, visible only), `serverNow`, X-Build -> `build-guard.ts`;

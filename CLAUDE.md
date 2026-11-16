@@ -29,7 +29,7 @@
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`, `fonts/` (Barlow woff2 + OFL, <= 120 KB).
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
 - `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`), drift (Mondays; `drift` issue), tick (*/5 cron fallback).
-- Status now: Phase 2 and its polish pass are done: every adapter and `/api` route, all seven pages (wall, weather), scrubbers,
+- Status now: Phase 2 and its polish passes (the last on 2026-11-15) are done: every adapter and `/api` route, all seven pages (wall, weather), scrubbers,
   custom base, MtnPowder browser fallback, model table, scripts. Next: Phase 3, checking parsers as each resort opens.
 
 ## Commands
@@ -101,7 +101,7 @@
 
 ## Gotchas
 - Cam stills (UDOT, Alta, Ski Utah, Snowbasin) and scrubber frames are plain `<img>` only: no fetch, no canvas, no `crossorigin`.
-- YouTube IDs churn: ordered regexes, CamStreamer and discovery; IDs are only seeds in `config/youtube.ts`.
+- YouTube IDs churn: ordered regexes, CamStreamer and discovery; IDs are only seeds in `config/youtube.ts`. An edited seed re-seeds its slot once while it is not live (`YtSlotState.seed`); a stream on a resort's second channel (`CHANNELS.<r>.also`) is never discovered, so its ID change needs a seed edit (`pnpm drift` flags it). The local Worker has no `YT_API_KEY`: keyless statuses differ from production's.
 - KV allows 1,000 writes/day, used only for frames (about 480).
 - Subrequests are 50 per invocation on the free plan and D1/KV calls count too: the dispatcher admits jobs while fetches <= 45 and fetches + 3 + (one D1 batch + `maxPuts`) per job <= 50; 6 connections at a time (fetchx 5, the 6th for KV).
 - CPU is 10 ms per API request, 30 s in the DO where ticks run (no DOM parsing, no un-memoized Intl); cron triggers fire 30-50 s late, so the 45 s tick deadline counts from the tick's actual start.
@@ -115,6 +115,6 @@
   (If-None-Match / If-Modified-Since) must also send `Cache-Control: max-age=0` or they never get a 304.
 - Ski Utah blob URLs (`skiutah.com/files/blob/...`) 404 on any `_=` query: never `bust: true` there. Alta's DO stills get a fresh Last-Modified every minute even when a camera is frozen (High Rustler served an Oct 21 frame for 11 days): cam-status tracks both by ETag (`asOf` = first sight). Alta's page lists only the cams that work that week; the drift check only notes an unlisted cam whose still still answers.
 - Deployed Workers freeze `Date.now()` during CPU work, so per-job timings show wall time only.
-- `biome migrate` rewrote `recommended: true` to `preset: "none"`; keep `"preset": "recommended"`.
+- `biome migrate` rewrote `recommended: true` to `preset: "none"`; keep `"preset": "recommended"`. Local D1 state is keyed by `database_id`: after changing it in `wrangler.jsonc`, rerun `pnpm db:local`.
 - `CamId` (`config/cams/index.ts`) is the union of real cam ids, so a wrong id in `STAKE_ORDER`/`HEROES` fails `tsc -b`.
-- Local D1 state is keyed by `database_id`; after changing it in `wrangler.jsonc`, rerun `pnpm db:local`.
+- A probed cam is fresh by its picture's age at the hourly probe (`checkedAt`, `shared/cam-fresh.ts`), never by the clock: `now - asOf` greyed healthy cams for 15-25 min of every hour. UDOT `map/Cctv/<id>`: new alias ids weekly, `Last-Modified` is the request time and a frame lasts 1-2 s, so never compare two ids by bytes (`scripts/drift-check/udot.ts`).
