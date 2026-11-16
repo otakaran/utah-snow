@@ -97,6 +97,7 @@
 .hdr-fresh .fresh-long {
   display: inline-block;
   min-width: 7em; /* '2 sources stale': room for a partial outage's count, so no state reflows the row */
+  text-align: start; /* a short word ('Data OK') stays beside its glyph; the spare room trails it */
 }
 
 .hdr-menu .seg label {
@@ -155,6 +156,7 @@
     display: inline-block;
     min-width: 3.1em; /* '2 down', the widest word */
     font-size: var(--fs-5);
+    text-align: start; /* 'OK' stays beside its glyph instead of floating mid-box */
   }
 
   .hdr-menu:popover-open {
@@ -172,6 +174,21 @@
   }
 }
 
+@media (max-width: 599px) {
+  /* Every phone, the large ones too: beside the clock, the freshness word and the base chip there is no room for
+     the wordmark and the zone. They used to come back at 420 px, where the wordmark ran into the date and the chip
+     was cut to "C…" (430 px, the large iPhones); the chip's long label follows the same rule (settings/header.css). */
+  .clock-tz,
+  .brand-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 419px) {
   /* narrow phones: tighter columns leave the base chip room for its short label */
   .hdr-row {
@@ -181,14 +198,12 @@
   .hdr-fresh {
     padding: 0;
   }
+}
 
-  .clock-tz,
-  .brand-word {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+@media (max-width: 374px) {
+  /* Under 375 px the wider box would cut the base chip ("COTTONW…") in the everyday OK state. Here the box fits
+     'Down', and a partial outage's '1 down' takes its few extra px from the chip only while it lasts. */
+  .hdr-fresh .fresh-short {
+    min-width: 2.5em;
   }
 }

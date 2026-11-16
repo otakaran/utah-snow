@@ -134,6 +134,12 @@
   color: var(--text-dim);
 }
 
+/* The status line keeps the first row to itself: a short one ('Data OK · just now') let the set name climb beside
+   it and left 'set 1/6' alone on the next row, hopping back as the age grew. */
+.wall-fresh {
+  flex-basis: 100%;
+}
+
 .wall-count {
   font-feature-settings: var(--num-features);
 }

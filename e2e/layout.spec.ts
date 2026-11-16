@@ -118,6 +118,31 @@ test('one source down: the header counts it in the same box, and the section say
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
 });
 
+// 2026-11-15: from 420 to 540 px the wordmark and the base chip's long label came back while the phone row had no
+// room for them: the wordmark ran into the date and the chip was cut to "C…" (430 px, the large iPhones).
+test.describe('large phone width', () => {
+  test.use({ viewport: { width: 430, height: 932 } });
+
+  test('the header pieces keep clear of each other and the base chip shows its whole label', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('global-fresh').locator('.fresh')).not.toHaveAttribute('data-badge', 'grey');
+    const got = await page.evaluate(async () => {
+      await document.fonts.ready;
+      const brand = document.querySelector('.app-brand')?.getBoundingClientRect();
+      const date = document.createRange();
+      date.selectNode(document.querySelector('.clock-date')?.firstChild as Node); // the date's own text
+      const chip = [...document.querySelectorAll('.hdr-chip-text')].find((el) => el.getClientRects().length > 0);
+      return {
+        gap: date.getBoundingClientRect().left - (brand?.right ?? Number.NaN),
+        cut: chip ? chip.scrollWidth - chip.clientWidth : Number.NaN,
+        chip: chip?.textContent,
+      };
+    });
+    expect(got.gap, `brand to date gap ${got.gap.toFixed(1)} px`).toBeGreaterThanOrEqual(8);
+    expect(got.cut, `base chip "${got.chip}" cut by ${got.cut} px`).toBeLessThanOrEqual(0);
+  });
+});
+
 test.describe('phone width', () => {
   test.use({ viewport: { width: 393, height: 659 } });
 

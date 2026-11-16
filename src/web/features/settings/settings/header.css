@@ -32,7 +32,8 @@
   display: none;
 }
 
-@media (max-width: 419px) {
+/* The phone header (shell/header.css, under 600 px) has room for the short label only */
+@media (max-width: 599px) {
   .hdr-chip-long {
     display: none;
   }

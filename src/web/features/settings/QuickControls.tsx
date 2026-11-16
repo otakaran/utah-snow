@@ -6,7 +6,7 @@ import { Icon } from '../../ui/Icon.tsx';
 import { Toggle } from '../../ui/Toggle.tsx';
 import './settings.css';
 
-// Phone-width chip labels (the full label shows from 420 px up).
+// Phone-width chip labels (the full label shows from 600 px up, with the desktop header row).
 const SHORT: Record<BaseId, string> = {
   'cottonwood-heights': 'Cottonwood',
   'downtown-slc': 'Downtown',
