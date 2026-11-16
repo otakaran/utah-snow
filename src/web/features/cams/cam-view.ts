@@ -3,6 +3,7 @@
 // be missing (still loading or failed): everything then comes from config/cams alone.
 import { CAM_BY_ID } from '../../../../config/cams/index.ts';
 import { RESORTS } from '../../../../config/resorts.ts';
+import { freshAtCheck } from '../../../shared/cam-fresh.ts';
 import { expandCamUrl, hasTimeBucket, hlsOrigin } from '../../../shared/cam-url.ts';
 import { isoToMs } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
@@ -106,7 +107,11 @@ export function tileStatus(state: CamApiState | undefined, failed: boolean): Til
   return state.status;
 }
 
-/** Caption age: from cams:status asOf, else an upper bound from the load time plus the provider's cadence. */
+/**
+ * Caption age. A cam that passed its last probe shows what the browser holds: an upper bound from the load time
+ * plus the provider's cadence (its `asOf` is up to an hour old by the next probe while the picture reloads every
+ * few minutes). Any other known `asOf` shows as is: an archive's newest frame, a stale cam, a Roundshot at night.
+ */
 export function ageLabel(
   def: CamDef,
   state: CamApiState | undefined,
@@ -115,7 +120,8 @@ export function ageLabel(
   nowMs: number,
 ): string {
   const asOf = isoToMs(state?.asOf);
-  if (asOf !== null) return ageText((nowMs - asOf) / 60_000);
+  const passed = (state?.status === 'ok' || state?.status === 'live') && freshAtCheck(state.asOf, state.checkedAt);
+  if (asOf !== null && !passed) return ageText((nowMs - asOf) / 60_000);
   if (loadedAt === null) return 'loading…';
   const cadence = KINDS[def.kind].cadenceMin(def, url ?? '');
   const min = (nowMs - loadedAt) / 60_000 + cadence;

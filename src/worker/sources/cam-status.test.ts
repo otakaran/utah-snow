@@ -114,7 +114,7 @@ describe('cam-status parse, live 2026-10-12 (pre-season, after dusk)', () => {
     const since = '2026-10-12T20:08:13.000Z'; // the same ETag, first seen 6 h earlier
     const prev = { 'cams:status': { 'alta-high-rustler': { ...first, etagSince: since } } };
     const again = row(LIVE, LIVE_NOW, prev)['alta-high-rustler'];
-    expect(again).toMatchObject({ online: true, asOf: since, etagSince: since }); // > 45 min: /api/cams says stale
+    expect(again).toMatchObject({ online: true, asOf: since, etagSince: since }); // 6 h old at this check: /api/cams says stale
     expect(again?.hidden).toBeUndefined(); // only hiddenUntilFresh cams hide; Alta's show as stale with their age
     // a new ETag (the camera moved on) starts over from its Last-Modified
     const moved = {

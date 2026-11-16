@@ -101,6 +101,12 @@ describe('/api/cams', () => {
           'snowbasin-snowstake': { ...ok, asOf: null, archive: { first: null, last: null, enabled: false } },
           'snowbird-little-cloud': { ...ok, asOf: null, archive: { first: null, last: iso(now), enabled: true } },
           'alta-albion-basin': { ...ok, asOf: null, archive: { first: null, last: null, enabled: false } },
+          // probed 49 min ago with a 1 min old picture: healthy until the next hourly probe, not "50 min stale"
+          'alta-high-rustler': { online: true, checkedAt: iso(now - 49 * MIN), asOf: iso(now - 50 * MIN) },
+          // the picture was already an hour old at that probe
+          'alta-salt-lake-valley': { online: true, checkedAt: iso(now - 49 * MIN), asOf: iso(now - 110 * MIN) },
+          // nobody has looked for three hours
+          'alta-mount-baldy': { online: true, checkedAt: iso(now - 180 * MIN), asOf: iso(now - 181 * MIN) },
         },
         now - MIN,
       ),
@@ -143,6 +149,9 @@ describe('/api/cams', () => {
 
     expect(cams.get('alta-mount-superior')).toMatchObject({ status: 'ok', online: true });
     expect(cams.get('alta-sugarloaf-peak')?.status).toBe('stale');
+    expect(cams.get('alta-high-rustler')).toMatchObject({ status: 'ok', checkedAt: iso(now - 49 * MIN) });
+    expect(cams.get('alta-salt-lake-valley')?.status).toBe('stale');
+    expect(cams.get('alta-mount-baldy')?.status).toBe('stale');
     expect(cams.get('alta-east-greeley')?.status).toBe('offline');
     expect(cams.get('brighton-snowstake-skiutah')?.status).toBe('stale');
     expect(cams.get('snowbird-peruvian-gulch')).toMatchObject({ status: 'offline', online: false });
@@ -167,6 +176,7 @@ describe('/api/cams', () => {
     });
     expect(cams.get('brighton-explorer')).toMatchObject({ status: 'offline', online: false });
 
+    expect(cams.get('alta-collins-stake')?.checkedAt).toBeUndefined(); // an archive's frame time is not a probe's
     expect(cams.get('alta-collins-stake')).toMatchObject({
       status: 'ok',
       asOf: iso(now - 30_000),

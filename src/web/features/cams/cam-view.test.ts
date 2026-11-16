@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { RESORT_CAMS, UDOT_CAMS } from '../../../../config/cams/index.ts';
+import { isoUtc as iso, MIN } from '../../../shared/time.ts';
 import type { CamDef } from '../../../shared/types.ts';
 import type { CamApiState } from '../../data/cams.ts';
-import { leadCam, visibleCams } from './cam-view.ts';
+import { ageLabel, leadCam, visibleCams } from './cam-view.ts';
 
 const NOW = Date.parse('2027-01-05T13:30:00Z');
 const LIVE = 'deer-valley-ontario-snowstake-live';
@@ -45,5 +46,26 @@ describe('leadCam', () => {
     expect(leadCam([other, stake], other.id)).toBe(stake);
     expect(leadCam([other], other.id)).toBe(other);
     expect(leadCam([other], 'nope')).toBeNull();
+  });
+});
+
+describe('ageLabel', () => {
+  const superior = RESORT_CAMS.alta.find((d) => d.id === 'alta-mount-superior');
+  const peak = RESORT_CAMS.snowbird.find((d) => d.kind === 'roundshot');
+  if (!superior || !peak) throw new Error('fixture');
+
+  it('a cam that passed its last probe shows the bound of the picture just loaded, not the probe time', () => {
+    const passed = state(superior.id, { asOf: iso(NOW - 56 * MIN), checkedAt: iso(NOW - 55 * MIN) });
+    expect(ageLabel(superior, passed, 'https://x/Superior.jpg', NOW - MIN, NOW)).toMatch(/^≤ \d+ min ago$/);
+    expect(ageLabel(superior, passed, 'https://x/Superior.jpg', null, NOW)).toBe('loading…');
+  });
+
+  it('a stale cam and a Roundshot at night show the real age of their picture', () => {
+    const stale = state(superior.id, { status: 'stale', asOf: iso(NOW - 180 * MIN), checkedAt: iso(NOW - 5 * MIN) });
+    expect(ageLabel(superior, stale, null, NOW - MIN, NOW)).toBe('3 h ago');
+    const night = state(peak.id, { status: 'ok', asOf: iso(NOW - 240 * MIN), checkedAt: iso(NOW - 5 * MIN) });
+    expect(ageLabel(peak, night, null, NOW - MIN, NOW)).toBe('4 h ago');
+    const archived = state('alta-collins-stake', { asOf: iso(NOW - 6 * MIN) }); // no checkedAt: the frame's time
+    expect(ageLabel(superior, archived, null, NOW - MIN, NOW)).toBe('6 min ago');
   });
 });

@@ -47,6 +47,8 @@ export interface CamState {
   status: 'live' | 'ok' | 'stale' | 'offline' | 'unknown' | 'seasonal-off';
   online: boolean | null;
   asOf: string | null;
+  /** When cam-status last probed the cam (ISO); absent for cams it does not probe and for archived stakes. */
+  checkedAt?: string;
   still: { card: string; detail: string; wall: string };
   live: { type: 'hls'; url: string } | { type: 'youtube'; videoId: string } | { type: 'iframe'; url: string } | null;
   timelapse: { provider: string; available: boolean };

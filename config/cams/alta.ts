@@ -50,7 +50,7 @@ export const ALTA_CAMS = [
   { ...PRISM, id: 'alta-albion-basin', name: 'Albion Basin',
     still: { card: `${GCS}/prism-cam-00065/360.jpg?t={m}`, detail: `${GCS}/prism-cam-00065/1080.jpg?t={m}`,
       wall: `${GCS}/prism-cam-00065/1080.jpg?t={m}` } },
-  // Prism 00088: HERO; falls back to albion-basin, then high-rustler (current.txt older than 45 min = stale).
+  // Prism 00088: HERO; falls back to albion-basin, then high-rustler (current.txt over 45 min old at the hourly check = stale).
   { ...PRISM, id: 'alta-mount-baldy', name: 'Mount Baldy', hero: true, fallback: ['alta-albion-basin', 'alta-high-rustler'],
     still: { card: `${GCS}/prism-cam-00088/360.jpg?t={m}`, detail: `${GCS}/prism-cam-00088/1080.jpg?t={m}`,
       wall: `${GCS}/prism-cam-00088/1080.jpg?t={m}` } },

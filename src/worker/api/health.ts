@@ -3,8 +3,9 @@
 // NWS /points check found a grid or zone change (Appendix C.1). Also arms the Scheduler alarm chain (waitUntil).
 import { CAMS } from '../../../config/cams/index.ts';
 import { CRON_STALE_MIN } from '../../../config/schedule.ts';
+import { camFresh } from '../../shared/cam-fresh.ts';
 import { ageMin, badge, isCritical } from '../../shared/freshness.ts';
-import { isBetweenLocal, isoToMs, isoUtc, MIN } from '../../shared/time.ts';
+import { isoUtc, MIN } from '../../shared/time.ts';
 import type { CamDef, CamKind, CamStatusEntry, Meta } from '../../shared/types.ts';
 import { BUILD_ID, json } from '../http.ts';
 import { redact } from '../lib/log.ts';
@@ -14,7 +15,6 @@ import { readHealthCounters } from '../store/counters.ts';
 import { CRON_LAST, cronLastOf, type MetaRow, readMetaRows } from '../store/source-state.ts';
 
 const YT_ANOMALY_UNITS = 1000;
-const CAM_STALE_MS = 45 * MIN; // §6.4
 const KIND = new Map<string, CamKind>((CAMS as readonly CamDef[]).map((c) => [c.id, c.kind]));
 const iso = (ms: number | null) => (ms === null ? null : isoUtc(ms));
 
@@ -33,17 +33,14 @@ type CamBucket = 'live' | 'ok' | 'stale' | 'offline';
 
 /**
  * One cams:status entry (§6.4 and the /api/cams rules): online false -> offline; Ski Utah hiddenUntilFresh -> stale;
- * no asOf (HDRelay live-only snapshot) -> live while online; else asOf <= 45 min -> ok, except Roundshot at night.
+ * no asOf (HDRelay live-only snapshot) -> live while online; else shared/cam-fresh.ts (the picture's age at the
+ * last check, and a recent check).
  */
 function camBucket(id: string, e: Partial<CamStatusEntry>, now: number): CamBucket {
   if (e.online === false) return 'offline';
   if (e.hidden === true) return 'stale';
   if (!e.asOf) return e.online === true ? 'live' : 'stale';
-  const ms = isoToMs(e.asOf);
-  if (ms !== null && now - ms <= CAM_STALE_MS) return 'ok';
-  const kind = KIND.get(id);
-  const night = (kind === 'roundshot' || kind === 'roundshot360') && !isBetweenLocal(now, '07:10', '17:30');
-  return night ? 'ok' : 'stale';
+  return camFresh(KIND.get(id), e.asOf, e.checkedAt, now) ? 'ok' : 'stale';
 }
 
 function camCounts(row: Record<string, unknown> | null, now: number): Record<'total' | CamBucket, number> {

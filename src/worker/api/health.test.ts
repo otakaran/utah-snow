@@ -112,6 +112,7 @@ describe('/api/health', () => {
       'snowbird-peruvian-gulch': { online: true, asOf: null, checkedAt: ago(1) }, // live (HDRelay snapshot)
       'brighton-snowstake-skiutah': { online: true, asOf: ago(5), hidden: true, checkedAt: ago(1) }, // stale
       'alta-collins': { online: null, asOf: ago(120), checkedAt: ago(1) }, // stale
+      'alta-high-rustler': { online: true, asOf: ago(50), checkedAt: ago(49) }, // ok: fresh at its hourly probe
     };
     const yt = { v: 1, mode: 'api', unmapped: [{ videoId: 'a' }, { videoId: 'b' }] };
     const points = { checkedAt: ago(60), points: [], changes: [{ id: 'alta:base', field: 'grid' }], failed: [] };
@@ -129,7 +130,7 @@ describe('/api/health', () => {
     ]);
     await runTick(env, now, { sources: [] });
     const body = (await (await get('/api/health')).json()) as Record<string, unknown>;
-    expect(body.cams).toEqual({ total: 5, live: 1, ok: 1, stale: 2, offline: 1 });
+    expect(body.cams).toEqual({ total: 6, live: 1, ok: 2, stale: 2, offline: 1 });
     expect(body.youtube).toEqual({ mode: 'api', unitsToday: 1200, unmapped: 2, anomaly: true });
     expect(body.failures).toEqual(['nws-points:1']);
   });

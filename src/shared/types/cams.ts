@@ -99,7 +99,7 @@ export interface CamArchive {
   enabled: boolean;
 }
 
-/** One `cams:status` entry. A cam whose `asOf` is more than 45 min old shows as stale. */
+/** One `cams:status` entry. A cam whose picture (`asOf`) was over 45 min old at `checkedAt` shows as stale. */
 export interface CamStatusEntry {
   online: boolean | null; // null = unknown
   asOf: string | null; // ISO time of the newest image; null for live-only stills (HDRelay snapshot)

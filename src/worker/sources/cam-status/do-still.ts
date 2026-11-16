@@ -1,7 +1,7 @@
 // Alta DigitalOcean stills (kind do_still): HEAD `?t={minute}` -> ETag + Last-Modified (spec §6.4). Alta's uploader
 // rewrites every object each minute, so Last-Modified moves even when a camera is frozen (on 2026-11-01 High Rustler
 // served an Oct 21 frame as "9 min ago"): asOf is when the ETag (the body's MD5) was first seen, so a repeat ETag
-// turns the tile stale through /api/cams' 45-min rule after the next hourly check, with an honest age.
+// is more than 45 min old at the next hourly check and the tile turns stale (shared/cam-fresh.ts), with an honest age.
 // The Collins stake (it has `archive`) is excluded: its freshness comes from stake-alta's frames.
 import { CAMS } from '../../../../config/cams/index.ts';
 import { httpDateToMs, isoUtc, MIN } from '../../../shared/time.ts';
