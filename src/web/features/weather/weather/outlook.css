@@ -59,7 +59,8 @@
 
 .wx-big small {
   margin-left: 1px;
-  font-size: 0.7em;
+  font-size: 0.5em;
+  vertical-align: 0.7em; /* a raised unit, as on the pick card: on the baseline the ″ read as a hyphen */
 }
 
 .wx-rows {

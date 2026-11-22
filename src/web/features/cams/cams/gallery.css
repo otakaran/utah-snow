@@ -107,9 +107,11 @@
   text-shadow: 0 0 14px var(--snow-glow);
 }
 
+/* the unit rides high like the pick card's: a half-size ″ on the baseline read as a hyphen ("0.0-") */
 .cam-inches-num small {
   margin-left: 0.06em;
   font-size: 0.5em;
+  vertical-align: 0.7em;
 }
 
 .cam-inches-cap {

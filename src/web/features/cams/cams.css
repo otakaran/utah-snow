@@ -147,8 +147,29 @@
 }
 
 .cam-strip-item {
+  display: flex;
   flex: 0 0 min(70%, 220px);
   scroll-snap-align: start;
+}
+
+/* Stake tiles read alike and end level: the name on top, the age with Timelapse on one row at the tile's foot; a
+   note (Alta's board clear) goes under that row instead of pushing the button down a line. */
+.cam-strip-item > .cam-tile,
+.cam-strip-item > .cam-tile > .cam-cap {
+  flex: 1;
+}
+
+.cam-stakes .cam-tile > .cam-cap {
+  align-content: space-between;
+  align-items: center;
+}
+
+.cam-stakes .cam-cap > .cam-title {
+  flex-basis: 100%;
+}
+
+.cam-stakes :is(.cam-note, .cam-extra) {
+  order: 1;
 }
 
 .cam-stakes .cam-media {

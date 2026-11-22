@@ -118,6 +118,8 @@ export function tileStatus(state: CamApiState | undefined, failed: boolean): Til
  * Caption age. A cam that passed its last probe shows what the browser holds: an upper bound from the load time
  * plus the provider's cadence (its `asOf` is up to an hour old by the next probe while the picture reloads every
  * few minutes). Any other known `asOf` shows as is: an archive's newest frame, a stale cam, a Roundshot at night.
+ * Before the first picture it is 'loading…', and a dash once that first request has failed (UDOT's sign GIFs
+ * answered 502 on 2026-11-17 and their tiles said "loading…" for as long as the page stayed open).
  */
 export function ageLabel(
   def: CamDef,
@@ -125,12 +127,13 @@ export function ageLabel(
   url: string | null,
   loadedAt: number | null,
   nowMs: number,
+  failed = false,
 ): string {
   const asOf = isoToMs(state?.asOf);
   const passed = (state?.status === 'ok' || state?.status === 'live') && freshAtCheck(state.asOf, state.checkedAt);
   if (asOf !== null && !passed) return ageText((nowMs - asOf) / 60_000);
   if (stillUrl(def, state, 'card', nowMs) === null) return DASH; // no picture to date
-  if (loadedAt === null) return 'loading…';
+  if (loadedAt === null) return failed ? DASH : 'loading…'; // a first picture that failed has no age to wait for
   const cadence = KINDS[def.kind].cadenceMin(def, url ?? '');
   const min = (nowMs - loadedAt) / 60_000 + cadence;
   return cadence > 0 ? `≤ ${ageText(Math.max(1, min))}` : ageText(min);

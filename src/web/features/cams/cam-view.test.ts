@@ -58,6 +58,7 @@ describe('ageLabel', () => {
     const passed = state(superior.id, { asOf: iso(NOW - 56 * MIN), checkedAt: iso(NOW - 55 * MIN) });
     expect(ageLabel(superior, passed, 'https://x/Superior.jpg', NOW - MIN, NOW)).toMatch(/^≤ \d+ min ago$/);
     expect(ageLabel(superior, passed, 'https://x/Superior.jpg', null, NOW)).toBe('loading…');
+    expect(ageLabel(superior, passed, 'https://x/Superior.jpg', null, NOW, true)).toBe('—'); // the first load failed
   });
 
   it('a stale cam and a Roundshot at night show the real age of their picture', () => {

@@ -116,7 +116,7 @@ function Tile(p: CamTileProps & { def: CamDef }) {
   const name = p.label ?? shown.name;
   const title = resort ? `${resort} – ${name}` : name;
   const star = p.star ?? (p.pick != null && def.resort === p.pick);
-  const age = ageLabel(shown, state, still.src, still.loadedAt, now);
+  const age = ageLabel(shown, state, still.src, still.loadedAt, now, still.failed);
   const inTile = mode.m === 'live' && !mode.inBox;
   const ytInTile = inTile && live?.type === 'youtube'; // no overlays on a YouTube player (§8.3)
   const status = mode.m === 'live' ? 'live' : tileStatus(state, still.failed);
