@@ -69,7 +69,7 @@ describe('openingText', () => {
     expect(openingText('2026-11-27', '2026-11-22')).toBe('projected open Nov 27');
     expect(openingText('2026-11-27', '2026-11-22', 'short')).toBe('projected open Fri, Nov 27');
     expect(openingText('2026-11-22', '2026-11-22')).toBe('projected to open today');
-    expect(openingText('2026-11-20', '2026-11-22', 'short')).toBe('opening delayed (was Nov 20)');
+    expect(openingText('2026-11-20', '2026-11-22', 'short')).toBe('not open yet (was projected Nov 20)');
     expect(openingText(null, '2026-11-22')).toBe('opening date TBA');
   });
 });

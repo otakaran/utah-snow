@@ -22,7 +22,7 @@ export function resortStatus(data: Partial<ResortSnapshot> | null | undefined): 
   return { tone: 'off', word: 'Unknown' };
 }
 
-/** 'Pre-season – projected open Nov 27', '… opening delayed (was Nov 20)' or '… opening date TBA'. */
+/** 'Pre-season – projected open Nov 27', '… not open yet (was projected Nov 20)' or '… opening date TBA'. */
 export const preseasonLine = (id: ResortId, today: string): string =>
   `Pre-season – ${openingText(RESORTS[id].projectedOpen, today)}`;
 

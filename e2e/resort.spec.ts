@@ -96,7 +96,7 @@ async function ready(page: Page, hash: string, season: Season): Promise<void> {
   }
   const head = page.getByTestId('head');
   if (season === 'open') await expect(head.locator('.rs-big .rs-u')).toBeVisible();
-  else await expect(head).toContainText(/projected open|opening delayed|opening date TBA/); // shared/season.ts openingText
+  else await expect(head).toContainText(/projected open|was projected|opening date TBA/); // shared/season.ts openingText
 }
 
 for (const season of ['open', 'preseason'] as const) {

@@ -62,12 +62,12 @@ export function reportIsToday(reportAt: When | null | undefined, now: number, lo
 /**
  * A pre-season resort's opening as the pages word it: 'projected open Nov 27' ('Fri, Nov 27' with `short`),
  * 'projected to open today', 'opening date TBA' without a date. Once the projected day has passed and the resort
- * is still pre-season it is 'opening delayed (was Nov 20)': a date in the past is not a projection (Alta read
- * "projected open Nov 20" on 2026-11-22).
+ * is still pre-season it is 'not open yet (was projected Nov 20)': a date in the past is not a projection (Alta
+ * read "projected open Nov 20" on 2026-11-22), and the date is this repo's guess, so nothing says "delayed".
  */
 export function openingText(projected: string | null, today: string, style: DateStyle = 'md'): string {
   if (!projected) return 'opening date TBA';
   if (projected === today) return 'projected to open today';
   const day = formatLocalDate(projected, projected < today ? 'md' : style);
-  return projected < today ? `opening delayed (was ${day})` : `projected open ${day}`;
+  return projected < today ? `not open yet (was projected ${day})` : `projected open ${day}`;
 }

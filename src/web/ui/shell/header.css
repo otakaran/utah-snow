@@ -140,7 +140,6 @@
      (right-aligned in its 1fr column it floated mid-row, tied to neither side) */
   .app-clock {
     justify-self: start;
-    margin-left: var(--space-1);
     text-align: left;
   }
 
@@ -191,6 +190,14 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+}
+
+@media (min-width: 420px) and (max-width: 599px) {
+  /* a little more air after the mark where there is room: under 420 px these 4 px cut the base chip to
+     "COTTONW…" at 360 px (2026-11-22) */
+  .app-clock {
+    margin-left: var(--space-1);
   }
 }
 

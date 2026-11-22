@@ -152,8 +152,8 @@
   scroll-snap-align: start;
 }
 
-/* Stake tiles read alike and end level: the name on top, the age with Timelapse on one row at the tile's foot; a
-   note (Alta's board clear) goes under that row instead of pushing the button down a line. */
+/* Stake tiles read alike and end level: the name on top, the age with Timelapse on one row at the tile's foot, at
+   the same height in every tile; a note (Alta's board clear) sits under the name, not between age and button. */
 .cam-strip-item > .cam-tile,
 .cam-strip-item > .cam-tile > .cam-cap {
   flex: 1;
@@ -168,7 +168,7 @@
   flex-basis: 100%;
 }
 
-.cam-stakes :is(.cam-note, .cam-extra) {
+.cam-stakes .cam-cap > :is(.cam-age, .cam-tl, .cam-stop) {
   order: 1;
 }
 
