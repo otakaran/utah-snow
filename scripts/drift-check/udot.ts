@@ -13,8 +13,8 @@ const CCTV = 'https://www.udottraffic.utah.gov/map/Cctv';
 const CCTV_RE = /Cctv\/(\d+)/g;
 const IMG_RE = /<img\b[^>]*>/g;
 const MP_RE = /\bMP\s*(\d+(?:\.\d+)?)/i;
-const RETRY_MS = 10_000;
-const ATTEMPTS = 3;
+const RETRY_MS = 12_000;
+const ATTEMPTS = 6;
 // Words that say nothing about the place ("Rd", "Canyon", the trailing city code is cut off before).
 const STOP = new Set(['rd', 'blvd', 'dr', 'canyon', 'mouth', 'rwis', 'mp', 'eb', 'wb', 'nb', 'sb']);
 
@@ -79,26 +79,57 @@ export function pairAlias<C extends Cam>(alt: string, cams: readonly C[]): C | n
   return best.c;
 }
 
+/** One moment's pictures: the sha256 of the page id's image and of the registry id's, fetched together. */
+export interface Look {
+  page: string;
+  reg: string;
+  regPng: boolean;
+}
+
 /**
- * null when `regId` still shows the camera `pageId` shows, else why not. Both ids serve the camera's current frame,
- * and many cams turn out a new one every second or two, so identical bytes are the easy case only: a registry id
- * whose own image changes between two looks is live too. What counts as drift is a registry id on the PNG offline
- * placeholder while the page id has a picture, or one stuck on a frame the page id does not show.
+ * What a run of looks says about a page id and the registry id it pairs with. Both ids serve the camera's current
+ * frame, many cams turn out a new one every second or two, and each id answers from its own cache, so two ids of one
+ * camera often show neighbouring frames. 'alias': the same bytes at one moment, or the registry id keeps turning out
+ * new frames (live), or one id showed a frame the other showed at another look (the same camera, a moment apart).
+ * 'placeholder': the registry id is on the PNG offline picture while the page id has another one. 'stuck': the page
+ * id's picture moved on and the registry id's never did or matched. 'static': neither picture changed and they
+ * differ, which a slow camera behind two caches gives as well (2026-11-22: 4 of 17 pairs in one run, 1 in the next,
+ * 0 in the third), so it is a note, not drift. null: one look that differs says nothing yet.
  */
-async function sameImage(pageId: string, regId: string): Promise<string | null> {
-  let seen: string | null = null;
+export function aliasVerdict(
+  looks: readonly Look[],
+  done = false,
+): 'alias' | 'placeholder' | 'stuck' | 'static' | null {
+  const last = looks[looks.length - 1];
+  if (!last) return null;
+  if (last.page === last.reg) return 'alias'; // also when both serve the placeholder: the camera itself is down
+  if (last.regPng) return 'placeholder';
+  const page = new Set(looks.map((l) => l.page));
+  const reg = new Set(looks.map((l) => l.reg));
+  if (reg.size > 1 || [...reg].some((h) => page.has(h))) return 'alias';
+  if (!done) return null;
+  return page.size > 1 ? 'stuck' : 'static';
+}
+
+/** Looks at both ids until the verdict is clear. `why`: drift; `note`: could not tell (both pictures static). */
+async function sameImage(pageId: string, regId: string): Promise<{ why?: string; note?: string }> {
+  const looks: Look[] = [];
+  const span = `${((ATTEMPTS - 1) * RETRY_MS) / 1000} s`;
   for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
     if (attempt > 0) await new Promise((done) => setTimeout(done, RETRY_MS));
     const t = Date.now(); // one cache buster for both fetches
     const [a, b] = await Promise.all([getBytes(`${CCTV}/${pageId}?t=${t}`), getBytes(`${CCTV}/${regId}?t=${t}`)]);
-    if (!b.ok) return `the registry image returns ${b.reason}`;
-    if (!a.ok) return `the page image returns ${a.reason}`;
-    if (a.sha256 === b.sha256) return null; // also when both serve the placeholder: the camera itself is down
-    if (b.type === 'image/png') return 'the registry image is the PNG offline placeholder';
-    if (seen !== null && seen !== b.sha256) return null; // new frames keep coming: live, a moment apart
-    seen = b.sha256;
+    if (!b.ok) return { why: `the registry image returns ${b.reason}` };
+    if (!a.ok) return { why: `the page image returns ${a.reason}` };
+    looks.push({ page: a.sha256, reg: b.sha256, regPng: b.type === 'image/png' });
+    const verdict = aliasVerdict(looks, attempt === ATTEMPTS - 1);
+    if (verdict === 'alias') return {};
+    if (verdict === 'placeholder') return { why: 'the registry image is the PNG offline placeholder' };
+    if (verdict === 'stuck')
+      return { why: `the registry image never matched the page's and did not change in ${span}` };
+    if (verdict === 'static') return { note: `two different pictures, neither changed in ${span}` };
   }
-  return `the registry image never matched the page's and did not change in ${((ATTEMPTS - 1) * RETRY_MS) / 1000} s`;
+  return {};
 }
 
 export async function checkUdot(): Promise<SiteResult> {
@@ -127,8 +158,10 @@ export async function checkUdot(): Promise<SiteResult> {
       const twin = pairAlias(alt, cams);
       if (!twin) return id; // unknown location: the set diff reports it with its alt text
       const regId = twin.id.replace(/^udot-/, '');
-      const why = await sameImage(id, regId);
+      const { why, note } = await sameImage(id, regId);
       if (why) r.problems.push(`\`${id}\` ("${alt}") pairs with ${twin.id} "${twin.name}" but ${why}`);
+      else if (note)
+        r.notes.push(`\`${id}\` pairs with ${twin.id} by place; its picture could not confirm it (${note})`);
       else aliases.push(`\`${id}\` alias of ${twin.id}`);
       return regId;
     }),

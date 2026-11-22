@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pairAlias } from './udot.ts';
+import { aliasVerdict, type Look, pairAlias } from './udot.ts';
 
 const cams = [
   { id: 'udot-171387', name: 'SR-210 @ SR-209 (canyon mouth)', corridor: 'lcc' },
@@ -30,5 +30,26 @@ describe('pairAlias', () => {
   it('returns null for an unknown location', () => {
     expect(pairAlias('Little Cottonwood Rd / SR-210 @ Snowbird Center / MP 11.3, SL', cams)).toBeNull();
     expect(pairAlias('I-215 @ 6200 S, HOL', cams)).toBeNull();
+  });
+});
+
+describe('aliasVerdict', () => {
+  const look = (page: string, reg: string, regPng = false): Look => ({ page, reg, regPng });
+
+  it('accepts the same bytes, a registry id that keeps changing, and a frame seen a moment apart', () => {
+    expect(aliasVerdict([look('f1', 'f1')])).toBe('alias');
+    expect(aliasVerdict([look('f2', 'f1'), look('f4', 'f3')])).toBe('alias');
+    // two caches of one slow camera: the registry id shows at the second look what the page id showed at the first
+    expect(aliasVerdict([look('f2', 'f1'), look('f3', 'f2')])).toBe('alias');
+    expect(aliasVerdict([look('f2', 'f1'), look('f2', 'f1')])).toBeNull();
+  });
+
+  it('calls a frozen registry id drift only while the page id moves on', () => {
+    const frozen = [look('f2', 'old'), look('f3', 'old'), look('f4', 'old')];
+    expect(aliasVerdict(frozen)).toBeNull();
+    expect(aliasVerdict(frozen, true)).toBe('stuck');
+    expect(aliasVerdict([look('f2', 'f1'), look('f2', 'f1')], true)).toBe('static');
+    expect(aliasVerdict([look('f2', 'png', true)])).toBe('placeholder');
+    expect(aliasVerdict([look('png', 'png', true)])).toBe('alias');
   });
 });
