@@ -197,7 +197,8 @@ test.describe('phone width', () => {
   });
 
   // 2026-11-01: at 393 px "Deer Valley" and "Snowbasin" touched (3 px apart), a 0″ hill was a 6 px sliver with a white
-  // cap smear, and the pick's 4 px one-column underline sat as a pedestal under its 1.5-column peak.
+  // cap smear, and the pick's 4 px one-column underline sat as a pedestal under its 1.5-column peak. The mountains
+  // are SVGs since 2026-11-22: a snow cap is a `.ridge-cap` polygon.
   test('ridge names keep their distance, dry hills carry no cap and the pick line spans its base', async ({ page }) => {
     await pinTime(page, AT);
     await page.goto('/');
@@ -214,7 +215,11 @@ test.describe('phone width', () => {
       const hills = peaks.map((p) => {
         const mtn = p.querySelector('.ridge-mtn') as HTMLElement;
         const num = (p.querySelector('.ridge-num') as HTMLElement).textContent ?? '';
-        return { dry: num === '0″' || num === '—', capped: getComputedStyle(mtn).backgroundImage !== 'none' };
+        return {
+          dry: num === '0″' || num === '—',
+          capped: mtn.querySelector('.ridge-cap') !== null,
+          height: mtn.getBoundingClientRect().height,
+        };
       });
       const pick = peaks.find((p) => p.classList.contains('is-pick'));
       const line = pick?.querySelector('.ridge-name')?.getBoundingClientRect();
@@ -232,6 +237,8 @@ test.describe('phone width', () => {
     // 13 px on WebKit; Linux Chromium at 1x rounds glyph advances and lands near 8 px, so the floor sits at 6
     expect(Math.min(...got.gaps), `gaps ${got.gaps.map((g) => g.toFixed(1)).join(' ')}`).toBeGreaterThanOrEqual(6);
     for (const hill of got.hills) expect(hill.capped).toBe(!hill.dry);
+    // 2026-11-22: a dry hill is a hill (26 px of the 72 px ridge), not the 6 px sliver six dry resorts used to draw
+    expect(Math.min(...got.hills.map((h) => h.height))).toBeGreaterThanOrEqual(20);
     expect(got.lineWidth?.[0]).toBeCloseTo(0, 0);
     expect(got.lineWidth?.[1]).toBeCloseTo(0, 0);
     expect(got.lineThick).toBe('2px');

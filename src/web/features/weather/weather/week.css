@@ -73,6 +73,12 @@
   white-space: nowrap;
 }
 
+/* a dry week's total is quiet, like a dry night on the ridge */
+.wx-tot.is-dry {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
 .wx-axis .wx-tot,
 .wx-days {
   color: var(--text-dim);
@@ -84,6 +90,11 @@
 
 .wx-days {
   display: flex;
+}
+
+/* the day labels carry 7 px of storm-marker room under them: centred against that box "Week" sat 3 px low */
+.wx-axis {
+  align-items: start;
 }
 
 .wx-days > span {

@@ -72,3 +72,7 @@ export function tripLine(nowMs: number): string | null {
   const day = tripDayNumber(today);
   return day === null ? 'Trip over' : `Trip day ${day} of ${TRIP.days}`;
 }
+
+/** A snow amount that reads as nothing ('0', '0.0', '0″', '0 cm'): such a number is drawn quiet (dim, no ice glow),
+ * so on a dry day the eye is not sent to a page of glowing zeros. A range ('0–0.1') or a dash is not dry. */
+export const isDrySnow = (text: string): boolean => /^0(?:\.0+)?\s?(?:″|cm)?$/.test(text.trim());

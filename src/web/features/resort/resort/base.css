@@ -16,6 +16,12 @@
   font-size: max(0.55em, min(1em, var(--fs-caption)));
 }
 
+/* the inch mark rides high, as on the pick card: shrunk on the baseline it read as a hyphen ("32-" for 32″). It
+   keeps .rs-u's size and its caption-size floor (e2e/resort.spec.ts: no text under 12 px). */
+.rs-u-mark {
+  vertical-align: 0.5em;
+}
+
 .rs-snow {
   color: var(--snow);
   text-shadow: 0 0 18px var(--snow-glow);

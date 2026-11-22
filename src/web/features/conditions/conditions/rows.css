@@ -185,8 +185,13 @@
   white-space: nowrap;
 }
 /* expandable blocks: road cams, AFD key messages */
+/* the 44 px summary brings its own air: no margin above it, and as a card's last line it sits into the padding
+   (a closed "Road cams" left 26 px of empty card under its label) */
 .cond-more {
-  margin-top: var(--space-2);
+  margin-top: 0;
+}
+.cond-more:last-child:not([open]) {
+  margin-bottom: calc(-1 * var(--space-2));
 }
 .cond-more > summary {
   line-height: var(--tap);

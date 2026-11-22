@@ -10,7 +10,7 @@ import type { ResortId } from '../../../shared/types.ts';
 import { type Units, unitOf } from '../../../shared/units.ts';
 import { omFor, openMeteo, openMeteoRetryAt, openMeteoStatus, startOpenMeteo } from '../../data/open-meteo.ts';
 import { serverNow, snapshot } from '../../data/snapshot.ts';
-import { ageText, clock } from '../../lib/format.ts';
+import { ageText, clock, isDrySnow } from '../../lib/format.ts';
 import { weatherHref } from '../../router.ts';
 import { Section } from '../../ui/Section.tsx';
 import { AfdNotes } from './AfdNotes.tsx';
@@ -37,6 +37,7 @@ export interface ForecastPanelProps {
 const rangesNote = (units: Units, wd: string): string =>
   `Snow in ${units === 'metric' ? 'cm' : 'inches'}, base to summit: today 8 AM–4 PM, tonight 4 PM–8 AM, ${wd} 8 AM–4 PM.`;
 const BLANK_NOTE = '— = NWS grid not reported.';
+const SLOT = ['today', 'tonight', 'tomorrow'] as const;
 
 function ModelsNote({ now, wd }: { now: number; wd: string }) {
   const om = openMeteo.value;
@@ -118,9 +119,11 @@ export function ForecastPanel({
               {rows.map((r) => (
                 <tr key={r.id} data-testid="forecast-row" data-resort={r.id}>
                   <th scope="row">{r.name}</th>
-                  <td class="cond-fc-snow">{r.today}</td>
-                  <td class="cond-fc-snow">{r.tonight}</td>
-                  <td class="cond-fc-snow">{r.tomorrow}</td>
+                  {[r.today, r.tonight, r.tomorrow].map((t, i) => (
+                    <td key={SLOT[i]} class={isDrySnow(t) ? 'cond-fc-snow is-dry' : 'cond-fc-snow'}>
+                      {t}
+                    </td>
+                  ))}
                   <td>{r.models}</td>
                   {compact ? null : <td>{r.wind}</td>}
                 </tr>

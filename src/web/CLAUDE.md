@@ -5,7 +5,7 @@ Shell: `main.tsx` (build guard, router, stores, theme), `app.tsx` (header, `Outl
 ## Feature folders (`features/<f>/`)
 - `index.ts` is the only import surface; `PascalCase.tsx` components; one `<f>.css` (tokens only; over 250 lines it
   `@import`s its leading sections from `<f>/`, keeping cascade order). Features import each other only via `index.ts`.
-- briefing (BriefJump once `#pick` scrolls off; ResortCard folds < 720 px), pick-card (PickCard, PickCompact, Ridge; the only caller
+- briefing (BriefJump once `#pick` scrolls off; ResortCard folds < 720 px), pick-card (PickCard, PickCompact, Ridge: SVG peaks from `ridge-shape.ts`, a dry night is a bare hill; the only caller
   of `src/shared/pick/`), conditions (Roads/Avalanche/Forecast panels, ModelTable), resort (a lift or gate is the red ◆
   Closed only while `liftsRunning`, else grey ◌), settings (+ header chips sized before data lands: `e2e/layout.spec.ts`; CustomBase, DriveChips; typed fields clamp and
   flash in the Section sub), tracker (§9.5: Grid from 900 px, DayList below; DayPicker, caps, thresholds, bookings, crew,

@@ -3,6 +3,7 @@
 // week's base–summit total on the right, ★ on the crew pick, the leader in accent; a name opens its outlook.
 import { RESORT_IDS } from '../../../../config/resorts.ts';
 import type { ResortId, Snapshot } from '../../../shared/types.ts';
+import { isDrySnow } from '../../lib/format.ts';
 import { weatherHref } from '../../router.ts';
 import { Bars, HRule, Plot, VRule } from '../../ui/Chart.tsx';
 import { Section } from '../../ui/Section.tsx';
@@ -64,7 +65,7 @@ function LaneRow({ l, v, onPick }: { l: Lane; v: WeekView; onPick: (id: ResortId
           <Bars values={l.day} pair={l.night} h={H} max={v.pairMax} gap={0.3} cls={cls} />
         </g>
       </Plot>
-      <span class="wx-tot num">
+      <span class={isDrySnow(l.total) ? 'wx-tot num is-dry' : 'wx-tot num'}>
         {l.total}
         {l.peak ? <span class="sr-only">, most {l.peak}</span> : null}
       </span>

@@ -17,7 +17,7 @@ export function Amount({ kind, value, units, class: cls }: Props) {
   return (
     <span class={`rs-num${cls ? ` ${cls}` : ''}`}>
       {q.value}
-      {q.unit ? <span class="rs-u">{q.unit}</span> : null}
+      {q.unit ? <span class={q.unit === '″' ? 'rs-u rs-u-mark' : 'rs-u'}>{q.unit}</span> : null}
     </span>
   );
 }

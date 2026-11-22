@@ -53,14 +53,22 @@
   white-space: nowrap;
 }
 
+/* a dry day is quiet: the cards of a storm week then stand out from the dry ones */
+.wx-big.is-dry {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
 .wx-big.is-long {
   font-size: min(var(--fs-resort-num), 20cqi);
 }
 
+/* a raised unit, as on the pick card: on the baseline the half-size ″ read as a hyphen ("0-"). The number is a
+   flex line here, so the unit rises with align-self (vertical-align does nothing on a flex item). */
 .wx-big small {
-  margin-left: 1px;
-  font-size: 0.5em;
-  vertical-align: 0.7em; /* a raised unit, as on the pick card: on the baseline the ″ read as a hyphen */
+  align-self: flex-start;
+  margin: 0.12em 0 0 1px;
+  font-size: max(0.5em, 12px); /* a long range shrinks the number; its unit stays readable */
 }
 
 .wx-rows {

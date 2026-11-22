@@ -137,6 +137,12 @@
   font-weight: 800;
   text-shadow: 0 0 12px var(--snow-glow);
 }
+/* a dry slot is quiet (lib/format.ts isDrySnow), as in the model table: a dry week was eighteen glowing zeros */
+.cond-fc-table td.cond-fc-snow.is-dry {
+  color: var(--text-dim);
+  font-weight: 700;
+  text-shadow: none;
+}
 @container (min-width: 30em) {
   .cond-fc-table td.cond-fc-snow {
     font-size: var(--fs-body);

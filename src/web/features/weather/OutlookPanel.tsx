@@ -5,7 +5,7 @@ import { RESORTS } from '../../../../config/resorts.ts';
 import type { ResortId, Snapshot } from '../../../shared/types.ts';
 import { fmt, type Units } from '../../../shared/units.ts';
 import { type OmData, omFor } from '../../data/open-meteo.ts';
-import { clockRel } from '../../lib/format.ts';
+import { clockRel, isDrySnow } from '../../lib/format.ts';
 import { Section } from '../../ui/Section.tsx';
 import { StatusChip } from '../../ui/StatusChip.tsx';
 import { gridRow, SourceLine, worstMeta } from '../conditions/index.ts';
@@ -26,7 +26,7 @@ function Card({ d }: { d: OutlookDay }) {
       <p class="wx-dy">
         <b>{d.label}</b> {d.dayNum}
       </p>
-      <p class={d.long ? 'wx-big num snow is-long' : 'wx-big num snow'}>
+      <p class={`wx-big num snow${d.long ? ' is-long' : ''}${isDrySnow(d.snow) ? ' is-dry' : ''}`}>
         {d.snow}
         {d.unit ? <small>{d.unit}</small> : null}
       </p>
