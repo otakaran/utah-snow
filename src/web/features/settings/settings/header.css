@@ -44,6 +44,20 @@
   }
 }
 
+/* Under 360 px the label had room for three letters ("COT…"): the chip is its house icon alone, still a 44 px link
+   to the base setting with the full name in its accessible label. */
+@media (max-width: 359px) {
+  .hdr-chip {
+    justify-content: center;
+    min-width: var(--tap);
+    padding: 0;
+  }
+
+  .hdr-chip-short {
+    display: none;
+  }
+}
+
 .theme-btn {
   display: inline-flex;
   align-items: center;
@@ -76,8 +90,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding-left: var(--space-2);
-  border: 2px solid var(--accent);
+  padding-left: var(--space-3);
+  border: 1px solid var(--accent);
   border-radius: 999px;
   font: 700 var(--fs-caption) / 1 var(--font-display);
   letter-spacing: 0.06em;

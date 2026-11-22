@@ -128,15 +128,20 @@
 }
 
 @media (max-width: 599px) {
-  /* One first row whatever the fonts or the data (a wrapping flex row reflowed when they arrived): brand | clock |
-     freshness | base chip (the one slot that yields, with an ellipsis) | ⋯; the "I am" chip alone on a second row. */
+  /* One first row whatever the fonts or the data (a wrapping flex row reflowed when they arrived): brand | clock
+     (its 1fr column holds the row's spare room) | freshness | base chip (the one slot that yields, with an ellipsis)
+     | ⋯; the "I am" chip alone on a second row. */
   .hdr-row {
     display: grid;
     grid-template-columns: auto minmax(max-content, 1fr) auto minmax(0, max-content) auto;
   }
 
+  /* the clock reads as one block with the mark at the left edge; freshness, base and the menu group at the right
+     (right-aligned in its 1fr column it floated mid-row, tied to neither side) */
   .app-clock {
-    justify-self: end;
+    justify-self: start;
+    margin-left: var(--space-1);
+    text-align: left;
   }
 
   .hdr-more {
