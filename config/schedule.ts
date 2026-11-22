@@ -146,3 +146,7 @@ export const MAINT = { slot: 9, utcHours: [8, 9, 10, 11], mondayUtcHour: 12 } as
 export const CPU_SUSPECT_TTL_MS = 7 * 86_400_000;
 export const CPU_SUSPECT_FAIL = 3;
 export const CRON_STALE_MIN = 15; // /api/health?strict=1 fails when the last tick is older
+// A critical row red from a network-class error (timeout, connection, HTTP 5xx/429) only warns in ?strict=1 while
+// its last success is this recent: an upstream unreachable for a few hours is theirs to fix (Snowbird timed out
+// for 4 h on 2026-11-21 and recovered); one unreachable for 6 h has probably moved or started refusing us: ours.
+export const UPSTREAM_GRACE_MIN = 360;

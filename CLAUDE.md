@@ -28,7 +28,7 @@
   `audit-phone.ts` (same-name folders hold their parts; `lib/`: the Node fetchx shim and the job list they share).
 - `public/`: `_headers`, `robots.txt`, `favicon.svg`, `manifest.webmanifest`, `fonts/` (Barlow woff2 + OFL, <= 120 KB).
 - Root: `wrangler.jsonc`, `worker-configuration.d.ts` (generated, committed), vite/vitest/playwright/biome/tsconfig files.
-- `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`), drift (Mondays; `drift` issue), tick (*/5 cron fallback).
+- `.github/workflows/`: ci (check, e2e, deploy on main), health (twice daily `/api/health?strict=1`; a red row from an upstream network error < 6 h only warns), drift (Mondays; `drift` issue), tick (*/5 cron fallback).
 - Status now: Phase 2 and its polish passes (the last on 2026-11-15) are done: every adapter and `/api` route, all seven pages (wall, weather), scrubbers,
   custom base, MtnPowder browser fallback, model table, scripts. Next: Phase 3, checking parsers as each resort opens.
 

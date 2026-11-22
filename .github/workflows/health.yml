@@ -1,5 +1,6 @@
 # Scheduled strict health check (spec §11): 14:00 and 23:00 UTC. On failure, open one "health" issue or comment on it;
 # on a pass, close it with a note (an issue left open after a recovery hides the next failure in its comments).
+# A body with warnings (e.g. `upstream:` rows red within UPSTREAM_GRACE_MIN) adds a run annotation, never an issue.
 name: Health
 
 on:
@@ -27,7 +28,10 @@ jobs:
           curl -sS --fail-with-body --max-time 30 -o health.json 'https://utah.otakar.dev/api/health?strict=1' \
             2> curl.err || rc=$?
           cat curl.err
-          jq -c '{ok, version, failures, lastTickAt: .cron.lastTickAt}' health.json 2>/dev/null || true
+          jq -c '{ok, version, failures, warnings, lastTickAt: .cron.lastTickAt}' health.json 2>/dev/null || true
+          # Warnings (an upstream outage within grace, a cpu-suspect job) never fail the run but show on its page.
+          warnings=$(jq -r '(.warnings // []) | join(", ")' health.json 2>/dev/null || true)
+          if [ -n "$warnings" ]; then echo "::warning title=Health warnings::$warnings"; fi
           exit "${rc:-0}"
       - name: Open or update the health issue
         if: failure()

@@ -3,7 +3,10 @@
 // 24 h, or the weekly NWS /points check found a grid or zone change (Appendix C.1). A job flagged less often is
 // only a warning: the flag means "the previous tick wrote none of this job's rows", which one interrupted tick
 // (a Durable Object reset, a D1 hiccup) causes too, and on 2026-11-12 that failed strict for a day while every row
-// was green. A job that is killed every time still turns its rows red. Also arms the Scheduler alarm chain.
+// was green. A job that is killed every time still turns its rows red. A red critical row whose error is a
+// network-class failure (timeout, connection, HTTP 5xx/429) with a success in the last UPSTREAM_GRACE_MIN is an
+// `upstream:` warning, not a failure (health/upstream.ts): a red run means something here needs fixing. The row
+// stays red in `sources` and the client. Also arms the Scheduler alarm chain.
 import { CAMS } from '../../../config/cams/index.ts';
 import { CPU_SUSPECT_FAIL, CRON_STALE_MIN } from '../../../config/schedule.ts';
 import { camFresh } from '../../shared/cam-fresh.ts';
@@ -16,6 +19,7 @@ import { ensureScheduler } from '../scheduler.ts';
 import { sourceOfRow, staleAfterMin } from '../sources/index.ts';
 import { readHealthCounters } from '../store/counters.ts';
 import { CRON_LAST, cronLastOf, type MetaRow, readMetaRows } from '../store/source-state.ts';
+import { inUpstreamGrace } from './health/upstream.ts';
 
 const YT_ANOMALY_UNITS = 1000;
 const KIND = new Map<string, CamKind>((CAMS as readonly CamDef[]).map((c) => [c.id, c.kind]));
@@ -101,8 +105,12 @@ export async function health(_req: Request, env: Env, ctx: ExecutionContext, url
   const warnings = [...suspects].sort().map(([job, n]) => `cpu-suspect:${job}${n > 1 ? ` x${n}` : ''}`);
   const repeat = [...suspects].filter(([, n]) => n >= CPU_SUSPECT_FAIL).map(([job]) => job);
   if (repeat.length) failures.push(`cpu-suspect:${repeat.sort().join(',')}`);
+  const graced = new Set(rows.filter((r) => inUpstreamGrace(r.status, r.error, r.ok_at, now)).map((r) => r.source_id));
   const red = sources.filter((s) => isCritical(s.id, s.status) && s.badge === 'red').map((s) => s.id);
-  if (red.length) failures.push(`red:${red.join(',')}`);
+  const upstream = red.filter((id) => graced.has(id));
+  const broken = red.filter((id) => !graced.has(id));
+  if (upstream.length) warnings.push(`upstream:${upstream.join(',')}`);
+  if (broken.length) failures.push(`red:${broken.join(',')}`);
   const pointChanges = payloadOf(rows, 'nws:points')?.changes;
   if (Array.isArray(pointChanges) && pointChanges.length) failures.push(`nws-points:${pointChanges.length}`);
 

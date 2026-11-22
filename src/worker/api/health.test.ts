@@ -157,6 +157,32 @@ describe('/api/health', () => {
     expect(((await repeat.json()) as { failures: string[] }).failures).toEqual(['cpu-suspect:resort:brighton']);
   });
 
+  it('a red row from an upstream timeout is a warning within UPSTREAM_GRACE_MIN, then a failure; parse errors fail', async () => {
+    // 2026-11-21: Snowbird's API timed out for about 4 h and recovered; strict failed and opened an issue
+    const now = Date.now();
+    await runTick(env, now, { sources: [] });
+    const put = env.DB.prepare(
+      "INSERT OR REPLACE INTO source_state (source_id, payload, fetched_at, ok_at, status, error, fail_count) VALUES ('resort:snowbird', '{}', ?1, ?2, 'error', ?3, 13)",
+    );
+    const timeout = 'TimeoutError: The operation was aborted due to timeout';
+    await put.bind(now, now - 264 * MIN, timeout).run();
+    const grace = await get('/api/health?strict=1');
+    expect(grace.status).toBe(200);
+    const body = (await grace.json()) as { ok: boolean; failures: string[]; warnings: string[]; sources: unknown[] };
+    expect(body).toMatchObject({ ok: true, failures: [], warnings: ['upstream:resort:snowbird'] });
+    expect(body.sources).toEqual([expect.objectContaining({ id: 'resort:snowbird', badge: 'red' })]);
+
+    await put.bind(now, now - 7 * 60 * MIN, timeout).run();
+    const late = await get('/api/health?strict=1');
+    expect(late.status).toBe(503);
+    expect(((await late.json()) as { failures: string[] }).failures).toEqual(['red:resort:snowbird']);
+
+    await put.bind(now, now - 30 * MIN, 'ValidationError: snowbird: no lifts').run();
+    const parse = await get('/api/health?strict=1');
+    expect(parse.status).toBe(503);
+    expect(((await parse.json()) as { failures: string[] }).failures).toEqual(['red:resort:snowbird']);
+  });
+
   it('unknown routes: /api 404 and 405 are no-store JSON, other paths 404 text/plain', async () => {
     const missing = await get('/api/nope');
     expect(missing.status).toBe(404);
