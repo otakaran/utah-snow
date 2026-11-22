@@ -1,6 +1,7 @@
 // PickCard (spec §8.2 `pick`, §10.3): the crew pick by default, [Crew | As me] when "I am" is set. Phone order: mode
-// band (section 01), who, resort name (outranks the number), overnight number + OVERNIGHT caption, tier/score/drive,
-// the six-peak ridge (CSS `order` lifts it above the fold), reasons, divergences, alternatives, action links, the
+// band (section 01; its label has a short form under 600 px so [Crew | As me] fits beside it), who, resort name
+// (outranks the number), overnight number + OVERNIGHT caption with the report's 7-day snow and base depth beside it
+// (a dry morning still says how the mountain is covered), tier/score/drive, the six-peak ridge (CSS `order` lifts it above the fold), reasons, divergences, alternatives, action links, the
 // collapsed crew/excluded/inputs block, the tomorrow outlook. From 900 px, .pick-main (who, hero, reasons,
 // divergences, the crew chips' block beside the crew line) and .pick-aside (ridge, alternatives, actions, tomorrow)
 // become two columns of about equal height. The root's id is a JumpBar target. Until the first snapshot, phones get
@@ -19,15 +20,19 @@ import { PickMore } from './PickMore.tsx';
 import { Actions, Alternatives, Divergences, Reasons } from './PickParts.tsx';
 import { effectiveView, me } from './prefs.ts';
 import { Ridge } from './Ridge.tsx';
-import { overnightAll, pickOvernight } from './snow-values.ts';
+import { overnightAll, pickOvernight, snowContext } from './snow-values.ts';
 import { TomorrowOutlook } from './TomorrowOutlook.tsx';
 import { shownPick } from './use-pick.ts';
 import './pick-card.css';
 
-function modeLabel(r: PickResult | null, now: number): string {
-  if (r?.mode === 'preview') return previewLabel();
-  if (r?.mode === 'post') return 'Trip over';
-  return `${r?.scope === 'me' ? 'My pick' : "Today's pick"} · ${formatLocalDate(now, 'short')}`;
+/** The band's label, and a short form for phones (`short` null: the long one fits). */
+function modeLabel(r: PickResult | null, now: number): { long: string; short: string | null } {
+  if (r?.mode === 'preview') return { long: previewLabel(), short: previewLabel(true) };
+  if (r?.mode === 'post') return { long: 'Trip over', short: null };
+  const day = formatLocalDate(now, 'short');
+  return r?.scope === 'me'
+    ? { long: `My pick · ${day}`, short: null }
+    : { long: `Today's pick · ${day}`, short: `Today · ${day}` };
 }
 
 const VIEW_OPTIONS = [
@@ -54,11 +59,13 @@ function Who({ r }: { r: PickResult }) {
   );
 }
 
-/** Name, overnight number + caption, tier, score and drive. Shared with the compact wall variant. */
-export function PickHero({ r, units: u }: { r: PickResult; units: Units }) {
+/** Name, overnight number + caption, the report's 7-day snow and base depth (`context`; not on the wall), tier,
+ * score and drive. Shared with the compact wall variant. */
+export function PickHero({ r, units: u, context = false }: { r: PickResult; units: Units; context?: boolean }) {
   const top = r.ranked.find((x) => x.resort === r.pick);
   const o = pickOvernight(snapshot.value, r);
   const snow = snowQty(o.inches, u);
+  const more = context ? snowContext(snapshot.value, r.pick) : [];
   return (
     <>
       <h2 id="pick-title" class="pick-name">
@@ -72,6 +79,16 @@ export function PickHero({ r, units: u }: { r: PickResult; units: Units }) {
           </span>
           <span class="pick-cap">Overnight{o.note ? ` · ${o.note}` : ''}</span>
         </p>
+        {more.length > 0 ? (
+          <dl class="pick-context" data-testid="pick-context">
+            {more.map((m) => (
+              <div key={m.label}>
+                <dt class="pick-cap">{m.label}</dt>
+                <dd class="num">{snowQty(m.inches, u).text}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
         <div class="pick-side">
           {r.tier ? <span class="pick-tier">{TIER_LABEL[r.tier]}</span> : null}
           <span class="pick-stat">
@@ -92,6 +109,7 @@ export function PickCard() {
   const live = r !== null && r.mode !== 'post';
   const waiting = snapshot.value === null;
   const meLoading = !me.value && !!meSetting.value && trackerStatus.value === 'idle';
+  const mode = modeLabel(r, serverNow.value);
   return (
     <section
       id="pick"
@@ -101,11 +119,16 @@ export function PickCard() {
       aria-labelledby="pick-title"
     >
       <div class="pick-band">
-        <p class="pick-mode">
+        <p class={mode.short ? 'pick-mode has-short' : 'pick-mode'}>
           <span class="pick-no num" aria-hidden="true">
             01
           </span>
-          {modeLabel(r, serverNow.value)}
+          <span class="pick-mode-long">{mode.long}</span>
+          {mode.short ? (
+            <span class="pick-mode-short" aria-hidden="true">
+              {mode.short}
+            </span>
+          ) : null}
         </p>
         {me.value || meLoading ? (
           <Toggle
@@ -122,7 +145,7 @@ export function PickCard() {
         <div class="pick-main">
           {live ? <Who r={r} /> : null}
           {live ? (
-            <PickHero r={r} units={u} />
+            <PickHero r={r} units={u} context />
           ) : (
             <h2 id="pick-title" class="pick-name">
               {r ? 'Trip over' : waiting ? 'Waiting for data…' : 'Pick unavailable'}

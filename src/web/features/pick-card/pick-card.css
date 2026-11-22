@@ -40,12 +40,25 @@
   font-weight: 600;
 }
 
+/* the next best resorts: one ruled list under its caption (three boxes inside the card read as three more cards) */
+.pick-alts {
+  gap: 0;
+}
+
 .pick-alts li {
   display: grid;
   gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-chip);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--line);
+}
+
+.pick-alts li:last-child {
+  padding-bottom: 0;
+}
+
+.pick .pick-alts-h {
+  margin-bottom: var(--space-2);
+  color: var(--text-dim);
 }
 
 .pick-alt-head,
@@ -200,8 +213,11 @@
     align-content: start;
   }
 
+  /* beside the hero the ridge needs no rule above it: the column gap separates them */
   .pick .ridge {
     --ridge-h: 110px;
     margin: 0;
+    padding-top: 0;
+    border-top: 0;
   }
 }

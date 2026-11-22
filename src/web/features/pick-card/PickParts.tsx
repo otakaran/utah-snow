@@ -71,21 +71,26 @@ export function Alternatives({ r, units }: { r: PickResult; units: Units }) {
     return inches === null ? null : <span class="num pick-alt-in">{snowQty(inches, units).text}</span>;
   };
   return (
-    <ol class="pick-alts" aria-label="Alternatives">
-      {alts.map((a) => (
-        <li key={a.resort}>
-          <span class="pick-alt-head">
-            <b>{RESORTS[a.resort].name}</b>
-            {alt(a.resort)}
-            <span class="num pick-alt-net">
-              {scoreText(a.net)}
-              <small> score</small>
+    <div class="pick-alts-box">
+      <h3 id="pick-alts-h" class="pick-more-h pick-alts-h">
+        Next best
+      </h3>
+      <ol class="pick-alts" aria-labelledby="pick-alts-h">
+        {alts.map((a) => (
+          <li key={a.resort}>
+            <span class="pick-alt-head">
+              <b>{RESORTS[a.resort].name}</b>
+              {alt(a.resort)}
+              <span class="num pick-alt-net">
+                {scoreText(a.net)}
+                <small> score</small>
+              </span>
             </span>
-          </span>
-          <span class="pick-alt-why">{altReason(a.reasons)}</span>
-        </li>
-      ))}
-    </ol>
+            <span class="pick-alt-why">{altReason(a.reasons)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CapDay } from '../../../shared/caps.ts';
-import { altReason, crewNames, memberCosts, peakFractions, scoreText, snowQty } from './labels.ts';
+import { altReason, crewNames, memberCosts, peakShares, scoreText, snowQty } from './labels.ts';
 
 describe('altReason', () => {
   it('prefers a scored effect, then the day cost, then the first reason', () => {
@@ -35,16 +35,11 @@ describe('memberCosts', () => {
   });
 });
 
-describe('peakFractions', () => {
-  it('scales to the deepest night with a 6″ floor, keeps a sliver for 0 and flattens missing values', () => {
-    expect(peakFractions([12, 6, 0, null])).toEqual([1, 0.54, 0.08, 0]);
-    expect(peakFractions([3, 1.5])).toEqual([0.54, 0.31]);
-  });
-
-  it('lifts any snow at all off the 0″ sliver (a 0.5″ night is not a smear)', () => {
-    const [half, zero] = peakFractions([0.5, 0]);
-    expect(zero).toBe(0.08);
-    expect(half).toBeGreaterThan(0.15);
+describe('peakShares', () => {
+  it('scales to the deepest night with a 6″ floor; a dry or unknown night is 0', () => {
+    expect(peakShares([12, 6, 0, null])).toEqual([1, 0.5, 0, 0]);
+    expect(peakShares([3, 1.5])).toEqual([0.5, 0.25]);
+    expect(peakShares([0, 0, null])).toEqual([0, 0, 0]);
   });
 });
 

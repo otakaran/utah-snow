@@ -48,7 +48,7 @@ type Forecasts = Record<string, Block<PointForecast>> | undefined;
 
 /**
  * Heights as 0..1 fractions of the tallest value, with a `floorIn` floor so a 1″ week never looks deep; a known
- * value shows at least 0.08 (the pick card's `peakFractions` rule), null is 0.
+ * value shows at least 0.08, null is 0.
  */
 export function barFractions(values: readonly (number | null)[], floorIn = 6): number[] {
   const top = Math.max(floorIn, ...values.map((v) => v ?? 0));

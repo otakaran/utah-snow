@@ -34,3 +34,15 @@ export const pickOvernight = (snap: Snapshot | null, r: PickResult): { inches: n
 export function overnightAll(snap: Snapshot | null, r: PickResult | null): { id: ResortId; inches: number | null }[] {
   return RESORT_IDS.map((id) => ({ id, inches: overnightFor(snap, r, id).inches }));
 }
+
+/** What the pick's own report says beyond the night: the last 7 days' snow and the base depth, where it has them
+ * (an open resort; a pre-season one has no report). Imperial; convert at render. */
+export function snowContext(snap: Snapshot | null, id: ResortId | null): { label: string; inches: number }[] {
+  const data = id ? snap?.resorts?.[id]?.data : null;
+  if (!data?.snow || data.season === 'preseason') return [];
+  const rows = [
+    { label: '7 days', inches: data.snow.new7dIn },
+    { label: 'Base', inches: data.snow.baseDepthIn },
+  ];
+  return rows.filter((r): r is { label: string; inches: number } => typeof r.inches === 'number' && r.inches > 0);
+}

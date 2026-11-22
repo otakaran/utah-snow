@@ -21,8 +21,11 @@ export function snowQty(inches: number | null | undefined, units: Units): Qty {
   return { ...q, value, text: q.text.replace(q.value, value) };
 }
 
-/** 'Preview (trip starts Dec 27)'. */
-export const previewLabel = (): string => `Preview (trip starts ${formatLocalDate(TRIP.start, 'md')})`;
+/** 'Preview (trip starts Dec 27)'; `short` for the phone band: 'Preview · trip Dec 27'. */
+export const previewLabel = (short = false): string => {
+  const day = formatLocalDate(TRIP.start, 'md');
+  return short ? `Preview · trip ${day}` : `Preview (trip starts ${day})`;
+};
 
 /** The §10.3 day-cost reason ('Spends 1 Alta/Snowbird day each (crew min 4 → 3): …'). */
 export const isDayCost = (reason: string): boolean => reason.startsWith('Spends ');
@@ -66,10 +69,9 @@ export function crewNames(members: readonly PickMember[]): string {
   return members.map((m) => `${m.name}${mode[m.mode]}`).join(', ');
 }
 
-/** Peak heights as 0..1 fractions of the tallest plausible night (a 6″ floor keeps a 1″ night from looking deep).
- * 0″ sits on a `lo` sliver and any snow at all rises above it (0.5″ on a 6″ night is 0.15, not the sliver);
- * a missing value is flat. */
-export function peakFractions(values: readonly (number | null)[], floorIn = 6, lo = 0.08): number[] {
+/** Each night against the tallest plausible one, 0..1 (a 6″ floor keeps a 1″ night from looking deep): the ridge
+ * chart's peak heights and snow lines. A dry or unknown night is 0. */
+export function peakShares(values: readonly (number | null)[], floorIn = 6): number[] {
   const top = Math.max(floorIn, ...values.map((v) => v ?? 0));
-  return values.map((v) => (v === null || !Number.isFinite(v) ? 0 : lo + (1 - lo) * Math.min(1, v / top)));
+  return values.map((v) => (v === null || !Number.isFinite(v) || v <= 0 ? 0 : Math.min(1, v / top)));
 }

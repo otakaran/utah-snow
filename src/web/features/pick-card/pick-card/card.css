@@ -45,6 +45,53 @@
   color: var(--accent-ink);
 }
 
+/* the band's label: the long form, and under 600 px a short one, so [Crew | As me] sits beside it on one row
+   (the long one stays for screen readers) */
+.pick-mode-short {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .has-short .pick-mode-long {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .has-short .pick-mode-short {
+    display: inline;
+  }
+}
+
+/* [Crew | As me] on the band: an ink outline with an ink thumb instead of a dark pill on the gradient, 34 px tall;
+   each label's ::after keeps the 44 px tap target */
+.pick-band .seg {
+  flex-wrap: nowrap;
+  border-color: var(--accent-ink);
+  background: none;
+}
+
+.pick-band .seg label {
+  position: relative;
+  min-height: 26px;
+  padding-inline: var(--space-2);
+  color: var(--accent-ink);
+}
+
+.pick-band .seg label::after {
+  content: "";
+  position: absolute;
+  inset: -9px 0;
+}
+
+.pick-band .seg input:checked + label {
+  background: var(--accent-ink);
+  color: var(--accent);
+}
+
 .pick-body {
   display: grid;
   gap: var(--space-3);
@@ -114,6 +161,28 @@
   margin-left: 0.04em;
   font-size: 0.5em;
   vertical-align: 0.7em;
+}
+
+/* beside the overnight number: what the report says of the last week and the base, captions on one line with
+   OVERNIGHT. Plain --text: the ice colour and its glow stay with the overnight inches. */
+.pick-context {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--line-strong);
+}
+
+.pick-context div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-1);
+}
+
+.pick-context dd {
+  margin: 0;
+  font-size: var(--fs-1);
+  line-height: 1;
 }
 
 .pick-tier {

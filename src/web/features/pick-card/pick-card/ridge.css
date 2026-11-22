@@ -1,13 +1,13 @@
 /* six-peak overnight ridge: full names, pick peak lit; --baseline puts every number on one line (wall).
-   Each mountain is 1.5 columns wide, so the peaks overlap into one ridge. A quarter-column spacer track on each
-   side (the ::before/::after grid items) holds the outer mountains' outer slopes: without it overflow: hidden cut
-   them flat at the card edge (phones, 2026-11-01). Tracks in fr share the ridge's own width exactly (a percentage
-   padding would resolve against the parent, 32 px narrower on phones). The first and last names reach into the
-   spacers so the ground line still runs edge to edge.
-   Phone clarity (2026-11-01, pre-season): a 0″ hill is bare (.is-dry), since a 28% cap on a 6 px sliver was a white
-   smear on every flat row; names carry --ridge-name-pad so Deer Valley wraps instead of touching Snowbasin at 393 px;
-   the pick's accent ground line is the same 2 px as its neighbours' and spans its mountain's 1.5-column base, where a
-   4 px one-column line read as a pedestal under the orange peak. */
+   Each mountain is an SVG (Ridge.tsx, ridge-shape.ts) 1.5 columns wide, so the peaks overlap into one ridge. A
+   quarter-column spacer track on each side (the ::before/::after grid items) holds the outer mountains' outer
+   slopes: without it overflow: hidden cut them flat at the card edge (phones, 2026-11-01). Tracks in fr share the
+   ridge's own width exactly (a percentage padding would resolve against the parent, 32 px narrower on phones). The
+   first and last names reach into the spacers so the ground line still runs edge to edge.
+   Dry nights (2026-11-22): a 0″ hill is a bare hill a third of the ridge tall with a quiet number, so six dry
+   resorts still draw a ridge; snow adds height, a white cap and the ice glow. Names carry --ridge-name-pad so Deer
+   Valley wraps instead of touching Snowbasin at 393 px; the pick's accent ground line is the same 2 px as its
+   neighbours' and spans its mountain's 1.5-column base. */
 .ridge {
   --ridge-h: calc(72px * var(--wall-scale));
   --ridge-name-pad: var(--space-1);
@@ -62,27 +62,39 @@
   text-shadow: none;
 }
 
-/* a snow cap marks fresh snow only; a dry night is bare ground. no-repeat: a fractional height let the gradient
-   tile once more at the base, a pale hairline under the hill */
+/* the rock, its snow (fresh snow only: a dry night has no cap) and the shaded face to the right of the summit */
 .ridge-mtn {
   display: block;
+  flex: none;
   width: 150%;
   height: calc(var(--h) * var(--ridge-h));
-  min-height: 2px;
-  background: linear-gradient(var(--peak-cap) 0 28%, var(--peak) 28%) no-repeat;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
-.is-pick .ridge-mtn {
-  background: linear-gradient(var(--peak-cap) 0 28%, var(--accent) 28%);
+.ridge-rock {
+  fill: var(--peak);
 }
 
-.is-dry .ridge-mtn {
-  background: var(--peak);
+.is-pick .ridge-rock {
+  fill: var(--accent);
 }
 
-.is-pick.is-dry .ridge-mtn {
-  background: var(--accent);
+.ridge-cap {
+  fill: var(--peak-cap);
+}
+
+.ridge-shade {
+  fill: var(--shadow);
+  opacity: 0.62;
+}
+
+/* a dry night's number steps back, so the eye goes to the peaks that got snow (or, on a dry morning, to the pick) */
+.is-dry .ridge-num {
+  color: var(--text-dim);
+  text-shadow: none;
+}
+
+.is-pick.is-dry .ridge-num {
+  color: var(--text);
 }
 
 .ridge-name {
