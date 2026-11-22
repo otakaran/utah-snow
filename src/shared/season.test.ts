@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { prevOpenedAt, reportIsToday, seasonState } from './season.ts';
+import { openingText, prevOpenedAt, reportIsToday, seasonState } from './season.ts';
 
 const at = (iso: string) => Date.parse(iso);
 const OCT = at('2026-10-20T16:00:00Z'); // before the 2026-11-01 floor
@@ -61,5 +61,15 @@ describe('reportIsToday', () => {
     expect(reportIsToday('2026-12-28T14:00:00Z', now, '2026-12-28 06:45:00')).toBe(true);
     expect(reportIsToday('2026-12-28T14:00:00Z', now, '2026-12-27 06:45:00')).toBe(false);
     expect(reportIsToday('2026-12-28T14:00:00Z', now, 'n/a')).toBe(true);
+  });
+});
+
+describe('openingText', () => {
+  it('projects a coming date, and stops calling a past one a projection', () => {
+    expect(openingText('2026-11-27', '2026-11-22')).toBe('projected open Nov 27');
+    expect(openingText('2026-11-27', '2026-11-22', 'short')).toBe('projected open Fri, Nov 27');
+    expect(openingText('2026-11-22', '2026-11-22')).toBe('projected to open today');
+    expect(openingText('2026-11-20', '2026-11-22', 'short')).toBe('opening delayed (was Nov 20)');
+    expect(openingText(null, '2026-11-22')).toBe('opening date TBA');
   });
 });

@@ -79,7 +79,7 @@ export const RESORTS = {
       ],
       source: 'live window.Alta.liftStatus',
     },
-    projectedOpen: '2026-11-20',
+    projectedOpen: '2026-11-25', // alta.com/weather on 2026-11-22: "Opening Day is November 25th—conditions permitting"
   },
   snowbird: {
     name: 'Snowbird',

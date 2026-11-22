@@ -2,6 +2,7 @@
 // reports two areas), surface, the resort's own report text (labelled) and the report time. Pre-season shows one
 // compact panel with the projected opening and a countdown instead of empty tiles. Captions sit under the numbers.
 import { RESORTS } from '../../../../config/resorts.ts';
+import { openingText } from '../../../shared/season.ts';
 import { formatLocalDate } from '../../../shared/time.ts';
 import type { ResortId, ResortSnapshot, SnowNumbers } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
@@ -42,7 +43,7 @@ const AREA: Record<SnowNumbers['area'], string> = {
   summit: 'Measured at the summit.',
 };
 
-/** 'Pre-season · projected open Fri, Nov 20' under the 'N days to opening' countdown. */
+/** 'Pre-season · projected open Fri, Nov 27' (shared/season.ts `openingText`) under the 'N days to opening' countdown. */
 function PreSeason({ id, today }: { id: ResortId; today: string }) {
   const open = RESORTS[id].projectedOpen;
   return (
@@ -50,7 +51,7 @@ function PreSeason({ id, today }: { id: ResortId; today: string }) {
       {open ? <Countdown today={today} to={open} word="to opening" /> : null}
       <div>
         <p class="rs-strong">
-          <Glyph tone="off" /> Pre-season · projected open {open ? formatLocalDate(open, 'short') : 'TBA'}
+          <Glyph tone="off" /> Pre-season · {openingText(open, today, 'short')}
         </p>
         <p class="rs-dim rs-small">Snow numbers start with the first report of the season.</p>
       </div>

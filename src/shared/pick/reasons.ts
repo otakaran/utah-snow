@@ -2,7 +2,7 @@
 // points in inches and print as '(−3.2)' / '(+2)'.
 import { CAP_GROUPS } from '../../../config/ikon.ts';
 import { STRATEGY } from '../../../config/strategy.ts';
-import { formatClock, zonedToUtc } from '../time.ts';
+import { formatClock, formatLocalDate, zonedToUtc } from '../time.ts';
 import type { CapGroupId, PickFresh } from '../types.ts';
 import { fmt, type Units } from '../units.ts';
 import type { DayTerm, GroupState } from './threshold.ts';
@@ -72,4 +72,7 @@ export function zeroDaysLine(names: readonly string[], g: CapGroupId): string {
   return `${who}0 ${label(g)} days left`;
 }
 
-export const PREVIEW_REASON = 'Preview – resorts not open yet; bookings not checked';
+/** Before the trip the pick runs for its first day on today's snow ('Preview for Dec 27 on today's snow; bookings
+ * not checked'). It used to say "resorts not open yet", which was wrong from the first opening on. */
+export const previewReason = (tripStart: string): string =>
+  `Preview for ${formatLocalDate(tripStart, 'md')} on today's snow; bookings not checked`;

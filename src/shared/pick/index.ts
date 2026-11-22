@@ -11,7 +11,7 @@ import { actions, inputs } from './actions.ts';
 import { buildCtx, type Ctx, resolveMembers } from './crew.ts';
 import type { RunMode } from './fresh.ts';
 import { rankWithPick, scoreAll, tierOf } from './rank.ts';
-import { PREVIEW_REASON, signed } from './reasons.ts';
+import { previewReason, signed } from './reasons.ts';
 import { thresholdsOut } from './threshold.ts';
 
 export { parkingRequired } from './calendar.ts';
@@ -38,7 +38,7 @@ function run(args: PickArgs, mode: RunMode, target: string): PickResult {
   const top = ranked[0] ?? null;
   const diverge = top ? divergences(args, ctx, top) : [];
   if (top) {
-    if (mode === 'preview') top.reasons.unshift(PREVIEW_REASON);
+    if (mode === 'preview') top.reasons.unshift(previewReason(target));
     for (const d of diverge) top.reasons.push(`${d.name} would pick ${RESORTS[d.resort].name} ${signed(d.gain)}`);
   }
   return {

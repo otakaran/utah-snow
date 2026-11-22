@@ -162,7 +162,7 @@ describe('modes and scope', () => {
     expect(res.ranked.length).toBeGreaterThanOrEqual(1);
     const text = [...res.excluded.flatMap((x) => x.reasons), ...res.ranked.flatMap((x) => x.reasons)].join('\n');
     expect(text).not.toMatch(/Not open yet|parking reservation|DV Ikon/);
-    expect(res.ranked[0]?.reasons[0]).toBe('Preview – resorts not open yet; bookings not checked');
+    expect(res.ranked[0]?.reasons[0]).toBe("Preview for Dec 27 on today's snow; bookings not checked");
     expect(res.actions).toEqual([]);
   });
 

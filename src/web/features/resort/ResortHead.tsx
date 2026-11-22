@@ -5,7 +5,7 @@ import { RESORTS } from '../../../../config/resorts.ts';
 import { CORRIDORS } from '../../../../config/roads.ts';
 import { ageMin, badge } from '../../../shared/freshness.ts';
 import { parkingCal } from '../../../shared/parking.ts';
-import { formatLocalDate } from '../../../shared/time.ts';
+import { openingText } from '../../../shared/season.ts';
 import type { Block, ResortId, ResortSnapshot } from '../../../shared/types.ts';
 import type { Units } from '../../../shared/units.ts';
 import { clockRel, qty } from '../../lib/format.ts';
@@ -105,11 +105,7 @@ export function ResortHead({ id, block, drive, today, now, units, days }: Props)
       </h1>
       <div class="rs-flex">
         <StatusChip tone={season.tone} word={season.word} stale={isStale(fresh) && season.tone !== 'off'} size="lg" />
-        {pre ? (
-          <span class="rs-dim">
-            projected open {def.projectedOpen ? formatLocalDate(def.projectedOpen, 'md') : 'TBA'}
-          </span>
-        ) : null}
+        {pre ? <span class="rs-dim">{openingText(def.projectedOpen, today)}</span> : null}
       </div>
       <div class="rs-flex rs-hero">
         {pre ? null : (

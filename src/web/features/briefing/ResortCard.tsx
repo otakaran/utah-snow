@@ -51,10 +51,11 @@ function DaysLeft({ parts }: { parts: DaysPart[] }) {
 
 function PreSeason({ id, now }: { id: ResortId; now: number }) {
   const open = RESORTS[id].projectedOpen;
+  const today = localDate(now);
   return (
     <div class="rc-pre">
-      {open ? <Countdown today={localDate(now)} to={open} word="to opening" /> : null}
-      <p>{preseasonLine(id)}</p>
+      {open ? <Countdown today={today} to={open} word="to opening" /> : null}
+      <p>{preseasonLine(id, today)}</p>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { CAP_GROUPS } from '../../../../config/ikon.ts';
 import { RESORTS } from '../../../../config/resorts.ts';
 import type { CapDay } from '../../../shared/caps.ts';
 import { crewRemaining, group, remaining } from '../../../shared/caps.ts';
-import { formatLocalDate } from '../../../shared/time.ts';
+import { openingText } from '../../../shared/season.ts';
 import type { ResortId, ResortSnapshot } from '../../../shared/types.ts';
 import { fmt, type Units } from '../../../shared/units.ts';
 import type { Tone } from '../../ui/status.ts';
@@ -22,11 +22,9 @@ export function resortStatus(data: Partial<ResortSnapshot> | null | undefined): 
   return { tone: 'off', word: 'Unknown' };
 }
 
-/** 'Pre-season – projected open Nov 20' (or 'TBA'). */
-export function preseasonLine(id: ResortId): string {
-  const d = RESORTS[id].projectedOpen;
-  return `Pre-season – projected open ${d ? formatLocalDate(d, 'md') : 'TBA'}`;
-}
+/** 'Pre-season – projected open Nov 27', '… opening delayed (was Nov 20)' or '… opening date TBA'. */
+export const preseasonLine = (id: ResortId, today: string): string =>
+  `Pre-season – ${openingText(RESORTS[id].projectedOpen, today)}`;
 
 /** '8/11 (+2 hold)'; '—' without a lift list. */
 export function liftsText(l: Partial<ResortSnapshot['lifts']> | undefined): string {

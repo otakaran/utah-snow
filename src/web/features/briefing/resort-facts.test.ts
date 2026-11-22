@@ -23,8 +23,9 @@ describe('card facts', () => {
     expect(windText({}, 'imperial')).toBe('—');
     expect(driveText(26, 8, false)).toBe('26 min (+8 live)');
     expect(driveText(26, 0, true)).toBe('≈ 26 min');
-    expect(preseasonLine('alta')).toBe('Pre-season – projected open Nov 20');
-    expect(preseasonLine('brighton')).toBe('Pre-season – projected open TBA');
+    expect(preseasonLine('alta', '2026-11-22')).toBe('Pre-season – projected open Nov 25');
+    expect(preseasonLine('alta', '2026-11-26')).toBe('Pre-season – opening delayed (was Nov 25)');
+    expect(preseasonLine('brighton', '2026-11-22')).toBe('Pre-season – opening date TBA');
   });
 });
 

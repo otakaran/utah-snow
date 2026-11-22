@@ -1,7 +1,7 @@
 // Resort season state and report freshness (spec §5.5 "Season state", reportIsToday), shared by every resort adapter
 // and the MtnPowder parser. Pure; all clock math goes through time.ts.
 import { SEASON_FLOOR } from '../../config/resorts.ts';
-import { isoLocal, isoToMs, localDate, localParts, type When } from './time.ts';
+import { type DateStyle, formatLocalDate, isoLocal, isoToMs, localDate, localParts, type When } from './time.ts';
 import type { LiftState, ResortSnapshot } from './types.ts';
 
 const REPORT_HOUR = 3; // a report stamped before 03:00 local still describes the night before
@@ -57,4 +57,17 @@ export function reportIsToday(reportAt: When | null | undefined, now: number, lo
   const today = localDate(now);
   if (!p || p.date !== today || p.hour < REPORT_HOUR) return false;
   return localDay && DAY_RE.test(localDay) ? localDay.slice(0, 10) === today : true;
+}
+
+/**
+ * A pre-season resort's opening as the pages word it: 'projected open Nov 27' ('Fri, Nov 27' with `short`),
+ * 'projected to open today', 'opening date TBA' without a date. Once the projected day has passed and the resort
+ * is still pre-season it is 'opening delayed (was Nov 20)': a date in the past is not a projection (Alta read
+ * "projected open Nov 20" on 2026-11-22).
+ */
+export function openingText(projected: string | null, today: string, style: DateStyle = 'md'): string {
+  if (!projected) return 'opening date TBA';
+  if (projected === today) return 'projected to open today';
+  const day = formatLocalDate(projected, projected < today ? 'md' : style);
+  return projected < today ? `opening delayed (was ${day})` : `projected open ${day}`;
 }
