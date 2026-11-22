@@ -1,5 +1,7 @@
-// (b) Snowbird: the view-all-webcams page-data contentBlocks[] (page slugs, Roundshot hashes), then each block's
-// buttonLink page-data for paragraph__webcam.webcamGuid (HDRelay player GUIDs) vs config/cams/snowbird.ts.
+// (b) Snowbird: the view-all-webcams page-data contentBlocks[] (page slugs, Roundshot hashes), then each distinct
+// buttonLink page-data for paragraph__webcam.webcamGuid (HDRelay player GUIDs) vs config/cams/snowbird.ts. Since
+// 2026-11 seven blocks link one modal page by anchor (`webcam-modal#snowstake`): the slug keeps the anchor, the
+// page-data URL drops it, and each page-data is fetched once.
 // The header tile (paragraph__dor_web_cam a0de9878…, an Eastern-time cam) is not ours and is ignored.
 import { SNOWBIRD_CAMS } from '../../config/cams/snowbird.ts';
 import { arr, obj, str, tryJson } from '../../src/shared/json.ts';
@@ -19,7 +21,16 @@ const BLOCKS_PATH = [
 
 const dig = (v: unknown, path: readonly (string | number)[]): unknown =>
   path.reduce<unknown>((o, k) => (typeof k === 'number' ? arr(o)[k] : obj(o)?.[k]), v);
-const slug = (path: string): string => path.replace(/\/+$/, '').split('/').pop() ?? path;
+
+/** A buttonLink or pageUrl -> its page-data URL (anchor dropped) and its slug (last segment, anchor kept). */
+export function pageDataOf(link: string): { pageDataUrl: string; slug: string } {
+  const at = link.indexOf('#');
+  const path = (at < 0 ? link : link.slice(0, at)).replace(/\/+$/, '');
+  const frag = at < 0 ? '' : link.slice(at);
+  const local = path.startsWith(ORIGIN) ? path.slice(ORIGIN.length) : path;
+  return { pageDataUrl: `${ORIGIN}/page-data${local}/page-data.json`, slug: (path.split('/').pop() ?? path) + frag };
+}
+const slug = (link: string): string => pageDataOf(link).slug;
 const hashOf = (url: string): string | undefined => ROUNDSHOT_RE.exec(url)?.[1];
 
 export async function checkSnowbird(): Promise<SiteResult> {
@@ -32,6 +43,7 @@ export async function checkSnowbird(): Promise<SiteResult> {
   // Page values are labelled with the block title, config values with the cam id.
   const labels: Record<string, string> = {};
   const live = { pages: [] as string[], guids: [] as string[], hashes: [] as string[] };
+  const fetched = new Set<string>();
   for (const b of blocks) {
     const title = str(b.title) ?? '(untitled)';
     const hash = hashOf(str(obj(b.staticImageUrl)?.uri) ?? '');
@@ -41,15 +53,16 @@ export async function checkSnowbird(): Promise<SiteResult> {
     }
     const link = str(b.buttonLink);
     if (!link) continue;
-    live.pages.push(slug(link));
-    labels[slug(link)] = title;
-    const sub = await get(`${ORIGIN}/page-data${link.replace(/\/+$/, '')}/page-data.json`, {
-      accept: 'application/json',
-    });
+    const { pageDataUrl, slug: s } = pageDataOf(link);
+    live.pages.push(s);
+    labels[s] = title;
+    if (fetched.has(pageDataUrl)) continue;
+    fetched.add(pageDataUrl);
+    const sub = await get(pageDataUrl, { accept: 'application/json' });
     if (!sub.ok) return pageFailed(r, `${link} page-data`, sub);
     for (const g of capture(sub.text, GUID_RE).filter((g) => g !== HEADER_CAM)) {
       live.guids.push(g);
-      labels[g] = title;
+      labels[g] = s.split('#')[0] ?? s;
     }
   }
 
