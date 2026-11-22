@@ -13,6 +13,7 @@ import {
   isoUtc,
   localDate,
   localHM,
+  MIN,
   monthNum,
   zonedToUtc,
 } from '../../../shared/time.ts';
@@ -22,7 +23,8 @@ import { str } from './raw.ts';
 export interface PostFacts {
   id: number;
   ms: number;
-  at: string; // date_gmt + 'Z'
+  at: string; // date_gmt + 'Z'; the state logic reads only this (an edited old closure post stays old)
+  editedAt?: string; // modified_gmt + 'Z' when over EDIT_MIN after date_gmt (UDOT re-uses posts yearly); display only
   link: string;
   site: string; // hostname
   text: string; // display text, one line per paragraph
@@ -75,6 +77,7 @@ const ADV_DATE_RE =
   /\b(?:THROUGH|UNTIL|COMPLETE(?: IN)?)\s+(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[A-Z]*\.?\s+(\d{1,2})\b/g;
 const ROUTE_RE = /\b(I|SR|US)-?\s?(\d{1,3})\b/;
 const ADVISORY_DEFAULT_DAYS = 60;
+const EDIT_MIN = 10;
 
 /** Resorts reported FULL in uppercased text ('PARKING IN ALTA IS NOW FULL'). */
 export const parkingIn = (upper: string): ResortId[] => [
@@ -142,6 +145,9 @@ export function classifyPost(post: unknown, site: string): PostFacts | null {
   const ms = isoToMs(at);
   const id = Number(p?.id);
   if (!p || ms === null || !Number.isFinite(id)) return null;
+  const mod = `${str(p.modified_gmt).replace(/Z$/, '')}Z`;
+  const modMs = isoToMs(mod);
+  const editedAt = modMs !== null && modMs > ms + EDIT_MIN * MIN ? mod : null;
   const text = postText(html);
   const U = text.toUpperCase();
   const all = sentences(text);
@@ -177,6 +183,7 @@ export function classifyPost(post: unknown, site: string): PostFacts | null {
     id,
     ms,
     at,
+    ...(editedAt ? { editedAt } : {}),
     link: str(p.link),
     site: site.replace(/^https?:\/\//, ''),
     text: text.length > 600 ? `${text.slice(0, 599).trimEnd()}…` : text,

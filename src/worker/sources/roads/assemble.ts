@@ -153,7 +153,15 @@ export function assembleCorridor(inp: CorridorInput): RoadStatus {
     reason,
     headline: headline.slice(0, 300),
     latestPost: lp
-      ? { id: lp.id, at: lp.at, text: lp.text, link: lp.link, site: lp.site, state: lp.state }
+      ? {
+          id: lp.id,
+          at: lp.at,
+          ...(lp.editedAt ? { editedAt: lp.editedAt } : {}),
+          text: lp.text,
+          link: lp.link,
+          site: lp.site,
+          state: lp.state,
+        }
       : up
         ? null
         : (prev?.latestPost ?? null),

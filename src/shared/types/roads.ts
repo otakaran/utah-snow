@@ -22,7 +22,8 @@ export interface RoadStatus {
   headline: string;
   latestPost: {
     id: number;
-    at: string;
+    at: string; // date_gmt: first publication
+    editedAt?: string; // modified_gmt when edited later (UDOT re-uses posts); display only, absent in older rows
     text: string;
     link: string;
     site: string;

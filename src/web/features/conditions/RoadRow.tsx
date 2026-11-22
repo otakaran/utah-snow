@@ -39,7 +39,7 @@ function Post({ post, now }: { post: NonNullable<RoadStatus['latestPost']>; now:
   return (
     <div class="cond-post">
       <a class="cond-link" href={post.link} {...external}>
-        UDOT post · {ageSince(post.at, now)} ↗
+        UDOT post · {post.editedAt ? `updated ${ageSince(post.editedAt, now)}` : ageSince(post.at, now)} ↗
       </a>
       <p>“{postSnippet(post.text)}”</p>
     </div>

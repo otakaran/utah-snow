@@ -106,6 +106,17 @@ describe('classifyPost: spec sentences (§5.6)', () => {
     expect(f?.advisory && localDate(f.advisory.until)).toBe('2026-12-08'); // 'late Spring' beats 'through Oct. 15'
   });
 
+  it('carries a later modified_gmt as editedAt for display; the state keeps date_gmt', () => {
+    const raw = {
+      ...post('<p>SR-224 will close for the season</p>', '2025-11-30T23:19:04'),
+      modified_gmt: '2026-11-19T23:59:30',
+    };
+    const f = classifyPost(raw, CC);
+    expect([f?.at, f?.editedAt]).toEqual(['2025-11-30T23:19:04Z', '2026-11-19T23:59:30Z']);
+    const same = classifyPost({ ...raw, modified_gmt: '2025-11-30T23:19:04' }, CC);
+    expect(same && 'editedAt' in same).toBe(false);
+  });
+
   it('rejects malformed posts', () => {
     expect(classifyPost({ id: 1, content: { rendered: 'x' } }, CC)).toBeNull();
     expect(classifyPost('nope', CC)).toBeNull();
